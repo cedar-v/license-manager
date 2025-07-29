@@ -1,0 +1,20 @@
+server:
+  port: 8080
+  host: "0.0.0.0"
+
+database:
+  type: "postgres"  # postgres or mysql
+  host: "localhost"
+  port: 5432
+  name: "license_manager"
+  user: "postgres"
+  password: "password"
+  ssl_mode: "disable"
+
+security:
+  hmac_secret: "your-secret-key-here"
+  jwt_secret: "your-jwt-secret-here"
+
+logging:
+  level: "info"  # debug, info, warn, error
+  format: "json"  # json or text
