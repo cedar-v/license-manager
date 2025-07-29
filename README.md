@@ -1,86 +1,86 @@
-# License Manager
+# 软件授权管理平台
 
-[English](README.md) | [中文](README_ZH.md)
+[中文](README.md) | [English](README_EN.md) 
 
 ---
 
-## Overview
+## 项目概述
 
-License Manager is an independent software licensing platform that provides license code generation, distribution, validation, and management services for IoT platforms and other software systems. It offers both online and offline licensing modes with hardware-based binding for enhanced security.
+软件授权管理平台是一个独立的软件授权管理系统，为IoT平台等软件系统提供授权码生成、分发、验证和管理服务。支持在线和离线两种授权模式，基于硬件绑定的授权机制确保安全性。
 
-## Key Features
+## 核心功能
 
-- 🔧 **Customer Management**: Complete customer information management with status control
-- 🔐 **License Generation**: Online/offline license modes with hardware fingerprinting
-- 📊 **License Management**: Real-time status monitoring and license lifecycle management
-- 📦 **Deployment Packages**: Automatic generation of deployment packages with configurations
-- 🌐 **API Services**: RESTful APIs for validation, activation, and heartbeat monitoring
-- ⚙️ **System Management**: Admin authentication and monitoring dashboard
-- 🛠️ **Cross-platform Tools**: Hardware information extraction tools for multiple platforms
+- 🔧 **客户管理**：完整的客户信息管理和状态控制
+- 🔐 **授权生成**：在线/离线授权模式，支持硬件指纹绑定
+- 📊 **授权管理**：实时状态监控和授权生命周期管理
+- 📦 **部署包生成**：自动生成包含配置的部署包
+- 🌐 **API服务**：提供验证、激活、心跳监控等RESTful API
+- ⚙️ **系统管理**：管理员认证和监控仪表盘
+- 🛠️ **跨平台工具**：多平台硬件信息获取工具
 
-## Technical Stack
+## 技术栈
 
-- **Frontend**: Vue.js 3+ with modern UI components
-- **Backend**: Go 1.23+ with Gorilla Mux router and Logrus logging
-- **Database**: PostgreSQL 12+ / MySQL 12+
-- **Configuration**: YAML format configuration files
-- **Deployment**: Docker, single machine, or system service
+- **前端**：Vue.js 3+ 配合现代化UI组件
+- **后端**：Go 1.23+ 使用Gorilla Mux路由和Logrus日志
+- **数据库**：PostgreSQL 12+ / MySQL 12+
+- **配置**：YAML格式配置文件
+- **部署**：Docker、单机部署或系统服务
 
-## API Endpoints
+## API接口
 
 ```
-POST /api/validate      - License validation
-POST /api/activate      - License activation
-POST /api/heartbeat     - Heartbeat reporting
-GET  /api/license/{code} - License information query
-GET  /api/customers     - Customer list API
-GET  /tools/{tool}      - Tool download
+POST /api/validate      - 授权验证
+POST /api/activate      - 授权激活
+POST /api/heartbeat     - 心跳上报
+GET  /api/license/{code} - 授权信息查询
+GET  /api/customers     - 客户列表API
+GET  /tools/{tool}      - 工具下载
 ```
 
-## Security & Performance
+## 安全与性能
 
-- **Security**: HMAC-SHA256 signing, hardware fingerprint binding, HTTPS encryption
-- **Performance**: Supports 100+ concurrent users with <2s API response time
-- **Reliability**: Comprehensive error handling and logging
+- **安全特性**：HMAC-SHA256签名，硬件指纹绑定，HTTPS传输加密
+- **性能表现**：支持100+并发用户，API响应时间<2秒
+- **可靠性**：完善的错误处理和日志记录
 
-## Installation
+## 安装部署
 
 ```bash
-# Clone the repository
+# 克隆项目
 git clone <repository-url>
 cd license-manager
 
-# Build the application
+# 构建应用
 go build -o license-manager
 
-# Configure the application
+# 配置应用
 cp config.example.yaml config.yaml
-# Edit config.yaml with your settings
+# 编辑 config.yaml 配置文件
 
-# Run the application
+# 运行应用
 ./license-manager
 ```
 
-## Docker Deployment
+## Docker部署
 
 ```bash
-# Build Docker image
+# 构建Docker镜像
 docker build -t license-manager .
 
-# Run with Docker
+# 使用Docker运行
 docker run -p 8080:8080 -v $(pwd)/config.yaml:/app/config.yaml license-manager
 ```
 
-## License
+## 开源许可证
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+本项目采用GNU通用公共许可证v3.0 - 详见[LICENSE](LICENSE)文件。
 
 ---
 
-## Contributing
+## 贡献
 
-We welcome contributions! Please feel free to submit a Pull Request.
+欢迎贡献代码！请随时提交Pull Request。
 
-## Support
+## 支持
 
-If you have any questions or need support, please open an issue.
+如有任何问题或需要支持，请提交issue。 
