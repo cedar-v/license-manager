@@ -1,0 +1,115 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [ main ]
+    paths: 
+      - 'backend/**'
+      - 'Dockerfile'
+      - '.github/workflows/deploy_backend.yml'
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: license-manager-backend
+  CONTAINER_NAME: license-manager
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.23'
+
+    - name: Build and test backend
+      run: |
+        cd backend
+        go mod tidy
+        go mod verify
+        go test ./...
+        go build -ldflags="-s -w" -o license-manager cmd/main.go
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker image
+      run: |
+        docker build -f Dockerfile.backend -t ${{ env.IMAGE_NAME }}:latest .
+        docker save ${{ env.IMAGE_NAME }}:latest > backend-image.tar
+
+    - name: Copy files to server
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.HOST_1 }}
+        username: root
+        password: ${{ secrets.PASS_1 }}
+        port: 22
+        source: "backend-image.tar,backend/configs/config.example.yaml"
+        target: "/opt/license-manager/"
+
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST_1 }}
+        username: root
+        password: ${{ secrets.PASS_1 }}
+        port: 22
+        script: |
+          cd /opt/license-manager
+          
+          # Stop and remove existing container
+          docker stop ${{ env.CONTAINER_NAME }} || true
+          docker rm ${{ env.CONTAINER_NAME }} || true
+          
+          # Load new image
+          docker load < backend-image.tar
+          
+          # Remove old image
+          docker rmi ${{ env.IMAGE_NAME }}:old || true
+          docker tag ${{ env.IMAGE_NAME }}:latest ${{ env.IMAGE_NAME }}:old || true
+          
+          # Create config file if not exists
+          if [ ! -f config.yaml ]; then
+            cp backend/configs/config.example.yaml config.yaml
+            echo "Created config.yaml from example. Please review and update configuration."
+          fi
+          
+          # Run new container
+          docker run -d \
+            --name ${{ env.CONTAINER_NAME }} \
+            --restart unless-stopped \
+            -p 18888:18888 \
+            -v /opt/license-manager/config.yaml:/app/config.yaml \
+            -v /opt/license-manager/logs:/app/logs \
+            ${{ env.IMAGE_NAME }}:latest
+          
+          # Clean up
+          rm -f backend-image.tar
+          docker image prune -f
+          
+          # Check deployment status
+          sleep 5
+          if docker ps | grep -q ${{ env.CONTAINER_NAME }}; then
+            echo "✅ Deployment successful! Container is running."
+            docker logs --tail 10 ${{ env.CONTAINER_NAME }}
+          else
+            echo "❌ Deployment failed! Container is not running."
+            docker logs ${{ env.CONTAINER_NAME }}
+            exit 1
+          fi
+
+    - name: Health check
+      run: |
+        sleep 10
+        response=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.HOST_1 }}:18888/api/v1/system/health || echo "000")
+        if [ "$response" = "200" ]; then
+          echo "✅ Health check passed! Service is responding."
+        else
+          echo "⚠️  Health check returned status: $response"
+          echo "Service may still be starting up..."
+        fi
