@@ -1,0 +1,20 @@
+server:
+  host: "0.0.0.0"
+  port: 18888
+  mode: "debug"  # debug, release, test 开发环境使用debug模式
+
+auth:
+  jwt:
+    secret: "license-manager-dev-secret-key-32-bytes" # 32字节的随机字符串
+    expire_hours: 1 # 1小时后过期
+    refresh_threshold_minutes: 30 # 30分钟后可刷新token
+  admin:
+    username: "admin"
+    password: "admin@123"
+  security:
+    max_login_attempts: 5 # 5次失败后锁定15分钟
+    lockout_duration_minutes: 15 # 15分钟后解锁
+
+log:
+  level: "info" # 日志级别
+  format: "text" # 日志格式

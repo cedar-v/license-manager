@@ -1,7 +1,25 @@
 server:
-  port: 8080
   host: "0.0.0.0"
+  port: 8080
+  mode: "release"  # debug, release, test
 
+auth:
+  jwt:
+    secret: "your-256-bit-secret-key-change-this-in-production"
+    expire_hours: 1
+    refresh_threshold_minutes: 30
+  admin:
+    username: "admin"
+    password: "admin@123"  # 明文密码，部署人员可修改
+  security:
+    max_login_attempts: 5
+    lockout_duration_minutes: 15
+
+log:
+  level: "info"    # debug, info, warn, error
+  format: "json"   # json, text
+
+# 数据库配置（暂未使用）
 database:
   type: "postgres"  # postgres or mysql
   host: "localhost"
@@ -10,11 +28,3 @@ database:
   user: "postgres"
   password: "password"
   ssl_mode: "disable"
-
-security:
-  hmac_secret: "your-secret-key-here"
-  jwt_secret: "your-jwt-secret-here"
-
-logging:
-  level: "info"  # debug, info, warn, error
-  format: "json"  # json or text
