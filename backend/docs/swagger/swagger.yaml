@@ -1,0 +1,212 @@
+basePath: /
+definitions:
+  models.APIResponse:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+      timestamp:
+        type: string
+    type: object
+  models.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      error:
+        type: string
+      message:
+        type: string
+      timestamp:
+        type: string
+    type: object
+  models.HealthResponse:
+    properties:
+      services:
+        additionalProperties:
+          type: string
+        type: object
+      status:
+        type: string
+      system:
+        $ref: '#/definitions/models.SystemInfo'
+      timestamp:
+        type: string
+      uptime:
+        type: string
+      version:
+        type: string
+    type: object
+  models.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  models.LoginResponse:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+    type: object
+  models.SystemInfo:
+    properties:
+      arch:
+        type: string
+      num_cpu:
+        type: integer
+      num_goroutine:
+        type: integer
+      os:
+        type: string
+      version:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: 软件授权管理平台API文档
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: License Manager API
+  version: "1.0"
+paths:
+  /api/v1/admin/system/info:
+    get:
+      consumes:
+      - application/json
+      description: 获取详细的系统信息（需要管理员权限）
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 系统信息
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取系统信息
+      tags:
+      - 系统
+  /api/v1/auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: 刷新用户Token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 刷新成功
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 刷新Token
+      tags:
+      - 认证
+  /api/v1/login:
+    post:
+      consumes:
+      - application/json
+      description: 管理员用户登录接口
+      parameters:
+      - description: 登录请求参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 登录成功
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 用户名或密码错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 用户登录
+      tags:
+      - 认证
+  /api/v1/logout:
+    post:
+      consumes:
+      - application/json
+      description: 用户登出接口
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 登出成功
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 用户登出
+      tags:
+      - 认证
+  /health:
+    get:
+      consumes:
+      - application/json
+      description: 系统健康状态检查
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 健康状态
+          schema:
+            $ref: '#/definitions/models.HealthResponse'
+      summary: 健康检测
+      tags:
+      - 系统
+securityDefinitions:
+  BearerAuth:
+    description: Bearer token for authentication
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
