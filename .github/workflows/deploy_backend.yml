@@ -111,7 +111,7 @@ jobs:
     - name: Health check
       run: |
         sleep 10
-        response=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.HOST_1 }}:18888/api/v1/system/health || echo "000")
+        response=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.HOST_1 }}:18888/health || echo "000")
         if [ "$response" = "200" ]; then
           echo "✅ Health check passed! Service is responding."
         else
