@@ -1,0 +1,16 @@
+{
+  "login": {
+    "title": "ユーザーログイン",
+    "username": "ユーザー名",
+    "usernamePlaceholder": "ユーザー名を入力してください",
+    "password": "パスワード",
+    "passwordPlaceholder": "パスワードを入力してください",
+    "remember": "パスワードを記憶する",
+    "submit": "ログイン",
+    "success": "ログインに成功しました！",
+    "error": {
+      "required": "ユーザー名とパスワードを入力してください",
+      "invalid": "ユーザー名またはパスワードが間違っています"
+    }
+  }
+}
