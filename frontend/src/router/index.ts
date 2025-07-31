@@ -24,7 +24,7 @@ const router = createRouter({
 });
 
 // 路由守卫
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   // 设置页面标题
   document.title = typeof(to.meta.title) === "string" ? to.meta.title : "授权管理平台";
   
