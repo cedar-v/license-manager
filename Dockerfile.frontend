@@ -1,9 +1,11 @@
 # Multi-stage build for frontend
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 COPY frontend/package*.json ./
-RUN npm ci
+
+# Update npm to latest version and install dependencies
+RUN npm install -g npm@latest && npm ci
 
 COPY frontend/ ./
 RUN npm run prod
@@ -19,6 +21,9 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Create log directory
 RUN mkdir -p /var/log/nginx
+
+# Install curl for health check
+RUN apk add --no-cache curl
 
 # Expose port
 EXPOSE 80
