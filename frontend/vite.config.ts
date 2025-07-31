@@ -49,10 +49,10 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       https: false, // 不启用HTTPS
       cors: true, // 启用CORS
       proxy: { // 代理配置
-        "/test": {
-          target: "http://47.92.24.89:16008", // 目标服务器
+        "/devApi": {
+          target: "http://104.156.140.42:18888", // 目标服务器
           changeOrigin: true, // 修改请求头中的origin为目标URL
-          rewrite: path => path.replace(/^\/test/, "") // 路径重写
+          rewrite: path => path.replace(/^\/devApi/, "") // 路径重写
         },
       }
     },

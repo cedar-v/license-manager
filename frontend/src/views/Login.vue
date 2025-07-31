@@ -88,6 +88,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { Login, type LoginRequest } from "@/api/user";
 
 const router = useRouter();
 
@@ -104,32 +105,47 @@ function handleForgotPassword() {
   alert("忘记密码功能暂未实现");
 }
 
-function handleLogin() {
+async function handleLogin() {
   if (!username.value || !password.value) {
     errorMsg.value = "请输入用户名和密码";
     return;
   }
 
-  if (username.value === "admin" && password.value === "123456") {
+  try {
     errorMsg.value = "";
     
-    localStorage.setItem("token", "mock-jwt-token-12345");
+    const loginData: LoginRequest = {
+      username: username.value,
+      password: password.value
+    };
     
-    if (rememberMe.value) {
-      localStorage.setItem(
-        "loginInfo",
-        JSON.stringify({
-          username: username.value,
-          password: password.value,
-        })
-      );
+    const response = await Login(loginData);
+    
+    if (response.code === 200) {
+      // 登录成功
+      if (response.data && response.data.token) {
+        localStorage.setItem("token", response.data.token);
+      }
+      
+      if (rememberMe.value) {
+        localStorage.setItem(
+          "loginInfo",
+          JSON.stringify({
+            username: username.value,
+            password: password.value,
+          })
+        );
+      } else {
+        localStorage.removeItem("loginInfo");
+      }
+      
+      router.push("/dashboard");
     } else {
-      localStorage.removeItem("loginInfo");
+      errorMsg.value = response.message || "登录失败";
     }
-    
-    router.push("/dashboard");
-  } else {
-    errorMsg.value = "用户名或密码错误";
+  } catch (error: any) {
+    console.error("登录错误:", error);
+    errorMsg.value = error.response?.data?.message || "登录失败，请稍后重试";
   }
 }
 </script>
@@ -213,10 +229,12 @@ function handleLogin() {
   backdrop-filter: blur(40px);
   box-shadow: -6px 0px 30px 0px rgba(63, 139, 255, 0.05);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   z-index: 50;
-  padding: 40px 30px;
+  padding-top: 200px;
+  padding-left: 120px;
+  padding-right: 120px;
   box-sizing: border-box;
 }
 
@@ -226,7 +244,7 @@ function handleLogin() {
 }
 
 .title {
-  margin: 0 0 29px 0;
+  margin: 0 0 63px 0;
   font-family: 'Source Han Sans CN', sans-serif;
   font-weight: 700;
   font-size: 44px;
@@ -235,7 +253,7 @@ function handleLogin() {
 }
 
 .subtitle {
-  margin: 0 0 72px 0;
+  margin: 0 0 36px 0;
   font-family: 'Source Han Sans CN', sans-serif;
   font-weight: 500;
   font-size: 24px;
@@ -249,6 +267,10 @@ function handleLogin() {
 
 .form-group {
   margin-bottom: 40px;
+}
+
+.form-group:last-of-type {
+  margin-bottom: 16px;
 }
 
 .input-container {
@@ -305,7 +327,7 @@ input::placeholder {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 96px;
+  margin-bottom: 60px;
   height: 20px;
 }
 

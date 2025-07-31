@@ -18,9 +18,11 @@ const Axios = axios.create({
 })
 // 添加请求拦截器
 Axios.interceptors.request.use(config => {
-  const token = localStorage.getItem('blockchain_special_token')
-  // 自定义请求头携带token
-  if(token){ config.headers['token'] = token}
+  const token = localStorage.getItem('token')
+  // 自定义请求头携带token (Bearer认证)
+  if(token){ 
+    config.headers['Authorization'] = `Bearer ${token}`
+  }
   return config
 })
 // 添加响应拦截器
@@ -35,8 +37,11 @@ Axios.interceptors.response.use(response => {
     return Promise.reject(new Error("非本系统的接口"))
   } else {
     switch (code) {
+      case 200:
+        // code === 200 代表成功
+        return apiData
       case 0:
-        // code === 0 代表没有错误
+        // code === 0 也代表成功 (兼容)
         return apiData
       default:
         // 不是正确的 Code
