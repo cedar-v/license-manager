@@ -8,7 +8,13 @@ COPY frontend/package.json ./
 RUN npm install
 
 COPY frontend/ ./
-RUN npm run prod
+
+# Set build environment variables
+ENV VITE_OUTDIR=dist
+ENV VITE_ADDRESS_BASE_URL=/
+
+# Build the project and verify output
+RUN npm run prod && ls -la && ls -la dist/
 
 # Production stage with Nginx
 FROM nginx:alpine
