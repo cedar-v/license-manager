@@ -1,10 +1,15 @@
 <template>
-  <!-- 路由出口 -->
-  <router-view></router-view>
+  <div id="app">
+    <router-view />
+  </div>
 </template>
- 
+
 <script setup lang="ts">
-console.log(import.meta.env.VITE_API_BASE_URL)
+// 根组件，只负责渲染路由视图
 </script>
- 
-<style scoped></style>
+
+<style>
+#app {
+  height: 100%;
+}
+</style>

@@ -1,32 +1,43 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
- 
-// 路由类型:RouteRecordRaw
+
+// 路由配置
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    component: () => import("@/view/Home.vue"),
-    meta: { title: '首页' }
+    redirect: "/login"
   },
   {
     path: "/login",
-    component: () => import("@/view/login.vue"),
-    meta: { title: '登录' }
+    component: () => import("@/views/Login.vue"),
+    meta: { title: "登录" }
   },
   {
-    path: "/register",
-    component: () => import("@/view/register.vue"),
-    meta: { title: '注册' }
-  },
+    path: "/dashboard",
+    component: () => import("@/views/Dashboard.vue"),
+    meta: { title: "仪表板", requiresAuth: true }
+  }
 ];
- 
+
 const router = createRouter({
-  // 路由模式
   history: createWebHistory(),
   routes,
 });
 
-router.beforeEach(async(to) => {
-  document.title = typeof(to.meta.title) === "string" ? to.meta.title : ""
-})
- 
+// 路由守卫
+router.beforeEach((to, from, next) => {
+  // 设置页面标题
+  document.title = typeof(to.meta.title) === "string" ? to.meta.title : "授权管理平台";
+  
+  // 检查是否需要认证
+  if (to.meta.requiresAuth) {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      next("/login");
+      return;
+    }
+  }
+  
+  next();
+});
+
 export default router;

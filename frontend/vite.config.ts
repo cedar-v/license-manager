@@ -2,13 +2,10 @@ import { ConfigEnv, UserConfig, defineConfig, loadEnv } from 'vite'
 import viteCompression from 'vite-plugin-compression'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
-import postCssPxToRem from "postcss-pxtorem"  // px转rem插件
 import { visualizer } from 'rollup-plugin-visualizer' // 打包分析插件
-// import eslintPlugin from 'vite-plugin-eslint' // 如需ESLint支持可解注
 
 // 获取当前时间戳，用于构建输出的文件名
 const Timestamp = new Date().getTime();
-
 
 // 路径解析辅助函数
 function _resolve(dir: string) {
@@ -29,15 +26,13 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     plugins: [
       // Vue插件
       vue(),
-      // 如需ESLint支持可启用以下插件
-      // eslintPlugin(),  
 
       // Gzip压缩插件（仅生产环境启用）
       viteCompression({
         verbose: true, // 显示压缩日志
         disable: !isProd, // 非生产环境禁用
         deleteOriginFile: false, // 不删除源文件
-        threshold: 10240, // 文件大于10KB才压缩
+        threshold: 10240, // 文件大小10KB才压缩
         algorithm: 'gzip', // 压缩算法
         ext: '.gz', // 压缩文件扩展名
       }),
@@ -59,7 +54,6 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
           changeOrigin: true, // 修改请求头中的origin为目标URL
           rewrite: path => path.replace(/^\/test/, "") // 路径重写
         },
-        // 可以继续添加其他代理规则
       }
     },
 
@@ -103,24 +97,6 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
           assetFileNames: `static/[ext]/[name]-[hash]${Timestamp}.[ext]`,
         }
       }
-    },
-
-    // CSS相关配置
-    css: {
-      preprocessorOptions: { // 预处理器配置
-        scss: {
-          // 全局注入scss变量文件
-          additionalData: `@import "@assets/styles/variables.scss";`
-        }
-      },
-      postcss: { // PostCSS插件
-        plugins: [
-          postCssPxToRem({ // px转rem插件配置
-            rootValue: 192, // 设计稿宽度/10（假设设计稿1920px）
-            propList: ["*", "!border"], // 转换所有属性，除了border
-          })
-        ]
-      },
     },
 
     // JSON文件处理配置
