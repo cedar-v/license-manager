@@ -3,9 +3,11 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"license-manager/internal/models"
 	"license-manager/internal/service"
+	"license-manager/pkg/errors"
+
+	"github.com/gin-gonic/gin"
 )
 
 type AuthHandler struct {
@@ -34,10 +36,11 @@ func NewAuthHandler(authService service.AuthService) *AuthHandler {
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req models.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Code:      http.StatusBadRequest,
-			Error:     "INVALID_REQUEST",
-			Message:   "请求参数无效",
+		status, errCode, message := errors.NewErrorResponse(errors.CodeBadRequest)
+		c.JSON(status, models.ErrorResponse{
+			Code:      status,
+			Error:     errCode,
+			Message:   message,
 			Timestamp: getCurrentTimestamp(),
 		})
 		return
@@ -49,10 +52,10 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		if err.Error() == "配置未初始化" {
 			statusCode = http.StatusInternalServerError
 		}
-		
+
 		c.JSON(statusCode, models.ErrorResponse{
 			Code:      statusCode,
-			Error:     "LOGIN_FAILED",
+			Error:     errors.CodeLoginFailed,
 			Message:   err.Error(),
 			Timestamp: getCurrentTimestamp(),
 		})
@@ -101,10 +104,11 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	// 从请求头获取Token
 	token := extractTokenFromHeader(c)
 	if token == "" {
-		c.JSON(http.StatusUnauthorized, models.ErrorResponse{
-			Code:      http.StatusUnauthorized,
-			Error:     "TOKEN_MISSING",
-			Message:   "认证令牌缺失",
+		status, errCode, message := errors.NewErrorResponse(errors.CodeAuthMissing)
+		c.JSON(status, models.ErrorResponse{
+			Code:      status,
+			Error:     errCode,
+			Message:   message,
 			Timestamp: getCurrentTimestamp(),
 		})
 		return
@@ -112,10 +116,17 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 
 	newToken, err := h.authService.RefreshToken(token)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, models.ErrorResponse{
-			Code:      http.StatusUnauthorized,
-			Error:     "TOKEN_REFRESH_FAILED",
-			Message:   "刷新令牌失败",
+		// 根据错误类型选择合适的认证错误码
+		errorCode := errors.CodeAuthExpired // token过期，可以刷新
+		if err.Error() == "token无效" {
+			errorCode = errors.CodeAuthInvalid // token无效，需要重新登录
+		}
+
+		status, errCode, message := errors.NewErrorResponse(errorCode, err.Error())
+		c.JSON(status, models.ErrorResponse{
+			Code:      status,
+			Error:     errCode,
+			Message:   message,
 			Timestamp: getCurrentTimestamp(),
 		})
 		return

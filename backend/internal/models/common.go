@@ -10,8 +10,8 @@ type APIResponse struct {
 
 // ErrorResponse 错误响应结构
 type ErrorResponse struct {
-	Code      int    `json:"code"`
-	Error     string `json:"error"`
-	Message   string `json:"message"`
-	Timestamp string `json:"timestamp"`
+	Code      int    `json:"code"`      // HTTP状态码，如 401, 500
+	Error     string `json:"error"`     // 业务错误码，如 AUTH_001, LOGIN_FAILED
+	Message   string `json:"message"`   // 错误描述信息
+	Timestamp string `json:"timestamp"` // 错误发生时间
 }

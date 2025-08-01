@@ -234,15 +234,19 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "code": {
+                    "description": "HTTP状态码，如 401, 500",
                     "type": "integer"
                 },
                 "error": {
+                    "description": "业务错误码，如 AUTH_001, LOGIN_FAILED",
                     "type": "string"
                 },
                 "message": {
+                    "description": "错误描述信息",
                     "type": "string"
                 },
                 "timestamp": {
+                    "description": "错误发生时间",
                     "type": "string"
                 }
             }
