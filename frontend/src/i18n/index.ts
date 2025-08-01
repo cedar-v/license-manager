@@ -2,14 +2,14 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-07-29 14:57:17
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-07-29 15:51:27
+ * @LastEditTime: 2025-07-31 15:04:43
  * @FilePath: /vue-demo3.0/src/i18n/index.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import { createI18n, type Composer } from 'vue-i18n'
 import { nextTick } from 'vue'
 
-type SupportedLocale = 'zh-CN' | 'en-US' | 'ja-JP'
+export type SupportedLocale = 'zh-CN' | 'en-US' | 'ja-JP'
 
 const DEFAULT_LOCALE: SupportedLocale = 'zh-CN'
 const SUPPORTED_LOCALES: SupportedLocale[] = ['zh-CN', 'en-US', 'ja-JP']
