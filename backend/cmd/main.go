@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/gin-gonic/gin"
 	"license-manager/internal/api/routes"
 	"license-manager/internal/config"
+	"license-manager/internal/database"
 	"license-manager/pkg/logger"
+
+	"github.com/gin-gonic/gin"
 )
 
 // @title License Manager API
@@ -32,7 +34,7 @@ import (
 
 func main() {
 	// 加载配置
-	if err := config.Load(""); err != nil {
+	if err := config.Load("../configs/config.yaml"); err != nil {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
@@ -43,7 +45,18 @@ func main() {
 	log.Info("启动 License Manager 服务器...")
 
 	cfg := config.GetConfig()
-	
+
+	// 初始化数据库
+	if err := database.InitDatabase(&cfg.Database); err != nil {
+		log.Fatalf("数据库初始化失败: %v", err)
+	}
+	defer database.Close()
+
+	// 运行数据库迁移
+	if err := database.RunMigrationIfEnabled(); err != nil {
+		log.Fatalf("数据库迁移失败: %v", err)
+	}
+
 	// 设置Gin模式
 	gin.SetMode(cfg.Server.Mode)
 
@@ -53,7 +66,7 @@ func main() {
 	// 启动服务器
 	addr := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
 	log.Infof("服务器启动在 %s", addr)
-	
+
 	if err := router.Run(addr); err != nil {
 		log.Fatalf("服务器启动失败: %v", err)
 	}

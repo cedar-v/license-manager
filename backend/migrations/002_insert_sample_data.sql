@@ -8,11 +8,13 @@ VALUES (YEAR(NOW()), 5)
 ON DUPLICATE KEY UPDATE sequence_number = 5;
 
 -- 插入示例客户数据
+-- 注意：created_at和updated_at将由应用程序自动设置，这里不需要指定
 INSERT INTO customers (
     customer_code, customer_name, customer_type, 
     contact_person, contact_title, email, phone, 
     address, company_size, preferred_license_type, 
-    customer_level, status, description, created_by
+    customer_level, status, description, 
+    created_at, updated_at, created_by
 ) VALUES 
 -- 示例1：VIP企业客户
 (
@@ -29,7 +31,7 @@ INSERT INTO customers (
     'vip', 
     'active', 
     '重要客户，IoT平台采购方，需要优先技术支持', 
-    UUID()
+    NOW(3), NOW(3), UUID()
 ),
 -- 示例2：普通个人客户
 (
@@ -46,7 +48,7 @@ INSERT INTO customers (
     'normal', 
     'active', 
     '个人开发者，主要用于学习和小型项目', 
-    UUID()
+    NOW(3), NOW(3), UUID()
 ),
 -- 示例3：政府客户
 (
@@ -63,7 +65,7 @@ INSERT INTO customers (
     'enterprise', 
     'active', 
     '政府客户，智慧城市项目，需要专项技术支持', 
-    UUID()
+    NOW(3), NOW(3), UUID()
 ),
 -- 示例4：教育客户
 (
@@ -80,7 +82,7 @@ INSERT INTO customers (
     'strategic', 
     'active', 
     '重点高校合作伙伴，科研项目合作，享受教育优惠政策', 
-    UUID()
+    NOW(3), NOW(3), UUID()
 ),
 -- 示例5：禁用状态的客户
 (
@@ -97,5 +99,5 @@ INSERT INTO customers (
     'normal', 
     'disabled', 
     '测试客户，已禁用，用于演示禁用状态', 
-    UUID()
+    NOW(3), NOW(3), UUID()
 );

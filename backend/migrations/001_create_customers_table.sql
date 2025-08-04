@@ -32,11 +32,12 @@ CREATE TABLE customers (
     status VARCHAR(20) NOT NULL DEFAULT 'active' COMMENT '状态: active, disabled',
     description TEXT,
     
-    -- 时间字段
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    -- 时间字段 (使用DATETIME(3)匹配Go的time.Time和GORM的精度要求)
+    created_at DATETIME(3) NOT NULL,
+    updated_at DATETIME(3) NOT NULL,
     created_by VARCHAR(36) NOT NULL,
-    updated_by VARCHAR(36)
+    updated_by VARCHAR(36),
+    deleted_at DATETIME(3) NULL  -- 软删除字段，匹配gorm.DeletedAt
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='客户信息表';
 
 -- MySQL的列注释已在CREATE TABLE语句中添加
@@ -48,9 +49,10 @@ CREATE INDEX idx_customers_customer_level ON customers(customer_level);
 CREATE INDEX idx_customers_status ON customers(status);
 CREATE INDEX idx_customers_created_at ON customers(created_at);
 CREATE INDEX idx_customers_created_by ON customers(created_by);
+CREATE INDEX idx_customers_deleted_at ON customers(deleted_at);  -- 软删除索引，提高查询性能
 
--- MySQL自动更新时间戳功能已在表定义中通过 ON UPDATE CURRENT_TIMESTAMP 实现
--- 无需额外的触发器
+-- 注意：时间戳由Go应用程序管理，不依赖数据库默认值
+-- 这样可以确保跨数据库兼容性并符合失败快速原则
 
 -- 创建客户编码序列表
 CREATE TABLE customer_code_sequence (

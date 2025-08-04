@@ -3,12 +3,13 @@
 ## 技术栈选择
 
   Web框架: Gin
-  ORM: GORM
+  ORM: GORM,开发环境使用Auto Migration
   配置: Viper
   日志: logrus
   认证: JWT
   缓存: Redis (可选)
   数据库: PostgreSQL/MySQL
+  
 
 ## 目录结构
 

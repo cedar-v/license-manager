@@ -3,6 +3,21 @@ server:
   port: 18888
   mode: "debug"  # debug, release, test 开发环境使用debug模式
 
+database:
+  driver: "mysql"
+  host: "104.156.140.42"
+  port: 13306
+  username: "root"
+  password: "root@123"
+  database: "license_manager"
+  charset: "utf8mb4"
+  parse_time: true
+  loc: "Local"
+  max_idle_conns: 10
+  max_open_conns: 100
+  conn_max_lifetime: 3600 # 连接最大生存时间(秒)
+  auto_migrate: true # 是否自动迁移数据库
+
 auth:
   jwt:
     secret: "license-manager-dev-secret-key-32-bytes" # 32字节的随机字符串

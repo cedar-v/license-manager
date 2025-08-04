@@ -8,15 +8,32 @@ import (
 )
 
 type Config struct {
-	Server ServerConfig `mapstructure:"server"`
-	Auth   AuthConfig   `mapstructure:"auth"`
-	Log    LogConfig    `mapstructure:"log"`
+	Server   ServerConfig   `mapstructure:"server"`
+	Database DatabaseConfig `mapstructure:"database"`
+	Auth     AuthConfig     `mapstructure:"auth"`
+	Log      LogConfig      `mapstructure:"log"`
 }
 
 type ServerConfig struct {
 	Host string `mapstructure:"host"`
 	Port int    `mapstructure:"port"`
 	Mode string `mapstructure:"mode"`
+}
+
+type DatabaseConfig struct {
+	Driver          string `mapstructure:"driver"`
+	Host            string `mapstructure:"host"`
+	Port            int    `mapstructure:"port"`
+	Username        string `mapstructure:"username"`
+	Password        string `mapstructure:"password"`
+	Database        string `mapstructure:"database"`
+	Charset         string `mapstructure:"charset"`
+	ParseTime       bool   `mapstructure:"parse_time"`
+	Loc             string `mapstructure:"loc"`
+	MaxIdleConns    int    `mapstructure:"max_idle_conns"`
+	MaxOpenConns    int    `mapstructure:"max_open_conns"`
+	ConnMaxLifetime int    `mapstructure:"conn_max_lifetime"`
+	AutoMigrate     bool   `mapstructure:"auto_migrate"`
 }
 
 type AuthConfig struct {
@@ -85,6 +102,21 @@ func setDefaults() {
 	viper.SetDefault("server.host", "0.0.0.0")
 	viper.SetDefault("server.port", 18888)
 	viper.SetDefault("server.mode", "debug")
+
+	// Database defaults
+	viper.SetDefault("database.driver", "mysql")
+	viper.SetDefault("database.host", "localhost")
+	viper.SetDefault("database.port", 3306)
+	viper.SetDefault("database.username", "root")
+	viper.SetDefault("database.password", "password")
+	viper.SetDefault("database.database", "license_manager")
+	viper.SetDefault("database.charset", "utf8mb4")
+	viper.SetDefault("database.parse_time", true)
+	viper.SetDefault("database.loc", "Local")
+	viper.SetDefault("database.max_idle_conns", 10)
+	viper.SetDefault("database.max_open_conns", 100)
+	viper.SetDefault("database.conn_max_lifetime", 3600)
+	viper.SetDefault("database.auto_migrate", true)
 
 	// Auth defaults
 	viper.SetDefault("auth.jwt.secret", "license-manager-default-secret-key")
