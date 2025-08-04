@@ -36,7 +36,7 @@ func NewAuthHandler(authService service.AuthService) *AuthHandler {
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req models.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		status, errCode, message := errors.NewErrorResponse(errors.CodeBadRequest)
+		status, errCode, message := errors.NewErrorResponse("900001")
 		c.JSON(status, models.ErrorResponse{
 			Code:      status,
 			Error:     errCode,
@@ -48,15 +48,16 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	data, err := h.authService.Login(&req)
 	if err != nil {
-		statusCode := http.StatusUnauthorized
+		errorCode := "100003" // 登录失败
 		if err.Error() == "配置未初始化" {
-			statusCode = http.StatusInternalServerError
+			errorCode = "900004" // 服务器内部错误
 		}
 
-		c.JSON(statusCode, models.ErrorResponse{
-			Code:      statusCode,
-			Error:     errors.CodeLoginFailed,
-			Message:   err.Error(),
+		status, errCode, message := errors.NewErrorResponse(errorCode, err.Error())
+		c.JSON(status, models.ErrorResponse{
+			Code:      status,
+			Error:     errCode,
+			Message:   message,
 			Timestamp: getCurrentTimestamp(),
 		})
 		return
@@ -104,7 +105,7 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	// 从请求头获取Token
 	token := extractTokenFromHeader(c)
 	if token == "" {
-		status, errCode, message := errors.NewErrorResponse(errors.CodeAuthMissing)
+		status, errCode, message := errors.NewErrorResponse("100004")
 		c.JSON(status, models.ErrorResponse{
 			Code:      status,
 			Error:     errCode,
@@ -117,9 +118,9 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	newToken, err := h.authService.RefreshToken(token)
 	if err != nil {
 		// 根据错误类型选择合适的认证错误码
-		errorCode := errors.CodeAuthExpired // token过期，可以刷新
+		errorCode := "100001" // token过期，可以刷新
 		if err.Error() == "token无效" {
-			errorCode = errors.CodeAuthInvalid // token无效，需要重新登录
+			errorCode = "100002" // token无效，需要重新登录
 		}
 
 		status, errCode, message := errors.NewErrorResponse(errorCode, err.Error())

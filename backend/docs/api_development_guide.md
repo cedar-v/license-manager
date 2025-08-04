@@ -1,43 +1,50 @@
-# API开发规范
+# API 开发规范
 
-## 注意
+## 设计原则
 
-- 中文回复
-- 数据访问层和业务逻辑层不要混淆，数据访问层只负责数据访问，业务逻辑层只负责业务逻辑。
-- 要保证复用性，不要写重复的代码。
-- 要保证可维护性，不要写难以维护的代码。
-- 要保证可扩展性，不要写难以扩展的代码。
+遵循系统设计理念，通过代码结构和命名体现设计思路：
+
+- **分层架构**：明确职责边界，保持高内聚低耦合
+- **代码即文档**：通过良好的命名和结构让代码自己说话
+- **渐进式复杂度**：从简单到复杂的实现路径
+- **失败快速原则**：早期验证，明确错误
 
 ## 目录结构规范
 
 ### 分层架构
+
 ```
 internal/
-├── models/          # 数据模型层
-├── service/         # 业务逻辑层  
-├── repository/      # 数据访问层
-└── api/handlers/    # HTTP处理层
+├── models/          # 数据模型层：结构体定义、验证规则
+├── service/         # 业务逻辑层：核心业务规则实现
+├── repository/      # 数据访问层：数据库、缓存操作
+└── api/handlers/    # HTTP处理层：请求处理、响应格式化
 ```
 
-### 职责划分
-- **Models**: 定义请求/响应结构体，数据验证规则
-- **Service**: 实现业务逻辑，处理业务规则
-- **Repository**: 数据库操作，缓存操作
-- **Handler**: HTTP请求处理，参数绑定，响应格式化
+### 职责边界
 
-## 文件命名规范
+每层专注单一职责，避免跨层调用：
 
-### 模块分组
-按业务模块组织文件：
+- **Models**：数据结构定义，输入验证规则，响应格式规范
+- **Service**：业务规则实现，数据处理逻辑，跨模块协调
+- **Repository**：数据持久化，查询优化，事务管理
+- **Handler**：HTTP协议处理，参数绑定，错误响应
+
+## 文件组织规范
+
+### 模块化设计
+
+按业务领域组织文件，体现清晰的模块边界：
+
 ```
 models/
-├── auth.go         # 认证相关模型
-├── customer.go     # 客户相关模型
-├── license.go      # 授权相关模型
-└── common.go       # 通用模型
+├── auth.go         # 认证领域：登录、Token、权限
+├── customer.go     # 客户领域：客户信息、关系管理
+├── license.go      # 授权领域：许可证、授权码
+└── common.go       # 通用结构：响应格式、分页
 
 service/
-├── interfaces.go   # 服务接口定义
+├── interfaces.go   # 接口契约：定义服务边界
 ├── auth_service.go
 ├── customer_service.go
 └── license_service.go
@@ -48,226 +55,142 @@ api/handlers/
 └── license_handler.go
 ```
 
-## 代码结构规范
+## 代码组织模式
 
-### 1. 模型定义 (models/)
-```go
-// 请求模型
-type CreateCustomerRequest struct {
-    Name    string `json:"name" binding:"required"`
-    Email   string `json:"email" binding:"required,email"`
-    Company string `json:"company"`
-}
+### 模型层设计要点
 
-// 响应模型
-type CustomerResponse struct {
-    ID      int    `json:"id"`
-    Name    string `json:"name"`
-    Email   string `json:"email"`
-    Company string `json:"company"`
-}
-```
+- 请求结构体：清晰的字段验证规则，语义化的字段命名
+- 响应结构体：统一的数据格式，合理的字段层次
+- 验证标签使用：利用 binding 标签进行输入验证
+- 文档标签：通过 json 标签明确 API 契约
 
-### 2. 服务接口 (service/interfaces.go)
-```go
-type CustomerService interface {
-    CreateCustomer(req *models.CreateCustomerRequest) (*models.CustomerResponse, error)
-    GetCustomer(id int) (*models.CustomerResponse, error)
-    UpdateCustomer(id int, req *models.UpdateCustomerRequest) error
-    DeleteCustomer(id int) error
-}
-```
+### 服务层设计要点
 
-### 3. 服务实现 (service/)
-```go
-type customerService struct {
-    repo repository.CustomerRepository
-}
+- 接口优先：先定义契约，后实现逻辑
+- 依赖注入：通过构造函数注入依赖
+- 错误处理：明确的错误类型和信息
+- 业务封装：核心逻辑集中在服务层
 
-func NewCustomerService(repo repository.CustomerRepository) CustomerService {
-    return &customerService{repo: repo}
-}
+### 处理器层设计要点
 
-func (s *customerService) CreateCustomer(req *models.CreateCustomerRequest) (*models.CustomerResponse, error) {
-    // 业务逻辑处理
-    // 数据验证
-    // 调用repository
-}
-```
+- 职责单一：只处理 HTTP 协议相关逻辑
+- 参数绑定：统一使用框架提供的绑定机制
+- 错误响应：使用统一的错误处理函数
+- 文档注解：完整的 Swagger 注解信息
 
-### 4. 处理器实现 (api/handlers/)
-```go
-type CustomerHandler struct {
-    service service.CustomerService
-}
+## REST API 设计
 
-func NewCustomerHandler(service service.CustomerService) *CustomerHandler {
-    return &CustomerHandler{service: service}
-}
+### 路由设计原则
 
-// @Summary 创建客户
-// @Tags 客户管理
-// @Accept json
-// @Produce json
-// @Param request body models.CreateCustomerRequest true "客户信息"
-// @Success 200 {object} models.APIResponse
-// @Router /api/v1/customers [post]
-func (h *CustomerHandler) CreateCustomer(c *gin.Context) {
-    var req models.CreateCustomerRequest
-    if err := c.ShouldBindJSON(&req); err != nil {
-        c.JSON(http.StatusBadRequest, models.ErrorResponse{
-            Code: http.StatusBadRequest,
-            Error: "INVALID_REQUEST",
-            Message: "请求参数无效",
-        })
-        return
-    }
+遵循 RESTful 风格，资源导向的 URL 设计：
 
-    result, err := h.service.CreateCustomer(&req)
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, models.ErrorResponse{
-            Code: http.StatusInternalServerError,
-            Error: "CREATE_FAILED",
-            Message: err.Error(),
-        })
-        return
-    }
+- 使用名词表示资源，动词通过 HTTP 方法体现
+- 嵌套路由体现资源关系
+- 版本控制通过路径前缀实现
+- 统一的路径命名约定
 
-    c.JSON(http.StatusOK, models.APIResponse{
-        Code: http.StatusOK,
-        Message: "创建成功",
-        Data: result,
-    })
-}
-```
+### 响应格式标准化
 
-## API设计规范
+**成功响应**：统一的数据结构，包含状态码、消息、数据
+**错误响应**：详细的错误信息，包含错误码、消息、时间戳
+**分页响应**：包含分页元信息的数据结构
 
-### 1. 路由设计
-```
-GET    /api/v1/customers       # 获取客户列表
-POST   /api/v1/customers       # 创建客户
-GET    /api/v1/customers/:id   # 获取客户详情
-PUT    /api/v1/customers/:id   # 更新客户
-DELETE /api/v1/customers/:id   # 删除客户
-```
+### HTTP 状态码使用策略
 
-### 2. 响应格式
-```go
-// 成功响应
-type APIResponse struct {
-    Code    int         `json:"code"`
-    Message string      `json:"message"`
-    Data    interface{} `json:"data,omitempty"`
-}
+遵循设计理念，大部分业务错误返回 200，通过响应体区分状态：
 
-// 错误响应
-type ErrorResponse struct {
-    Code      int    `json:"code"`
-    Error     string `json:"error"`
-    Message   string `json:"message"`
-    Timestamp string `json:"timestamp"`
-}
-```
+- **200**：成功（包括业务逻辑失败）
+- **400**：请求格式错误  
+- **401**：身份认证失败
+- **403**：权限不足
+- **404**：资源不存在
+- **500**：服务器内部错误
 
-### 3. HTTP状态码
-- `200` - 请求成功
-- `201` - 创建成功
-- `400` - 请求参数错误
-- `401` - 未认证
-- `403` - 权限不足
-- `404` - 资源不存在
-- `500` - 服务器内部错误
+## API 文档规范
 
-## Swagger文档规范
+### Swagger 注解要求
 
-### 必需注解
-```go
-// @Summary 接口简要描述
-// @Description 接口详细描述
-// @Tags 标签分组
-// @Accept json
-// @Produce json
-// @Param 参数名 参数位置 参数类型 是否必需 "参数描述"
-// @Success 状态码 {object} 响应类型 "成功描述"
-// @Failure 状态码 {object} 错误类型 "失败描述"
-// @Security BearerAuth (需要认证的接口)
-// @Router 路由路径 [HTTP方法]
-```
+完整的接口文档注解，包含所有必要信息：
 
-### 标签分组
-- `认证` - 登录、登出、Token相关
-- `客户管理` - 客户CRUD操作
-- `授权管理` - 授权码、许可证相关
-- `系统` - 系统信息、健康检测
+- **Summary**：简洁的接口描述
+- **Description**：详细的功能说明
+- **Tags**：合理的分组标签
+- **Parameters**：完整的参数说明
+- **Responses**：所有可能的响应状态
+- **Security**：认证要求说明
 
-## 错误处理规范
+### 文档分组策略
 
-### 错误码定义
-```go
-const (
-    // 通用错误
-    ErrInvalidRequest = "INVALID_REQUEST"
-    ErrUnauthorized   = "UNAUTHORIZED"
-    ErrForbidden      = "FORBIDDEN"
-    ErrNotFound       = "NOT_FOUND"
-    ErrInternalError  = "INTERNAL_ERROR"
-    
-    // 业务错误
-    ErrCustomerExists    = "CUSTOMER_EXISTS"
-    ErrLicenseExpired    = "LICENSE_EXPIRED"
-    ErrInvalidLicense    = "INVALID_LICENSE"
-)
-```
+按业务领域组织接口文档：
 
-### 统一错误处理
-```go
-func handleError(c *gin.Context, err error) {
-    var statusCode int
-    var errorCode string
-    
-    switch err {
-    case ErrCustomerExists:
-        statusCode = http.StatusConflict
-        errorCode = "CUSTOMER_EXISTS"
-    default:
-        statusCode = http.StatusInternalServerError
-        errorCode = "INTERNAL_ERROR"
-    }
-    
-    c.JSON(statusCode, models.ErrorResponse{
-        Code:      statusCode,
-        Error:     errorCode,
-        Message:   err.Error(),
-        Timestamp: time.Now().Format(time.RFC3339),
-    })
-}
-```
+- **认证管理**：登录、登出、Token 刷新
+- **客户管理**：客户信息 CRUD 操作
+- **授权管理**：许可证、授权码管理
+- **系统监控**：健康检测、系统信息
 
-## 开发流程
+## 错误处理体系
 
-### 1. 新增API步骤
-1. 在 `models/` 定义请求/响应结构体
-2. 在 `service/interfaces.go` 添加服务接口
-3. 在 `service/` 实现业务逻辑
-4. 在 `handlers/` 实现HTTP处理器
-5. 在 `routes/router.go` 注册路由
-6. 添加Swagger注解
-7. 生成文档：`swag init -g cmd/main.go -o ./docs/swagger`
+### 错误码设计
 
-### 2. 代码检查清单
-- [ ] 模型定义是否合理
-- [ ] 业务逻辑是否在service层
-- [ ] 错误处理是否完整
-- [ ] Swagger注解是否完整
-- [ ] 路由是否正确注册
-- [ ] HTTP状态码是否合适
+采用六位数字业务错误码，体现模块化设计：
 
-## 最佳实践
+- **前2位**：模块代码（10=认证，20=客户，30=授权，90=系统）
+- **后4位**：连续错误号，无需分层
+- **直接映射**：错误码到错误信息的直接对应关系
 
-1. **职责单一**：每个函数只做一件事
-2. **接口优先**：先定义接口，再实现
-3. **错误优雅**：统一错误处理和响应格式
-4. **文档完整**：所有API都要有Swagger文档
-5. **命名规范**：使用有意义的命名
-6. **代码复用**：提取公共逻辑到utils包
+### 错误响应策略
+
+**失败快速原则**：早期验证，明确提示
+**统一处理**：使用 NewErrorResponse 函数统一创建错误响应
+**分层错误**：Service 层返回业务错误，Handler 层转换为 HTTP 响应
+
+## 开发工作流
+
+### API 开发步骤
+
+遵循分层架构，自下而上的开发顺序：
+
+1. **模型设计**：定义请求响应结构，明确数据契约
+2. **接口定义**：在 interfaces.go 中声明服务契约
+3. **业务实现**：在 service 层实现核心逻辑
+4. **处理器编写**：在 handlers 层处理 HTTP 协议
+5. **路由注册**：在 router.go 中注册 API 路由
+6. **文档完善**：添加完整的 Swagger 注解
+7. **文档生成**：更新 API 文档
+
+### 质量检查要点
+
+**架构层面**：
+- 分层职责是否清晰
+- 依赖关系是否合理
+- 接口设计是否完整
+
+**实现层面**：
+- 错误处理是否完整
+- 输入验证是否充分
+- 响应格式是否统一
+
+**文档层面**：
+- Swagger 注解是否完整
+- 接口描述是否清晰
+- 错误码是否正确
+
+## 实施准则
+
+### 整洁代码
+
+- **命名语义化**：函数、变量名体现其用途
+- **函数职责单一**：每个函数专注一个职责
+- **避免深层嵌套**：使用早期返回减少复杂度
+
+### 可维护性
+
+- **接口优先设计**：先定义契约再实现
+- **依赖注入模式**：便于测试和扩展
+- **统一错误处理**：减少重复代码
+
+### 渐进式复杂度
+
+- **基础功能优先**：先实现核心功能
+- **逐步增强**：根据需求添加高级特性
+- **配置驱动**：通过配置控制功能开关
