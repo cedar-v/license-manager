@@ -19,5 +19,5 @@ WORKDIR /app
 COPY --from=backend-builder /app/backend/license-manager .
 COPY --from=frontend-builder /app/frontend/dist ./static
 COPY backend/configs/config.example.yaml ./config.yaml
-EXPOSE 8080
+EXPOSE 18888
 CMD ["./license-manager"]
