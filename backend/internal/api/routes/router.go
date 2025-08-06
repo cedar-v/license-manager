@@ -4,6 +4,7 @@ import (
 	_ "license-manager/docs/swagger" // swagger docs
 	"license-manager/internal/api/handlers"
 	"license-manager/internal/api/middleware"
+	"license-manager/internal/config"
 	"license-manager/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,17 @@ func SetupRouter() *gin.Engine {
 	router.Use(middleware.CustomLoggerMiddleware())
 	router.Use(gin.Recovery())
 	router.Use(middleware.CORSMiddleware())
+	
+	// 多语言中间件
+	cfg := config.GetConfig()
+	if cfg.I18n.Enable {
+		i18nConfig := &middleware.I18nConfig{
+			Enable:       cfg.I18n.Enable,
+			DefaultLang:  cfg.I18n.DefaultLang,
+			SupportLangs: cfg.I18n.SupportLangs,
+		}
+		router.Use(middleware.I18nMiddleware(i18nConfig))
+	}
 
 	// 初始化服务
 	authService := service.NewAuthService()

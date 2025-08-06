@@ -1,0 +1,39 @@
+system:
+  name: "English"
+  locale: "en-US"
+
+errors:
+  # Success status
+  "000000": "Success"
+  
+  # Authentication module (10xxxx)
+  auth:
+    "100001": "Authentication expired"
+    "100002": "Invalid authentication"
+    "100003": "Invalid username or password"
+    "100004": "Authentication required"
+    "100005": "Insufficient permissions"
+  
+  # Customer module (20xxxx) - Reserved
+  customer:
+    "200001": "Customer not found"
+    "200002": "Customer already exists"
+    "200003": "Customer name is required"
+    "200004": "Invalid customer information format"
+  
+  # License module (30xxxx) - Reserved
+  license:
+    "300001": "Invalid license key"
+    "300002": "License expired"
+    "300003": "License key is required"
+    "300004": "License key already used"
+  
+  # System general (90xxxx)
+  system:
+    "900001": "Invalid request parameters"
+    "900002": "Resource not found"
+    "900003": "Resource conflict"
+    "900004": "Internal server error"
+
+# Default error message
+default_error: "Unknown error"

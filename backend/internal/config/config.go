@@ -12,6 +12,7 @@ type Config struct {
 	Database DatabaseConfig `mapstructure:"database"`
 	Auth     AuthConfig     `mapstructure:"auth"`
 	Log      LogConfig      `mapstructure:"log"`
+	I18n     I18nConfig     `mapstructure:"i18n"`
 }
 
 type ServerConfig struct {
@@ -61,6 +62,13 @@ type SecurityConfig struct {
 type LogConfig struct {
 	Level  string `mapstructure:"level"`
 	Format string `mapstructure:"format"`
+}
+
+type I18nConfig struct {
+	Enable       bool     `mapstructure:"enable"`        // 是否启用多语言
+	DefaultLang  string   `mapstructure:"default_lang"`  // 默认语言
+	ConfigPath   string   `mapstructure:"config_path"`   // 语言包路径
+	SupportLangs []string `mapstructure:"support_langs"` // 支持的语言列表
 }
 
 var AppConfig *Config
@@ -132,6 +140,12 @@ func setDefaults() {
 	// Log defaults
 	viper.SetDefault("log.level", "info")
 	viper.SetDefault("log.format", "json")
+
+	// I18n defaults
+	viper.SetDefault("i18n.enable", true)
+	viper.SetDefault("i18n.default_lang", "zh-CN")
+	viper.SetDefault("i18n.config_path", "../configs/i18n/errors")
+	viper.SetDefault("i18n.support_langs", []string{"zh-CN", "en-US", "ja-JP"})
 }
 
 func GetConfig() *Config {

@@ -3,9 +3,10 @@ package handlers
 import (
 	"net/http"
 
+	"license-manager/internal/api/middleware"
 	"license-manager/internal/models"
 	"license-manager/internal/service"
-	"license-manager/pkg/errors"
+	"license-manager/pkg/i18n"
 
 	"github.com/gin-gonic/gin"
 )
@@ -36,7 +37,8 @@ func NewAuthHandler(authService service.AuthService) *AuthHandler {
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req models.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		status, errCode, message := errors.NewErrorResponse("900001")
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
 		c.JSON(status, models.ErrorResponse{
 			Code:      status,
 			Error:     errCode,
@@ -53,7 +55,8 @@ func (h *AuthHandler) Login(c *gin.Context) {
 			errorCode = "900004" // 服务器内部错误
 		}
 
-		status, errCode, message := errors.NewErrorResponse(errorCode, err.Error())
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse(errorCode, lang, err.Error())
 		c.JSON(status, models.ErrorResponse{
 			Code:      status,
 			Error:     errCode,
@@ -63,9 +66,11 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
+	lang := middleware.GetLanguage(c)
+	successMessage := i18n.GetErrorMessage("000000", lang)
 	c.JSON(http.StatusOK, models.LoginResponse{
 		Code:    http.StatusOK,
-		Message: "登录成功",
+		Message: successMessage,
 		Data:    data,
 	})
 }
@@ -84,9 +89,11 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 	// 对于JWT无状态认证，客户端删除Token即可
 	// 这里可以记录登出日志或将Token加入黑名单（可选实现）
 
+	lang := middleware.GetLanguage(c)
+	successMessage := i18n.GetErrorMessage("000000", lang)
 	c.JSON(http.StatusOK, models.APIResponse{
 		Code:    http.StatusOK,
-		Message: "登出成功",
+		Message: successMessage,
 	})
 }
 
@@ -105,7 +112,8 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	// 从请求头获取Token
 	token := extractTokenFromHeader(c)
 	if token == "" {
-		status, errCode, message := errors.NewErrorResponse("100004")
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("100004", lang)
 		c.JSON(status, models.ErrorResponse{
 			Code:      status,
 			Error:     errCode,
@@ -123,7 +131,8 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 			errorCode = "100002" // token无效，需要重新登录
 		}
 
-		status, errCode, message := errors.NewErrorResponse(errorCode, err.Error())
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse(errorCode, lang, err.Error())
 		c.JSON(status, models.ErrorResponse{
 			Code:      status,
 			Error:     errCode,
@@ -133,9 +142,11 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 		return
 	}
 
+	lang := middleware.GetLanguage(c)
+	successMessage := i18n.GetErrorMessage("000000", lang)
 	c.JSON(http.StatusOK, models.APIResponse{
 		Code:    http.StatusOK,
-		Message: "刷新成功",
+		Message: successMessage,
 		Data: map[string]interface{}{
 			"token": newToken,
 		},

@@ -33,3 +33,9 @@ auth:
 log:
   level: "info" # 日志级别
   format: "text" # 日志格式
+
+i18n:
+  enable: true # 是否启用多语言支持
+  default_lang: "zh-CN" # 默认语言
+  config_path: "../configs/i18n/errors" # 语言包文件路径（相对于backend目录）
+  support_langs: ["zh-CN", "en-US", "ja-JP"] # 支持的语言列表

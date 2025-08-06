@@ -8,6 +8,7 @@ import (
 	"license-manager/internal/config"
 	"license-manager/internal/database"
 	"license-manager/pkg/logger"
+	"license-manager/pkg/i18n"
 
 	"github.com/gin-gonic/gin"
 )
@@ -55,6 +56,25 @@ func main() {
 	// 运行数据库迁移
 	if err := database.RunMigrationIfEnabled(); err != nil {
 		log.Fatalf("数据库迁移失败: %v", err)
+	}
+
+	// 初始化多语言支持
+	if cfg.I18n.Enable {
+		if err := i18n.InitGlobalManager(cfg.I18n.ConfigPath, cfg.I18n.DefaultLang); err != nil {
+			log.Fatalf("多语言初始化失败: %v", err)
+		}
+		
+		// 预加载支持的语言
+		for _, lang := range cfg.I18n.SupportLangs {
+			if err := i18n.LoadLanguage(lang); err != nil {
+				log.Warnf("加载语言包 %s 失败: %v", lang, err)
+			} else {
+				log.Infof("成功加载语言包: %s", lang)
+			}
+		}
+		log.Info("多语言支持已启用")
+	} else {
+		log.Info("多语言支持已禁用")
 	}
 
 	// 设置Gin模式
