@@ -35,24 +35,10 @@ import (
 // @description Bearer token for authentication
 
 func main() {
-	// 加载配置 - 支持Docker环境和本地开发环境
-	configPath := ""
-	if len(os.Args) > 1 {
-		configPath = os.Args[1]
-	} else {
-		// 尝试不同的配置文件路径
-		possiblePaths := []string{
-			"config.yaml",              // Docker 环境
-			"../configs/config.yaml",   // 本地开发环境
-			"configs/config.yaml",      // 其他环境
-		}
-		
-		for _, path := range possiblePaths {
-			if _, err := os.Stat(path); err == nil {
-				configPath = path
-				break
-			}
-		}
+	// 加载配置
+	configPath := "config.yaml" // Docker 环境默认路径
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		configPath = "../configs/config.yaml" // 本地开发环境
 	}
 	
 	if err := config.Load(configPath); err != nil {

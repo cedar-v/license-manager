@@ -91,11 +91,9 @@ func Load(configPath string) error {
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
-		log.Printf("Warning: Config file not found, using defaults: %v", err)
-		log.Printf("Searched paths: %v", viper.ConfigFileUsed())
-	} else {
-		log.Printf("Using config file: %s", viper.ConfigFileUsed())
+		return fmt.Errorf("failed to read config file: %w", err)
 	}
+	log.Printf("Using config file: %s", viper.ConfigFileUsed())
 
 	AppConfig = &Config{}
 	if err := viper.Unmarshal(AppConfig); err != nil {
