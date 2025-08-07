@@ -40,8 +40,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		lang := middleware.GetLanguage(c)
 		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
 		c.JSON(status, models.ErrorResponse{
-			Code:      status,
-			Error:     errCode,
+			Code:      errCode,
 			Message:   message,
 			Timestamp: getCurrentTimestamp(),
 		})
@@ -58,8 +57,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		lang := middleware.GetLanguage(c)
 		status, errCode, message := i18n.NewI18nErrorResponse(errorCode, lang, err.Error())
 		c.JSON(status, models.ErrorResponse{
-			Code:      status,
-			Error:     errCode,
+			Code:      errCode,
 			Message:   message,
 			Timestamp: getCurrentTimestamp(),
 		})
@@ -115,8 +113,7 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 		lang := middleware.GetLanguage(c)
 		status, errCode, message := i18n.NewI18nErrorResponse("100004", lang)
 		c.JSON(status, models.ErrorResponse{
-			Code:      status,
-			Error:     errCode,
+			Code:      errCode,
 			Message:   message,
 			Timestamp: getCurrentTimestamp(),
 		})
@@ -134,8 +131,7 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 		lang := middleware.GetLanguage(c)
 		status, errCode, message := i18n.NewI18nErrorResponse(errorCode, lang, err.Error())
 		c.JSON(status, models.ErrorResponse{
-			Code:      status,
-			Error:     errCode,
+			Code:      errCode,
 			Message:   message,
 			Timestamp: getCurrentTimestamp(),
 		})
