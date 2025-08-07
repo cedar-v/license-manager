@@ -49,7 +49,7 @@ jobs:
         username: root
         password: ${{ secrets.PASS_1 }}
         port: 22
-        source: "backend-image.tar,backend/configs/config.yaml"
+        source: "backend-image.tar"
         target: "/opt/license-manager/"
 
     - name: Deploy to server
@@ -73,18 +73,11 @@ jobs:
           docker rmi ${{ env.IMAGE_NAME }}:old || true
           docker tag ${{ env.IMAGE_NAME }}:latest ${{ env.IMAGE_NAME }}:old || true
           
-          # Ensure config file exists
-          if [ ! -f config.yaml ] && [ -f backend/configs/config.yaml ]; then
-            cp backend/configs/config.yaml config.yaml
-            echo "Copied config.yaml from backend configs."
-          fi
-          
           # Run new container with host network
           docker run -d \
             --name ${{ env.CONTAINER_NAME }} \
             --restart unless-stopped \
             --network host \
-            -v /opt/license-manager/config.yaml:/app/config.yaml \
             -v /opt/license-manager/logs:/app/logs \
             ${{ env.IMAGE_NAME }}:latest
           
