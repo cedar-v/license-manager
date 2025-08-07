@@ -1,30 +1,42 @@
+# 自动部署使用
 server:
   host: "0.0.0.0"
-  port: 8080
-  mode: "release"  # debug, release, test
+  port: 18888
+  mode: "debug"  # debug, release, test 开发环境使用debug模式
+
+database:
+  driver: "mysql"
+  host: "127.0.0.1"
+  port: 13306
+  username: "root"
+  password: "root@123"
+  database: "license_manager"
+  charset: "utf8mb4"
+  parse_time: true
+  loc: "Local"
+  max_idle_conns: 10
+  max_open_conns: 100
+  conn_max_lifetime: 3600 # 连接最大生存时间(秒)
+  auto_migrate: true # 是否自动迁移数据库
 
 auth:
   jwt:
-    secret: "your-256-bit-secret-key-change-this-in-production"
-    expire_hours: 1
-    refresh_threshold_minutes: 30
+    secret: "license-manager-dev-secret-key-32-bytes" # 32字节的随机字符串
+    expire_hours: 1 # 1小时后过期
+    refresh_threshold_minutes: 30 # 30分钟后可刷新token
   admin:
     username: "admin"
-    password: "admin@123"  # 明文密码，部署人员可修改
+    password: "admin@123"
   security:
-    max_login_attempts: 5
-    lockout_duration_minutes: 15
+    max_login_attempts: 5 # 5次失败后锁定15分钟
+    lockout_duration_minutes: 15 # 15分钟后解锁
 
 log:
-  level: "info"    # debug, info, warn, error
-  format: "json"   # json, text
+  level: "info" # 日志级别
+  format: "text" # 日志格式
 
-# 数据库配置（暂未使用）
-database:
-  type: "postgres"  # postgres or mysql
-  host: "localhost"
-  port: 5432
-  name: "license_manager"
-  user: "postgres"
-  password: "password"
-  ssl_mode: "disable"
+i18n:
+  enable: true # 是否启用多语言支持
+  default_lang: "zh-CN" # 默认语言
+  config_path: "../configs/i18n/errors" # 语言包文件路径（相对于backend目录）
+  support_langs: ["zh-CN", "en-US", "ja-JP"] # 支持的语言列表

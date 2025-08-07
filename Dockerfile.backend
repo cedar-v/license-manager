@@ -11,5 +11,6 @@ RUN apk --no-cache add ca-certificates tzdata
 WORKDIR /app
 COPY --from=builder /app/backend/license-manager .
 COPY backend/configs/config.example.yaml ./config.example.yaml
+COPY backend/configs/i18n/ ./configs/i18n/
 EXPOSE 18888
 CMD ["./license-manager"]
