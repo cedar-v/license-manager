@@ -9,8 +9,7 @@ RUN go build -ldflags="-s -w" -o license-manager cmd/main.go
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates tzdata
 WORKDIR /app
-COPY --from=builder /app/backend/license-manager .
-COPY backend/configs/config.yaml ./config.yaml
-COPY backend/configs/i18n/ ./configs/i18n/
+COPY --from=builder /app/backend/license-manager ./backend/cmd/license-manager
+COPY backend/configs/ ./backend/configs/
 EXPOSE 18888
-CMD ["./license-manager"]
+CMD ["./backend/cmd/license-manager"]
