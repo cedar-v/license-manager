@@ -1,0 +1,22 @@
+{
+  "login": {
+    "title": "Authorization Management Platform",
+    "subtitle": "Sign in to your account",
+    "usernamePlaceholder": "Username",
+    "passwordPlaceholder": "Enter password",
+    "remember": "Remember password",
+    "forgotPassword": "Forgot password?",
+    "forgotPasswordAlert": "Password recovery feature is not implemented yet",
+    "submit": "Get Started",
+    "success": "Login successful",
+    "error": {
+      "required": "Please enter username and password",
+      "invalid": "Invalid username or password",
+      "general": "Login failed, please try again later",
+      "usernameRequired": "Please enter username",
+      "usernameMinLength": "Username must be at least 3 characters",
+      "passwordRequired": "Please enter password",
+      "passwordMinLength": "Password must be at least 6 characters"
+    }
+  }
+}

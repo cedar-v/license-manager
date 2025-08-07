@@ -15,3 +15,14 @@ html, body {
 #app {
   height: 100%;
 }
+
+/* Element Plus 主题色自定义 */
+:root {
+  --el-color-primary: #019C7C !important;
+  --el-color-primary-light-3: rgba(1, 156, 124, 0.7) !important;
+  --el-color-primary-light-5: rgba(1, 156, 124, 0.5) !important;
+  --el-color-primary-light-7: rgba(1, 156, 124, 0.3) !important;
+  --el-color-primary-light-8: rgba(1, 156, 124, 0.2) !important;
+  --el-color-primary-light-9: rgba(1, 156, 124, 0.1) !important;
+  --el-color-primary-dark-2: #0e8a71 !important;
+}
