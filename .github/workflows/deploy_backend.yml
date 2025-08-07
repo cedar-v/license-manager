@@ -49,7 +49,7 @@ jobs:
         username: root
         password: ${{ secrets.PASS_1 }}
         port: 22
-        source: "backend-image.tar,backend/configs/config.example.yaml,backend/configs/config.yaml"
+        source: "backend-image.tar,backend/configs/config.example.yaml,backend/configs/config.yaml,backend/configs/i18n"
         target: "/opt/license-manager/"
 
     - name: Deploy to server
@@ -84,12 +84,22 @@ jobs:
             fi
           fi
           
-          # Run new container
+          # Create i18n directory if not exists
+          mkdir -p /opt/license-manager/configs/i18n
+          
+          # Copy i18n configs if they exist
+          if [ -d "backend/configs/i18n" ]; then
+            cp -r backend/configs/i18n/* /opt/license-manager/configs/i18n/
+            echo "Copied i18n configuration files."
+          fi
+          
+          # Run new container with host network
           docker run -d \
             --name ${{ env.CONTAINER_NAME }} \
             --restart unless-stopped \
-            -p 18888:18888 \
+            --network host \
             -v /opt/license-manager/config.yaml:/app/config.yaml \
+            -v /opt/license-manager/configs/i18n:/app/configs/i18n \
             -v /opt/license-manager/logs:/app/logs \
             ${{ env.IMAGE_NAME }}:latest
           
