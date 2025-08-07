@@ -2,7 +2,7 @@
   "login": {
     "title": "Authorization Management Platform",
     "subtitle": "Sign in to your account",
-    "usernamePlaceholder": "Username",
+    "usernamePlaceholder": "Please enter Username",
     "passwordPlaceholder": "Enter password",
     "remember": "Remember password",
     "forgotPassword": "Forgot password?",

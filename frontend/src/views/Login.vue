@@ -29,10 +29,9 @@
     <!-- 登录区域 -->
     <div class="login-section">
       <div class="login-container">
-        <el-card class="login-card" :body-style="{ padding: '2rem' }">
+        <div class="login-card" >
           <h1 class="title">{{ t('login.title') }}</h1>
           <p class="subtitle">{{ t('login.subtitle') }}</p>
-          
           <el-form 
             ref="loginFormRef"
             :model="loginForm" 
@@ -94,7 +93,7 @@
               </el-button>
             </el-form-item>
           </el-form>
-        </el-card>
+        </div>
       </div>
     </div>
   </div>
@@ -306,11 +305,7 @@ async function handleLogin() {
 }
 
 .login-card {
-  border: none;
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
-  backdrop-filter: blur(4px);
-  background: rgba(255, 255, 255, 0.95);
+  padding: '2rem'
 }
 
 .title {
@@ -341,7 +336,7 @@ async function handleLogin() {
 .login-input :deep(.el-input__wrapper) {
   height: clamp(45px, 8vh, 55px);
   border-radius: 10px;
-  border: 1px solid #019C7C;
+  /* border: 1px solid #019C7C; */
   background-color: #ffffff;
   box-shadow: none;
   transition: all 0.3s ease;
@@ -425,7 +420,7 @@ async function handleLogin() {
   transition: all 0.3s ease;
 }
 
-.language-switcher :deep(.el-input__inner):focus {
+.language-switcher :deep(.el-input__inner):hover {
   border-color: #019C7C;
   box-shadow: 0 0 0 2px rgba(1, 156, 124, 0.2);
 }
@@ -483,7 +478,7 @@ async function handleLogin() {
     max-width: 90vw;
   }
   
-  .login-card :deep(.el-card__body) {
+  .login-card {
     padding: 1.5rem !important;
   }
   
@@ -507,7 +502,7 @@ async function handleLogin() {
     max-width: 100%;
   }
   
-  .login-card :deep(.el-card__body) {
+  .login-card  {
     padding: 1rem !important;
   }
   
@@ -538,7 +533,7 @@ async function handleLogin() {
     margin-bottom: 1.5rem;
   }
   
-  .login-card :deep(.el-card__body) {
+  .login-card {
     padding: 1.5rem !important;
   }
 }
@@ -548,7 +543,7 @@ async function handleLogin() {
     padding-top: 3rem;
   }
   
-  .login-card :deep(.el-card__body) {
+  .login-card  {
     padding: 1rem !important;
   }
   

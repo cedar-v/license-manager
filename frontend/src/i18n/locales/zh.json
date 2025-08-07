@@ -2,7 +2,7 @@
   "login": {
     "title": "授权管理平台",
     "subtitle": "登录您的账户",
-    "usernamePlaceholder": "用户名",
+    "usernamePlaceholder": "请输入用户名",
     "passwordPlaceholder": "请输入密码",
     "remember": "记住密码",
     "forgotPassword": "忘记密码？",

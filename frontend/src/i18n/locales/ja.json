@@ -2,7 +2,7 @@
   "login": {
     "title": "権限管理プラットフォーム",
     "subtitle": "アカウントにログイン",
-    "usernamePlaceholder": "ユーザー名",
+    "usernamePlaceholder": "ユーザー名を入力してください",
     "passwordPlaceholder": "パスワードを入力してください",
     "remember": "パスワードを記憶する",
     "forgotPassword": "パスワードをお忘れですか？",
