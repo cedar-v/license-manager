@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"license-manager/internal/api/routes"
 	"license-manager/internal/config"
@@ -34,8 +35,27 @@ import (
 // @description Bearer token for authentication
 
 func main() {
-	// 加载配置
-	if err := config.Load("../configs/config.yaml"); err != nil {
+	// 加载配置 - 支持Docker环境和本地开发环境
+	configPath := ""
+	if len(os.Args) > 1 {
+		configPath = os.Args[1]
+	} else {
+		// 尝试不同的配置文件路径
+		possiblePaths := []string{
+			"config.yaml",              // Docker 环境
+			"../configs/config.yaml",   // 本地开发环境
+			"configs/config.yaml",      // 其他环境
+		}
+		
+		for _, path := range possiblePaths {
+			if _, err := os.Stat(path); err == nil {
+				configPath = path
+				break
+			}
+		}
+	}
+	
+	if err := config.Load(configPath); err != nil {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
