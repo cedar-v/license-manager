@@ -1,0 +1,22 @@
+{
+  "login": {
+    "title": "権限管理プラットフォーム",
+    "subtitle": "アカウントにログイン",
+    "usernamePlaceholder": "ユーザー名",
+    "passwordPlaceholder": "パスワードを入力してください",
+    "remember": "パスワードを記憶する",
+    "forgotPassword": "パスワードをお忘れですか？",
+    "forgotPasswordAlert": "パスワード回復機能はまだ実装されていません",
+    "submit": "利用開始",
+    "success": "ログインしました",
+    "error": {
+      "required": "ユーザー名とパスワードを入力してください",
+      "invalid": "ユーザー名またはパスワードが正しくありません",
+      "general": "ログインに失敗しました。後ほど再度お試しください",
+      "usernameRequired": "ユーザー名を入力してください",
+      "usernameMinLength": "ユーザー名は3文字以上である必要があります",
+      "passwordRequired": "パスワードを入力してください",
+      "passwordMinLength": "パスワードは6文字以上である必要があります"
+    }
+  }
+}

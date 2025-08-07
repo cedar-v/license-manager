@@ -1,0 +1,22 @@
+{
+  "login": {
+    "title": "授权管理平台",
+    "subtitle": "登录您的账户",
+    "usernamePlaceholder": "用户名",
+    "passwordPlaceholder": "请输入密码",
+    "remember": "记住密码",
+    "forgotPassword": "忘记密码？",
+    "forgotPasswordAlert": "忘记密码功能暂未实现",
+    "submit": "开始使用",
+    "success": "登录成功",
+    "error": {
+      "required": "请输入用户名和密码",
+      "invalid": "用户名或密码错误",
+      "general": "登录失败，请稍后重试",
+      "usernameRequired": "请输入用户名",
+      "usernameMinLength": "用户名至少需要3个字符",
+      "passwordRequired": "请输入密码",
+      "passwordMinLength": "密码至少需要6个字符"
+    }
+  }
+}
