@@ -1,0 +1,394 @@
+<!--
+/**
+ * 侧边栏组件
+ * 提供应用导航菜单，支持折叠/展开功能和响应式设计
+ * 包含Logo区域、导航菜单和底部区域
+ */
+-->
+<template>
+  <!-- 侧边栏容器 -->
+  <aside 
+    class="sidebar" 
+    :class="{ 'sidebar--collapsed': isCollapsed }"
+  >
+    <!-- Logo区域 -->
+    <div class="sidebar__header">
+      <div class="sidebar__logo">
+        <div class="logo-container">
+          <div class="logo-icon">
+            <svg width="41" height="40" viewBox="0 0 41 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g class="logo-icon-group">
+                <path d="M0 0H29.74V40H0V0Z" fill="#019C7C"/>
+                <path d="M24.59 20.16H41V40H24.59V20.16Z" fill="#146B59"/>
+              </g>
+            </svg>
+          </div>
+          <span v-show="!isCollapsed" class="logo-text">Cedar-V</span>
+        </div>
+      </div>
+      <button 
+        v-if="collapsible"
+        class="sidebar__toggle"
+        @click="toggleSidebar"
+        :aria-label="isCollapsed ? '展开侧边栏' : '收起侧边栏'"
+      >
+        <i :class="isCollapsed ? 'el-icon-s-unfold' : 'el-icon-s-fold'"></i>
+      </button>
+    </div>
+
+    <!-- 导航菜单 -->
+    <nav class="sidebar__nav">
+      <div class="nav-section">
+        <slot name="nav-items">
+          <div class="nav-item" v-for="item in navItems" :key="item.id">
+            <a 
+              :href="item.href" 
+              class="nav-link"
+              :class="{ 'nav-link--active': item.active }"
+              @click="handleNavClick(item, $event)"
+            >
+              <div class="nav-icon-wrapper">
+                <el-icon v-if="item.icon" class="nav-icon">
+                  <component :is="item.icon" />
+                </el-icon>
+              </div>
+              <span v-show="!isCollapsed" class="nav-text">{{ item.label }}</span>
+            </a>
+            
+            <!-- 子菜单 -->
+            <div v-if="item.children && !isCollapsed" class="nav-submenu">
+              <a 
+                v-for="child in item.children"
+                :key="child.id"
+                :href="child.href"
+                class="nav-sublink"
+                :class="{ 'nav-sublink--active': child.active }"
+                @click="handleNavClick(child, $event)"
+              >
+                <span class="nav-subtext">{{ child.label }}</span>
+              </a>
+            </div>
+          </div>
+        </slot>
+      </div>
+    </nav>
+
+    <!-- 底部区域 -->
+    <div class="sidebar__footer">
+      <slot name="footer">
+        <!-- 用户信息等 -->
+      </slot>
+    </div>
+  </aside>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+
+// 导航项接口定义
+interface NavItem {
+  id: string // 导航项唯一标识
+  label: string // 显示文本
+  href: string // 链接地址
+  icon?: string // 图标类名（可选）
+  active?: boolean // 是否为当前活跃项（可选）
+  children?: NavItem[] // 子菜单项（可选）
+}
+
+// 组件属性接口定义
+interface Props {
+  appName?: string // 应用名称，显示在Logo区域
+  navItems?: NavItem[] // 导航菜单项列表
+  collapsible?: boolean // 是否允许折叠侧边栏
+  defaultCollapsed?: boolean // 默认是否为折叠状态
+}
+
+// 定义组件属性和默认值
+const props = withDefaults(defineProps<Props>(), {
+  appName: 'Cedar',
+  navItems: () => [],
+  collapsible: true,
+  defaultCollapsed: false
+})
+
+// 定义组件事件
+const emit = defineEmits<{
+  navClick: [item: NavItem, event: Event]
+  toggle: [collapsed: boolean]
+}>()
+
+// 侧边栏折叠状态管理
+const isCollapsed = ref(props.defaultCollapsed)
+
+// 切换侧边栏折叠状态
+const toggleSidebar = () => {
+  isCollapsed.value = !isCollapsed.value
+  emit('toggle', isCollapsed.value)
+}
+
+// 处理导航项点击事件
+const handleNavClick = (item: NavItem, event: Event) => {
+  emit('navClick', item, event)
+}
+</script>
+
+<style scoped>
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 280px;
+  height: 100vh;
+  background: linear-gradient(180deg, #F5F7FA 0%, #FFFFFF 100%);
+  border-right: 1px solid rgba(29, 29, 29, 0.12);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.sidebar--collapsed {
+  width: 64px;
+}
+
+/* Header 区域 */
+.sidebar__header {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid rgba(29, 29, 29, 0.06);
+}
+
+.sidebar__logo {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  width: 41px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.logo-text {
+  font-family: 'Swis721 BlkCn BT', sans-serif;
+  font-size: 30px;
+  font-weight: 400;
+  color: #333333;
+  white-space: nowrap;
+  overflow: hidden;
+  line-height: 1.2;
+}
+
+.sidebar__toggle {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #B2B8C2;
+  transition: all 0.2s;
+}
+
+.sidebar__toggle:hover {
+  background: rgba(1, 156, 124, 0.1);
+  color: #019C7C;
+}
+
+/* 导航区域 */
+.sidebar__nav {
+  flex: 1;
+  padding: 8px 0;
+  overflow-y: auto;
+}
+
+.nav-section {
+  padding: 8px 16px;
+}
+
+.nav-item {
+  margin-bottom: 4px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: #1D1D1D;
+  text-decoration: none;
+  border-radius: 28px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 16px;
+  font-family: 'OPPOSans', sans-serif;
+  font-weight: 400;
+  line-height: 1.3;
+  margin-bottom: 10px;
+}
+
+.nav-link:hover {
+  background: rgba(1, 156, 124, 0.08);
+  color: #019C7C;
+}
+
+.nav-link--active {
+  background: linear-gradient(90deg, #39CC68 0%, #A6E852 100%);
+  color: #019C7C;
+  font-weight: 700;
+  box-shadow: 0px 2px 32px 0px rgba(0, 0, 0, 0.02);
+}
+
+.nav-link--active .nav-text {
+  color: #019C7C;
+}
+
+.nav-icon-wrapper {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FFFFFF;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  font-size: 16px;
+  color: #B2B8C2;
+}
+
+.nav-link--active .nav-icon {
+  color: #019C7C;
+}
+
+.nav-text {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* 子菜单 */
+.nav-submenu {
+  margin-left: 32px;
+  margin-top: 4px;
+}
+
+.nav-sublink {
+  display: block;
+  padding: 8px 16px;
+  color: #888;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 13px;
+  transition: all 0.2s;
+  margin-bottom: 2px;
+}
+
+.nav-sublink:hover {
+  background: rgba(1, 156, 124, 0.06);
+  color: #019C7C;
+}
+
+.nav-sublink--active {
+  background: rgba(1, 156, 124, 0.08);
+  color: #019C7C;
+  font-weight: 500;
+}
+
+.nav-subtext {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* 底部区域 */
+.sidebar__footer {
+  padding: 16px;
+  border-top: 1px solid rgba(29, 29, 29, 0.06);
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  
+  .sidebar--mobile-open {
+    transform: translateX(0);
+  }
+  
+  .sidebar--collapsed {
+    width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100vw;
+    max-width: 320px;
+  }
+  
+  .sidebar--collapsed {
+    width: 100vw;
+    max-width: 320px;
+  }
+}
+
+/* 收起状态下的样式调整 */
+.sidebar--collapsed .sidebar__logo {
+  justify-content: center;
+}
+
+.sidebar--collapsed .logo-container {
+  justify-content: center;
+}
+
+.sidebar--collapsed .logo-text {
+  display: none;
+}
+
+.sidebar--collapsed .nav-link {
+  justify-content: center;
+  padding: 24px 12px;
+}
+
+.sidebar--collapsed .nav-text {
+  display: none;
+}
+
+.sidebar--collapsed .nav-submenu {
+  display: none;
+}
+
+/* 滚动条样式 */
+.sidebar__nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar__nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar__nav::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+}
+
+.sidebar__nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+</style>
