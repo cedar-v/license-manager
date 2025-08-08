@@ -1,0 +1,43 @@
+server:
+  host: "0.0.0.0"
+  port: 18888
+  mode: "debug"
+
+database:
+  driver: "mysql"
+  host: "mysql"
+  port: 3306
+  username: "license_user"
+  password: "license@123"
+  database: "license_manager"
+  charset: "utf8mb4"
+  parse_time: true
+  loc: "Local"
+  max_idle_conns: 10
+  max_open_conns: 100
+  conn_max_lifetime: 3600
+  auto_migrate: true
+
+auth:
+  jwt:
+    secret: "license-manager-dev-secret-key-32-bytes"
+    expire_hours: 1
+    refresh_threshold_minutes: 30
+  admin:
+    username: "admin"
+    password: "admin@123"
+  security:
+    max_login_attempts: 5
+    lockout_duration_minutes: 15
+
+log:
+  level: "info"
+  format: "text"
+
+i18n:
+  enable: true
+  default_lang: "zh-CN"
+  config_path: "../configs/i18n/errors"
+  support_langs: ["zh-CN", "en-US", "ja-JP"]
+
+

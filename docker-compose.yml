@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  # MySQL 8数据库
+  mysql:
+    image: mysql:8.0
+    container_name: license-manager-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root@123
+      MYSQL_DATABASE: license_manager
+      MYSQL_USER: license_user
+      MYSQL_PASSWORD: license@123
+      TZ: Asia/Shanghai
+    ports:
+      - "13306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --sql_mode=STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO
+      --max_connections=1000
+      --innodb_buffer_pool_size=256M
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - license-manager-network
+
+  # 后端服务
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: license-manager-backend
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - "18888:18888"
+    volumes:
+      - ./backend/configs:/app/backend/configs
+      - ./logs:/app/logs
+      - ./backend/configs/config.dev.yaml:/app/backend/cmd/config.yaml:ro
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:18888/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 6
+      start_period: 60s
+    networks:
+      - license-manager-network
+
+  # 前端服务  
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: license-manager-frontend
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - "18080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - license-manager-network
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  license-manager-network:
+    driver: bridge

@@ -22,7 +22,7 @@ License Manager is an independent software licensing platform that provides lice
 
 - **Frontend**: Vue.js 3+ with modern UI components
 - **Backend**: Go 1.23+ with Gin framework, GORM, Viper configuration and Logrus logging
-- **Database**: PostgreSQL 12+ / MySQL 8+
+- **Database**: MySQL 8+
 - **Configuration**: YAML format configuration files
 - **Deployment**: Docker, single machine, or system service
 
@@ -63,73 +63,42 @@ GET  /tools/{tool}      - Tool download
 ```bash
 # Clone the repository
 git clone https://github.com/cedar-v/license-manager.git
-cd license-manager/backend/cmd
+cd license-manager
 
-# Build the application
+# Local backend build & run (optional)
+cd backend/cmd
 go build -o license-manager
 
-# Configure the application
-cp config.example.yaml config.yaml
-# Edit config.yaml with your settings
+# Configuration (choose one)
+# 1) Create config.yaml in the working directory (the app looks here first)
+#    cp ../configs/config.example.yaml ./config.yaml && edit it
+# 2) Edit ../configs/config.yaml (the app will fall back to this path)
 
-# Run the application
 ./license-manager
 ```
 
 ## Docker Deployment
 
+We provide ready-to-use Docker Compose files for development and production:
+
 ```bash
-# Build Docker image (multi-stage build with frontend and backend)
-docker build -t license-manager .
+# Development (first run with --build is recommended)
+docker compose up -d --build
 
-# Create configuration file
-cp backend/configs/config.example.yaml config.yaml
-# Edit config.yaml to configure database and other settings
+# Production
+docker compose -f docker-compose.prod.yml up -d
 
-# Run with Docker
-docker run -d \
-  --name license-manager \
-  -p 18888:18888 \
-  -v $(pwd)/config.yaml:/app/config.yaml \
-  license-manager
-
-# Check running status
-docker logs license-manager
-
-# Health check
+# Verify backend health
 curl http://localhost:18888/health
 ```
 
-### Docker Compose Deployment (Recommended)
-
-```yaml
-# docker-compose.yml
-version: '3.8'
-services:
-  license-manager:
-    build: .
-    ports:
-      - "18888:18888"
-    volumes:
-      - ./config.yaml:/app/config.yaml
-    environment:
-      - GIN_MODE=release
-    restart: unless-stopped
-    
-  mysql:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: root@123
-      MYSQL_DATABASE: license_manager
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    restart: unless-stopped
-
-volumes:
-  mysql_data:
-```
+Notes
+- Backend config is mounted by Compose:
+  - Dev: `backend/configs/config.dev.yaml` → `/app/backend/cmd/config.yaml`
+  - Prod: `backend/configs/config.prod.yaml` → `/app/backend/cmd/config.yaml`
+- Frontend Nginx proxies `/api/` to `backend:18888` inside the Docker network.
+- Health checks use `curl`; the backend image includes `curl`.
+- For full details (reverse proxy, health checks, mounts, troubleshooting), see `README-Docker.md`.
 
 ## Open Source License
 

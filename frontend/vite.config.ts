@@ -18,6 +18,8 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
   // 加载环境变量文件(.env)
   const env = loadEnv(mode, process.cwd())
 
+  const enableVisualizer = isProd && env.VITE_VISUALIZER === 'true'
+
   return {
     // 基础公共路径，从环境变量VITE_ADDRESS_BASE_URL获取
     base: env.VITE_ADDRESS_BASE_URL,
@@ -37,8 +39,8 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         ext: '.gz', // 压缩文件扩展名
       }),
 
-      // 打包分析插件（仅生产环境启用）
-      isProd && visualizer({ open: true })
+      // 打包分析插件（仅在显式启用时生效；容器/CI 默认不打开浏览器）
+      enableVisualizer && visualizer({ open: false })
     ].filter(Boolean), // 过滤掉false的插件
 
     // 开发服务器配置

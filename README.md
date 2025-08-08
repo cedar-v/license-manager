@@ -22,7 +22,7 @@
 
 - **前端**：Vue.js 3+ 配合现代化UI组件
 - **后端**：Go 1.23+ 使用Gin框架、GORM、Viper配置和Logrus日志
-- **数据库**：PostgreSQL 12+ / MySQL 8+
+- **数据库**：MySQL 8+
 - **配置**：YAML格式配置文件
 - **部署**：Docker、单机部署或系统服务
 
@@ -52,73 +52,36 @@
 ```bash
 # 克隆项目
 git clone https://github.com/cedar-v/license-manager.git
-cd license-manager/backend/cmd
+cd license-manager
 
-# 构建应用
+# 本地后端构建与运行（可选）
+cd backend/cmd
 go build -o license-manager
 
-# 配置应用
-cp config.example.yaml config.yaml
-# 编辑 config.yaml 配置文件
+# 配置（二选一）
+# 1) 在当前目录创建配置文件（程序优先读取工作目录下的 config.yaml）
+# cp ../configs/config.example.yaml ./config.yaml && 编辑
+# 2) 直接编辑 ../configs/config.yaml（程序会自动回退读取该文件）
 
-# 运行应用
 ./license-manager
 ```
 
-## Docker部署
+## Docker 部署
+
+推荐使用 Docker Compose，已提供开发与生产编排文件：
 
 ```bash
-# 构建Docker镜像（多阶段构建，包含前后端）
-docker build -t license-manager .
+# 开发环境（首次建议带 --build）
+docker compose up -d --build
 
-# 创建配置文件
-cp backend/configs/config.example.yaml config.yaml
-# 编辑 config.yaml 配置数据库等信息
+# 生产环境
+docker compose -f docker-compose.prod.yml up -d
 
-# 使用Docker运行
-docker run -d \
-  --name license-manager \
-  -p 18888:18888 \
-  -v $(pwd)/config.yaml:/app/config.yaml \
-  license-manager
-
-# 查看运行状态
-docker logs license-manager
-
-# 健康检查
+# 验证后端健康
 curl http://localhost:18888/health
 ```
 
-### Docker Compose部署（推荐）
-
-```yaml
-# docker-compose.yml
-version: '3.8'
-services:
-  license-manager:
-    build: .
-    ports:
-      - "18888:18888"
-    volumes:
-      - ./config.yaml:/app/config.yaml
-    environment:
-      - GIN_MODE=release
-    restart: unless-stopped
-    
-  mysql:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: root@123
-      MYSQL_DATABASE: license_manager
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    restart: unless-stopped
-
-volumes:
-  mysql_data:
-```
+完整部署说明（反向代理、健康检查、配置挂载等）请参见 `README-Docker.md`。
 
 ## 开源许可证
 
