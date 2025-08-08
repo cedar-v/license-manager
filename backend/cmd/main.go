@@ -8,8 +8,8 @@ import (
 	"license-manager/internal/api/routes"
 	"license-manager/internal/config"
 	"license-manager/internal/database"
-	"license-manager/pkg/logger"
 	"license-manager/pkg/i18n"
+	"license-manager/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,6 +28,7 @@ import (
 
 // @host localhost:18888
 // @BasePath /
+// @schemes http https
 
 // @securityDefinitions.apikey BearerAuth
 // @in header
@@ -40,7 +41,7 @@ func main() {
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		configPath = "../configs/config.yaml" // 本地开发环境
 	}
-	
+
 	if err := config.Load(configPath); err != nil {
 		log.Fatalf("Failed to load config: %v", err)
 	}
@@ -69,7 +70,7 @@ func main() {
 		if err := i18n.InitGlobalManager(cfg.I18n.ConfigPath, cfg.I18n.DefaultLang); err != nil {
 			log.Fatalf("多语言初始化失败: %v", err)
 		}
-		
+
 		// 预加载支持的语言
 		for _, lang := range cfg.I18n.SupportLangs {
 			if err := i18n.LoadLanguage(lang); err != nil {
