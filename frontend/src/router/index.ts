@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-01 09:32:42
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-08-06 16:40:56
+ * @LastEditTime: 2025-08-08 11:03:44
  * @FilePath: /frontend/src/router/index.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -22,7 +22,8 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/dashboard",
     component: () => import("@/views/Dashboard.vue"),
-    meta: { title: "仪表板", requiresAuth: true }
+    // meta: { title: "仪表板", requiresAuth: true }
+      meta: { title: "仪表板"}
   },
 ];
 
