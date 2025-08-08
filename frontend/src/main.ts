@@ -15,10 +15,16 @@ import './assets/styles/global.css'
 
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import i18n, { getCurrentElementLocale } from './i18n'
 
 
 const app = createApp(App)
+
+// 全局注册Element Plus图标
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component)
+}
 
 // 正确配置Element Plus语言包
 app.use(ElementPlus, {
