@@ -68,7 +68,6 @@ services:
     restart: unless-stopped
     environment:
       - TZ=Asia/Shanghai
-      - API_UPSTREAM=http://backend:18888
     ports:
       - "18080:80"
     depends_on:

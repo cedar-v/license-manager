@@ -22,10 +22,10 @@ FROM nginx:alpine
 # Copy built assets
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy nginx configuration template and entrypoint to render from env
-COPY nginx.conf /etc/nginx/conf.d/default.conf.template
-COPY frontend/entrypoint/10-envsubst.sh /docker-entrypoint.d/10-envsubst.sh
-RUN chmod +x /docker-entrypoint.d/10-envsubst.sh
+# Selectable nginx configuration (default: nginx.conf). Use build-arg to switch.
+ARG NGINX_CONF=nginx.conf
+ENV NGINX_CONF=${NGINX_CONF}
+COPY ${NGINX_CONF} /etc/nginx/conf.d/default.conf
 
 # Create log directory
 RUN mkdir -p /var/log/nginx

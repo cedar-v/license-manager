@@ -87,8 +87,6 @@ services:
     restart: unless-stopped
     environment:
       - TZ=Asia/Shanghai
-      # Set API upstream for automated deployments (e.g., external gateway or backend host)
-      - API_UPSTREAM=${API_UPSTREAM:-http://backend:18888}
     ports:
       - "${FRONTEND_PORT:-80}:80"
     depends_on:
