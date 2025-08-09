@@ -27,7 +27,7 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -f Dockerfile.frontend -t ${{ env.IMAGE_NAME }}:latest .
+        docker build -f Dockerfile.frontend --build-arg NGINX_CONF=nginx-ci.conf -t ${{ env.IMAGE_NAME }}:latest .
         docker save ${{ env.IMAGE_NAME }}:latest > frontend-image.tar
 
     - name: Copy files to server
