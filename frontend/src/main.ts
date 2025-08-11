@@ -10,8 +10,12 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 
-// 全局样式重置
-import './assets/styles/global.css'
+// 全局样式系统
+import './assets/styles/global.scss'
+import './assets/styles/element-theme.scss'
+
+// Pinia状态管理
+import pinia from './store'
 
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
@@ -30,6 +34,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 app.use(ElementPlus, {
   locale: getCurrentElementLocale()
 })
+app.use(pinia)
 app.use(i18n)
 app.use(router)
 app.mount('#app')

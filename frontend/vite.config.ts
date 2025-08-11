@@ -50,6 +50,10 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       open: true, // 自动打开浏览器
       https: false, // 不启用HTTPS
       cors: true, // 启用CORS
+      // 开发环境热更新优化
+      hmr: {
+        overlay: true
+      },
       proxy: { // 代理配置
         "/devApi": {
           target: "http://104.156.140.42:18888", // 目标服务器
@@ -57,6 +61,20 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
           rewrite: path => path.replace(/^\/devApi/, "") // 路径重写
         },
       }
+    },
+
+    // 依赖优化配置
+    optimizeDeps: {
+      include: [
+        'vue',
+        'vue-router',
+        'pinia',
+        'element-plus',
+        '@element-plus/icons-vue',
+        'axios',
+        'vue-i18n'
+      ],
+      exclude: ['@vueuse/core'] // 排除某些包的预构建
     },
 
     // 模块解析配置
@@ -80,24 +98,52 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     // 构建配置
     build: {
       minify: 'terser', // 使用terser进行代码压缩
-      assetsInlineLimit: 8 * 1024, // 小于8KB的资源转为base64
-      sourcemap: isProd, // 生产环境生成sourcemap
-      outDir: env.VITE_OUTDIR, // 输出目录（从环境变量获取）
+      assetsInlineLimit: 4 * 1024, // 小于4KB的资源转为base64（优化）
+      sourcemap: !isProd, // 开发环境生成sourcemap，生产环境不生成
+      outDir: env.VITE_OUTDIR || 'dist', // 输出目录
       emptyOutDir: true, // 构建前清空输出目录
-      chunkSizeWarningLimit: 1500, // 块大小警告阈值(KB)
+      chunkSizeWarningLimit: 1000, // 降低块大小警告阈值至1MB
+      cssCodeSplit: true, // CSS代码分割
+      terserOptions: {
+        compress: {
+          drop_console: isProd, // 生产环境移除console
+          drop_debugger: isProd, // 生产环境移除debugger
+          pure_funcs: isProd ? ['console.log'] : [] // 移除纯函数调用
+        }
+      },
       rollupOptions: { // Rollup打包配置
         output: {
-          manualChunks(id) { // 手动分块策略
-            if (id.includes('node_modules')) {
-              // 将node_modules中的依赖单独分块
-              return id.toString().split('node_modules/')[1].split('/')[0].toString();
-            }
+          // 优化的手动分块策略
+          manualChunks: {
+            // Vue核心
+            vue: ['vue', 'vue-router', 'pinia'],
+            // Element Plus相关
+            elementPlus: ['element-plus'],
+            // Element Plus图标
+            elementIcons: ['@element-plus/icons-vue'],
+            // 工具库
+            utils: ['axios'],
+            // 其他第三方库单独打包
+            vendor: ['vue-i18n']
           },
-          // 输出文件命名规则（添加时间戳避免缓存）
-          chunkFileNames: `static/js/[name]-[hash]${Timestamp}.js`,
-          entryFileNames: `static/js/[name]-[hash]${Timestamp}.js`,
-          assetFileNames: `static/[ext]/[name]-[hash]${Timestamp}.[ext]`,
-        }
+          // 输出文件命名规则（优化缓存策略）
+          chunkFileNames: `static/js/[name].[hash].js`,
+          entryFileNames: `static/js/[name].[hash].js`,
+          assetFileNames: (assetInfo) => {
+            const name = assetInfo.name || ''
+            if (/\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/i.test(name)) {
+              return `static/media/[name].[hash][extname]`
+            } else if (/\.(png|jpe?g|gif|svg|ico|webp)(\?.*)?$/i.test(name)) {
+              return `static/images/[name].[hash][extname]`
+            } else if (/\.(woff2?|eot|ttf|otf)(\?.*)?$/i.test(name)) {
+              return `static/fonts/[name].[hash][extname]`
+            } else {
+              return `static/assets/[name].[hash][extname]`
+            }
+          }
+        },
+        // 外部化依赖（CDN优化，可选）
+        external: isProd ? [] : []
       }
     },
 

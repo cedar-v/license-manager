@@ -20,8 +20,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router';
-import Layout from '@/views/components/layout/Layout.vue';
-import type { NavItem, BreadcrumbItem } from '@/views/components/layout/index';
+import Layout from '@/components/common/layout/Layout.vue';
+import type { NavItem, BreadcrumbItem } from '@/components/common/layout/index';
 const router = useRouter();
 
 const navigationItems = ref<NavItem[]>([

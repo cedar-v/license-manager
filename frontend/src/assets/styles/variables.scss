@@ -1,0 +1,70 @@
+// 主色调
+$primary-color: #019C7C;        // 主色
+$success-color: #67C23A;        // 成功色
+$warning-color: #E6A23C;        // 警告色
+$danger-color: #F56C6C;         // 危险色
+$info-color: #909399;           // 信息色
+
+// 中性色
+$text-color-primary: #303133;   // 主要文字
+$text-color-regular: #606266;   // 常规文字
+$text-color-secondary: #909399; // 次要文字
+$text-color-placeholder: #C0C4CC; // 占位符文字
+
+// 边框色
+$border-color-base: #DCDFE6;
+$border-color-light: #E4E7ED;
+$border-color-lighter: #EBEEF5;
+$border-color-extra-light: #F2F6FC;
+
+// 背景色
+$background-color-base: #F5F7FA;
+$background-color-white: #FFFFFF;
+
+// 字体大小
+$font-size-extra-large: 20px;
+$font-size-large: 18px;
+$font-size-medium: 16px;
+$font-size-base: 14px;
+$font-size-small: 13px;
+$font-size-extra-small: 12px;
+
+// 字体粗细
+$font-weight-primary: 500;
+$font-weight-secondary: 400;
+
+// 行高
+$line-height-primary: 24px;
+$line-height-secondary: 16px;
+
+// 间距变量
+$spacing-extra-large: 32px;
+$spacing-large: 24px;
+$spacing-medium: 16px;
+$spacing-base: 12px;
+$spacing-small: 8px;
+$spacing-extra-small: 4px;
+
+// 圆角
+$border-radius-base: 4px;
+$border-radius-small: 2px;
+$border-radius-round: 20px;
+$border-radius-circle: 100%;
+
+// 阴影
+$box-shadow-base: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+$box-shadow-light: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+
+// 响应式断点
+$breakpoint-mobile: 768px;
+$breakpoint-tablet: 992px;
+$breakpoint-desktop: 1200px;
+$breakpoint-wide: 1920px;
+
+// Z-index 层级
+$z-index-popper: 2000;
+$z-index-dialog: 2001;
+$z-index-drawer: 2002;
+$z-index-message: 3000;
+$z-index-notification: 4000;
+$z-index-tooltip: 2003;

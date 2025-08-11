@@ -7,32 +7,30 @@
 -->
 <template>
   <!-- 侧边栏容器 -->
-  <aside 
-    class="sidebar" 
-    :class="{ 'sidebar--collapsed': isCollapsed }"
-  >
+  <aside class="sidebar" :class="{
+    'sidebar--collapsed': isCollapsed,
+    'sidebar--mobile-open': appStore.isMobile && !isCollapsed
+  }">
     <!-- Logo区域 -->
     <div class="sidebar__header">
-      <div class="sidebar__logo">
+      <div class="sidebar__logo" v-show="!isCollapsed">
         <div class="logo-container">
           <div class="logo-icon">
             <svg width="41" height="40" viewBox="0 0 41 40" fill="none" xmlns="http://www.w3.org/2000/svg">
               <g class="logo-icon-group">
-                <path d="M0 0H29.74V40H0V0Z" fill="#019C7C"/>
-                <path d="M24.59 20.16H41V40H24.59V20.16Z" fill="#146B59"/>
+                <path d="M0 0H29.74V40H0V0Z" fill="#019C7C" />
+                <path d="M24.59 20.16H41V40H24.59V20.16Z" fill="#146B59" />
               </g>
             </svg>
           </div>
-          <span v-show="!isCollapsed" class="logo-text">Cedar-V</span>
+          <span class="logo-text">Cedar-V</span>
         </div>
       </div>
-      <button 
-        v-if="collapsible"
-        class="sidebar__toggle"
-        @click="toggleSidebar"
-        :aria-label="isCollapsed ? '展开侧边栏' : '收起侧边栏'"
-      >
-        <i :class="isCollapsed ? 'el-icon-s-unfold' : 'el-icon-s-fold'"></i>
+      <button v-if="collapsible" class="sidebar__toggle" :class="{ 'sidebar__toggle--collapsed': isCollapsed }"
+        @click="toggleSidebar" :aria-label="isCollapsed ? '展开侧边栏' : '收起侧边栏'">
+        <el-icon class="toggle-icon">
+          <component :is="isCollapsed ? 'ArrowRight' : 'ArrowLeft'" />
+        </el-icon>
       </button>
     </div>
 
@@ -41,12 +39,8 @@
       <div class="nav-section">
         <slot name="nav-items">
           <div class="nav-item" v-for="item in navItems" :key="item.id">
-            <a 
-              :href="item.href" 
-              class="nav-link"
-              :class="{ 'nav-link--active': item.active }"
-              @click="handleNavClick(item, $event)"
-            >
+            <a :href="item.href" class="nav-link" :class="{ 'nav-link--active': item.active }"
+              @click="handleNavClick(item, $event)">
               <div class="nav-icon-wrapper">
                 <el-icon v-if="item.icon" class="nav-icon">
                   <component :is="item.icon" />
@@ -54,17 +48,11 @@
               </div>
               <span v-show="!isCollapsed" class="nav-text">{{ item.label }}</span>
             </a>
-            
+
             <!-- 子菜单 -->
             <div v-if="item.children && !isCollapsed" class="nav-submenu">
-              <a 
-                v-for="child in item.children"
-                :key="child.id"
-                :href="child.href"
-                class="nav-sublink"
-                :class="{ 'nav-sublink--active': child.active }"
-                @click="handleNavClick(child, $event)"
-              >
+              <a v-for="child in item.children" :key="child.id" :href="child.href" class="nav-sublink"
+                :class="{ 'nav-sublink--active': child.active }" @click="handleNavClick(child, $event)">
                 <span class="nav-subtext">{{ child.label }}</span>
               </a>
             </div>
@@ -83,7 +71,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed } from 'vue'
+import { useAppStore } from '@/store/modules/app'
 
 // 导航项接口定义
 interface NavItem {
@@ -117,13 +106,16 @@ const emit = defineEmits<{
   toggle: [collapsed: boolean]
 }>()
 
-// 侧边栏折叠状态管理
-const isCollapsed = ref(props.defaultCollapsed)
+// 使用全局状态管理
+const appStore = useAppStore()
+
+// 从 store 获取折叠状态
+const isCollapsed = computed(() => appStore.sidebarCollapsed)
 
 // 切换侧边栏折叠状态
 const toggleSidebar = () => {
-  isCollapsed.value = !isCollapsed.value
-  emit('toggle', isCollapsed.value)
+  appStore.toggleSidebar()
+  emit('toggle', !appStore.sidebarCollapsed)
 }
 
 // 处理导航项点击事件
@@ -190,22 +182,57 @@ const handleNavClick = (item: NavItem, event: Event) => {
 }
 
 .sidebar__toggle {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border: none;
-  background: transparent;
-  border-radius: 4px;
+  background: #FFFFFF;
+  border-radius: 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #B2B8C2;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(29, 29, 29, 0.08);
 }
 
+/* 未选中状态的hover */
 .sidebar__toggle:hover {
-  background: rgba(1, 156, 124, 0.1);
+  background: #F8F9FA;
   color: #019C7C;
+  border-color: rgba(1, 156, 124, 0.2);
+  transform: scale(1.02);
+}
+
+/* 选中状态（折叠时的样式） */
+.sidebar__toggle--collapsed {
+  background: linear-gradient(135deg, #019C7C 0%, #0BB68A 100%);
+  color: #FFFFFF;
+  border-color: #019C7C;
+  box-shadow: 0px 2px 8px 0px rgba(1, 156, 124, 0.24);
+}
+
+/* 选中状态的hover */
+.sidebar__toggle--collapsed:hover {
+  background: linear-gradient(135deg, #028970 0%, #0AA67D 100%);
+  transform: scale(1.02);
+  box-shadow: 0px 4px 12px 0px rgba(1, 156, 124, 0.32);
+}
+
+.toggle-icon {
+  width: 16px;
+  height: 16px;
+  font-size: 14px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar__toggle:hover .toggle-icon {
+  transform: translateX(1px);
+}
+
+.sidebar__toggle--collapsed:hover .toggle-icon {
+  transform: translateX(-1px);
 }
 
 /* 导航区域 */
@@ -220,14 +247,15 @@ const handleNavClick = (item: NavItem, event: Event) => {
 }
 
 .nav-item {
-  margin-bottom: 4px;
+  margin-bottom: 10px;
+  padding: 8px 16px;
 }
 
 .nav-link {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 12px 20px;
   color: #1D1D1D;
   text-decoration: none;
   border-radius: 28px;
@@ -236,7 +264,6 @@ const handleNavClick = (item: NavItem, event: Event) => {
   font-family: 'OPPOSans', sans-serif;
   font-weight: 400;
   line-height: 1.3;
-  margin-bottom: 10px;
 }
 
 .nav-link:hover {
@@ -245,7 +272,7 @@ const handleNavClick = (item: NavItem, event: Event) => {
 }
 
 .nav-link--active {
-  background: linear-gradient(90deg, #39CC68 0%, #A6E852 100%);
+  background: rgba(0, 194, 124, 0.12);
   color: #019C7C;
   font-weight: 700;
   box-shadow: 0px 2px 32px 0px rgba(0, 0, 0, 0.02);
@@ -271,6 +298,10 @@ const handleNavClick = (item: NavItem, event: Event) => {
   height: 20px;
   font-size: 16px;
   color: #B2B8C2;
+}
+
+.nav-link:hover .nav-icon {
+  color: #019C7C;
 }
 
 .nav-link--active .nav-icon {
@@ -326,11 +357,11 @@ const handleNavClick = (item: NavItem, event: Event) => {
   .sidebar {
     transform: translateX(-100%);
   }
-  
+
   .sidebar--mobile-open {
     transform: translateX(0);
   }
-  
+
   .sidebar--collapsed {
     width: 280px;
   }
@@ -341,7 +372,7 @@ const handleNavClick = (item: NavItem, event: Event) => {
     width: 100vw;
     max-width: 320px;
   }
-  
+
   .sidebar--collapsed {
     width: 100vw;
     max-width: 320px;
@@ -363,7 +394,7 @@ const handleNavClick = (item: NavItem, event: Event) => {
 
 .sidebar--collapsed .nav-link {
   justify-content: center;
-  padding: 24px 12px;
+  padding: 3px 12px;
 }
 
 .sidebar--collapsed .nav-text {

@@ -1,34 +1,52 @@
 {
-  "name": "vue3_vite",
+  "name": "license-manager-frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "description": "License Manager Frontend built with Vue 3 + TypeScript + Element Plus",
+  "author": "License Manager Team",
   "scripts": {
+    "dev": "vite",
     "serve": "vite",
-    "test": "vue-tsc && vite build --mode test",
-    "prod": "vue-tsc && vite build --mode production",
-    "preview": "vite preview"
+    "build": "vue-tsc --noEmit && vite build",
+    "build:test": "vue-tsc --noEmit && vite build --mode test",
+    "build:prod": "vue-tsc --noEmit && vite build --mode production",
+    "preview": "vite preview",
+    "type-check": "vue-tsc --noEmit",
+    "lint": "eslint src --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
-    "amfe-flexible": "^2.2.1",
-    "axios": "^1.3.6",
+    "axios": "^1.7.0",
     "element-plus": "^2.10.5",
-    "postcss-pxtorem": "^6.0.0",
-    "rollup-plugin-visualizer": "^6.0.3",
-    "sass": "^1.89.2",
-    "vite-plugin-eslint": "^1.8.1",
-    "vue": "^3.2.47",
+    "pinia": "^2.2.0",
+    "vue": "^3.5.0",
     "vue-i18n": "^9.14.5",
-    "vue-router": "^4.1.6"
+    "vue-router": "^4.4.0"
   },
   "devDependencies": {
-    "@types/node": "^18.16.16",
-    "@vitejs/plugin-vue": "^4.1.0",
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "@vitejs/plugin-vue": "^5.0.0",
+    "@vue/eslint-config-prettier": "^9.0.0",
+    "@vue/eslint-config-typescript": "^13.0.0",
+    "eslint": "^9.0.0",
+    "eslint-plugin-vue": "^9.0.0",
+    "prettier": "^3.0.0",
+    "rollup-plugin-visualizer": "^5.12.0",
+    "sass": "^1.89.2",
     "terser": "^5.43.1",
     "typescript": "^5.8.3",
-    "vite": "^4.3.0",
+    "vite": "^5.0.0",
     "vite-plugin-compression": "^0.5.1",
-    "vue-tsc": "^3.0.4"
+    "vitest": "^2.0.0",
+    "vue-tsc": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   }
 }
