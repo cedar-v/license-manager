@@ -14,11 +14,10 @@ type Customer struct {
 	CustomerType         string         `gorm:"type:varchar(20);not null;default:'enterprise';index" json:"customer_type"`
 	ContactPerson        string         `gorm:"type:varchar(100);not null" json:"contact_person"`
 	ContactTitle         *string        `gorm:"type:varchar(100)" json:"contact_title"`
-	Email                string         `gorm:"type:varchar(255);uniqueIndex;not null" json:"email"`
+	Email                *string        `gorm:"type:varchar(255)" json:"email"`
 	Phone                *string        `gorm:"type:varchar(20)" json:"phone"`
 	Address              *string        `gorm:"type:text" json:"address"`
 	CompanySize          *string        `gorm:"type:varchar(20)" json:"company_size"`
-	PreferredLicenseType string         `gorm:"type:varchar(20);default:'online'" json:"preferred_license_type"`
 	CustomerLevel        string         `gorm:"type:varchar(20);not null;default:'normal';index" json:"customer_level"`
 	Status               string         `gorm:"type:varchar(20);not null;default:'active';index" json:"status"`
 	Description          *string        `gorm:"type:text" json:"description"`

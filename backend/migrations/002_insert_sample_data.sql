@@ -12,7 +12,7 @@ ON DUPLICATE KEY UPDATE sequence_number = 5;
 INSERT INTO customers (
     customer_code, customer_name, customer_type, 
     contact_person, contact_title, email, phone, 
-    address, company_size, preferred_license_type, 
+    address, company_size, 
     customer_level, status, description, 
     created_at, updated_at, created_by
 ) VALUES 
@@ -27,7 +27,6 @@ INSERT INTO customers (
     '13800138000',
     '北京市朝阳区科技园区100号', 
     'medium', 
-    'online',
     'vip', 
     'active', 
     '重要客户，IoT平台采购方，需要优先技术支持', 
@@ -44,7 +43,6 @@ INSERT INTO customers (
     '13900139000',
     '上海市浦东新区张江高科技园区200号', 
     NULL, 
-    'offline',
     'normal', 
     'active', 
     '个人开发者，主要用于学习和小型项目', 
@@ -61,7 +59,6 @@ INSERT INTO customers (
     '010-12345678',
     '某市政府大楼信息化中心', 
     'large', 
-    'hybrid',
     'enterprise', 
     'active', 
     '政府客户，智慧城市项目，需要专项技术支持', 
@@ -78,7 +75,6 @@ INSERT INTO customers (
     '010-62785678',
     '北京市海淀区清华大学计算机学院', 
     'large', 
-    'online',
     'strategic', 
     'active', 
     '重点高校合作伙伴，科研项目合作，享受教育优惠政策', 
@@ -95,7 +91,6 @@ INSERT INTO customers (
     '13700137000',
     '测试地址', 
     'small', 
-    'online',
     'normal', 
     'disabled', 
     '测试客户，已禁用，用于演示禁用状态', 

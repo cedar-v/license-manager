@@ -13,7 +13,7 @@ CREATE TABLE customers (
     -- 联系信息
     contact_person VARCHAR(100) NOT NULL,
     contact_title VARCHAR(100),
-    email VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(255),
     phone VARCHAR(20),
     
     -- 地址信息
@@ -21,9 +21,6 @@ CREATE TABLE customers (
     
     -- 商业属性
     company_size VARCHAR(20) COMMENT '企业规模: small, medium, large, enterprise',
-    
-    -- 授权配置
-    preferred_license_type VARCHAR(20) DEFAULT 'online' COMMENT '授权类型: online, offline, hybrid',
     
     -- 客户分级
     customer_level VARCHAR(20) NOT NULL DEFAULT 'normal' COMMENT '客户等级: normal, vip, enterprise, strategic',
