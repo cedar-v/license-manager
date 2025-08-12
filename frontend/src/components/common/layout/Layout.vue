@@ -10,7 +10,7 @@
     <!-- 侧边栏 -->
     <Sidebar 
       :app-name="props.appName"
-      :nav-items="props.navItems"
+      :nav-items="navItems"
       @nav-click="handleNavClick"
     />
     
@@ -31,6 +31,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/store/modules/app'
 import Sidebar from './Sidebar.vue'
 import NavContent from './NavContent.vue'
@@ -53,16 +54,34 @@ interface BreadcrumbItem {
 // 组件 Props
 interface Props {
   appName?: string
-  navItems?: NavItem[]
-  breadcrumbItems?: BreadcrumbItem[]
   pageTitle?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   appName: 'Cedar-V',
-  navItems: () => [],
-  breadcrumbItems: () => [],
   pageTitle: ''
+})
+
+// 默认导航配置
+const defaultNavItems: NavItem[] = [
+  { id: "dashboard", label: "仪表盘", href: "/dashboard", icon: "dashboard" },
+  { id: "customers", label: "客户管理", href: "/customers", icon: "customers" },
+  { id: "licenses", label: "授权管理", href: "/licenses", icon: "licenses" },
+  { id: "roles", label: "角色权限", href: "/roles", icon: "roles" },
+  { id: "users", label: "系统用户", href: "/users", icon: "users" }
+]
+
+// 使用 store 和路由
+const appStore = useAppStore()
+const route = useRoute()
+const router = useRouter()
+
+// 计算当前激活的导航项
+const navItems = computed(() => {
+  return defaultNavItems.map(item => ({
+    ...item,
+    active: route.path === item.href
+  }))
 })
 
 // 定义组件事件
@@ -70,11 +89,10 @@ const emit = defineEmits<{
   navClick: [item: NavItem, event: Event]
 }>()
 
-// 使用 store
-const appStore = useAppStore()
 
 // 处理导航点击
 const handleNavClick = (item: NavItem, event: Event) => {
+  router.push(item.href)
   emit('navClick', item, event)
 }
 
@@ -125,13 +143,6 @@ onUnmounted(() => {
   background: #F5F7FA;
   overflow: hidden;
   
-  &--mobile {
-    // 移动端特定样式
-  }
-  
-  &--sidebar-collapsed {
-    // 侧边栏折叠状态样式
-  }
 }
 
 // 遮罩层
