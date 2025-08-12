@@ -2,10 +2,10 @@
 FROM node:20-alpine AS builder
 
 WORKDIR /app
-COPY frontend/package.json ./
+COPY frontend/package.json frontend/package-lock.json ./
 
-# Install dependencies without package-lock.json constraints
-RUN npm install
+# Install dependencies using package-lock.json
+RUN npm ci
 
 COPY frontend/ ./
 
@@ -14,7 +14,7 @@ ENV VITE_OUTDIR=dist
 ENV VITE_ADDRESS_BASE_URL=/
 
 # Build the project and verify output
-RUN npm run prod && ls -la && ls -la dist/
+RUN npm run build:prod && ls -la && ls -la dist/
 
 # Production stage with Nginx
 FROM nginx:alpine
