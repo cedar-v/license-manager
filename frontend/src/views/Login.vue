@@ -2,24 +2,25 @@
   <div class="login-page">
     <!-- 背景层 -->
     <div class="background-layer"></div>
-    
+
     <!-- Logo -->
     <div class="logo-section">
       <div class="logo-icon">
-        <div class="logo-shape-1"></div>
-        <div class="logo-shape-2"></div>
+        <svg width="54" height="52" viewBox="0 0 54 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M26.3125 11.4814L22.25 19.5947V22.7148L27.1191 13.0576L29.7393 18.1777L18.7988 40H0L13.5938 22.8037H14L13.8125 23.1201L7.46875 33.541H17.8438V16.9111L7.1875 25.6475L18.0312 10.1406L11.625 14.4463V14.2588L20.4375 0L26.3125 11.4814Z"
+            fill="#019C7C" />
+          <path
+            d="M34.5498 39.9996H28.75L24.5938 32.8864L27.125 27.6246L34.5498 39.9996ZM41 39.9996H36.2705L27.9346 25.941L30.7188 20.1559L41 39.9996Z"
+            fill="#146B59" />
+        </svg>
       </div>
       <span class="logo-text">Cedar-V</span>
     </div>
 
     <!-- 语言切换器 -->
     <div class="language-switcher">
-      <el-select 
-        v-model="currentLanguage" 
-        @change="changeLanguage"
-        size="default"
-        popper-class="language-popper"
-      >
+      <el-select v-model="currentLanguage" @change="changeLanguage" size="default" popper-class="language-popper">
         <el-option label="English" value="en" />
         <el-option label="中文" value="zh" />
         <el-option label="日本語" value="ja" />
@@ -29,66 +30,36 @@
     <!-- 登录区域 -->
     <div class="login-section">
       <div class="login-container">
-        <div class="login-card" >
+        <div class="login-card">
           <h1 class="title">{{ t('login.title') }}</h1>
           <p class="subtitle">{{ t('login.subtitle') }}</p>
-          <el-form 
-            ref="loginFormRef"
-            :model="loginForm" 
-            :rules="loginRules" 
-            @submit.prevent="handleLogin"
-            class="login-form"
-            size="large"
-          >
+          <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" @submit.prevent="handleLogin"
+            class="login-form" size="large">
             <!-- 用户名输入框 -->
             <el-form-item prop="username">
-              <el-input
-                v-model="loginForm.username"
-                :placeholder="t('login.usernamePlaceholder')"
-                :prefix-icon="User"
-                clearable
-                class="login-input"
-              />
+              <el-input v-model="loginForm.username" :placeholder="t('login.usernamePlaceholder')" :prefix-icon="User"
+                clearable class="login-input" />
             </el-form-item>
-            
+
             <!-- 密码输入框 -->
             <el-form-item prop="password">
-              <el-input
-                v-model="loginForm.password"
-                type="password"
-                :placeholder="t('login.passwordPlaceholder')"
-                :prefix-icon="Lock"
-                show-password
-                clearable
-                class="login-input"
-                @keyup.enter="handleLogin"
-              />
+              <el-input v-model="loginForm.password" type="password" :placeholder="t('login.passwordPlaceholder')"
+                :prefix-icon="Lock" show-password clearable class="login-input" @keyup.enter="handleLogin" />
             </el-form-item>
-            
+
             <!-- 记住密码和忘记密码 -->
             <div class="form-options">
               <el-checkbox v-model="rememberMe" size="default">
                 {{ t('login.remember') }}
               </el-checkbox>
-              <el-link 
-                type="info" 
-                @click="handleForgotPassword"
-                :underline="false"
-                class="forgot-link"
-              >
+              <el-link type="info" @click="handleForgotPassword" :underline="false" class="forgot-link">
                 {{ t('login.forgotPassword') }}
               </el-link>
             </div>
-            
+
             <!-- 登录按钮 -->
             <el-form-item>
-              <el-button 
-                type="primary" 
-                @click="handleLogin"
-                :loading="loading"
-                class="login-button"
-                size="large"
-              >
+              <el-button type="primary" @click="handleLogin" :loading="loading" class="login-button" size="large">
                 {{ t('login.submit') }}
               </el-button>
             </el-form-item>
@@ -153,7 +124,7 @@ onMounted(() => {
     loginForm.password = info.password || "";
     rememberMe.value = true;
   }
-  
+
   // 同步当前语言状态
   currentLanguage.value = locale.value;
 });
@@ -164,26 +135,26 @@ function handleForgotPassword() {
 
 async function handleLogin() {
   if (!loginFormRef.value) return;
-  
+
   try {
     const valid = await loginFormRef.value.validate();
     if (!valid) return;
-    
+
     loading.value = true;
-    
+
     const loginData: LoginRequest = {
       username: loginForm.username,
       password: loginForm.password
     };
-    
+
     const response = await Login(loginData);
-    
+
     if (response.code === 200) {
       // 登录成功
       if (response.data && response.data.token) {
         localStorage.setItem("token", response.data.token);
       }
-      
+
       if (rememberMe.value) {
         localStorage.setItem(
           "loginInfo",
@@ -195,7 +166,7 @@ async function handleLogin() {
       } else {
         localStorage.removeItem("loginInfo");
       }
-      
+
       ElMessage.success(t('login.success'));
       router.push("/dashboard");
     } else {
@@ -248,29 +219,10 @@ async function handleLogin() {
 
 .logo-icon {
   position: relative;
-  width: clamp(50px, 6vw, 72px);
-  height: clamp(48px, 6vw, 70px);
+  width: clamp(54px, 6vw, 54px);
+  height: clamp(52px, 6vw, 52px);
 }
 
-.logo-shape-1 {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 72%;
-  height: 100%;
-  background: #019C7C;
-  clip-path: polygon(0 0, 100% 0, 70% 100%, 0 100%);
-}
-
-.logo-shape-2 {
-  position: absolute;
-  top: 51%;
-  right: 0;
-  width: 42%;
-  height: 49%;
-  background: #146B59;
-  clip-path: polygon(30% 0, 100% 0, 100% 100%, 0 100%);
-}
 
 .logo-text {
   font-family: 'Swis721 BlkCn BT', Arial, sans-serif;
@@ -440,23 +392,23 @@ async function handleLogin() {
     backdrop-filter: blur(20px);
     position: relative;
   }
-  
+
   .login-page {
     flex-direction: column;
   }
-  
+
   .background-layer {
     filter: blur(2px);
     position: fixed;
   }
-  
+
   .logo-section {
     position: fixed;
     top: 1.5rem;
     left: 1.5rem;
     z-index: 300;
   }
-  
+
   .language-switcher {
     position: fixed;
     top: 1.5rem;
@@ -473,21 +425,21 @@ async function handleLogin() {
     align-items: center;
     justify-content: center;
   }
-  
+
   .login-container {
     max-width: 90vw;
   }
-  
+
   .login-card {
     padding: 1.5rem !important;
   }
-  
+
   .form-options {
     flex-direction: column;
     gap: 1rem;
     align-items: flex-start;
   }
-  
+
   .language-switcher :deep(.el-select) {
     width: 100px;
   }
@@ -497,20 +449,20 @@ async function handleLogin() {
   .login-section {
     padding: 1rem 0.5rem;
   }
-  
+
   .login-container {
     max-width: 100%;
   }
-  
-  .login-card  {
+
+  .login-card {
     padding: 1rem !important;
   }
-  
+
   .logo-section {
     transform: scale(0.8);
     transform-origin: left top;
   }
-  
+
   .language-switcher {
     transform: scale(0.8);
     transform-origin: right top;
@@ -524,15 +476,15 @@ async function handleLogin() {
     align-items: flex-start;
     padding-top: 5rem;
   }
-  
+
   .title {
     margin-bottom: 1rem;
   }
-  
+
   .subtitle {
     margin-bottom: 1.5rem;
   }
-  
+
   .login-card {
     padding: 1.5rem !important;
   }
@@ -542,19 +494,19 @@ async function handleLogin() {
   .login-section {
     padding-top: 3rem;
   }
-  
-  .login-card  {
+
+  .login-card {
     padding: 1rem !important;
   }
-  
+
   .title {
     margin-bottom: 0.5rem;
   }
-  
+
   .subtitle {
     margin-bottom: 1rem;
   }
-  
+
   .form-options {
     margin: 1rem 0;
   }
