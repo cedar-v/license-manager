@@ -92,8 +92,8 @@ interface Props {
   defaultCollapsed?: boolean // 默认是否为折叠状态
 }
 
-// 定义组件属性和默认值
-const props = withDefaults(defineProps<Props>(), {
+// 定义组件属性和默认值  
+withDefaults(defineProps<Props>(), {
   appName: 'Cedar',
   navItems: () => [],
   collapsible: true,
