@@ -234,11 +234,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "code": {
-                    "description": "HTTP状态码，如 401, 500",
-                    "type": "integer"
-                },
-                "error": {
-                    "description": "业务错误码，如 AUTH_001, LOGIN_FAILED",
+                    "description": "业务错误码，如 \"100001\", \"900001\"",
                     "type": "string"
                 },
                 "message": {
@@ -338,9 +334,9 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:18888",
+	Host:             "",
 	BasePath:         "/",
-	Schemes:          []string{},
+	Schemes:          []string{"http", "https"},
 	Title:            "License Manager API",
 	Description:      "软件授权管理平台API文档",
 	InfoInstanceName: "swagger",

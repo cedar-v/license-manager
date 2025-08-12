@@ -1,4 +1,8 @@
 {
+    "schemes": [
+        "http",
+        "https"
+    ],
     "swagger": "2.0",
     "info": {
         "description": "软件授权管理平台API文档",
@@ -15,7 +19,6 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:18888",
     "basePath": "/",
     "paths": {
         "/api/v1/admin/system/info": {
@@ -228,11 +231,7 @@
             "type": "object",
             "properties": {
                 "code": {
-                    "description": "HTTP状态码，如 401, 500",
-                    "type": "integer"
-                },
-                "error": {
-                    "description": "业务错误码，如 AUTH_001, LOGIN_FAILED",
+                    "description": "业务错误码，如 \"100001\", \"900001\"",
                     "type": "string"
                 },
                 "message": {

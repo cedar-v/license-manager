@@ -19,7 +19,7 @@ func SetupRouter() *gin.Engine {
 	router.Use(middleware.CustomLoggerMiddleware())
 	router.Use(gin.Recovery())
 	router.Use(middleware.CORSMiddleware())
-	
+
 	// 多语言中间件
 	cfg := config.GetConfig()
 	if cfg.I18n.Enable {
@@ -43,7 +43,7 @@ func SetupRouter() *gin.Engine {
 	router.GET("/health", systemHandler.HealthCheck)
 
 	// Swagger文档路由
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.URL("/swagger/doc.json")))
 
 	// API v1 路由组
 	v1 := router.Group("/api/v1")
