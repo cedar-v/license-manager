@@ -25,6 +25,26 @@ const routes: Array<RouteRecordRaw> = [
     // meta: { title: "仪表板", requiresAuth: true }
       meta: { title: "仪表板"}
   },
+  {
+    path: "/customers",
+    component: () => import("@/views/Customers.vue"),
+    meta: { title: "客户管理"}
+  },
+  {
+    path: "/licenses",
+    component: () => import("@/views/Licenses.vue"),
+    meta: { title: "授权管理"}
+  },
+  {
+    path: "/roles",
+    component: () => import("@/views/Roles.vue"),
+    meta: { title: "角色权限"}
+  },
+  {
+    path: "/users",
+    component: () => import("@/views/Users.vue"),
+    meta: { title: "系统用户"}
+  },
 ];
 
 const router = createRouter({

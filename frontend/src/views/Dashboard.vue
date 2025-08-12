@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-01 09:32:42
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-08-08 14:08:31
+ * @LastEditTime: 2025-08-12 09:44:47
  * @FilePath: /frontend/src/views/Dashboard.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -25,11 +25,11 @@ import type { NavItem, BreadcrumbItem } from '@/components/common/layout/index';
 const router = useRouter();
 
 const navigationItems = ref<NavItem[]>([
-  { id: "dashboard", label: "仪表盘", href: "/dashboard", icon: "Dashboard", active: true },
-  { id: "customers", label: "客户管理", href: "/customers", icon: "User" },
-  { id: "licenses", label: "授权管理", href: "/licenses", icon: "Key" },
-  { id: "roles", label: "角色权限", href: "/roles", icon: "UserFilled" },
-  { id: "users", label: "系统用户", href: "/users", icon: "Avatar" }
+  { id: "dashboard", label: "仪表盘", href: "/dashboard", icon: "dashboard", active: true },
+  { id: "customers", label: "客户管理", href: "/customers", icon: "customers" },
+  { id: "licenses", label: "授权管理", href: "/licenses", icon: "licenses" },
+  { id: "roles", label: "角色权限", href: "/roles", icon: "roles" },
+  { id: "users", label: "系统用户", href: "/users", icon: "users" }
 ]);
 const breadcrumbs = ref<BreadcrumbItem[]>([
   { title: "仪表盘", path: "/dashboard" }

@@ -17,10 +17,8 @@
         <div class="logo-container">
           <div class="logo-icon">
             <svg width="41" height="40" viewBox="0 0 41 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <g class="logo-icon-group">
-                <path d="M0 0H29.74V40H0V0Z" fill="#019C7C" />
-                <path d="M24.59 20.16H41V40H24.59V20.16Z" fill="#146B59" />
-              </g>
+              <path d="M26.3125 11.4814L22.25 19.5947V22.7148L27.1191 13.0576L29.7393 18.1777L18.7988 40H0L13.5938 22.8037H14L13.8125 23.1201L7.46875 33.541H17.8438V16.9111L7.1875 25.6475L18.0312 10.1406L11.625 14.4463V14.2588L20.4375 0L26.3125 11.4814Z" fill="#019C7C"/>
+              <path d="M34.5498 39.9996H28.75L24.5938 32.8864L27.125 27.6246L34.5498 39.9996ZM41 39.9996H36.2705L27.9346 25.941L30.7188 20.1559L41 39.9996Z" fill="#146B59"/>
             </svg>
           </div>
           <span class="logo-text">Cedar-V</span>
@@ -42,9 +40,7 @@
             <a :href="item.href" class="nav-link" :class="{ 'nav-link--active': item.active }"
               @click="handleNavClick(item, $event)">
               <div class="nav-icon-wrapper">
-                <el-icon v-if="item.icon" class="nav-icon">
-                  <component :is="item.icon" />
-                </el-icon>
+                <SidebarIcon v-if="item.icon" :name="item.icon" :active="item.active" />
               </div>
               <span v-show="!isCollapsed" class="nav-text">{{ item.label }}</span>
             </a>
@@ -73,6 +69,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useAppStore } from '@/store/modules/app'
+import SidebarIcon from '@/components/common/icons/SidebarIcon.vue'
 
 // 导航项接口定义
 interface NavItem {
@@ -263,7 +260,7 @@ const handleNavClick = (item: NavItem, event: Event) => {
   font-size: 16px;
   font-family: 'OPPOSans', sans-serif;
   font-weight: 400;
-  line-height: 1.3;
+  line-height: 1;
 }
 
 .nav-link:hover {
@@ -288,7 +285,6 @@ const handleNavClick = (item: NavItem, event: Event) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #FFFFFF;
   border-radius: 4px;
   flex-shrink: 0;
 }
