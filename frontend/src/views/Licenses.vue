@@ -7,8 +7,7 @@
  * @Description: 授权管理页面
 -->
 <template>
-  <Layout app-name="License Manager" :nav-items="navigationItems" :breadcrumb-items="breadcrumbs" page-title="授权管理"
-    @nav-click="handleNavigation">
+  <Layout app-name="Cedar-V" page-title="授权管理">
     <!-- 页面内容 -->
     <div>
       <h1>欢迎你来到授权管理页面</h1>
@@ -17,25 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router';
 import Layout from '@/components/common/layout/Layout.vue';
-import type { NavItem, BreadcrumbItem } from '@/components/common/layout/index';
-const router = useRouter();
-
-const navigationItems = ref<NavItem[]>([
-  { id: "dashboard", label: "仪表盘", href: "/dashboard", icon: "dashboard" },
-  { id: "customers", label: "客户管理", href: "/customers", icon: "customers" },
-  { id: "licenses", label: "授权管理", href: "/licenses", icon: "licenses", active: true },
-  { id: "roles", label: "角色权限", href: "/roles", icon: "roles" },
-  { id: "users", label: "系统用户", href: "/users", icon: "users" }
-]);
-const breadcrumbs = ref<BreadcrumbItem[]>([
-  { title: "授权管理", path: "/licenses" }
-]);
-const handleNavigation = (item: NavItem) => {
-  router.push(item.href);
-};
 </script>
 
 <style scoped></style>
