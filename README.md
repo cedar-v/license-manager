@@ -125,7 +125,7 @@ https://www.gnu.org/licenses/gpl-3.0.html
 
 我们非常重视用户的反馈和建议！欢迎加入我们的QQ群进行讨论和交流：
 
-![QQ群二维码](docs/images/qrcode_1755081220153.jpg)
+<img src="docs/images/qrcode_1755081220153.jpg" alt="QQ群二维码" width="200" />
 
 扫描二维码或者搜索QQ群号加入，与其他用户和开发者一起：
 - 分享使用经验和最佳实践

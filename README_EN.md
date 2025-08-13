@@ -141,7 +141,7 @@ We welcome contributions! Please feel free to submit a Pull Request.
 
 We highly value user feedback and suggestions! Join our QQ group for discussions and communication:
 
-![QQ Group QR Code](docs/images/qrcode_1755081220153.jpg)
+<img src="docs/images/qrcode_1755081220153.jpg" alt="QQ Group QR Code" width="200" />
 
 Scan the QR code or search for the QQ group number to join and connect with other users and developers to:
 - Share usage experiences and best practices
