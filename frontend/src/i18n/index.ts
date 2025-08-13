@@ -33,27 +33,39 @@ export const elementLocales = {
 // 支持的语言类型
 export type SupportedLocale = 'en' | 'zh' | 'ja'
 
+// 语言代码标准映射
+export const LANGUAGE_MAP = {
+  'zh': { code: 'zh', iso: 'zh-CN', name: '中文' },
+  'en': { code: 'en', iso: 'en-US', name: 'English' }, 
+  'ja': { code: 'ja', iso: 'ja-JP', name: '日本語' }
+} as const
+
 // 检测浏览器语言并返回支持的语言
 function detectBrowserLanguage(): SupportedLocale {
-  // 优先使用本地存储中的语言偏好
+  // 1. 优先使用本地存储中的语言偏好（用户显式选择）
   const savedLanguage = localStorage.getItem('userLanguage') as SupportedLocale
-  if (savedLanguage && ['en', 'zh', 'ja'].includes(savedLanguage)) {
+  if (savedLanguage && Object.keys(LANGUAGE_MAP).includes(savedLanguage)) {
     return savedLanguage
   }
 
-  // 获取浏览器语言
-  const browserLanguage = navigator.language.toLowerCase()
+  // 2. 检测浏览器语言设置
+  const browserLanguages = navigator.languages || [navigator.language]
   
-  // 匹配浏览器语言到支持的语言
-  if (browserLanguage.startsWith('en')) {
-    return 'en'
-  } else if (browserLanguage.startsWith('ja')) {
-    return 'ja'
-  } else if (browserLanguage.startsWith('zh')) {
-    return 'zh'
+  for (const lang of browserLanguages) {
+    const langCode = lang.toLowerCase()
+    
+    // 精确匹配
+    if (langCode === 'zh-cn' || langCode === 'zh') return 'zh'
+    if (langCode === 'en-us' || langCode === 'en') return 'en'
+    if (langCode === 'ja-jp' || langCode === 'ja') return 'ja'
+    
+    // 前缀匹配
+    if (langCode.startsWith('zh')) return 'zh'
+    if (langCode.startsWith('en')) return 'en'
+    if (langCode.startsWith('ja')) return 'ja'
   }
   
-  // 默认回退到中文
+  // 3. 默认回退到中文
   return 'zh'
 }
 
@@ -67,10 +79,34 @@ const i18n = createI18n({
 
 // 设置语言的函数
 export function setI18nLanguage(locale: SupportedLocale) {
+  // 验证语言代码
+  if (!Object.keys(LANGUAGE_MAP).includes(locale)) {
+    console.warn(`Unsupported locale: ${locale}, falling back to zh`)
+    locale = 'zh'
+  }
+  
+  // 更新 i18n 当前语言
   i18n.global.locale.value = locale
-  // 设置 HTML 文档的 lang 属性
-  document.documentElement.setAttribute('lang', locale)
+  
+  // 设置 HTML 文档的 lang 属性为标准 ISO 代码
+  const isoCode = LANGUAGE_MAP[locale].iso
+  document.documentElement.setAttribute('lang', isoCode)
+  
+  // 保存用户语言偏好（用于下次访问和 Accept-Language 头）
+  localStorage.setItem('userLanguage', locale)
+  
+  // 触发自定义事件，通知其他组件语言已变更
+  window.dispatchEvent(new CustomEvent('language-change', { 
+    detail: { locale, isoCode, name: LANGUAGE_MAP[locale].name } 
+  }))
+  
   return locale
+}
+
+// 获取当前语言的 ISO 代码
+export function getCurrentLanguageISO(): string {
+  const currentLocale = i18n.global.locale.value as SupportedLocale
+  return LANGUAGE_MAP[currentLocale]?.iso || 'zh-CN'
 }
 
 // 获取当前Element Plus语言包

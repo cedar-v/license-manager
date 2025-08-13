@@ -1,3 +1,11 @@
+/*
+ * @Author: 13895237362 2205451508@qq.com
+ * @Date: 2025-07-31 14:30:20
+ * @LastEditors: 13895237362 2205451508@qq.com
+ * @LastEditTime: 2025-08-13 09:38:31
+ * @FilePath: /frontend/src/api/https/errorCodeType.ts
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 export const errorCodeType = function(status:Number):string{
     let errMessage:string = "未知错误"
     switch (status) {
