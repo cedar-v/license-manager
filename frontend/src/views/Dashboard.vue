@@ -53,7 +53,7 @@
               :data="recentData"
               style="width: 100%"
               :header-row-class-name="'table-header'"
-              :row-class-name="({ rowIndex }: { rowIndex: number }) => rowIndex % 2 === 1 ? 'stripe-row' : ''"
+              :row-class-name="(params: any) => params.rowIndex % 2 === 1 ? 'stripe-row' : ''"
             >
               <el-table-column label="序号"  min-width="90">
                 <template #default="{ $index }" style="min-width: 90px;">

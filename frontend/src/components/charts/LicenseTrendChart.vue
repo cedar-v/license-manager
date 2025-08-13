@@ -21,8 +21,19 @@
             </el-button>
           </div>
           
-          <!-- 日期范围选择器 -->
+          <!-- 日期范围选择器 - 条件渲染模式 -->
+          <!-- 显示模式：当有快捷选择时，显示只读的文本输入框 -->
+          <div v-if="selectedQuick" class="date-display-wrapper">
+            <div class="date-display" @click="switchToEditMode">
+              {{ formatDateRange(dateRange) }}
+              <el-icon class="date-icon"><Calendar /></el-icon>
+            </div>
+          </div>
+          
+          <!-- 编辑模式：实际的日期选择器 -->
           <el-date-picker
+            v-else
+            ref="datePickerRef"
             v-model="dateRange"
             type="daterange"
             range-separator="至"
@@ -31,6 +42,8 @@
             size="small"
             format="MM-DD"
             value-format="YYYY-MM-DD"
+            :clearable="false"
+            :editable="false"
             @change="handleDateChange"
             style="width: 200px;"
           />
@@ -78,6 +91,7 @@ import { ref, computed, onMounted } from 'vue'
 import { use } from 'echarts/core'
 import { useDevice } from '@/composables/useDevice'
 import MobileDateRange from '@/components/common/MobileDateRange.vue'
+import { Calendar } from '@element-plus/icons-vue'
 import { CanvasRenderer } from 'echarts/renderers'
 import { LineChart } from 'echarts/charts'
 import {
@@ -106,8 +120,9 @@ const quickOptions = [
 // 响应式数据
 const { isMobile } = useDevice()
 const selectedQuick = ref('week')
-const dateRange = ref<[string, string]>(['2024-05-13', '2024-05-17'])
+const dateRange = ref<[string, string]>(['2024-05-13', '2024-05-17']) // 初始值会被handleQuickSelect('week')覆盖
 const chartRef = ref()
+const datePickerRef = ref()
 
 // 模拟授权趋势数据
 const trendData = ref([
@@ -233,28 +248,39 @@ const chartOption = computed(() => {
   }
 })
 
-// 快捷选择处理
+// 快捷选择处理 - 简化版，不处理弹出层冲突
 const handleQuickSelect = (value: string) => {
   selectedQuick.value = value
   
   const today = new Date()
   let startDate: Date
-  let endDate: Date = new Date(today)
+  let endDate: Date
   
   switch (value) {
     case 'today':
+      // 本日：今天到今天
       startDate = new Date(today)
+      endDate = new Date(today)
       break
     case 'week':
-      startDate = new Date(today.getTime() - 6 * 24 * 60 * 60 * 1000)
+      // 本周：本周一到本周日
+      const currentDay = today.getDay() // 0=周日, 1=周一, ..., 6=周六
+      const mondayOffset = currentDay === 0 ? 6 : currentDay - 1 // 计算到周一的偏移
+      startDate = new Date(today)
+      startDate.setDate(today.getDate() - mondayOffset)
+      endDate = new Date(startDate)
+      endDate.setDate(startDate.getDate() + 6) // 周日
       break
     case 'month':
+      // 本月：当前月1号到当前月末
       startDate = new Date(today.getFullYear(), today.getMonth(), 1)
+      endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0) // 下个月0号=本月最后一天
       break
     default:
       return
   }
   
+  // 设置日期值
   dateRange.value = [
     startDate.toISOString().split('T')[0],
     endDate.toISOString().split('T')[0]
@@ -264,13 +290,37 @@ const handleQuickSelect = (value: string) => {
   updateChartData()
 }
 
-// 日期范围改变处理
+// 日期范围改变处理 - 只有通过日期选择器手动选择时才触发
 const handleDateChange = (dates: [string, string] | null) => {
   if (dates) {
+    // 清空快捷选择状态，表示用户手动选择了日期
     selectedQuick.value = ''
     dateRange.value = dates
     updateChartData()
   }
+}
+
+// 切换到编辑模式（显示真正的日期选择器）
+const switchToEditMode = () => {
+  selectedQuick.value = ''
+}
+
+// 格式化日期范围用于显示
+const formatDateRange = (range: [string, string]) => {
+  if (!range || !range[0] || !range[1]) {
+    return '请选择日期范围'
+  }
+  
+  const startDate = new Date(range[0])
+  const endDate = new Date(range[1])
+  
+  const formatDate = (date: Date) => {
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${month}-${day}`
+  }
+  
+  return `${formatDate(startDate)} 至 ${formatDate(endDate)}`
 }
 
 // 更新图表数据
@@ -300,7 +350,7 @@ const generateMockData = (startDate: string, endDate: string) => {
 }
 
 onMounted(() => {
-  // 初始化默认选择本周数据
+  // 初始化时直接调用快捷选择，设置为本周
   handleQuickSelect('week')
 })
 </script>
@@ -372,6 +422,46 @@ onMounted(() => {
     
     .el-input__wrapper {
       border-radius: 4px;
+    }
+  }
+  
+  // 日期显示组件样式
+  .date-display-wrapper {
+    display: inline-block;
+    
+    .date-display {
+      height: 32px;
+      width: 200px;
+      padding: 0 12px;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+      background: #fff;
+      font-size: 14px;
+      color: #606266;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        border-color: #c0c4cc;
+      }
+      
+      &:focus {
+        border-color: #019C7C;
+        outline: none;
+      }
+      
+      .date-icon {
+        color: #c0c4cc;
+        font-size: 14px;
+        transition: color 0.2s ease;
+      }
+      
+      &:hover .date-icon {
+        color: #909399;
+      }
     }
   }
 }

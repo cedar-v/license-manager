@@ -306,3 +306,36 @@ html, body {
     box-sizing: border-box !important;
   }
 }
+
+/* Element Plus 日期选择器初始化修复 */
+.el-picker__popper {
+  /* 防止初始化时意外显示 */
+  &[aria-hidden="true"] {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}
+
+/* 防止初始化时弹出层闪现 */
+.el-picker__popper[data-popper-placement] {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* 初始化时隐藏所有遮罩层 */
+.el-overlay {
+  &:empty {
+    display: none !important;
+  }
+}
+
+/* 确保日期选择器组件正确初始化 */
+.el-date-editor {
+  .el-input__inner {
+    cursor: pointer;
+  }
+  
+  /* 防止初始化时的样式闪动 */
+  &.el-input--small {
+    transition: all 0.2s ease;
+  }
+}

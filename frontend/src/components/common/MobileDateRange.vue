@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch } from 'vue'
 
 interface Props {
   modelValue: [string, string] | null
@@ -72,11 +72,9 @@ const selectedQuick = ref('')
 
 // 快捷选择选项
 const quickOptions = [
-  { label: '今天', value: 'today' },
+  { label: '本日', value: 'today' },
   { label: '本周', value: 'week' },
-  { label: '本月', value: 'month' },
-  { label: '近7天', value: '7days' },
-  { label: '近30天', value: '30days' }
+  { label: '本月', value: 'month' }
 ]
 
 // 格式化日期为 YYYY-MM-DD
@@ -84,14 +82,16 @@ const formatDate = (date: Date): string => {
   return date.toISOString().split('T')[0]
 }
 
-// 处理开始日期变化
+// 处理开始日期变化 - 手动输入时清空快捷选择
 const handleStartChange = () => {
+  // 清空快捷选择状态，表示用户手动选择了日期
   selectedQuick.value = ''
   emitChange()
 }
 
-// 处理结束日期变化
+// 处理结束日期变化 - 手动输入时清空快捷选择
 const handleEndChange = () => {
+  // 清空快捷选择状态，表示用户手动选择了日期
   selectedQuick.value = ''
   emitChange()
 }
@@ -114,23 +114,27 @@ const handleQuickSelect = (value: string) => {
   
   const today = new Date()
   let startDate: Date
-  let endDate: Date = new Date(today)
+  let endDate: Date
   
   switch (value) {
     case 'today':
+      // 本日：今天到今天
       startDate = new Date(today)
+      endDate = new Date(today)
       break
     case 'week':
-      startDate = new Date(today.getTime() - 6 * 24 * 60 * 60 * 1000)
+      // 本周：本周一到本周日
+      const currentDay = today.getDay() // 0=周日, 1=周一, ..., 6=周六
+      const mondayOffset = currentDay === 0 ? 6 : currentDay - 1 // 计算到周一的偏移
+      startDate = new Date(today)
+      startDate.setDate(today.getDate() - mondayOffset)
+      endDate = new Date(startDate)
+      endDate.setDate(startDate.getDate() + 6) // 周日
       break
     case 'month':
+      // 本月：当前月1号到当前月末
       startDate = new Date(today.getFullYear(), today.getMonth(), 1)
-      break
-    case '7days':
-      startDate = new Date(today.getTime() - 6 * 24 * 60 * 60 * 1000)
-      break
-    case '30days':
-      startDate = new Date(today.getTime() - 29 * 24 * 60 * 60 * 1000)
+      endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0) // 下个月0号=本月最后一天
       break
     default:
       return
