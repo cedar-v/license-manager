@@ -63,3 +63,37 @@ func (c *Customer) BeforeUpdate(tx *gorm.DB) error {
 func (CustomerCodeSequence) TableName() string {
 	return "customer_code_sequence"
 }
+
+// CustomerListRequest 客户列表查询请求结构
+type CustomerListRequest struct {
+	Page         int    `form:"page" binding:"omitempty,min=1"`                              // 页码，默认1
+	PageSize     int    `form:"page_size" binding:"omitempty,min=1,max=100"`               // 每页条数，默认20，最大100
+	Search       string `form:"search" binding:"omitempty,max=100"`                        // 搜索关键词(支持客户编码、名称、联系人、邮箱)
+	CustomerType string `form:"customer_type" binding:"omitempty,oneof=individual enterprise government education"` // 客户类型筛选
+	CustomerLevel string `form:"customer_level" binding:"omitempty,oneof=normal vip enterprise strategic"` // 客户等级筛选
+	Status       string `form:"status" binding:"omitempty,oneof=active disabled"`          // 状态筛选
+	Sort         string `form:"sort" binding:"omitempty,oneof=created_at updated_at customer_name customer_code"` // 排序字段，默认created_at
+	Order        string `form:"order" binding:"omitempty,oneof=asc desc"`                  // 排序方向，默认desc
+}
+
+// CustomerListItem 客户列表项结构（用于列表展示，包含主要字段）
+type CustomerListItem struct {
+	ID            string `json:"id"`
+	CustomerCode  string `json:"customer_code"`
+	CustomerName  string `json:"customer_name"`
+	CustomerType  string `json:"customer_type"`
+	ContactPerson string `json:"contact_person"`
+	Email         *string `json:"email"`
+	CustomerLevel string `json:"customer_level"`
+	Status        string `json:"status"`
+	CreatedAt     string `json:"created_at"`
+}
+
+// CustomerListResponse 客户列表响应结构
+type CustomerListResponse struct {
+	List       []CustomerListItem `json:"list"`
+	Total      int64              `json:"total"`
+	Page       int                `json:"page"`
+	PageSize   int                `json:"page_size"`
+	TotalPages int                `json:"total_pages"`
+}

@@ -23,6 +23,13 @@ var ErrorMessages = map[string]string{
 	"100004": "缺少认证信息",
 	"100005": "权限不足",
 
+	// 20xxxx - 客户模块
+	"200001": "客户不存在",
+	"200002": "客户已存在",
+	"200003": "客户名称不能为空",
+	"200004": "客户信息格式无效",
+	"200005": "客户列表查询失败",
+
 	// 90xxxx - 系统通用错误
 	"900001": "请求参数无效",
 	"900002": "资源不存在",
@@ -62,12 +69,14 @@ func getHTTPStatusByCode(code string) int {
 		return StatusUnauthorized
 	case "100005": // 权限不足
 		return StatusForbidden
-	case "900002": // 资源不存在
+	case "200001", "900002": // 资源不存在
 		return StatusNotFound
-	case "900003": // 资源冲突
+	case "200002", "900003": // 资源冲突
 		return StatusConflict
-	case "900004": // 服务器内部错误
-		return StatusInternalServerError
+	case "200003", "200004": // 客户信息无效
+		return StatusBadRequest
+	case "200005", "900004": // 服务器内部错误
+		return StatusOK // 根据设计理念，大部分业务错误返回200，通过响应体区分
 	default:
 		return StatusInternalServerError
 	}

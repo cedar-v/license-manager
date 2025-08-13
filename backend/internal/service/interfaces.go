@@ -1,6 +1,9 @@
 package service
 
-import "license-manager/internal/models"
+import (
+	"context"
+	"license-manager/internal/models"
+)
 
 // AuthService 认证服务接口
 type AuthService interface {
@@ -13,4 +16,9 @@ type AuthService interface {
 type SystemService interface {
 	GetHealthStatus() *models.HealthResponse
 	GetSystemInfo() map[string]interface{}
+}
+
+// CustomerService 客户服务接口
+type CustomerService interface {
+	GetCustomerList(ctx context.Context, req *models.CustomerListRequest) (*models.CustomerListResponse, error)
 }

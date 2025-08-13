@@ -10,6 +10,42 @@ definitions:
       timestamp:
         type: string
     type: object
+  models.CustomerListItem:
+    properties:
+      contact_person:
+        type: string
+      created_at:
+        type: string
+      customer_code:
+        type: string
+      customer_level:
+        type: string
+      customer_name:
+        type: string
+      customer_type:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      status:
+        type: string
+    type: object
+  models.CustomerListResponse:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/models.CustomerListItem'
+        type: array
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
   models.ErrorResponse:
     properties:
       code:
@@ -83,6 +119,97 @@ info:
   title: License Manager API
   version: "1.0"
 paths:
+  /api/customers:
+    get:
+      consumes:
+      - application/json
+      description: 分页查询客户列表，支持搜索和筛选
+      parameters:
+      - description: 页码，默认1
+        in: query
+        minimum: 1
+        name: page
+        type: integer
+      - description: 每页条数，默认20，最大100
+        in: query
+        maximum: 100
+        minimum: 1
+        name: page_size
+        type: integer
+      - description: 搜索关键词(支持客户编码、名称、联系人、邮箱)
+        in: query
+        name: search
+        type: string
+      - description: 客户类型筛选
+        enum:
+        - individual
+        - enterprise
+        - government
+        - education
+        in: query
+        name: customer_type
+        type: string
+      - description: 客户等级筛选
+        enum:
+        - normal
+        - vip
+        - enterprise
+        - strategic
+        in: query
+        name: customer_level
+        type: string
+      - description: 状态筛选
+        enum:
+        - active
+        - disabled
+        in: query
+        name: status
+        type: string
+      - description: 排序字段，默认created_at
+        enum:
+        - created_at
+        - updated_at
+        - customer_name
+        - customer_code
+        in: query
+        name: sort
+        type: string
+      - description: 排序方向，默认desc
+        enum:
+        - asc
+        - desc
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.CustomerListResponse'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 查询客户列表
+      tags:
+      - 客户管理
   /api/v1/admin/system/info:
     get:
       consumes:

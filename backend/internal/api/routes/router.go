@@ -5,6 +5,8 @@ import (
 	"license-manager/internal/api/handlers"
 	"license-manager/internal/api/middleware"
 	"license-manager/internal/config"
+	"license-manager/internal/database"
+	"license-manager/internal/repository"
 	"license-manager/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -31,13 +33,19 @@ func SetupRouter() *gin.Engine {
 		router.Use(middleware.I18nMiddleware(i18nConfig))
 	}
 
-	// 初始化服务
+	// 初始化数据访问层
+	db := database.GetDB()
+	customerRepo := repository.NewCustomerRepository(db)
+
+	// 初始化服务层
 	authService := service.NewAuthService()
 	systemService := service.NewSystemService()
+	customerService := service.NewCustomerService(customerRepo)
 
-	// 初始化处理器
+	// 初始化处理器层
 	authHandler := handlers.NewAuthHandler(authService)
 	systemHandler := handlers.NewSystemHandler(systemService)
+	customerHandler := handlers.NewCustomerHandler(customerService)
 
 	// 健康检测接口（无需认证）
 	router.GET("/health", systemHandler.HealthCheck)
@@ -45,26 +53,29 @@ func SetupRouter() *gin.Engine {
 	// Swagger文档路由
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.URL("/swagger/doc.json")))
 
-	// API v1 路由组
-	v1 := router.Group("/api/v1")
+	// API路由组
+	api := router.Group("/api")
 	{
 		// 公开接口（无需认证）
-		public := v1.Group("")
+		public := api.Group("")
 		{
-			public.POST("/login", authHandler.Login)
+			public.POST("/v1/login", authHandler.Login)
 		}
 
 		// 需要认证的接口
-		auth := v1.Group("")
+		auth := api.Group("")
 		auth.Use(middleware.AuthMiddleware())
 		{
 			// 认证相关
-			auth.POST("/logout", authHandler.Logout)
-			auth.POST("/auth/refresh", authHandler.RefreshToken)
+			auth.POST("/v1/logout", authHandler.Logout)
+			auth.POST("/v1/auth/refresh", authHandler.RefreshToken)
+			
+			// 客户管理
+			auth.GET("/customers", customerHandler.GetCustomerList)
 		}
 
 		// 管理员接口
-		admin := v1.Group("/admin")
+		admin := api.Group("/v1/admin")
 		admin.Use(middleware.AuthMiddleware(), middleware.AdminOnlyMiddleware())
 		{
 			admin.GET("/system/info", systemHandler.GetSystemInfo)

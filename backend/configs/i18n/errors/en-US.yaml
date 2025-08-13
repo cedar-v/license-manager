@@ -14,12 +14,13 @@ errors:
     "100004": "Authentication required"
     "100005": "Insufficient permissions"
   
-  # Customer module (20xxxx) - Reserved
+  # Customer module (20xxxx)
   customer:
     "200001": "Customer not found"
     "200002": "Customer already exists"
     "200003": "Customer name is required"
     "200004": "Invalid customer information format"
+    "200005": "Failed to query customer list"
   
   # License module (30xxxx) - Reserved
   license:

@@ -1,9 +1,11 @@
 package middleware
 
 import (
+	"context"
 	"strings"
 
 	"license-manager/pkg/i18n"
+	pkgcontext "license-manager/pkg/context"
 
 	"github.com/gin-gonic/gin"
 )
@@ -209,4 +211,12 @@ func (h *I18nResponseHelper) GetLang() string {
 func (h *I18nResponseHelper) ErrorResponse(code string, customMessage ...string) (int, string, string) {
 	lang := h.GetLang()
 	return i18n.NewI18nErrorResponse(code, lang, customMessage...)
+}
+
+// Context相关工具函数
+
+// WithLanguage 将语言信息添加到Context中
+func WithLanguage(ctx context.Context, c *gin.Context) context.Context {
+	lang := GetLanguage(c)
+	return pkgcontext.WithLanguage(ctx, lang)
 }

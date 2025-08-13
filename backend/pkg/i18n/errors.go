@@ -67,6 +67,7 @@ func getDefaultErrorMessage(code string) string {
 		"200002": "Customer already exists",
 		"200003": "Customer name is required",
 		"200004": "Invalid customer information format",
+		"200005": "Failed to query customer list",
 		"300001": "Invalid license key",
 		"300002": "License expired",
 		"300003": "License key is required",
@@ -111,6 +112,8 @@ func getHTTPStatusByCode(code string) int {
 		return StatusConflict
 	case "900004": // 服务器内部错误
 		return StatusInternalServerError
+	case "200005": // 客户列表查询失败 - 根据设计理念返回200，通过响应体区分
+		return StatusOK
 	default:
 		// 根据错误码前缀判断
 		if len(code) >= 2 {
@@ -118,10 +121,10 @@ func getHTTPStatusByCode(code string) int {
 			switch prefix {
 			case "10": // 认证模块错误，默认401
 				return StatusUnauthorized
-			case "20": // 客户模块错误，默认404
-				return StatusNotFound
-			case "30": // 授权模块错误，默认404
-				return StatusNotFound
+			case "20": // 客户模块错误，默认200（业务错误通过响应体区分）
+				return StatusOK
+			case "30": // 授权模块错误，默认200（业务错误通过响应体区分）
+				return StatusOK
 			case "90": // 系统错误，默认500
 				return StatusInternalServerError
 			}
