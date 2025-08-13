@@ -7,7 +7,7 @@
 -->
 <template>
   <!-- 顶部导航栏容器 -->
-  <header class="nav-content">
+  <header class="nav-content" :class="navClasses">
     <!-- 左侧：侧边栏切换按钮和面包屑 -->
     <div class="nav-content__left">
       <!-- 侧边栏切换按钮 -->
@@ -91,6 +91,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useAppStore } from '@/store/modules/app'
 import NavIcon from '@/components/common/icons/NavIcon.vue'
 import { useBreadcrumb } from '@/utils/breadcrumb'
@@ -116,6 +117,12 @@ const emit = defineEmits<{
 // 使用store和组合函数
 const appStore = useAppStore()
 const { breadcrumbs, navigateTo } = useBreadcrumb()
+
+// 计算导航栏样式类
+const navClasses = computed(() => ({
+  'nav-content--sidebar-collapsed': appStore.sidebarCollapsed,
+  'nav-content--mobile': appStore.isMobile
+}))
 
 // 处理侧边栏切换
 const handleSidebarToggle = () => {
@@ -335,11 +342,25 @@ const handleUserClick = () => {
   line-height: 1.3;
 }
 
+/* 侧边栏状态配合 */
+.nav-content--sidebar-collapsed {
+  left: 64px;
+}
+
+.nav-content--mobile {
+  left: 0;
+}
+
 /* 响应式设计 */
 @media (max-width: 1024px) {
   .nav-content {
     left: 0;
     padding: 16px 20px;
+  }
+  
+  /* 覆盖侧边栏收起状态，移动端和平板端始终从左侧边缘开始 */
+  .nav-content--sidebar-collapsed {
+    left: 0;
   }
 }
 
@@ -385,8 +406,10 @@ const handleUserClick = () => {
   }
 }
 
-/* 与侧边栏收起状态的配合 */
-.nav-content--sidebar-collapsed {
-  left: 64px;
+/* 桌面端特定样式 */
+@media (min-width: 1025px) {
+  .nav-content--sidebar-collapsed {
+    left: 64px;
+  }
 }
 </style>
