@@ -24,6 +24,16 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     // 基础公共路径，从环境变量VITE_ADDRESS_BASE_URL获取
     base: env.VITE_ADDRESS_BASE_URL,
 
+    // CSS预处理器配置
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler', // 使用现代Sass编译器API
+          silenceDeprecations: ['legacy-js-api'],
+        }
+      }
+    },
+
     // 插件配置
     plugins: [
       // Vue插件
@@ -48,19 +58,19 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       host: '0.0.0.0', // 监听所有IP
       port: 8080, // 端口号
       open: true, // 自动打开浏览器
-      https: false, // 不启用HTTPS
+      // https: false, // 不启用HTTPS
       cors: true, // 启用CORS
       // 开发环境热更新优化
       hmr: {
         overlay: true
       },
-      proxy: { // 代理配置
-        "/devApi": {
-          target: "http://104.156.140.42:18888", // 目标服务器
-          changeOrigin: true, // 修改请求头中的origin为目标URL
-          rewrite: path => path.replace(/^\/devApi/, "") // 路径重写
-        },
-      }
+      // 代理配置 (已直接配置 API 基础地址，不需要代理)
+      // proxy: { 
+      //   "/": {
+      //     target: "http://104.156.140.42:18888/", 
+      //     changeOrigin: true, 
+      //   },
+      // }
     },
 
     // 依赖优化配置
