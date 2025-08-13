@@ -1,0 +1,1 @@
+export { default as LicenseTrendChart } from './LicenseTrendChart.vue'

@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-01 09:32:42
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-08-12 09:44:47
+ * @LastEditTime: 2025-08-13 15:21:33
  * @FilePath: /frontend/src/views/Dashboard.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -41,32 +41,7 @@
       <!-- 图表和表格区域 -->
       <div class="content-section">
         <!-- 授权趋势图表 -->
-        <div class="chart-card">
-          <div class="card-header">
-            <h3 class="card-title">授权趋势</h3>
-          </div>
-          <div class="chart-container">
-            <!-- 图表占位区域 -->
-            <div class="chart-placeholder">
-              <svg class="trend-chart" viewBox="0 0 800 200">
-                <!-- 背景渐变 -->
-                <defs>
-                  <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="#5AD8A6" stop-opacity="0.6"/>
-                    <stop offset="100%" stop-color="#5AD8A6" stop-opacity="0.08"/>
-                  </linearGradient>
-                </defs>
-                <!-- 趋势线和填充区域 -->
-                <path d="M40 160 Q200 100 400 80 Q600 60 760 40" 
-                      stroke="#00C27C" 
-                      stroke-width="2" 
-                      fill="none"/>
-                <path d="M40 160 Q200 100 400 80 Q600 60 760 40 L760 160 L40 160 Z" 
-                      fill="url(#chartGradient)"/>
-              </svg>
-            </div>
-          </div>
-        </div>
+        <LicenseTrendChart />
 
         <!-- 最近授权表格 -->
         <div class="table-card">
@@ -74,30 +49,32 @@
             <h3 class="card-title">最近授权</h3>
           </div>
           <div class="table-container">
-            <table class="recent-table">
-              <thead>
-                <tr>
-                  <th>客户名称</th>
-                  <th>产品</th>
-                  <th>授权类型</th>
-                  <th>到期时间</th>
-                  <th>状态</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in recentData" :key="item.id" :class="item.rowClass">
-                  <td>{{ item.customer }}</td>
-                  <td>{{ item.product }}</td>
-                  <td>{{ item.type }}</td>
-                  <td>{{ item.expiry }}</td>
-                  <td>
-                    <span class="status-badge" :class="item.statusClass">
-                      {{ item.status }}
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <el-table
+              :data="recentData"
+              style="width: 100%"
+              :header-row-class-name="'table-header'"
+              :row-class-name="({ rowIndex }: { rowIndex: number }) => rowIndex % 2 === 1 ? 'stripe-row' : ''"
+            >
+              <el-table-column label="序号"  min-width="90">
+                <template #default="{ $index }" style="min-width: 90px;">
+                  {{ $index + 1 }}
+                </template>
+              </el-table-column>
+              <el-table-column prop="customer" label="客户名称" min-width="200" />
+              <el-table-column prop="description" label="描述" min-width="150" />
+              <el-table-column label="状态" min-width="100">
+                <template #default="{ row }">
+                  <span 
+                    class="status-badge" 
+                    :class="row.status === 1 ? 'status-valid' : 'status-invalid'"
+                  >
+                    {{ row.status === 1 ? '有效' : '失效' }}
+                  </span>
+                </template>
+              </el-table-column>
+              <el-table-column prop="expiry" label="到期时间" width="301" />
+              <el-table-column prop="createTime" label="创建时间" width="301" />
+            </el-table>
           </div>
         </div>
       </div>
@@ -107,6 +84,7 @@
 
 <script setup lang="ts">
 import Layout from '@/components/common/layout/Layout.vue';
+import LicenseTrendChart from '@/components/charts/LicenseTrendChart.vue';
 
 // 统计卡片数据
 const statsData = [
@@ -148,67 +126,55 @@ const statsData = [
   }
 ];
 
-// 最近授权数据
+// 最近授权数据 - 根据Figma设计更新
 const recentData = [
   {
     id: 1,
-    customer: '阿里巴巴集团',
-    product: 'Cedar-V Pro',
-    type: '企业版',
-    expiry: '2024-12-31',
-    status: '正常',
-    statusClass: 'status-active',
-    rowClass: ''
+    customer: '石狮市潢安有限公司',
+    description: '落魄山一哥',
+    status: 1, // 1代表有效，0代表失效
+    expiry: '2023-05-26 12:12:00',
+    createTime: '2023-05-26 12:12:00'
   },
   {
     id: 2,
-    customer: '腾讯科技',
-    product: 'Cedar-V Standard',
-    type: '标准版',
-    expiry: '2024-11-15',
-    status: '即将到期',
-    statusClass: 'status-warning',
-    rowClass: ''
+    customer: '石狮市潢安有限公司',
+    description: '落魄山一哥',
+    status: 0,
+    expiry: '2023-05-26 12:12:00',
+    createTime: '2023-05-26 12:12:00'
   },
   {
     id: 3,
-    customer: '字节跳动',
-    product: 'Cedar-V Enterprise',
-    type: '企业版',
-    expiry: '2025-03-20',
-    status: '正常',
-    statusClass: 'status-active',
-    rowClass: 'row-highlight'
+    customer: '石狮市潢安有限公司',
+    description: '落魄山一哥',
+    status: 1,
+    expiry: '2023-05-26 12:12:00',
+    createTime: '2023-05-26 12:12:00'
   },
   {
     id: 4,
-    customer: '美团科技',
-    product: 'Cedar-V Pro',
-    type: '专业版',
-    expiry: '2024-08-10',
-    status: '已过期',
-    statusClass: 'status-expired',
-    rowClass: ''
+    customer: '石狮市潢安有限公司',
+    description: '落魄山一哥',
+    status: 0,
+    expiry: '2023-05-26 12:12:00',
+    createTime: '2023-05-26 12:12:00'
   },
   {
     id: 5,
-    customer: '滴滴出行',
-    product: 'Cedar-V Standard',
-    type: '标准版',
-    expiry: '2025-01-30',
-    status: '正常',
-    statusClass: 'status-active',
-    rowClass: 'row-highlight'
+    customer: '石狮市潢安有限公司',
+    description: '落魄山一哥',
+    status: 1,
+    expiry: '2023-05-26 12:12:00',
+    createTime: '2023-05-26 12:12:00'
   },
   {
     id: 6,
-    customer: '京东集团',
-    product: 'Cedar-V Enterprise',
-    type: '企业版',
-    expiry: '2024-10-25',
-    status: '即将到期',
-    statusClass: 'status-warning',
-    rowClass: 'row-highlight'
+    customer: '石狮市潢安有限公司',
+    description: '落魄山一哥',
+    status: 0,
+    expiry: '2023-05-26 12:12:00',
+    createTime: '2023-05-26 12:12:00'
   }
 ];
 </script>
@@ -329,7 +295,6 @@ const recentData = [
 }
 
 // 卡片通用样式
-.chart-card,
 .table-card {
   background: #FFFFFF;
   border-radius: 8px;
@@ -349,77 +314,73 @@ const recentData = [
   }
 }
 
-// 图表卡片
-.chart-container {
+// 表格卡片
+.table-container {
   padding: 26px 24px 24px;
   
-  .chart-placeholder {
-    height: 246px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  // Element Plus 表格样式重写
+  :deep(.el-table) {
+    border: 1px solid #F5F7FA;
     
-    .trend-chart {
-      width: 100%;
-      height: 100%;
+    .table-header th {
+      background-color: #F7F8FA !important;
+      color: #1D1D1D;
+    font-weight: 500;
+      font-size: 16px;
+      font-family: 'Source Han Sans CN', sans-serif;
+      height: 48px;
+      padding: 13px 20px;
+      border-bottom: none;
+    }
+    
+    .el-table__body tr {
+      height: 48px;
+      
+      td {
+        padding: 13px 20px;
+        border-bottom: 1px solid #F7F8FA;
+    font-size: 14px;
+        font-family: 'Source Han Sans CN', sans-serif;
+        font-weight: 350;
+    color: #1D1D1D;
+  }
+  
+      &.stripe-row {
+    background-color: #F7F8FA;
+  }
+  
+      &:hover > td {
+        background-color: #F7F8FA !important;
+      }
+    }
+    
+    // 序号列居中
+    .el-table__body tr td:nth-child(1) {
+      text-align: center;
     }
   }
 }
 
-// 表格卡片
-.table-container {
-  padding: 26px 24px 24px;
-}
-
-.recent-table {
-  width: 100%;
-  border-collapse: collapse;
-  
-  th {
-    text-align: left;
-    padding: 12px 16px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #666;
-    border-bottom: 1px solid #F5F7FA;
-    background: transparent;
-  }
-  
-  td {
-    padding: 16px;
-    font-size: 14px;
-    color: #1D1D1D;
-    border-bottom: 1px solid #F7F8FA;
-  }
-  
-  tr:hover {
-    background-color: #F7F8FA;
-  }
-  
-  .row-highlight {
-    background-color: #F7F8FA;
-  }
-}
-
 .status-badge {
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
+  padding: 5px 15px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: 'Source Han Sans CN', sans-serif;
+  display: inline-block;
+  min-width: 58px;
+  height: 24px;
+  text-align: center;
+  line-height: 14px;
   
-  &.status-active {
-    background: #E8F5E8;
-    color: #00C27C;
+  &.status-valid {
+    background:#F0F5FF;
+    color:#4763FF;
   }
   
-  &.status-warning {
-    background: #FFF3E0;
-    color: #FF9800;
-  }
-  
-  &.status-expired {
-    background: #FFEBEE;
-    color: #F44336;
+  &.status-invalid {
+    background:#FFE5E5;
+    color: #E90C0C;
   }
 }
 
