@@ -171,3 +171,171 @@ html, body {
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   }
 }
+
+/* 移动端日期选择器弹出层优化 */
+.mobile-date-picker {
+  @media (max-width: 768px) {
+    /* 限制最大宽度，防止超出屏幕 */
+    max-width: calc(100vw - 32px) !important;
+    /* 确保在屏幕范围内 */
+    left: 16px !important;
+    right: 16px !important;
+    /* 使用较小的字体 */
+    font-size: 13px !important;
+    /* 添加z-index确保在最上层 */
+    z-index: 9999 !important;
+    
+    /* 日期面板样式调整 */
+    .el-picker-panel {
+      width: auto !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+    }
+    
+    /* 日期范围选择器的两个面板调整为上下布局 */
+    .el-picker-panel__content {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 8px !important;
+      overflow-x: auto !important;
+    }
+    
+    /* 日期表格调整 */
+    .el-date-table {
+      font-size: 12px !important;
+      min-width: unset !important;
+      
+      td {
+        padding: 1px !important;
+        min-width: 28px !important;
+        
+        span {
+          height: 28px !important;
+          width: 28px !important;
+          line-height: 28px !important;
+          font-size: 11px !important;
+        }
+      }
+    }
+    
+    /* 头部月份切换按钮 */
+    .el-date-picker__header {
+      padding: 6px 8px !important;
+      
+      button {
+        font-size: 12px !important;
+        padding: 0 4px !important;
+      }
+      
+      .el-date-picker__header-label {
+        font-size: 13px !important;
+      }
+    }
+    
+    /* 快捷选项调整 */
+    .el-picker-panel__sidebar {
+      width: 100% !important;
+      padding: 8px !important;
+      border-right: none !important;
+      border-bottom: 1px solid #e4e7ed !important;
+      
+      .el-picker-panel__shortcut {
+        display: inline-block !important;
+        width: calc(50% - 4px) !important;
+        margin: 2px !important;
+        padding: 6px 8px !important;
+        font-size: 12px !important;
+        text-align: center !important;
+      }
+    }
+    
+    /* 底部确认按钮 */
+    .el-picker-panel__footer {
+      padding: 8px !important;
+      text-align: center !important;
+      
+      .el-button {
+        font-size: 12px !important;
+        height: 28px !important;
+        padding: 0 12px !important;
+        margin: 0 4px !important;
+      }
+    }
+  }
+}
+
+/* 移动端日期选择器输入框优化 */
+@media (max-width: 768px) {
+  .el-date-editor.el-input {
+    /* 确保输入框在小屏幕上合适显示 */
+    font-size: 13px !important;
+    
+    .el-input__wrapper {
+      padding: 0 6px !important;
+    }
+    
+    .el-input__inner {
+      font-size: 13px !important;
+      height: 28px !important;
+    }
+    
+    .el-range-separator {
+      font-size: 12px !important;
+      padding: 0 2px !important;
+    }
+    
+    .el-input__suffix {
+      .el-input__suffix-inner {
+        .el-icon {
+          font-size: 14px !important;
+        }
+      }
+    }
+  }
+}
+
+/* 防止移动端弹出日期选择器时页面被撑开 */
+@media (max-width: 768px) {
+  body:has(.mobile-date-picker) {
+    overflow-x: hidden !important;
+  }
+  
+  /* 确保弹出层不会导致水平滚动 */
+  .mobile-date-picker * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* Element Plus 日期选择器初始化修复 */
+.el-picker__popper {
+  /* 防止初始化时意外显示 */
+  &[aria-hidden="true"] {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}
+
+/* 防止初始化时弹出层闪现 */
+.el-picker__popper[data-popper-placement] {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* 初始化时隐藏所有遮罩层 */
+.el-overlay {
+  &:empty {
+    display: none !important;
+  }
+}
+
+/* 确保日期选择器组件正确初始化 */
+.el-date-editor {
+  .el-input__inner {
+    cursor: pointer;
+  }
+  
+  /* 防止初始化时的样式闪动 */
+  &.el-input--small {
+    transition: all 0.2s ease;
+  }
+}

@@ -20,7 +20,7 @@
 
     <!-- 语言切换器 -->
     <div class="language-switcher">
-      <el-select v-model="currentLanguage" @change="changeLanguage" size="default" popper-class="language-popper">
+      <el-select v-model="currentLanguage" @change="handleLanguageChange" size="default" popper-class="language-popper">
         <el-option label="English" value="en" />
         <el-option label="中文" value="zh" />
         <el-option label="日本語" value="ja" />
@@ -77,7 +77,7 @@ import { useI18n } from 'vue-i18n';
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus';
 import { User, Lock } from '@element-plus/icons-vue';
 import { Login, type LoginRequest } from "@/api/user";
-import { setI18nLanguage, SupportedLocale } from '@/i18n'
+import { changeLanguage, type SupportedLocale } from '@/utils/language'
 
 const router = useRouter();
 const { t, locale } = useI18n();
@@ -108,11 +108,10 @@ const loginRules: FormRules = {
 };
 
 // 切换语言
-function changeLanguage(lang: string) {
-  locale.value = lang;
+function handleLanguageChange(lang: string) {
+  // 使用统一的语言管理器切换语言
+  changeLanguage(lang as SupportedLocale);
   currentLanguage.value = lang;
-  localStorage.setItem('userLanguage', lang);
-  setI18nLanguage(lang as SupportedLocale);
 }
 
 onMounted(() => {
@@ -148,8 +147,10 @@ async function handleLogin() {
     };
 
     const response = await Login(loginData);
+    console.log('登录响应:', response);
 
-    if (response.code === 200) {
+    // 检查响应是否成功 (支持 code 200 或 0)
+    if (response.code === 200 || response.code === 0) {
       // 登录成功
       if (response.data && response.data.token) {
         localStorage.setItem("token", response.data.token);
@@ -174,7 +175,22 @@ async function handleLogin() {
     }
   } catch (error: any) {
     console.error("登录错误:", error);
-    ElMessage.error(error.response?.data?.message || t("login.error.general"));
+    
+    // 优先使用后端返回的错误信息
+    let errorMessage = t("login.error.general"); // 默认错误信息
+    
+    if (error.backendMessage) {
+      // 使用 axios 拦截器处理过的后端错误信息
+      errorMessage = error.backendMessage;
+    } else if (error.response?.data?.message) {
+      // 直接从响应中获取后端错误信息
+      errorMessage = error.response.data.message;
+    } else if (error.message && error.message !== "Error") {
+      // 使用错误对象的消息（避免显示通用的 "Error"）
+      errorMessage = error.message;
+    }
+    
+    ElMessage.error(errorMessage);
   } finally {
     loading.value = false;
   }

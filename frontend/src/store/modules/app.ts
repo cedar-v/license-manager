@@ -6,7 +6,7 @@ export const useAppStore = defineStore('app', () => {
   const sidebarCollapsed = ref(false)
   const isMobile = ref(false)
   const theme = ref<'light' | 'dark' | 'auto'>('light')
-  const language = ref<'zh' | 'en'>('zh')
+  const language = ref<'zh' | 'en' | 'ja'>('zh')
   const loading = ref(false)
 
   // 计算属性
@@ -35,8 +35,10 @@ export const useAppStore = defineStore('app', () => {
     document.documentElement.setAttribute('data-theme', newTheme)
   }
 
-  const setLanguage = (lang: 'zh' | 'en') => {
+  const setLanguage = (lang: 'zh' | 'en' | 'ja') => {
     language.value = lang
+    // 同时更新 localStorage 以保持一致性
+    localStorage.setItem('userLanguage', lang)
   }
 
   const setLoading = (isLoading: boolean) => {

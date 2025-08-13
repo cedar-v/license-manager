@@ -46,10 +46,6 @@ interface NavItem {
   children?: NavItem[]
 }
 
-interface BreadcrumbItem {
-  title: string
-  path?: string
-}
 
 // 组件 Props
 interface Props {
