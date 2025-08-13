@@ -101,9 +101,7 @@ interface Props {
 }
 
 // 定义组件属性和默认值
-const props = withDefaults(defineProps<Props>(), {
-  notificationCount: 24
-})
+const { notificationCount = 24 } = defineProps<Props>()
 
 // 定义组件事件
 const emit = defineEmits<{

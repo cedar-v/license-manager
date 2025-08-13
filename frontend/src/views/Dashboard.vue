@@ -227,9 +227,13 @@ const recentData = [
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('/src/assets/dashboard-bg.svg') no-repeat center;
-    background-size: cover;
-    opacity: 0.1;
+    background: linear-gradient(45deg, rgba(255,255,255,0.08) 25%, transparent 25%), 
+                linear-gradient(-45deg, rgba(255,255,255,0.08) 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.08) 75%), 
+                linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.08) 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    opacity: 0.15;
     border-radius: 8px;
   }
 }
