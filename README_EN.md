@@ -137,4 +137,21 @@ We welcome contributions! Please feel free to submit a Pull Request.
 
 ## Support
 
-If you have any questions or need support, please open an issue.
+### User Feedback & Community
+
+We highly value user feedback and suggestions! Join our QQ group for discussions and communication:
+
+![QQ Group QR Code](docs/images/qrcode_1755081220153.jpg)
+
+Scan the QR code or search for the QQ group number to join and connect with other users and developers to:
+- Share usage experiences and best practices
+- Ask questions and get help
+- Participate in new feature discussions
+- Provide feedback and improvement suggestions
+
+### Issue Reporting
+
+For technical issues or bug reports, please contact us through:
+- Submit GitHub Issues (recommended)
+- Provide feedback in the QQ group
+- Send email to project maintainers
