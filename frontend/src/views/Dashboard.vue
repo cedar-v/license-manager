@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-01 09:32:42
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-08-13 15:21:33
+ * @LastEditTime: 2025-08-14 09:12:33
  * @FilePath: /frontend/src/views/Dashboard.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -62,7 +62,7 @@
               </el-table-column>
               <el-table-column prop="customer" label="客户名称" min-width="200" />
               <el-table-column prop="description" label="描述" min-width="150" />
-              <el-table-column label="状态" min-width="100">
+              <el-table-column label="状态" width="120" align="center">
                 <template #default="{ row }">
                   <span 
                     class="status-badge" 
@@ -126,7 +126,7 @@ const statsData = [
   }
 ];
 
-// 最近授权数据 - 根据Figma设计更新
+// 最近授权数据 
 const recentData = [
   {
     id: 1,
@@ -354,24 +354,32 @@ const recentData = [
       }
     }
     
-    // 序号列居中
-    .el-table__body tr td:nth-child(1) {
+    // 序号列和状态列居中
+    .el-table__body tr td:nth-child(1),
+    .el-table__body tr td:nth-child(4) {
       text-align: center;
+    }
+    
+    // 状态列防止文本溢出
+    .el-table__body tr td:nth-child(4) {
+      overflow: visible;
+      text-overflow: initial;
     }
   }
 }
 
 .status-badge {
-  padding: 5px 15px;
+  padding: 4px 12px;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
   font-family: 'Source Han Sans CN', sans-serif;
-  display: inline-block;
-  min-width: 58px;
-  height: 24px;
-  text-align: center;
-  line-height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  width: 46px;
+  height: 22px;
   
   &.status-valid {
     background:#F0F5FF;

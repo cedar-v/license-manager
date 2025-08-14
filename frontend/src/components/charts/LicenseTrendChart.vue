@@ -89,7 +89,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { use } from 'echarts/core'
-import { useDevice } from '@/composables/useDevice'
+import { useDevice } from '@/utils/useDevice'
 import MobileDateRange from '@/components/common/MobileDateRange.vue'
 import { Calendar } from '@element-plus/icons-vue'
 import { CanvasRenderer } from 'echarts/renderers'
