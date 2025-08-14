@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-01 09:32:42
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-08-08 11:03:44
+ * @LastEditTime: 2025-08-14 09:10:33
  * @FilePath: /frontend/src/router/index.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -22,28 +22,27 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/dashboard",
     component: () => import("@/views/Dashboard.vue"),
-    // meta: { title: "仪表板", requiresAuth: true }
-      meta: { title: "仪表板"}
+    meta: { title: "仪表板", requiresAuth: true }
   },
   {
     path: "/customers",
     component: () => import("@/views/Customers.vue"),
-    meta: { title: "客户管理"}
+    meta: { title: "客户管理", requiresAuth: true }
   },
   {
     path: "/licenses",
     component: () => import("@/views/Licenses.vue"),
-    meta: { title: "授权管理"}
+    meta: { title: "授权管理", requiresAuth: true }
   },
   {
     path: "/roles",
     component: () => import("@/views/Roles.vue"),
-    meta: { title: "角色权限"}
+    meta: { title: "角色管理", requiresAuth: true }
   },
   {
     path: "/users",
     component: () => import("@/views/Users.vue"),
-    meta: { title: "系统用户"}
+    meta: { title: "用户管理", requiresAuth: true }
   },
 ];
 
@@ -55,8 +54,8 @@ const router = createRouter({
 // 路由守卫
 router.beforeEach((to, _from, next) => {
   // 设置页面标题
-  document.title = typeof(to.meta.title) === "string" ? to.meta.title : "授权管理平台";
-  
+  document.title = typeof (to.meta.title) === "string" ? to.meta.title : "授权管理平台";
+
   // 检查是否需要认证
   if (to.meta.requiresAuth) {
     const token = localStorage.getItem("token");
@@ -65,7 +64,7 @@ router.beforeEach((to, _from, next) => {
       return;
     }
   }
-  
+
   next();
 });
 
