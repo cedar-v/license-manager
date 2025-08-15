@@ -362,20 +362,24 @@ onMounted(() => {
 <style lang="scss" scoped>
 .license-trend-chart {
   background: #FFFFFF;
-  border-radius: 8px;
-  box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.1);
+  border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
+  box-shadow: 0px 0px 0.21vw 0px rgba(0, 0, 0, 0.1); /* 4px/1920 = 0.21vw */
   overflow: hidden;
+  height: 100%; /* 充满容器高度 */
+  display: flex;
+  flex-direction: column;
 }
 
 .chart-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 24px 24px 0;
+  padding: 1.25vw 1.25vw 0; /* 24px/1920 = 1.25vw */
+  flex-shrink: 0; /* 头部不收缩 */
   
   .chart-title {
     font-family: 'OPPOSans', sans-serif;
-    font-size: 20px;
+    font-size: 1.04vw; /* 20px/1920 = 1.04vw */
     font-weight: 400;
     color: #1D1D1D;
     margin: 0;
@@ -471,15 +475,43 @@ onMounted(() => {
 }
 
 .chart-container {
-  padding: 26px 24px 24px;
+  padding: 1.35vw 1.25vw 1.25vw; /* 26px 24px 24px → vw */
+  flex: 1; /* 占据剩余高度 */
+  display: flex;
+  min-height: 0; /* 防止flex溢出 */
   
   .trend-chart {
     width: 100%;
-    height: 246px;
+    height: 100%; /* 充满容器 */
+    min-height: 12.8vw; /* 最小高度246px/1920 = 12.8vw，确保图表可读性 */
   }
 }
 
-// 响应式设计
+// 响应式设计 - 移动端和平板使用固定像素单位
+@media (max-width: 1024px) {
+  .license-trend-chart {
+    border-radius: 8px; /* 移动端使用固定像素 */
+    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.1);
+  }
+  
+  .chart-header {
+    padding: 16px 16px 0; /* 移动端固定像素 */
+    
+    .chart-title {
+      font-size: 18px; /* 移动端固定字体 */
+    }
+  }
+  
+  .chart-container {
+    padding: 16px; /* 移动端固定间距 */
+    
+    .trend-chart {
+      height: 200px; /* 移动端固定高度 */
+      min-height: unset; /* 清除vw最小高度 */
+    }
+  }
+}
+
 @media (max-width: 768px) {
   .chart-header {
     flex-direction: column;

@@ -1,5 +1,47 @@
 @use './variables.scss' as *;
 
+/* 响应式根字体大小设置 */
+html {
+  /* 移动端和平板保持固定16px基准 */
+  font-size: 16px;
+}
+
+/* 桌面端动态缩放 - 以1920*1080为基准 */
+@media (min-width: 1025px) {
+  html {
+    font-size: 16px; /* 1920px基准 */
+  }
+}
+
+/* 2K屏幕自适应放大33% */
+@media (min-width: 2560px) {
+  html {
+    font-size: 21.33px; /* 16px * (2560/1920) = 21.33px */
+  }
+}
+
+/* 4K屏幕自适应放大100% */
+@media (min-width: 3840px) {
+  html {
+    font-size: 32px; /* 16px * (3840/1920) = 32px */
+  }
+}
+
+/* 调试：在页面右上角显示当前根字体大小 */
+body::before {
+  content: "Font Size: " attr(data-font-size);
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 4px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
 /* 全局样式重置 */
 * {
   margin: 0;
@@ -12,7 +54,7 @@ html, body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-size: 14px;
+  font-size: 0.875rem; /* 14px → 0.875rem，让body也使用rem */
   color: #303133;
   background-color: #F5F7FA;
 }

@@ -126,11 +126,12 @@ const handleNavClick = (item: NavItem, event: Event) => {
 </script>
 
 <style scoped>
+/* 侧边栏 - 基于1920*1080设计的vw适配 */
 .sidebar {
   position: fixed;
   left: 0;
   top: 0;
-  width: 280px;
+  width: 14.58vw; /* 280px/1920 = 14.58vw */
   height: 100vh;
   background: linear-gradient(180deg, #F5F7FA 0%, #FFFFFF 100%);
   border-right: 1px solid rgba(29, 29, 29, 0.12);
@@ -141,16 +142,16 @@ const handleNavClick = (item: NavItem, event: Event) => {
 }
 
 .sidebar--collapsed {
-  width: 64px;
+  width: 3.33vw; /* 64px/1920 = 3.33vw */
 }
 
 /* Header 区域 */
 .sidebar__header {
-  height: 80px;
+  height: 4.17vw; /* 80px/1920 = 4.17vw */
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
+  padding: 0 0.83vw; /* 16px/1920 = 0.83vw */
   border-bottom: 1px solid rgba(29, 29, 29, 0.06);
 }
 
@@ -163,18 +164,18 @@ const handleNavClick = (item: NavItem, event: Event) => {
 .logo-container {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 0.63vw; /* 12px/1920 = 0.63vw */
 }
 
 .logo-icon {
-  width: 41px;
-  height: 40px;
+  width: 2.14vw; /* 41px/1920 = 2.14vw */
+  height: 2.08vw; /* 40px/1920 = 2.08vw */
   flex-shrink: 0;
 }
 
 .logo-text {
   font-family: 'Swis721 BlkCn BT', sans-serif;
-  font-size: 30px;
+  font-size: 1.56vw; /* 30px/1920 = 1.56vw */
   font-weight: 400;
   color: #333333;
   white-space: nowrap;
@@ -183,18 +184,18 @@ const handleNavClick = (item: NavItem, event: Event) => {
 }
 
 .sidebar__toggle {
-  width: 36px;
-  height: 36px;
+  width: 1.88vw; /* 36px/1920 = 1.88vw */
+  height: 1.88vw; /* 36px/1920 = 1.88vw */
   border: none;
   background: #FFFFFF;
-  border-radius: 8px;
+  border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #B2B8C2;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.08);
+  box-shadow: 0px 1px 0.16vw 0px rgba(0, 0, 0, 0.08); /* 3px/1920 = 0.16vw */
   border: 1px solid rgba(29, 29, 29, 0.08);
 }
 
@@ -222,9 +223,9 @@ const handleNavClick = (item: NavItem, event: Event) => {
 }
 
 .toggle-icon {
-  width: 16px;
-  height: 16px;
-  font-size: 14px;
+  width: 0.83vw; /* 16px/1920 = 0.83vw */
+  height: 0.83vw; /* 16px/1920 = 0.83vw */
+  font-size: 0.73vw; /* 14px/1920 = 0.73vw */
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -239,29 +240,29 @@ const handleNavClick = (item: NavItem, event: Event) => {
 /* 导航区域 */
 .sidebar__nav {
   flex: 1;
-  padding: 8px 0;
+  padding: 0.42vw 0; /* 8px/1920 = 0.42vw */
   overflow-y: auto;
 }
 
 .nav-section {
-  padding: 8px 16px;
+  padding: 0.42vw 0.83vw; /* 8px 16px/1920 = 0.42vw 0.83vw */
 }
 
 .nav-item {
-  margin-bottom: 10px;
-  padding: 8px 16px;
+  margin-bottom: 0.52vw; /* 10px/1920 = 0.52vw */
+  padding: 0.42vw 0.83vw; /* 8px 16px/1920 = 0.42vw 0.83vw */
 }
 
 .nav-link {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 20px;
+  gap: 0.63vw; /* 12px/1920 = 0.63vw */
+  padding: 0.63vw 1.04vw; /* 12px 20px/1920 = 0.63vw 1.04vw */
   color: #1D1D1D;
   text-decoration: none;
-  border-radius: 28px;
+  border-radius: 1.46vw; /* 28px/1920 = 1.46vw */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 16px;
+  font-size: 0.83vw; /* 16px/1920 = 0.83vw */
   font-family: 'OPPOSans', sans-serif;
   font-weight: 400;
   line-height: 1;
@@ -284,19 +285,19 @@ const handleNavClick = (item: NavItem, event: Event) => {
 }
 
 .nav-icon-wrapper {
-  width: 20px;
-  height: 20px;
+  width: 1.04vw; /* 20px/1920 = 1.04vw */
+  height: 1.04vw; /* 20px/1920 = 1.04vw */
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
+  border-radius: 0.21vw; /* 4px/1920 = 0.21vw */
   flex-shrink: 0;
 }
 
 .nav-icon {
-  width: 20px;
-  height: 20px;
-  font-size: 16px;
+  width: 1.04vw; /* 20px/1920 = 1.04vw */
+  height: 1.04vw; /* 20px/1920 = 1.04vw */
+  font-size: 0.83vw; /* 16px/1920 = 0.83vw */
   color: #B2B8C2;
 }
 
@@ -315,19 +316,19 @@ const handleNavClick = (item: NavItem, event: Event) => {
 
 /* 子菜单 */
 .nav-submenu {
-  margin-left: 32px;
-  margin-top: 4px;
+  margin-left: 1.67vw; /* 32px/1920 = 1.67vw */
+  margin-top: 0.21vw; /* 4px/1920 = 0.21vw */
 }
 
 .nav-sublink {
   display: block;
-  padding: 8px 16px;
+  padding: 0.42vw 0.83vw; /* 8px 16px/1920 = 0.42vw 0.83vw */
   color: #888;
   text-decoration: none;
-  border-radius: 6px;
-  font-size: 13px;
+  border-radius: 0.31vw; /* 6px/1920 = 0.31vw */
+  font-size: 0.68vw; /* 13px/1920 = 0.68vw */
   transition: all 0.2s;
-  margin-bottom: 2px;
+  margin-bottom: 0.10vw; /* 2px/1920 = 0.10vw */
 }
 
 .nav-sublink:hover {
@@ -348,14 +349,15 @@ const handleNavClick = (item: NavItem, event: Event) => {
 
 /* 底部区域 */
 .sidebar__footer {
-  padding: 16px;
+  padding: 0.83vw; /* 16px/1920 = 0.83vw */
   border-top: 1px solid rgba(29, 29, 29, 0.06);
 }
 
-/* 响应式设计 */
+/* 响应式设计 - 移动端切换回px单位 */
 @media (max-width: 1024px) {
   .sidebar {
     transform: translateX(-100%);
+    width: 280px; /* 移动端使用固定宽度 */
   }
 
   .sidebar--mobile-open {
@@ -363,7 +365,52 @@ const handleNavClick = (item: NavItem, event: Event) => {
   }
 
   .sidebar--collapsed {
-    width: 280px;
+    width: 280px; /* 移动端不折叠 */
+  }
+  
+  /* 移动端使用固定像素值 */
+  .sidebar__header {
+    height: 80px;
+    padding: 0 16px;
+  }
+  
+  .logo-icon {
+    width: 41px;
+    height: 40px;
+  }
+  
+  .logo-text {
+    font-size: 30px;
+  }
+  
+  .sidebar__toggle {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+  }
+  
+  .toggle-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 14px;
+  }
+  
+  .nav-link {
+    font-size: 16px;
+    gap: 12px;
+    padding: 12px 20px;
+    border-radius: 28px;
+  }
+  
+  .nav-icon-wrapper {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .nav-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 16px;
   }
 }
 
@@ -394,7 +441,7 @@ const handleNavClick = (item: NavItem, event: Event) => {
 
 .sidebar--collapsed .nav-link {
   justify-content: center;
-  padding: 3px 12px;
+  padding: 0.16vw 0.63vw; /* 3px 12px/1920 = 0.16vw 0.63vw */
 }
 
 .sidebar--collapsed .nav-text {

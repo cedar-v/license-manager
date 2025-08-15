@@ -271,7 +271,7 @@ async function handleLogin() {
 }
 
 .login-card {
-  padding: '2rem'
+  padding: 2rem;
 }
 
 .title {
@@ -480,6 +480,93 @@ async function handleLogin() {
   .language-switcher {
     transform: scale(0.8);
     transform-origin: right top;
+  }
+}
+
+/* 桌面端vw适配 - 2K/4K屏幕优化 */
+@media (min-width: 1025px) {
+  /* Logo区域 - 使用vw单位 */
+  .logo-section {
+    top: 2.6vw; /* 50px/1920 = 2.6vw */
+    left: 3.13vw; /* 60px/1920 = 3.13vw */
+    gap: 0.65vw; /* 12.5px/1920 = 0.65vw */
+  }
+  
+  .logo-icon {
+    width: 2.81vw; /* 54px/1920 = 2.81vw */
+    height: 2.71vw; /* 52px/1920 = 2.71vw */
+  }
+  
+  .logo-text {
+    font-size: 1.35vw; /* 26px/1920 = 1.35vw */
+  }
+  
+  /* 登录区域 - 使用vw单位 */
+  .login-section {
+    width: 46.875vw; /* 900px/1920 = 46.875vw */
+    padding: 1.04vw; /* 20px/1920 = 1.04vw */
+  }
+  
+  .login-container {
+    max-width: 23.44vw; /* 450px/1920 = 23.44vw */
+  }
+  
+  .login-card {
+    padding: 1.04vw; /* 20px/1920 = 1.04vw */
+  }
+  
+  .title {
+    font-size: 1.56vw; /* 30px/1920 = 1.56vw */
+    margin: 0 0 0.78vw 0; /* 15px/1920 = 0.78vw */
+  }
+  
+  .subtitle {
+    font-size: 0.78vw; /* 15px/1920 = 0.78vw */
+    margin: 0 0 1.04vw 0; /* 20px/1920 = 1.04vw */
+  }
+  
+  /* 输入框适配 */
+  .login-input :deep(.el-input__wrapper) {
+    height: 2.86vw; /* 55px/1920 = 2.86vw */
+    border-radius: 0.52vw; /* 10px/1920 = 0.52vw */
+    padding: 0 0.625vw; /* 12px/1920 = 0.625vw */
+  }
+  
+  .login-input :deep(.el-input__inner) {
+    font-size: 0.83vw; /* 16px/1920 = 0.83vw */
+  }
+  
+  /* 登录按钮适配 */
+  .login-button {
+    height: 3.125vw; /* 60px/1920 = 3.125vw */
+    font-size: 0.94vw; /* 18px/1920 = 0.94vw */
+    border-radius: 0.52vw; /* 10px/1920 = 0.52vw */
+    margin-top: 0.52vw; /* 10px/1920 = 0.52vw */
+  }
+  
+  /* 表单选项 */
+  .form-options {
+    margin: 0.78vw 0; /* 15px/1920 = 0.78vw */
+    font-size: 0.73vw; /* 14px/1920 = 0.73vw */
+  }
+  
+  .forgot-link {
+    font-size: 0.73vw; /* 14px/1920 = 0.73vw */
+  }
+  
+  /* 语言切换器 */
+  .language-switcher {
+    top: 2.6vw; /* 50px/1920 = 2.6vw */
+    right: 3.13vw; /* 60px/1920 = 3.13vw */
+  }
+  
+  .language-switcher :deep(.el-select) {
+    width: 7.81vw; /* 150px/1920 = 7.81vw */
+  }
+  
+  .language-switcher :deep(.el-input__inner) {
+    font-size: 0.73vw; /* 14px/1920 = 0.73vw */
+    border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
   }
 }
 

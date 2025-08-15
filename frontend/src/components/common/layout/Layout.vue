@@ -107,20 +107,39 @@ const mainClasses = computed(() => ({
   'layout-main--sidebar-collapsed': appStore.sidebarCollapsed
 }))
 
-// 响应式设备检测 - 统一断点系统
+// 响应式设备检测 - 简化版本
 const checkResponsive = () => {
   const width = window.innerWidth
   const isMobile = width <= 768      // 768px 及以下为移动端
   const isTablet = width > 768 && width <= 1024  // 769-1024px 为平板
+  const isDesktop = width > 1024  // 1025px+ 桌面端（包含2K、4K）
   
   appStore.setMobile(isMobile)
   
   // 移动端和小平板自动折叠侧边栏
   if (isMobile || isTablet) {
     appStore.setSidebarCollapsed(true)
-  } else if (width > 1024) {
-    // 桌面端默认展开侧边栏
+  } else if (isDesktop) {
+    // 桌面端默认展开侧边栏（rem会自动缩放）
     appStore.setSidebarCollapsed(false)
+  }
+  
+  // 调试信息：显示当前根字体大小
+  if (isDesktop) {
+    const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize)
+    console.log(`桌面屏幕: ${width}px, 根字体: ${rootFontSize}px`)
+    
+    // 更新页面调试信息
+    document.body.setAttribute('data-font-size', `${rootFontSize}px (${width}px)`)
+    
+    // 额外调试：检测屏幕类型
+    if (width >= 3840) {
+      console.log('🖥️ 4K屏幕检测')
+    } else if (width >= 2560) {
+      console.log('🖥️ 2K屏幕检测')
+    } else {
+      console.log('🖥️ 1080p屏幕检测')
+    }
   }
 }
 
@@ -157,16 +176,16 @@ onUnmounted(() => {
   backdrop-filter: blur(2px);
 }
 
-// 主内容区域
+// 主内容区域 - 桌面端使用vw单位适配2K/4K
 .layout-main {
-  margin-left: 280px;
+  margin-left: 14.58vw; /* 280px/1920 = 14.58vw */
   height: 100vh;
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
   
   &--sidebar-collapsed {
-    margin-left: 64px;
+    margin-left: 3.33vw; /* 64px/1920 = 3.33vw */
   }
   
   &--mobile {
@@ -177,7 +196,7 @@ onUnmounted(() => {
 // 页面内容
 .layout-content {
   flex: 1;
-  padding-top: 80px;
+  padding-top: 4.17vw; /* 80px/1920 = 4.17vw */
   overflow-y: auto;
   position: relative;
   
@@ -202,19 +221,28 @@ onUnmounted(() => {
 }
 
 .content-container {
-  min-height: calc(100vh - 80px);
+  min-height: calc(100vh - 80px); /* 默认使用固定像素的最小高度 */
   padding: 24px;
-  max-width: 1600px;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 // 响应式设计 - 统一断点系统
-// 平板以下：768px 及以下为移动端
-@media (max-width: 768px) {
+// 平板以下：768px 及以下为移动端，使用固定px单位
+@media (max-width: 1024px) {
   .layout-main {
-    margin-left: 0;
+    margin-left: 0; /* 移动端和平板从左边缘开始 */
   }
   
+  .layout-content {
+    padding-top: 80px; /* 移动端使用固定高度 */
+  }
+  
+  /* 移动端继承基础样式的min-height设置 */
+}
+
+@media (max-width: 768px) {
   .content-container {
     padding: 16px;
   }
@@ -227,10 +255,35 @@ onUnmounted(() => {
   }
 }
 
-// 平板：769px - 1024px 之间
+/* 平板：769px - 1024px 之间 */
 @media (min-width: 769px) and (max-width: 1024px) {
   .layout-main {
-    margin-left: 64px; // 平板显示折叠侧边栏
+    margin-left: 64px; /* 平板显示折叠侧边栏 */
+  }
+}
+
+/* 桌面端：使用vw单位统一适配2K/4K，使用flex布局充满高度 */
+@media (min-width: 1025px) {
+  .layout-main {
+    margin-left: 14.58vw; /* 280px/1920 = 14.58vw */
+    
+    &--sidebar-collapsed {
+      margin-left: 3.33vw; /* 64px/1920 = 3.33vw */
+    }
+  }
+  
+  .layout-content {
+    padding-top: 4.17vw; /* 80px/1920 = 4.17vw */
+  }
+  
+  .content-container {
+    height: calc(100vh - 4.17vw); /* 精确计算可用高度：视口高度减去顶部导航栏高度 */
+    padding: 1.25vw; /* 24px/1920 = 1.25vw */
+    width: 100%; /* 充满整个屏幕 */
+    margin: 0;
+    box-sizing: border-box;
+    display: flex; /* 桌面端使用flex布局传递高度给子组件 */
+    flex-direction: column;
   }
 }
 

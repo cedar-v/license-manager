@@ -81,47 +81,49 @@
 
       <!-- 数据表格 -->
       <div class="table-container">
-        <el-table
-          :data="tableData"
-          v-loading="loading"
-          element-loading-text="加载中..."
-          stripe
-          border
-          style="width: 100%"
-          :header-cell-style="{ backgroundColor: '#F7F8FA', color: '#1D1D1D' }"
-          :row-style="getRowStyle"
-        >
-          <el-table-column prop="customer_code" label="客户编码" width="170">
+        <div class="table-wrapper">
+          <el-table
+            :data="tableData"
+            v-loading="loading"
+            element-loading-text="加载中..."
+            stripe
+            border
+            style="width: 100%;"
+            :header-cell-style="{ backgroundColor: '#F7F8FA', color: '#1D1D1D' }"
+            :row-style="getRowStyle"
+            :max-height="'calc(100vh - 200px)'"
+          >
+          <el-table-column prop="customer_code" label="客户编码" :width="170" :min-width="170" align="left">
             <template #default="scope">
               <span class="customer-code">{{ scope.row.customer_code }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="customer_name" label="客户名称" width="191" show-overflow-tooltip />
-          <el-table-column prop="customer_type" label="客户类型" width="145">
+          <el-table-column prop="customer_name" label="客户名称" :width="191" :min-width="180" show-overflow-tooltip align="left" />
+          <el-table-column prop="customer_type" label="客户类型" :width="145" :min-width="120" align="center">
             <template #default="scope">
               {{ getCustomerTypeLabel(scope.row.customer_type) }}
             </template>
           </el-table-column>
-          <el-table-column prop="contact_person" label="联系人" width="130" show-overflow-tooltip />
-          <el-table-column prop="email" label="邮箱" width="204" show-overflow-tooltip />
-          <el-table-column prop="customer_level" label="客户等级" width="145">
+          <el-table-column prop="contact_person" label="联系人" :width="130" :min-width="100" show-overflow-tooltip align="center" />
+          <el-table-column prop="email" label="邮箱" :width="204" :min-width="180" show-overflow-tooltip align="left" />
+          <el-table-column prop="customer_level" label="客户等级" :width="145" :min-width="120" align="center">
             <template #default="scope">
               {{ getCustomerLevelLabel(scope.row.customer_level) }}
             </template>
           </el-table-column>
-          <el-table-column prop="status" label="状态" width="145">
+          <el-table-column prop="status" label="状态" :width="145" :min-width="100" align="center">
             <template #default="scope">
               <div class="status-tag" :class="getStatusClass(scope.row.status)">
                 {{ getStatusLabel(scope.row.status) }}
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="创建时间" width="145" show-overflow-tooltip>
+          <el-table-column label="创建时间" :width="145" :min-width="120" show-overflow-tooltip align="center">
             <template #default="scope">
               {{ formatDate(scope.row.created_at) }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="300" fixed="right" class-name="action-column">
+          <el-table-column label="操作" :width="300" :min-width="280" fixed="right" class-name="action-column" align="center">
             <template #default="scope">
               <div class="action-buttons">
                 <button class="action-btn primary" @click="handleViewLicense(scope.row)">查看授权</button>
@@ -131,7 +133,8 @@
               </div>
             </template>
           </el-table-column>
-        </el-table>
+          </el-table>
+        </div>
       </div>
 
       <!-- 分页组件 -->
@@ -509,40 +512,47 @@ onMounted(() => {
 
 <style scoped>
 .customers-container {
-  padding: 24px;
+  padding: 1.25vw; /* 24px/1920 = 1.25vw */
   background-color: #ffffff;
-  min-height: 100vh;
+  height: 100%; /* 充满容器高度 */
+  width: 100%; /* 确保宽度充满 */
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box; /* 包含内边距 */
 }
 
 .top-actions {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  gap: 20px;
-  margin-bottom: 16px;
+  gap: 1.04vw; /* 20px/1920 = 1.04vw */
+  margin-bottom: 0.83vw; /* 16px/1920 = 0.83vw */
+  flex-shrink: 0;
 }
+
+/* 桌面端vw单位在基础样式中已设置 */
 
 .left-actions {
   display: flex;
-  gap: 20px;
+  gap: 1.04vw; /* 20px/1920 = 1.04vw */
 }
 
 .add-customer-btn {
-  height: 32px;
-  padding: 6px 16px;
+  height: 1.67vw; /* 32px/1920 = 1.67vw */
+  padding: 0.31vw 0.83vw; /* 6px 16px/1920 */
   background-color: #019C7C;
   border-color: #019C7C;
-  border-radius: 2px;
+  border-radius: 0.10vw; /* 2px/1920 = 0.10vw */
   font-family: 'Source Han Sans CN', sans-serif;
   font-weight: 500;
-  font-size: 14px;
-  line-height: 21px;
+  font-size: 0.73vw; /* 14px/1920 = 0.73vw */
+  line-height: 1.09vw; /* 21px/1920 = 1.09vw */
 }
 
 .right-actions {
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap: 2.08vw; /* 40px/1920 = 2.08vw */
   min-width: 0;
   flex-shrink: 1;
 }
@@ -550,23 +560,23 @@ onMounted(() => {
 .filter-section {
   display: flex;
   align-items: center;
-  gap: 4px;
-  min-width: 280px;
+  gap: 0.21vw; /* 4px/1920 = 0.21vw */
+  min-width: 14.58vw; /* 280px/1920 = 14.58vw */
   flex-shrink: 1;
 }
 
 .filter-label {
   font-family: 'Source Han Sans CN', sans-serif;
   font-weight: 500;
-  font-size: 14px;
-  line-height: 22px;
+  font-size: 0.73vw; /* 14px/1920 = 0.73vw */
+  line-height: 1.15vw; /* 22px/1920 = 1.15vw */
   color: #1D1D1D;
-  margin-right: 4px;
-  width: 50px;
+  margin-right: 0.21vw; /* 4px/1920 = 0.21vw */
+  width: 2.6vw; /* 50px/1920 = 2.6vw */
 }
 
 .search-section {
-  min-width: 280px;
+  min-width: 14.58vw; /* 280px/1920 = 14.58vw */
   flex-shrink: 1;
 }
 
@@ -575,21 +585,85 @@ onMounted(() => {
 }
 
 .table-container {
+  width: 100%; /* 确保宽度铺满 */
+  background: #FFFFFF;
   border: 1px solid #F5F7FA;
-  border-radius: 8px;
+  border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
   overflow: hidden;
-  margin-bottom: 16px;
+  margin-bottom: 0.83vw; /* 16px/1920 = 0.83vw */
+  /* 高度跟随内容，但设置最大值 */
+  max-height: calc(100vh - 200px); /* 保留空间给顶部操作和分页 */
 }
 
 .pagination-container {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 8px;
+  gap: 0.42vw; /* 8px/1920 = 0.42vw */
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto; /* 水平滚动 */
+  position: relative;
 }
 
 :deep(.el-table) {
+  width: 100% !important;
+  min-width: 1400px; /* 设置最小宽度防止列压缩 */
   border: 1px solid #F5F7FA;
+  table-layout: fixed; /* 固定表格布局防止错位 */
+  
+  /* 表头和表体宽度一致 */
+  .el-table__header-wrapper,
+  .el-table__body-wrapper {
+    width: 100% !important;
+    overflow-x: hidden !important; /* 防止水平滚动条影响对齐 */
+  }
+  
+  .el-table__body-wrapper {
+    overflow-y: auto !important;
+    max-height: calc(100vh - 250px) !important;
+    /* 预留滚动条宽度空间 */
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+  }
+  
+  /* 修复滚动条宽度问题 */
+  .el-table__body-wrapper::-webkit-scrollbar {
+    width: 8px;
+    background-color: transparent;
+  }
+  
+  .el-table__body-wrapper::-webkit-scrollbar-track {
+    background-color: #f5f5f5;
+    border-radius: 4px;
+  }
+  
+  .el-table__body-wrapper::-webkit-scrollbar-thumb {
+    background-color: #c1c1c1;
+    border-radius: 4px;
+  }
+  
+  /* 表格主体和表头宽度一致 */
+  .el-table__header,
+  .el-table__body {
+    width: 100% !important;
+    table-layout: fixed !important;
+  }
+  
+  /* 确保所有列宽度一致 */
+  th, td {
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  /* 列宽度分配 - 防止错位 */
+  colgroup {
+    width: 100% !important;
+  }
 }
 
 /* 分页组件样式 - 匹配Figma设计 */
@@ -717,11 +791,216 @@ onMounted(() => {
   }
 }
 
-/* 移动端响应式布局 */
+/* 1920*1080分辨率专用修复 */
+@media (min-width: 1900px) and (max-width: 1940px) and (min-height: 1060px) and (max-height: 1100px) {
+  .table-wrapper {
+    width: 100% !important;
+  }
+  
+  :deep(.el-table) {
+    width: 100% !important;
+    min-width: 100% !important;
+    
+    .el-table__header-wrapper,
+    .el-table__body-wrapper {
+      width: 100% !important;
+    }
+    
+    .el-table__header,
+    .el-table__body {
+      width: 100% !important;
+    }
+    
+    /* 1920*1080下的列宽度优化 */
+    th, td {
+      min-width: auto !important;
+    }
+  }
+}
+
+/* 桌面端：使用vw单位实现2K/4K适配 */
+@media (min-width: 1025px) {
+  .customers-container {
+    padding: 1.25vw; /* 24px/1920 = 1.25vw */
+  }
+  
+  .table-container {
+    border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
+    margin-bottom: 0.83vw; /* 16px/1920 = 0.83vw */
+    max-height: calc(100vh - 10.42vw); /* 200px/1920 = 10.42vw */
+    width: 100%;
+  }
+  
+  .table-wrapper {
+    width: 100%;
+  }
+  
+  .pagination-container {
+    flex-shrink: 0;
+    gap: 0.42vw; /* 8px/1920 = 0.42vw */
+  }
+  
+  .right-actions {
+    gap: 2.08vw; /* 40px/1920 = 2.08vw */
+  }
+  
+  .filter-section {
+    min-width: 14.58vw; /* 280px/1920 = 14.58vw */
+    gap: 0.21vw; /* 4px/1920 = 0.21vw */
+  }
+  
+  .search-section {
+    min-width: 14.58vw; /* 280px/1920 = 14.58vw */
+  }
+  
+  .action-buttons {
+    gap: 0.42vw; /* 8px/1920 = 0.42vw */
+  }
+  
+  .action-btn {
+    padding: 0.16vw 0.625vw; /* 3px 12px/1920 = 0.16vw 0.625vw */
+    font-size: 0.625vw; /* 12px/1920 = 0.625vw */
+    height: 1.46vw; /* 28px/1920 = 1.46vw */
+    min-width: fit-content;
+  }
+  
+  /* 表格样式使用vw - 确保表格充满容器且对齐 */
+  .table-wrapper {
+    width: 100% !important;
+  }
+  
+  :deep(.el-table) {
+    width: 100% !important;
+    min-width: 73vw !important; /* 1400px/1920 = 73vw */
+    
+    .el-table__header-wrapper,
+    .el-table__body-wrapper {
+      width: 100% !important;
+      overflow-x: hidden !important;
+    }
+    
+    .el-table__body-wrapper {
+      overflow-y: auto !important;
+      max-height: calc(100vh - 13.02vw) !important; /* 250px/1920 = 13.02vw */
+    }
+    
+    .el-table__header,
+    .el-table__body {
+      width: 100% !important;
+      table-layout: fixed !important;
+    }
+    
+    /* 桌面端列宽度优化和对齐修复 */
+    th, td {
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+      padding: 0.68vw 1.04vw !important;
+      box-sizing: border-box !important;
+    }
+    
+    /* 确保操作列在桌面端的正确宽度 */
+    .action-column {
+      width: 15.625vw !important; /* 300px/1920 = 15.625vw */
+      min-width: 15.625vw !important;
+    }
+  }
+  
+  :deep(.el-table .el-table__header-wrapper) {
+    th {
+      height: 2.5vw !important; /* 48px/1920 = 2.5vw */
+      padding: 0.68vw 1.04vw !important; /* 13px 20px/1920 = 0.68vw 1.04vw */
+      font-size: 0.83vw !important; /* 16px/1920 = 0.83vw */
+    }
+  }
+  
+  :deep(.el-table .el-table__body-wrapper) {
+    td {
+      height: 2.5vw !important; /* 48px/1920 = 2.5vw */
+      padding: 0.68vw 1.04vw !important; /* 13px 20px/1920 = 0.68vw 1.04vw */
+      font-size: 0.73vw !important; /* 14px/1920 = 0.73vw */
+    }
+  }
+  
+  /* 筛选器和搜索框使用vw - 提高优先级 */
+  :deep(.filter-select) {
+    width: 6.25vw !important; /* 120px/1920 = 6.25vw */
+    height: 1.875vw !important; /* 36px/1920 = 1.875vw */
+  }
+  
+  :deep(.filter-select .el-select__wrapper) {
+    min-height: 1.875vw !important; /* 36px/1920 = 1.875vw */
+    height: 1.875vw !important;
+    padding: 0 0.625vw !important; /* 12px/1920 = 0.625vw */
+  }
+  
+  :deep(.search-input) {
+    height: 1.875vw !important; /* 36px/1920 = 1.875vw */
+  }
+  
+  :deep(.search-input .el-input__wrapper) {
+    height: 1.875vw !important; /* 36px/1920 = 1.875vw */
+  }
+  
+  :deep(.search-input .el-input-group__append) {
+    width: 2.5vw !important; /* 48px/1920 = 2.5vw */
+    height: 1.875vw !important; /* 36px/1920 = 1.875vw */
+  }
+}
+
+/* 移动端响应式布局 - 修复表头错位 */
 @media (max-width: 768px) {
+  /* 表格容器移动端优化 */
+  .table-wrapper {
+    overflow-x: scroll !important;
+    -webkit-overflow-scrolling: touch;
+    width: 100% !important;
+  }
+  
+  /* 移动端表格样式修复 */
+  :deep(.el-table) {
+    min-width: 1200px !important; /* 移动端最小宽度 */
+    
+    .el-table__header-wrapper,
+    .el-table__body-wrapper {
+      width: 100% !important;
+      overflow-x: visible !important;
+    }
+    
+    .el-table__body-wrapper {
+      max-height: calc(100vh - 300px) !important;
+    }
+    
+    /* 移动端表头和表体对齐 */
+    .el-table__header,
+    .el-table__body {
+      width: 100% !important;
+      min-width: 1200px !important;
+    }
+    
+    /* 移动端列宽度修复 */
+    th, td {
+      min-width: 80px !important;
+      white-space: nowrap !important;
+      padding: 8px 12px !important;
+    }
+    
+    /* 移动端操作列宽度修复 */
+    .action-column {
+      width: 160px !important;
+      min-width: 160px !important;
+    }
+  }
   /* 设置表格容器 */
   .table-container {
     --action-column-width: 160px;
+    overflow-x: auto;
+    width: 100%;
+  }
+  
+  .table-wrapper {
+    min-width: 100%;
+    overflow-x: auto;
   }
   
   /* 确保表格在移动端正确显示 */

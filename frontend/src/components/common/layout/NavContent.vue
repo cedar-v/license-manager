@@ -161,18 +161,19 @@ const handleUserClick = () => {
 </script>
 
 <style scoped>
+/* 顶部导航栏 - 基于1920*1080设计的vw适配，确保4K下正确显示 */
 .nav-content {
   position: fixed;
   top: 0;
-  left: 280px;
+  left: 14.58vw; /* 280px/1920 = 14.58vw */
   right: 0;
-  height: 80px;
+  height: 4.17vw; /* 80px/1920 = 4.17vw */
   background: #FFFFFF;
   border-bottom: 1px solid rgba(29, 29, 29, 0.12);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 24px;
+  padding: 1.04vw 1.25vw; /* 20px 24px/1920 = 1.04vw 1.25vw */
   z-index: 2001;
   transition: all 0.3s ease;
 }
@@ -181,21 +182,21 @@ const handleUserClick = () => {
 .nav-content__left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 0.63vw; /* 12px/1920 = 0.63vw */
 }
 
 /* 侧边栏切换按钮 */
 .sidebar-toggle-btn {
-  width: 32px;
-  height: 32px;
+  width: 1.67vw; /* 32px/1920 = 1.67vw */
+  height: 1.67vw; /* 32px/1920 = 1.67vw */
   border: none;
   background: transparent;
-  border-radius: 8px;
+  border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4px;
+  padding: 0.21vw; /* 4px/1920 = 0.21vw */
   transition: all 0.2s;
 }
 
@@ -207,15 +208,15 @@ const handleUserClick = () => {
 .breadcrumb-section {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0.10vw; /* 2px/1920 = 0.10vw */
 }
 
 /* 面包屑导航 */
 .breadcrumb {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 12px;
+  gap: 0.21vw; /* 4px/1920 = 0.21vw */
+  font-size: 0.63vw; /* 12px/1920 = 0.63vw */
   color: #888;
   flex-wrap: wrap;
 }
@@ -223,14 +224,14 @@ const handleUserClick = () => {
 .breadcrumb-item {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0.21vw; /* 4px/1920 = 0.21vw */
   white-space: nowrap;
 }
 
 /* 面包屑当前页面样式，使用页面标题样式 */
 .breadcrumb-current.page-title {
   font-family: 'OPPOSans', sans-serif;
-  font-size: 20px;
+  font-size: 1.04vw; /* 20px/1920 = 1.04vw */
   font-weight: 400;
   color: #1D1D1D;
   line-height: 1.32;
@@ -240,7 +241,7 @@ const handleUserClick = () => {
   border: none;
   background: none;
   color: #019C7C;
-  font-size: 12px;
+  font-size: 0.63vw; /* 12px/1920 = 0.63vw */
   cursor: pointer;
   padding: 0;
   text-decoration: none;
@@ -254,18 +255,18 @@ const handleUserClick = () => {
 
 .breadcrumb-current {
   color: #666;
-  font-size: 12px;
+  font-size: 0.63vw; /* 12px/1920 = 0.63vw */
 }
 
 .breadcrumb-separator {
   color: #ccc;
-  margin: 0 4px;
-  font-size: 12px;
+  margin: 0 0.21vw; /* 4px/1920 = 0.21vw */
+  font-size: 0.63vw; /* 12px/1920 = 0.63vw */
 }
 
 .page-title {
   font-family: 'OPPOSans', sans-serif;
-  font-size: 20px;
+  font-size: 1.04vw; /* 20px/1920 = 1.04vw */
   font-weight: 400;
   color: #1D1D1D;
   line-height: 1.32;
@@ -275,13 +276,13 @@ const handleUserClick = () => {
 .nav-content__right {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 1.25vw; /* 24px/1920 = 1.25vw */
 }
 
 /* 用户头像 */
 .user-avatar {
-  width: 20px;
-  height: 20px;
+  width: 1.04vw; /* 20px/1920 = 1.04vw */
+  height: 1.04vw; /* 20px/1920 = 1.04vw */
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -296,25 +297,25 @@ const handleUserClick = () => {
 /* 分割线 */
 .divider {
   width: 1px;
-  height: 24px;
+  height: 1.25vw; /* 24px/1920 = 1.25vw */
   background: rgba(29, 29, 29, 0.12);
-  border-radius: 2px;
+  border-radius: 0.10vw; /* 2px/1920 = 0.10vw */
 }
 
 /* 操作按钮组 */
 .action-buttons {
   display: flex;
-  gap: 12px;
+  gap: 0.63vw; /* 12px/1920 = 0.63vw */
 }
 
 /* 操作按钮 */
 .action-btn {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 2.08vw; /* 40px/1920 = 2.08vw */
+  height: 2.08vw; /* 40px/1920 = 2.08vw */
   border: none;
   background: #F7F8FA;
-  border-radius: 20px;
+  border-radius: 1.04vw; /* 20px/1920 = 1.04vw */
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -329,15 +330,15 @@ const handleUserClick = () => {
 /* 通知徽章 */
 .notification-badge {
   position: absolute;
-  top: -3px;
-  right: -1px;
-  width: 22px;
-  height: 16px;
+  top: -0.16vw; /* -3px/1920 = -0.16vw */
+  right: -0.05vw; /* -1px/1920 = -0.05vw */
+  width: 1.15vw; /* 22px/1920 = 1.15vw */
+  height: 0.83vw; /* 16px/1920 = 0.83vw */
   background: #00C27C;
   color: white;
-  font-size: 10px;
+  font-size: 0.52vw; /* 10px/1920 = 0.52vw */
   font-weight: 700;
-  border-radius: 90px;
+  border-radius: 4.69vw; /* 90px/1920 = 4.69vw */
   border: 1px solid #FFFFFF;
   display: flex;
   align-items: center;
@@ -348,23 +349,77 @@ const handleUserClick = () => {
 
 /* 侧边栏状态配合 */
 .nav-content--sidebar-collapsed {
-  left: 64px;
+  left: 3.33vw; /* 64px/1920 = 3.33vw */
 }
 
 .nav-content--mobile {
   left: 0;
 }
 
-/* 响应式设计 */
+/* 响应式设计 - 移动端切换回px单位 */
 @media (max-width: 1024px) {
   .nav-content {
     left: 0;
     padding: 16px 20px;
+    height: 80px; /* 移动端使用固定高度 */
   }
   
   /* 覆盖侧边栏收起状态，移动端和平板端始终从左侧边缘开始 */
   .nav-content--sidebar-collapsed {
     left: 0;
+  }
+  
+  /* 移动端使用固定像素值 */
+  .nav-content__left {
+    gap: 12px;
+  }
+  
+  .sidebar-toggle-btn {
+    width: 32px;
+    height: 32px;
+    padding: 4px;
+    border-radius: 8px;
+  }
+  
+  .breadcrumb {
+    font-size: 12px;
+    gap: 4px;
+  }
+  
+  .breadcrumb-current.page-title,
+  .page-title {
+    font-size: 20px;
+  }
+  
+  .nav-content__right {
+    gap: 24px;
+  }
+  
+  .user-avatar {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .divider {
+    height: 24px;
+  }
+  
+  .action-buttons {
+    gap: 12px;
+  }
+  
+  .action-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+  }
+  
+  .notification-badge {
+    width: 22px;
+    height: 16px;
+    font-size: 10px;
+    top: -3px;
+    right: -1px;
   }
 }
 
@@ -384,6 +439,7 @@ const handleUserClick = () => {
   .action-btn {
     width: 36px;
     height: 36px;
+    border-radius: 18px;
   }
   
   .page-title {
@@ -407,13 +463,9 @@ const handleUserClick = () => {
   .action-btn {
     width: 32px;
     height: 32px;
+    border-radius: 16px;
   }
 }
 
-/* 桌面端特定样式 */
-@media (min-width: 1025px) {
-  .nav-content--sidebar-collapsed {
-    left: 64px;
-  }
-}
+/* 桌面端vw单位在基础样式中已设置，移动端通过媒体查询覆盖为px单位 */
 </style>

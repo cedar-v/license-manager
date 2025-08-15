@@ -40,10 +40,12 @@
 
       <!-- 图表和表格区域 -->
       <div class="content-section">
-        <!-- 授权趋势图表 -->
-        <LicenseTrendChart />
+        <!-- 授权趋势图表 - 占据40%高度 -->
+        <div class="chart-section">
+          <LicenseTrendChart />
+        </div>
 
-        <!-- 最近授权表格 -->
+        <!-- 最近授权表格 - 占据60%高度 -->
         <div class="table-card">
           <div class="card-header">
             <h3 class="card-title">{{ t('dashboard.recentLicenses.title') }}</h3>
@@ -51,7 +53,7 @@
           <div class="table-container">
             <el-table
               :data="recentData"
-              style="width: 100%"
+              style="width: 100%; height: 100%;"
               :header-row-class-name="'table-header'"
               :row-class-name="(params: any) => params.rowIndex % 2 === 1 ? 'stripe-row' : ''"
             >
@@ -187,17 +189,21 @@ const recentData = [
 <style lang="scss" scoped>
 .dashboard {
   padding: 0;
+  width: 100%;
+  height: 100%; /* 使用100%高度充满父容器 */
+  display: flex;
+  flex-direction: column;
 }
 
-// 统计卡片区域
+// 统计卡片区域 - 基于1920*1080设计的vw适配
 .stats-section {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 40px;
-  padding: 24px;
+  grid-template-columns: repeat(6, 1fr); /* 6个统计卡片 */
+  gap: 1.04vw; /* 20px/1920 = 1.04vw */
+  margin-bottom: 2.08vw; /* 40px/1920 = 2.08vw */
+  padding: 1.25vw; /* 24px/1920 = 1.25vw */
   background: linear-gradient(135deg, #019C7C 0%, #5AD8A6 100%);
-  border-radius: 8px;
+  border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
   position: relative;
   
   &::before {
@@ -211,29 +217,29 @@ const recentData = [
                 linear-gradient(-45deg, rgba(255,255,255,0.08) 25%, transparent 25%), 
                 linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.08) 75%), 
                 linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.08) 75%);
-    background-size: 20px 20px;
-    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    background-size: 1.04vw 1.04vw; /* 20px/1920 = 1.04vw */
+    background-position: 0 0, 0 0.52vw, 0.52vw -0.52vw, -0.52vw 0vw; /* 10px/1920 = 0.52vw */
     opacity: 0.15;
-    border-radius: 8px;
+    border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
   }
 }
 
 .stats-card {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 24px 0;
+  gap: 0.83vw; /* 16px/1920 = 0.83vw */
+  padding: 1.25vw 0; /* 24px/1920 = 1.25vw */
   position: relative;
   z-index: 1;
   
   &:not(:last-child)::after {
     content: '';
     position: absolute;
-    right: -10px;
+    right: -0.52vw; /* -10px/1920 = -0.52vw */
     top: 50%;
     transform: translateY(-50%);
     width: 1px;
-    height: 64px;
+    height: 3.33vw; /* 64px/1920 = 3.33vw */
     background: linear-gradient(to bottom, 
       rgba(255, 255, 255, 0.08) 0%, 
       rgba(255, 255, 255, 0.6) 49%, 
@@ -243,8 +249,8 @@ const recentData = [
 
 .stat-icon {
   .icon-circle {
-    width: 56px;
-    height: 56px;
+    width: 2.92vw; /* 56px/1920 = 2.92vw */
+    height: 2.92vw; /* 56px/1920 = 2.92vw */
     background: rgba(255, 255, 255, 0.2);
     border-radius: 50%;
     display: flex;
@@ -253,8 +259,8 @@ const recentData = [
     
     .stat-icon-svg {
       color: rgba(255, 255, 255, 0.9);
-      width: 24px;
-      height: 24px;
+      width: 1.25vw; /* 24px/1920 = 1.25vw */
+      height: 1.25vw; /* 24px/1920 = 1.25vw */
     }
   }
 }
@@ -263,23 +269,23 @@ const recentData = [
   flex: 1;
   
   .stat-value {
-    font-size: 28px;
+    font-size: 1.46vw; /* 28px/1920 = 1.46vw */
     font-weight: 600;
     color: #FFFFFF;
     line-height: 1.2;
   }
   
   .stat-label {
-    font-size: 14px;
+    font-size: 0.73vw; /* 14px/1920 = 0.73vw */
     color: rgba(255, 255, 255, 0.9);
-    margin-top: 4px;
+    margin-top: 0.21vw; /* 4px/1920 = 0.21vw */
   }
 }
 
 .stat-trend {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0.21vw; /* 4px/1920 = 0.21vw */
   color: rgba(255, 255, 255, 0.8);
   
   .trend-icon {
@@ -287,31 +293,45 @@ const recentData = [
   }
   
   .trend-value {
-    font-size: 14px;
+    font-size: 0.73vw; /* 14px/1920 = 0.73vw */
     font-weight: 500;
   }
 }
 
-// 内容区域 - 默认上下布局，充满屏幕宽度
+// 内容区域 - 默认上下布局，充满屏幕宽度和高度
 .content-section {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25vw; /* 24px/1920 = 1.25vw */
+  flex: 1; /* 占据剩余空间 */
+  min-height: 0; /* 防止flex子元素溢出 */
 }
 
-// 卡片通用样式
+// 图表区域 - 占据40%高度
+.chart-section {
+  flex: 0.4; /* 40%高度 */
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+// 卡片通用样式 - 表格卡片占据60%高度
 .table-card {
   background: #FFFFFF;
-  border-radius: 8px;
-  box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.1);
+  border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
+  box-shadow: 0px 0px 0.21vw 0px rgba(0, 0, 0, 0.1); /* 4px/1920 = 0.21vw */
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 0.6; /* 占据60%高度 */
+  min-height: 0; /* 防止flex子元素溢出 */
 }
 
 .card-header {
-  padding: 24px 24px 0;
+  padding: 1.25vw 1.25vw 0; /* 24px/1920 = 1.25vw */
   
   .card-title {
-    font-size: 20px;
+    font-size: 1.04vw; /* 20px/1920 = 1.04vw */
     font-weight: 400;
     color: #1D1D1D;
     margin: 0;
@@ -321,11 +341,20 @@ const recentData = [
 
 // 表格卡片
 .table-container {
-  padding: 26px 24px 24px;
+  padding: 1.35vw 1.25vw 1.25vw; /* 26px 24px 24px → 1.35vw 1.25vw 1.25vw */
+  flex: 1; /* 占据剩余高度 */
+  overflow: auto; /* 如果内容过多，允许滚动 */
+  display: flex;
+  flex-direction: column;
   
   // Element Plus 表格样式重写
   :deep(.el-table) {
     border: 1px solid #F5F7FA;
+    height: 100%; /* 充满容器高度 */
+    
+    .el-table__body-wrapper {
+      flex: 1; /* 表格主体占据剩余高度 */
+    }
     
     .table-header th {
       background-color: #F7F8FA !important;
@@ -397,13 +426,13 @@ const recentData = [
   }
 }
 
-// 响应式设计已在默认样式中设置为上下布局
-
+// 响应式设计 - 移动端切换回px单位确保可读性
 @media (max-width: 768px) {
   .stats-section {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: 16px; /* 移动端使用固定像素 */
     padding: 16px;
+    border-radius: 8px;
   }
   
   .stats-card {
@@ -417,26 +446,98 @@ const recentData = [
     }
   }
   
-  .stat-content {
-    .stat-value {
-      font-size: 24px;
+  .stat-icon .icon-circle {
+    width: 48px; /* 移动端固定大小 */
+    height: 48px;
+    
+    .stat-icon-svg {
+      width: 20px;
+      height: 20px;
     }
   }
   
-  // 图表和表格区域保持上下布局（已在默认样式中设置）
+  .stat-content {
+    .stat-value {
+      font-size: 24px; /* 移动端固定字体大小 */
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      margin-top: 4px;
+    }
+  }
+  
+  .stat-trend .trend-value {
+    font-size: 12px;
+  }
+  
+  .content-section {
+    gap: 16px;
+  }
+  
+  .table-card {
+    border-radius: 8px;
+    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-header {
+    padding: 16px 16px 0;
+    
+    .card-title {
+      font-size: 18px;
+    }
+  }
+  
+  .table-container {
+    padding: 20px 16px 16px;
+  }
 }
 
 @media (max-width: 480px) {
   .stats-section {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 12px;
   }
   
-  .recent-table {
-    font-size: 12px;
+  .stat-content .stat-value {
+    font-size: 20px;
+  }
+  
+  .card-header {
+    padding: 12px 12px 0;
     
-    th,
-    td {
-      padding: 8px;
+    .card-title {
+      font-size: 16px;
+    }
+  }
+  
+  .table-container {
+    padding: 16px 12px 12px;
+  }
+}
+
+/* 大屏幕vw适配 - 基于1920*1080设计的视口单位缩放 */
+@media (min-width: 1025px) {
+  .dashboard {
+    /* vw单位确保内容在2K(2560px)和4K(3840px)下按比例缩放充满屏幕 */
+    overflow-x: hidden; /* 防止水平滚动条 */
+  }
+}
+
+/* 超大屏幕适配 - 确保在8K等极端屏幕上也能正常显示 */
+@media (min-width: 7680px) {
+  .dashboard {
+    .stat-content .stat-value {
+      font-size: max(1.46vw, 28px); /* 设置最小字体大小 */
+    }
+    
+    .stat-content .stat-label {
+      font-size: max(0.73vw, 14px);
+    }
+    
+    .card-title {
+      font-size: max(1.04vw, 20px);
     }
   }
 }
