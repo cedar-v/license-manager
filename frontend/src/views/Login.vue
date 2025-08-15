@@ -174,8 +174,6 @@ async function handleLogin() {
       ElMessage.error(response.message || t("login.error.invalid"));
     }
   } catch (error: any) {
-    console.error("登录错误:", error);
-    
     // 优先使用后端返回的错误信息
     let errorMessage = t("login.error.general"); // 默认错误信息
     

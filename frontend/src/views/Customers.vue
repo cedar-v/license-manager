@@ -29,11 +29,12 @@
               class="filter-select"
               @change="handleFilterChange"
             >
-              <el-option label="全部" value="" />
-              <el-option label="个人" value="individual" />
-              <el-option label="企业" value="enterprise" />
-              <el-option label="政府" value="government" />
-              <el-option label="教育" value="education" />
+              <el-option 
+                v-for="option in customerDictionaries.customerType" 
+                :key="option.value" 
+                :label="option.label" 
+                :value="option.value" 
+              />
             </el-select>
             <el-select
               v-model="filterCustomerLevel"
@@ -41,11 +42,12 @@
               class="filter-select"
               @change="handleFilterChange"
             >
-              <el-option label="全部" value="" />
-              <el-option label="普通" value="normal" />
-              <el-option label="VIP" value="vip" />
-              <el-option label="企业" value="enterprise" />
-              <el-option label="战略" value="strategic" />
+              <el-option 
+                v-for="option in customerDictionaries.customerLevel" 
+                :key="option.value" 
+                :label="option.label" 
+                :value="option.value" 
+              />
             </el-select>
             <el-select
               v-model="filterStatus"
@@ -53,9 +55,12 @@
               class="filter-select"
               @change="handleFilterChange"
             >
-              <el-option label="全部" value="" />
-              <el-option label="正常" value="active" />
-              <el-option label="禁用" value="disabled" />
+              <el-option 
+                v-for="option in customerDictionaries.status" 
+                :key="option.value" 
+                :label="option.label" 
+                :value="option.value" 
+              />
             </el-select>
           </div>
           
@@ -94,20 +99,20 @@
           <el-table-column prop="customer_name" label="客户名称" width="191" show-overflow-tooltip />
           <el-table-column prop="customer_type" label="客户类型" width="145">
             <template #default="scope">
-              {{ formatCustomerType(scope.row.customer_type) }}
+              {{ getCustomerTypeLabel(scope.row.customer_type) }}
             </template>
           </el-table-column>
           <el-table-column prop="contact_person" label="联系人" width="130" show-overflow-tooltip />
           <el-table-column prop="email" label="邮箱" width="204" show-overflow-tooltip />
           <el-table-column prop="customer_level" label="客户等级" width="145">
             <template #default="scope">
-              {{ formatCustomerLevel(scope.row.customer_level) }}
+              {{ getCustomerLevelLabel(scope.row.customer_level) }}
             </template>
           </el-table-column>
           <el-table-column prop="status" label="状态" width="145">
             <template #default="scope">
               <div class="status-tag" :class="getStatusClass(scope.row.status)">
-                {{ formatStatus(scope.row.status) }}
+                {{ getStatusLabel(scope.row.status) }}
               </div>
             </template>
           </el-table-column>
@@ -147,7 +152,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import Layout from '@/components/common/layout/Layout.vue'
 import { Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, ElLoading } from 'element-plus'
@@ -158,6 +163,12 @@ import {
   type Customer,
   type CustomerQueryRequest 
 } from '@/api/customer'
+import { 
+  getCustomerDictionaries,
+  getCustomerTypeLabel,
+  getCustomerLevelLabel,
+  getStatusLabel
+} from '@/utils/dictionaries'
 
 // Customer类型已从API文件导入
 
@@ -172,35 +183,10 @@ const loading = ref(false)
 
 const tableData = ref<Customer[]>([])
 
+// 获取国际化字典选项
+const customerDictionaries = computed(() => getCustomerDictionaries())
 
-// 格式化函数
-const formatCustomerType = (type: string) => {
-  const typeMap: Record<string, string> = {
-    'individual': '个人',
-    'enterprise': '企业', 
-    'government': '政府',
-    'education': '教育'
-  }
-  return typeMap[type] || type
-}
-
-const formatCustomerLevel = (level: string) => {
-  const levelMap: Record<string, string> = {
-    'normal': '普通',
-    'vip': 'VIP',
-    'enterprise': '企业',
-    'strategic': '战略'
-  }
-  return levelMap[level] || level
-}
-
-const formatStatus = (status: string) => {
-  const statusMap: Record<string, string> = {
-    'active': '正常',
-    'disabled': '禁用'
-  }
-  return statusMap[status] || status
-}
+// 格式化函数已移至 utils/dictionaries.ts
 
 const formatDate = (dateStr: string) => {
   if (!dateStr) return ''
@@ -304,9 +290,24 @@ const loadData = async () => {
       tableData.value = filtered.slice(start, end)
       total.value = filtered.length
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('加载数据错误:', error)
-    ElMessage.warning('网络请求失败，使用本地数据')
+    
+    // 优先使用后端返回的错误信息
+    let errorMessage = '网络请求失败，使用本地数据' // 默认错误信息
+    
+    if (error.backendMessage) {
+      // 使用 axios 拦截器处理过的后端错误信息
+      errorMessage = error.backendMessage
+    } else if (error.response?.data?.message) {
+      // 直接从响应中获取后端错误信息
+      errorMessage = error.response.data.message
+    } else if (error.message && error.message !== "Error") {
+      // 使用错误对象的消息（避免显示通用的 "Error"）
+      errorMessage = error.message
+    }
+    
+    ElMessage.warning(errorMessage)
     // 如果网络错误，使用mock数据
     const filtered = getFilteredMockData()
     const start = (currentPage.value - 1) * pageSize.value
@@ -410,9 +411,24 @@ const handleDisable = async (row: Customer) => {
       } else {
         ElMessage.error(response.message || `${actionText}失败`)
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(`${actionText}错误:`, error)
-      ElMessage.error(`${actionText}失败，请稍后重试`)
+      
+      // 优先使用后端返回的错误信息
+      let errorMessage = `${actionText}失败，请稍后重试` // 默认错误信息
+      
+      if (error.backendMessage) {
+        // 使用 axios 拦截器处理过的后端错误信息
+        errorMessage = error.backendMessage
+      } else if (error.response?.data?.message) {
+        // 直接从响应中获取后端错误信息
+        errorMessage = error.response.data.message
+      } else if (error.message && error.message !== "Error") {
+        // 使用错误对象的消息（避免显示通用的 "Error"）
+        errorMessage = error.message
+      }
+      
+      ElMessage.error(errorMessage)
     } finally {
       loadingInstance.close()
     }
@@ -460,9 +476,24 @@ const handleDelete = async (row: Customer) => {
       } else {
         ElMessage.error(response.message || '删除失败')
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('删除错误:', error)
-      ElMessage.error('删除失败，请稍后重试')
+      
+      // 优先使用后端返回的错误信息
+      let errorMessage = '删除失败，请稍后重试' // 默认错误信息
+      
+      if (error.backendMessage) {
+        // 使用 axios 拦截器处理过的后端错误信息
+        errorMessage = error.backendMessage
+      } else if (error.response?.data?.message) {
+        // 直接从响应中获取后端错误信息
+        errorMessage = error.response.data.message
+      } else if (error.message && error.message !== "Error") {
+        // 使用错误对象的消息（避免显示通用的 "Error"）
+        errorMessage = error.message
+      }
+      
+      ElMessage.error(errorMessage)
     } finally {
       loadingInstance.close()
     }

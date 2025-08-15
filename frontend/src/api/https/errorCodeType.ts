@@ -10,10 +10,10 @@ export const errorCodeType = function(status:Number):string{
     let errMessage:string = "未知错误"
     switch (status) {
         case 400:
-            errMessage = '请求失败！请您稍后重试'
+            errMessage = '请求参数无效'
             break
         case 401:
-            errMessage = '未授权，请重新登录'
+            errMessage = '未认证'
             break
         case 403:
             errMessage = '当前账号无权限访问！'
@@ -28,7 +28,7 @@ export const errorCodeType = function(status:Number):string{
             errMessage = '请求超时！请您稍后重试'
             break
         case 500:
-            errMessage = '服务器端出错'
+            errMessage = '服务器内部错误'
             break
         case 501:
             errMessage = '网络未实现'

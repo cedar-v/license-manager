@@ -4,6 +4,8 @@ import axios from 'axios'
 import { errorCodeType } from './errorCodeType'
 // 语言管理器
 import { generateAcceptLanguageHeader } from '@/utils/language'
+// 路由
+import router from '@/router'
 
 const envUrl = import.meta.env.VITE_API_BASE_URL
 
@@ -49,6 +51,13 @@ Axios.interceptors.response.use(response => {
       case 0:
         // code === 0 也代表成功 (兼容)
         return apiData
+      case 401:
+        // code === 401 代表未授权，清除token并跳转到登录页
+        localStorage.removeItem('token')
+        router.push('/login')
+        const authError = new Error(apiData.message || "未授权访问")
+        ;(authError as any).response = { data: apiData }
+        return Promise.reject(authError)
       default:
         // 不在拦截器中显示错误，让组件自己处理
         // 将错误信息附加到 Error 对象上，供组件使用
@@ -66,6 +75,14 @@ Axios.interceptors.response.use(response => {
   if (error.response) {
     const status = error.response.status
     const data = error.response.data
+    
+    // 处理HTTP 401状态码
+    if (status === 401) {
+      localStorage.removeItem('token')
+      router.push('/login')
+      ;(error as any).backendMessage = '登录已过期，请重新登录'
+      return Promise.reject(error)
+    }
     
     // 如果后端返回了错误消息，优先使用后端消息
     if (data && data.message) {
