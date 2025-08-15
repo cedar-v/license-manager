@@ -28,9 +28,9 @@ jobs:
         script_stop: true
         envs: HOME,PATH
         script: |
-          # 加载用户环境配置（包括代理设置）
-          source ~/.bashrc || true
-          source ~/.profile || true
+          # 加载pi用户的环境配置（包括代理设置）
+          source /home/pi/.bashrc || true
+          source /home/pi/.profile || true
           
           cd /home/pi/license-manager
           git pull origin main
