@@ -1,13 +1,13 @@
 name: Deploy Frontend
 
 on:
-  push:
-    branches: [ main ]
-    paths: 
-      - 'frontend/**'
-      - 'Dockerfile.frontend'
-      - 'nginx.conf'
-      - '.github/workflows/deploy_frontend.yml'
+  # push:
+  #   branches: [ main ]
+  #   paths: 
+  #     - 'frontend/**'
+  #     - 'Dockerfile.frontend'
+  #     - 'nginx.conf'
+  #     - '.github/workflows/deploy_frontend.yml'
   workflow_dispatch:
 
 env:

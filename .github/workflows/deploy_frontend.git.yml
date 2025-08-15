@@ -1,0 +1,72 @@
+name: Deploy Frontend via Git
+
+# 触发条件
+on:
+  # 当推送到主分支且修改前端相关文件时自动触发
+  push:
+    branches: [ main ]
+    paths: 
+      - 'frontend/**'
+      - '.github/workflows/deploy_frontend.git.yml'
+  # 支持手动触发
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # 检出代码
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # 设置Node.js环境
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    # 安装依赖并构建
+    - name: Install dependencies and build
+      run: |
+        cd frontend
+        npm ci
+        npm run build
+
+    # 将构建产物传输到服务器
+    - name: Copy build files to server
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.HOST_PI }}
+        username: pi
+        password: ${{ secrets.PASS_PI }}
+        port: 22
+        source: "frontend/dist/*"
+        target: "/home/pi/lm-www/"
+        strip_components: 2
+        rm: true
+
+    # 重载nginx配置
+    - name: Reload nginx
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST_PI }}
+        username: pi
+        password: ${{ secrets.PASS_PI }}
+        port: 22
+        script: |
+          # 检查nginx配置文件语法
+          echo "Checking nginx configuration..."
+          sudo nginx -t
+          
+          # 重载nginx配置
+          echo "Reloading nginx..."
+          sudo nginx -s reload
+          
+          # 检查nginx状态
+          echo "Checking nginx status..."
+          sudo systemctl status nginx --no-pager -l
+          
+          echo "Frontend deployment completed successfully!"

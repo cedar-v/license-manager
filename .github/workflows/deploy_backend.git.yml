@@ -1,0 +1,43 @@
+name: Deploy Backend via Git
+
+# 触发条件
+on:
+  # 当推送到主分支且修改后端相关文件时自动触发
+  push:
+    branches: [ main ]
+    paths: 
+      - 'backend/**'
+      - '.github/workflows/deploy_backend.git.yml'
+  # 支持手动触发
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # 通过SSH连接服务器进行部署
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST_PI }}
+        username: pi
+        password: ${{ secrets.PASS_PI }}
+        port: 22
+        script: |
+          # 进入项目目录
+          cd /home/pi/license-manager
+          
+          # 拉取最新代码
+          echo "Pulling latest changes from repository..."
+          git pull origin main
+          
+          # 使用PM2重启应用
+          echo "Restarting license-manager with PM2..."
+          pm2 restart license-manager
+          
+          # 检查PM2状态
+          echo "Checking PM2 status..."
+          pm2 status license-manager
+          
+          echo "Deployment completed successfully!"
