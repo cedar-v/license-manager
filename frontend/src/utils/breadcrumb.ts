@@ -9,6 +9,7 @@
 
 import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 // 面包屑项接口
 export interface BreadcrumbItem {
@@ -17,43 +18,32 @@ export interface BreadcrumbItem {
   icon?: string
 }
 
-// 路由面包屑配置
-const routeBreadcrumbConfig: Record<string, BreadcrumbItem[]> = {
-  '/dashboard': [
-    { title: '仪表盘', path: '/dashboard' }
-  ],
-  '/customers': [
-    { title: '客户管理', path: '/customers' }
-  ],
-  '/licenses': [
-    { title: '授权管理', path: '/licenses' }
-  ],
-  '/roles': [
-    { title: '角色权限', path: '/roles' }
-  ],
-  '/users': [
-    { title: '系统用户', path: '/users' }
-  ],
-  '/login': [
-    { title: '登录' }
-  ]
+// 路由面包屑配置的key
+const routeBreadcrumbKeys: Record<string, string[]> = {
+  '/dashboard': ['dashboard'],
+  '/customers': ['customers'],
+  '/licenses': ['licenses'],
+  '/roles': ['roles'],
+  '/users': ['users'],
+  '/login': ['login']
 }
 
 export function useBreadcrumb() {
   const route = useRoute()
   const router = useRouter()
+  const { t } = useI18n()
 
   // 生成面包屑
   const breadcrumbs = computed<BreadcrumbItem[]>(() => {
     const currentPath = route.path
     
     // 从配置中获取面包屑
-    const configBreadcrumbs = routeBreadcrumbConfig[currentPath]
-    if (configBreadcrumbs) {
-      return configBreadcrumbs.map((item, index) => ({
-        ...item,
+    const configKeys = routeBreadcrumbKeys[currentPath]
+    if (configKeys) {
+      return configKeys.map((key, index) => ({
+        title: t(`navigation.breadcrumb.${key}`),
         // 最后一项不需要链接
-        path: index === configBreadcrumbs.length - 1 ? undefined : item.path
+        path: index === configKeys.length - 1 ? undefined : currentPath
       }))
     }
 
@@ -63,7 +53,7 @@ export function useBreadcrumb() {
 
   // 当前页面标题
   const pageTitle = computed(() => {
-    return (route.meta?.title as string) || '未知页面'
+    return (route.meta?.title as string) || t('navigation.breadcrumb.unknown')
   })
 
   // 自动生成面包屑
@@ -73,7 +63,7 @@ export function useBreadcrumb() {
 
     // 总是以工作台开始（除了登录页）
     if (path !== '/login') {
-      breadcrumbs.push({ title: '工作台', path: '/dashboard' })
+      breadcrumbs.push({ title: t('navigation.breadcrumb.workspace'), path: '/dashboard' })
     }
 
     // 根据路径段生成面包屑
@@ -95,18 +85,13 @@ export function useBreadcrumb() {
 
   // 根据路径段获取标题
   function getSegmentTitle(segment: string): string {
-    const titleMap: Record<string, string> = {
-      'dashboard': '工作台',
-      'customers': '客户管理',
-      'licenses': '授权管理',
-      'roles': '角色权限',
-      'users': '系统用户',
-      'login': '登录',
-      'settings': '设置',
-      'profile': '个人资料'
+    const knownSegments = ['dashboard', 'customers', 'licenses', 'roles', 'users', 'login', 'settings', 'profile']
+    
+    if (knownSegments.includes(segment)) {
+      return t(`navigation.breadcrumb.${segment}`)
     }
     
-    return titleMap[segment] || segment
+    return segment
   }
 
   // 导航到面包屑项

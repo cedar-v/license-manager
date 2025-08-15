@@ -2,7 +2,7 @@
   <div class="mobile-date-range">
     <div class="date-range-inputs">
       <div class="date-input-group">
-        <label class="date-label">开始日期</label>
+        <label class="date-label">{{ t('chart.mobileDateRange.startDate') }}</label>
         <input
           type="date"
           v-model="startDateValue"
@@ -13,10 +13,10 @@
         />
       </div>
       
-      <div class="date-separator">至</div>
+      <div class="date-separator">{{ t('chart.mobileDateRange.separator') }}</div>
       
       <div class="date-input-group">
-        <label class="date-label">结束日期</label>
+        <label class="date-label">{{ t('chart.mobileDateRange.endDate') }}</label>
         <input
           type="date"
           v-model="endDateValue"
@@ -44,7 +44,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 interface Props {
   modelValue: [string, string] | null
@@ -66,16 +67,19 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
+// 使用国际化
+const { t } = useI18n()
+
 const startDateValue = ref('')
 const endDateValue = ref('')
 const selectedQuick = ref('')
 
 // 快捷选择选项
-const quickOptions = [
-  { label: '本日', value: 'today' },
-  { label: '本周', value: 'week' },
-  { label: '本月', value: 'month' }
-]
+const quickOptions = computed(() => [
+  { label: t('chart.mobileDateRange.quickOptions.today'), value: 'today' },
+  { label: t('chart.mobileDateRange.quickOptions.week'), value: 'week' },
+  { label: t('chart.mobileDateRange.quickOptions.month'), value: 'month' }
+])
 
 // 格式化日期为 YYYY-MM-DD
 const formatDate = (date: Date): string => {

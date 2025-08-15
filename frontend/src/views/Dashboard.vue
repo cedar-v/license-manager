@@ -7,7 +7,7 @@
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
 <template>
-  <Layout app-name="Cedar-V" page-title="仪表盘">
+  <Layout app-name="Cedar-V" :page-title="t('dashboard.title')">
     <!-- 页面内容 -->
     <div class="dashboard">
       <!-- 统计卡片区域 -->
@@ -46,7 +46,7 @@
         <!-- 最近授权表格 -->
         <div class="table-card">
           <div class="card-header">
-            <h3 class="card-title">最近授权</h3>
+            <h3 class="card-title">{{ t('dashboard.recentLicenses.title') }}</h3>
           </div>
           <div class="table-container">
             <el-table
@@ -55,25 +55,25 @@
               :header-row-class-name="'table-header'"
               :row-class-name="(params: any) => params.rowIndex % 2 === 1 ? 'stripe-row' : ''"
             >
-              <el-table-column label="序号"  min-width="90">
+              <el-table-column :label="t('dashboard.recentLicenses.columns.serialNumber')"  min-width="90">
                 <template #default="{ $index }" style="min-width: 90px;">
                   {{ $index + 1 }}
                 </template>
               </el-table-column>
-              <el-table-column prop="customer" label="客户名称" min-width="200" />
-              <el-table-column prop="description" label="描述" min-width="150" />
-              <el-table-column label="状态" width="120" align="center">
+              <el-table-column prop="customer" :label="t('dashboard.recentLicenses.columns.customerName')" min-width="200" />
+              <el-table-column prop="description" :label="t('dashboard.recentLicenses.columns.description')" min-width="150" />
+              <el-table-column :label="t('dashboard.recentLicenses.columns.status')" width="120" align="center">
                 <template #default="{ row }">
                   <span 
                     class="status-badge" 
                     :class="row.status === 1 ? 'status-valid' : 'status-invalid'"
                   >
-                    {{ row.status === 1 ? '有效' : '失效' }}
+                    {{ row.status === 1 ? t('dashboard.recentLicenses.statusLabels.valid') : t('dashboard.recentLicenses.statusLabels.invalid') }}
                   </span>
                 </template>
               </el-table-column>
-              <el-table-column prop="expiry" label="到期时间" width="301" />
-              <el-table-column prop="createTime" label="创建时间" width="301" />
+              <el-table-column prop="expiry" :label="t('dashboard.recentLicenses.columns.expiryTime')" width="301" />
+              <el-table-column prop="createTime" :label="t('dashboard.recentLicenses.columns.createTime')" width="301" />
             </el-table>
           </div>
         </div>
@@ -83,48 +83,53 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Layout from '@/components/common/layout/Layout.vue';
 import LicenseTrendChart from '@/components/charts/LicenseTrendChart.vue';
 
+// 使用国际化
+const { t } = useI18n()
+
 // 统计卡片数据
-const statsData = [
+const statsData = computed(() => [
   {
     id: 1,
     value: '1,234',
-    label: '总授权数',
+    label: t('dashboard.stats.totalLicenses'),
     trend: '8.5%',
   },
   {
     id: 2,
     value: '856',
-    label: '活跃授权',
+    label: t('dashboard.stats.activeLicenses'),
     trend: '8.5%',
   },
   {
     id: 3,
     value: '123',
-    label: '即将到期',
+    label: t('dashboard.stats.expiringSoon'),
     trend: '8.5%',
   },
   {
     id: 4,
     value: '45',
-    label: '已过期',
+    label: t('dashboard.stats.expired'),
     trend: '8.5%',
   },
   {
     id: 5,
     value: '678',
-    label: '本月新增',
+    label: t('dashboard.stats.newThisMonth'),
     trend: '8.5%',
   },
   {
     id: 6,
     value: '234',
-    label: '客户总数',
+    label: t('dashboard.stats.totalCustomers'),
     trend: '8.5%',
   }
-];
+]);
 
 // 最近授权数据 
 const recentData = [

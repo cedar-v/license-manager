@@ -2,7 +2,7 @@
   <div class="license-trend-chart">
     <!-- 卡片头部 -->
     <div class="chart-header">
-      <h3 class="chart-title">授权趋势</h3>
+      <h3 class="chart-title">{{ t('chart.licenseTrend.title') }}</h3>
       
       <!-- 时间选择器 -->
       <div class="time-selector">
@@ -36,9 +36,9 @@
             ref="datePickerRef"
             v-model="dateRange"
             type="daterange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
+            :range-separator="t('chart.licenseTrend.datePicker.rangeSeparator')"
+            :start-placeholder="t('chart.licenseTrend.datePicker.startPlaceholder')"
+            :end-placeholder="t('chart.licenseTrend.datePicker.endPlaceholder')"
             size="small"
             format="MM-DD"
             value-format="YYYY-MM-DD"
@@ -88,6 +88,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { use } from 'echarts/core'
 import { useDevice } from '@/utils/useDevice'
 import MobileDateRange from '@/components/common/MobileDateRange.vue'
@@ -110,12 +111,15 @@ use([
   LegendComponent
 ])
 
+// 使用国际化
+const { t } = useI18n()
+
 // 快捷选择选项
-const quickOptions = [
-  { label: '本日', value: 'today' },
-  { label: '本周', value: 'week' },
-  { label: '本月', value: 'month' }
-]
+const quickOptions = computed(() => [
+  { label: t('chart.licenseTrend.quickOptions.today'), value: 'today' },
+  { label: t('chart.licenseTrend.quickOptions.week'), value: 'week' },
+  { label: t('chart.licenseTrend.quickOptions.month'), value: 'month' }
+])
 
 // 响应式数据
 const { isMobile } = useDevice()
@@ -199,7 +203,7 @@ const chartOption = computed(() => {
       extraCssText: 'box-shadow: 0px 4px 12px 0px rgba(59, 210, 180, 0.2); backdrop-filter: blur(4px);',
       formatter: (params: any) => {
         const data = params[0]
-        return `授权数量: ${data.value}`
+        return `${t('chart.licenseTrend.tooltip.licenseCount')}: ${data.value}`
       }
     },
     series: [
@@ -308,7 +312,7 @@ const switchToEditMode = () => {
 // 格式化日期范围用于显示
 const formatDateRange = (range: [string, string]) => {
   if (!range || !range[0] || !range[1]) {
-    return '请选择日期范围'
+    return t('chart.licenseTrend.datePicker.selectDateRange')
   }
   
   const startDate = new Date(range[0])
@@ -320,7 +324,7 @@ const formatDateRange = (range: [string, string]) => {
     return `${month}-${day}`
   }
   
-  return `${formatDate(startDate)} 至 ${formatDate(endDate)}`
+  return `${formatDate(startDate)} ${t('chart.licenseTrend.datePicker.rangeSeparator')} ${formatDate(endDate)}`
 }
 
 // 更新图表数据

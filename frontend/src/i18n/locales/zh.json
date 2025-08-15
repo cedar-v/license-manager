@@ -18,5 +18,86 @@
       "passwordRequired": "请输入密码",
       "passwordMinLength": "密码至少需要6个字符"
     }
+  },
+  "sidebar": {
+    "expand": "展开侧边栏",
+    "collapse": "收起侧边栏"
+  },
+  "dashboard": {
+    "title": "仪表盘",
+    "stats": {
+      "totalLicenses": "总授权数",
+      "activeLicenses": "活跃授权",
+      "expiringSoon": "即将到期",
+      "expired": "已过期",
+      "newThisMonth": "本月新增",
+      "totalCustomers": "客户总数"
+    },
+    "recentLicenses": {
+      "title": "最近授权",
+      "columns": {
+        "serialNumber": "序号",
+        "customerName": "客户名称",
+        "description": "描述",
+        "status": "状态",
+        "expiryTime": "到期时间",
+        "createTime": "创建时间"
+      },
+      "statusLabels": {
+        "valid": "有效",
+        "invalid": "失效"
+      }
+    }
+  },
+  "navigation": {
+    "menu": {
+      "dashboard": "仪表盘",
+      "customers": "客户管理",
+      "licenses": "授权管理",
+      "roles": "角色权限",
+      "users": "系统用户"
+    },
+    "toggleSidebar": "切换侧边栏",
+    "breadcrumb": {
+      "dashboard": "仪表盘",
+      "customers": "客户管理",
+      "licenses": "授权管理",
+      "roles": "角色权限",
+      "users": "系统用户",
+      "login": "登录",
+      "settings": "设置",
+      "profile": "个人资料",
+      "workspace": "工作台",
+      "unknown": "未知页面"
+    }
+  },
+  "chart": {
+    "licenseTrend": {
+      "title": "授权趋势",
+      "quickOptions": {
+        "today": "本日",
+        "week": "本周",
+        "month": "本月"
+      },
+      "datePicker": {
+        "rangeSeparator": "至",
+        "startPlaceholder": "开始日期",
+        "endPlaceholder": "结束日期",
+        "selectDateRange": "请选择日期范围"
+      },
+      "tooltip": {
+        "licenseCount": "授权数量"
+      }
+    },
+    "mobileDateRange": {
+      "startDate": "开始日期",
+      "endDate": "结束日期",
+      "separator": "至",
+      "quickOptions": {
+        "today": "本日",
+        "week": "本周",
+        "month": "本月"
+      }
+    }
   }
 }

@@ -18,5 +18,86 @@
       "passwordRequired": "パスワードを入力してください",
       "passwordMinLength": "パスワードは6文字以上である必要があります"
     }
+  },
+  "sidebar": {
+    "expand": "サイドバーを展開",
+    "collapse": "サイドバーを折りたたむ"
+  },
+  "dashboard": {
+    "title": "ダッシュボード",
+    "stats": {
+      "totalLicenses": "総ライセンス数",
+      "activeLicenses": "アクティブライセンス",
+      "expiringSoon": "期限近し",
+      "expired": "期限切れ",
+      "newThisMonth": "今月新規",
+      "totalCustomers": "顧客総数"
+    },
+    "recentLicenses": {
+      "title": "最近のライセンス",
+      "columns": {
+        "serialNumber": "番号",
+        "customerName": "顧客名",
+        "description": "説明",
+        "status": "ステータス",
+        "expiryTime": "有効期限",
+        "createTime": "作成日時"
+      },
+      "statusLabels": {
+        "valid": "有効",
+        "invalid": "無効"
+      }
+    }
+  },
+  "navigation": {
+    "menu": {
+      "dashboard": "ダッシュボード",
+      "customers": "顧客管理",
+      "licenses": "ライセンス管理",
+      "roles": "ロールと権限",
+      "users": "システムユーザー"
+    },
+    "toggleSidebar": "サイドバー切り替え",
+    "breadcrumb": {
+      "dashboard": "ダッシュボード",
+      "customers": "顧客管理",
+      "licenses": "ライセンス管理",
+      "roles": "ロールと権限",
+      "users": "システムユーザー",
+      "login": "ログイン",
+      "settings": "設定",
+      "profile": "プロフィール",
+      "workspace": "ワークスペース",
+      "unknown": "未知ページ"
+    }
+  },
+  "chart": {
+    "licenseTrend": {
+      "title": "ライセンストレンド",
+      "quickOptions": {
+        "today": "今日",
+        "week": "今週",
+        "month": "今月"
+      },
+      "datePicker": {
+        "rangeSeparator": "から",
+        "startPlaceholder": "開始日",
+        "endPlaceholder": "終了日",
+        "selectDateRange": "日付範囲を選択"
+      },
+      "tooltip": {
+        "licenseCount": "ライセンス数"
+      }
+    },
+    "mobileDateRange": {
+      "startDate": "開始日付",
+      "endDate": "終了日付",
+      "separator": "から",
+      "quickOptions": {
+        "today": "今日",
+        "week": "今週",
+        "month": "今月"
+      }
+    }
   }
 }

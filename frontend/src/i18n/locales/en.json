@@ -18,5 +18,86 @@
       "passwordRequired": "Please enter password",
       "passwordMinLength": "Password must be at least 6 characters"
     }
+  },
+  "sidebar": {
+    "expand": "Expand Sidebar",
+    "collapse": "Collapse Sidebar"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "stats": {
+      "totalLicenses": "Total Licenses",
+      "activeLicenses": "Active Licenses",
+      "expiringSoon": "Expiring Soon",
+      "expired": "Expired",
+      "newThisMonth": "New This Month",
+      "totalCustomers": "Total Customers"
+    },
+    "recentLicenses": {
+      "title": "Recent Licenses",
+      "columns": {
+        "serialNumber": "Serial No.",
+        "customerName": "Customer Name",
+        "description": "Description",
+        "status": "Status",
+        "expiryTime": "Expiry Time",
+        "createTime": "Create Time"
+      },
+      "statusLabels": {
+        "valid": "Valid",
+        "invalid": "Invalid"
+      }
+    }
+  },
+  "navigation": {
+    "menu": {
+      "dashboard": "Dashboard",
+      "customers": "Customer Management",
+      "licenses": "License Management",
+      "roles": "Roles & Permissions",
+      "users": "System Users"
+    },
+    "toggleSidebar": "Toggle Sidebar",
+    "breadcrumb": {
+      "dashboard": "Dashboard",
+      "customers": "Customer Management",
+      "licenses": "License Management",
+      "roles": "Roles & Permissions",
+      "users": "System Users",
+      "login": "Login",
+      "settings": "Settings",
+      "profile": "Profile",
+      "workspace": "Workspace",
+      "unknown": "Unknown Page"
+    }
+  },
+  "chart": {
+    "licenseTrend": {
+      "title": "License Trend",
+      "quickOptions": {
+        "today": "Today",
+        "week": "This Week",
+        "month": "This Month"
+      },
+      "datePicker": {
+        "rangeSeparator": "to",
+        "startPlaceholder": "Start Date",
+        "endPlaceholder": "End Date",
+        "selectDateRange": "Select Date Range"
+      },
+      "tooltip": {
+        "licenseCount": "License Count"
+      }
+    },
+    "mobileDateRange": {
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "separator": "to",
+      "quickOptions": {
+        "today": "Today",
+        "week": "This Week",
+        "month": "This Month"
+      }
+    }
   }
 }

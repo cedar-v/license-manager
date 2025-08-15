@@ -14,7 +14,7 @@
       <button 
         class="sidebar-toggle-btn"
         @click="handleSidebarToggle"
-        :aria-label="'切换侧边栏'"
+        :aria-label="t('navigation.toggleSidebar')"
       >
         <NavIcon name="sidebar-toggle" size="large" />
       </button>
@@ -92,6 +92,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/store/modules/app'
 import NavIcon from '@/components/common/icons/NavIcon.vue'
 import { useBreadcrumb } from '@/utils/breadcrumb'
@@ -113,6 +114,9 @@ const emit = defineEmits<{
   themeClick: []
   userClick: []
 }>()
+
+// 使用国际化
+const { t } = useI18n()
 
 // 使用store和组合函数
 const appStore = useAppStore()

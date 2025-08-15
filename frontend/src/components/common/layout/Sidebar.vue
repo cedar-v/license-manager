@@ -25,7 +25,7 @@
         </div>
       </div>
       <button v-if="collapsible" class="sidebar__toggle" :class="{ 'sidebar__toggle--collapsed': isCollapsed }"
-        @click="toggleSidebar" :aria-label="isCollapsed ? '展开侧边栏' : '收起侧边栏'">
+        @click="toggleSidebar" :aria-label="isCollapsed ? t('sidebar.expand') : t('sidebar.collapse')">
         <el-icon class="toggle-icon">
           <component :is="isCollapsed ? 'ArrowRight' : 'ArrowLeft'" />
         </el-icon>
@@ -68,6 +68,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/store/modules/app'
 import SidebarIcon from '@/components/common/icons/SidebarIcon.vue'
 
@@ -102,6 +103,9 @@ const emit = defineEmits<{
   navClick: [item: NavItem, event: Event]
   toggle: [collapsed: boolean]
 }>()
+
+// 使用国际化
+const { t } = useI18n()
 
 // 使用全局状态管理
 const appStore = useAppStore()

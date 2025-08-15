@@ -32,6 +32,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/store/modules/app'
 import Sidebar from './Sidebar.vue'
 import NavContent from './NavContent.vue'
@@ -58,14 +59,17 @@ const props = withDefaults(defineProps<Props>(), {
   pageTitle: ''
 })
 
+// 使用国际化
+const { t } = useI18n()
+
 // 默认导航配置
-const defaultNavItems: NavItem[] = [
-  { id: "dashboard", label: "仪表盘", href: "/dashboard", icon: "dashboard" },
-  { id: "customers", label: "客户管理", href: "/customers", icon: "customers" },
-  { id: "licenses", label: "授权管理", href: "/licenses", icon: "licenses" },
-  { id: "roles", label: "角色权限", href: "/roles", icon: "roles" },
-  { id: "users", label: "系统用户", href: "/users", icon: "users" }
-]
+const defaultNavItems = computed(() => [
+  { id: "dashboard", label: t('navigation.menu.dashboard'), href: "/dashboard", icon: "dashboard" },
+  { id: "customers", label: t('navigation.menu.customers'), href: "/customers", icon: "customers" },
+  { id: "licenses", label: t('navigation.menu.licenses'), href: "/licenses", icon: "licenses" },
+  { id: "roles", label: t('navigation.menu.roles'), href: "/roles", icon: "roles" },
+  { id: "users", label: t('navigation.menu.users'), href: "/users", icon: "users" }
+])
 
 // 使用 store 和路由
 const appStore = useAppStore()
@@ -74,7 +78,7 @@ const router = useRouter()
 
 // 计算当前激活的导航项
 const navItems = computed(() => {
-  return defaultNavItems.map(item => ({
+  return defaultNavItems.value.map(item => ({
     ...item,
     active: route.path === item.href
   }))
