@@ -33,7 +33,10 @@ jobs:
       run: |
         cd frontend
         npm ci
-        npm run build
+        npm run build:prod
+        # 检查构建结果
+        echo "Build completed, checking production directory:"
+        ls -la production/
 
     # 将构建产物传输到服务器
     - name: Copy build files to server
@@ -43,10 +46,8 @@ jobs:
         username: pi
         password: ${{ secrets.PASS_PI }}
         port: 22
-        source: "frontend/dist/*"
+        source: "frontend/production/*"
         target: "/home/pi/lm-www/"
-        strip_components: 2
-        rm: true
 
     # 重载nginx配置
     - name: Reload nginx
