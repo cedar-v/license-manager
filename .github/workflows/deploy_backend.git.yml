@@ -26,8 +26,12 @@ jobs:
         port: 22
         command_timeout: 10m
         script_stop: true
-        envs: HOME,PATH
+        envs: USER
         script: |
+          # 确保使用正确的用户环境
+          export HOME=/home/pi
+          export USER=pi
+          
           # 加载pi用户的环境配置（包括代理设置）
           source /home/pi/.bashrc || true
           source /home/pi/.profile || true
