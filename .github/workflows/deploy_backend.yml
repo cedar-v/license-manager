@@ -45,9 +45,9 @@ jobs:
     - name: Copy files to server
       uses: appleboy/scp-action@v0.1.7
       with:
-        host: ${{ secrets.HOST_1 }}
-        username: root
-        password: ${{ secrets.PASS_1 }}
+        host: ${{ secrets.HOST_PI }}
+        username: pi
+        password: ${{ secrets.PASS_PI }}
         port: 22
         source: "backend-image.tar"
         target: "/opt/license-manager/"
@@ -55,9 +55,9 @@ jobs:
     - name: Deploy to server
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.HOST_1 }}
-        username: root
-        password: ${{ secrets.PASS_1 }}
+        host: ${{ secrets.HOST_PI }}
+        username: pi
+        password: ${{ secrets.PASS_PI }}
         port: 22
         script: |
           cd /opt/license-manager
@@ -99,7 +99,7 @@ jobs:
     - name: Health check
       run: |
         sleep 10
-        response=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.HOST_1 }}:18888/health || echo "000")
+        response=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.HOST_PI }}:18888/health || echo "000")
         if [ "$response" = "200" ]; then
           echo "✅ Health check passed! Service is responding."
         else
