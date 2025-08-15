@@ -49,8 +49,8 @@ jobs:
         source: "frontend/production/*"
         target: "/home/pi/lm-www/"
 
-    # 重载nginx配置
-    - name: Reload nginx
+    # 设置文件权限并重载nginx配置
+    - name: Set permissions and reload nginx
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.HOST_PI }}
@@ -58,6 +58,11 @@ jobs:
         password: ${{ secrets.PASS_PI }}
         port: 22
         script: |
+          # 设置正确的文件权限
+          echo "Setting correct file permissions..."
+          sudo chown -R www-data:www-data /home/pi/lm-www/frontend/
+          sudo chmod -R 755 /home/pi/lm-www/frontend/
+          
           # 检查nginx配置文件语法
           echo "Checking nginx configuration..."
           sudo nginx -t
