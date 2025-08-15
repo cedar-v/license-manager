@@ -173,7 +173,7 @@ const handleUserClick = () => {
   align-items: center;
   justify-content: space-between;
   padding: 20px 24px;
-  z-index: 999;
+  z-index: 2001;
   transition: all 0.3s ease;
 }
 

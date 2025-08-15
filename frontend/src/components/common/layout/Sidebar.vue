@@ -137,7 +137,7 @@ const handleNavClick = (item: NavItem, event: Event) => {
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
-  z-index: 1000;
+  z-index: 2000;
 }
 
 .sidebar--collapsed {
