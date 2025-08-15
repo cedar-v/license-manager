@@ -38,7 +38,7 @@ jobs:
         password: ${{ secrets.PASS_PI }}
         port: 22
         source: "frontend-image.tar"
-        target: "/opt/license-manager/"
+        target: "/home/pi/license-manager/"
 
     - name: Deploy to server
       uses: appleboy/ssh-action@v1.0.3
@@ -48,7 +48,7 @@ jobs:
         password: ${{ secrets.PASS_PI }}
         port: 22
         script: |
-          cd /opt/license-manager
+          cd /home/pi/license-manager
           
           # Stop and remove existing container
           docker stop ${{ env.CONTAINER_NAME }} || true
