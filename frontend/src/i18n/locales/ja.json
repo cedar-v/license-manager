@@ -99,5 +99,27 @@
         "month": "今月"
       }
     }
+  },
+  "dictionary": {
+    "common": {
+      "all": "すべて",
+      "unknown": "未知"
+    },
+    "customerType": {
+      "individual": "個人",
+      "enterprise": "企業",
+      "government": "政府",
+      "education": "教育"
+    },
+    "customerLevel": {
+      "normal": "一般",
+      "vip": "VIP",
+      "enterprise": "企業",
+      "strategic": "戦略"
+    },
+    "status": {
+      "active": "有効",
+      "disabled": "無効"
+    }
   }
 }

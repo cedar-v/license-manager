@@ -99,5 +99,27 @@
         "month": "本月"
       }
     }
+  },
+  "dictionary": {
+    "common": {
+      "all": "全部",
+      "unknown": "未知"
+    },
+    "customerType": {
+      "individual": "个人",
+      "enterprise": "企业",
+      "government": "政府",
+      "education": "教育"
+    },
+    "customerLevel": {
+      "normal": "普通",
+      "vip": "VIP",
+      "enterprise": "企业",
+      "strategic": "战略"
+    },
+    "status": {
+      "active": "正常",
+      "disabled": "禁用"
+    }
   }
 }
