@@ -8,7 +8,7 @@ type LoginRequest struct {
 
 // LoginResponse 登录响应结构
 type LoginResponse struct {
-	Code    int         `json:"code"`
+	Code    string      `json:"code"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data,omitempty"`
 }

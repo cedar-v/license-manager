@@ -23,6 +23,9 @@ type CustomerService interface {
 	GetCustomerList(ctx context.Context, req *models.CustomerListRequest) (*models.CustomerListResponse, error)
 	GetCustomer(ctx context.Context, id string) (*models.Customer, error)
 	CreateCustomer(ctx context.Context, req *models.CustomerCreateRequest) (*models.Customer, error)
+	UpdateCustomer(ctx context.Context, id string, req *models.CustomerUpdateRequest) (*models.Customer, error)
+	DeleteCustomer(ctx context.Context, id string) error
+	UpdateCustomerStatus(ctx context.Context, id string, req *models.CustomerStatusUpdateRequest) (*models.Customer, error)
 }
 
 // EnumService 枚举服务接口

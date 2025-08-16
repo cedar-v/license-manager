@@ -2,7 +2,7 @@ package models
 
 // APIResponse 通用API响应结构
 type APIResponse struct {
-	Code      int         `json:"code"`
+	Code      string      `json:"code"`
 	Message   string      `json:"message"`
 	Data      interface{} `json:"data,omitempty"`
 	Timestamp string      `json:"timestamp,omitempty"`

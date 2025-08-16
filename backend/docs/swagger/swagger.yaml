@@ -3,7 +3,7 @@ definitions:
   models.APIResponse:
     properties:
       code:
-        type: integer
+        type: string
       data: {}
       message:
         type: string
@@ -164,6 +164,78 @@ definitions:
       total_pages:
         type: integer
     type: object
+  models.CustomerStatusUpdateRequest:
+    properties:
+      status:
+        description: 状态，必填
+        enum:
+        - active
+        - disabled
+        type: string
+    required:
+    - status
+    type: object
+  models.CustomerUpdateRequest:
+    properties:
+      address:
+        description: 地址，可选
+        maxLength: 500
+        type: string
+      company_size:
+        description: 企业规模，可选
+        enum:
+        - small
+        - medium
+        - large
+        - enterprise
+        type: string
+      contact_person:
+        description: 联系人姓名，可选
+        maxLength: 100
+        type: string
+      contact_title:
+        description: 联系人职位，可选
+        maxLength: 100
+        type: string
+      customer_level:
+        description: 客户等级，可选
+        enum:
+        - normal
+        - vip
+        - enterprise
+        - strategic
+        type: string
+      customer_name:
+        description: 客户名称，可选
+        maxLength: 200
+        type: string
+      customer_type:
+        description: 客户类型，可选
+        enum:
+        - individual
+        - enterprise
+        - government
+        - education
+        type: string
+      description:
+        description: 描述，可选
+        maxLength: 1000
+        type: string
+      email:
+        description: 邮箱，可选
+        maxLength: 255
+        type: string
+      phone:
+        description: 电话，可选
+        maxLength: 20
+        type: string
+      status:
+        description: 状态，可选
+        enum:
+        - active
+        - disabled
+        type: string
+    type: object
   models.EnumItem:
     properties:
       display:
@@ -234,7 +306,7 @@ definitions:
   models.LoginResponse:
     properties:
       code:
-        type: integer
+        type: string
       data: {}
       message:
         type: string
@@ -401,6 +473,44 @@ paths:
       tags:
       - 客户管理
   /api/customers/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 软删除客户记录
+      parameters:
+      - description: 客户ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除成功
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 客户不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 删除客户
+      tags:
+      - 客户管理
     get:
       consumes:
       - application/json
@@ -442,6 +552,105 @@ paths:
       security:
       - BearerAuth: []
       summary: 获取客户详情
+      tags:
+      - 客户管理
+    put:
+      consumes:
+      - application/json
+      description: 更新客户信息，所有字段都是可选的
+      parameters:
+      - description: 客户ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 客户信息
+        in: body
+        name: customer
+        required: true
+        schema:
+          $ref: '#/definitions/models.CustomerUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 更新成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Customer'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 客户不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 更新客户信息
+      tags:
+      - 客户管理
+  /api/customers/{id}/status:
+    patch:
+      consumes:
+      - application/json
+      description: 修改客户状态（激活/停用）
+      parameters:
+      - description: 客户ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 状态信息
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/models.CustomerStatusUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 状态更新成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Customer'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 客户不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 修改客户状态
       tags:
       - 客户管理
   /api/enums:

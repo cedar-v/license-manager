@@ -51,7 +51,7 @@ func (h *CustomerHandler) GetCustomerList(c *gin.Context) {
 		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
 		c.JSON(status, models.ErrorResponse{
 			Code:      errCode,
-			Message:   message,
+			Message:   message + ": " + err.Error(),
 			Timestamp: time.Now().Format(time.RFC3339),
 		})
 		return
@@ -86,7 +86,7 @@ func (h *CustomerHandler) GetCustomerList(c *gin.Context) {
 	lang := middleware.GetLanguage(c)
 	successMessage := i18n.GetErrorMessage("000000", lang)
 	c.JSON(http.StatusOK, models.APIResponse{
-		Code:    0,
+		Code:    "000000",
 		Message: successMessage,
 		Data:    data,
 	})
@@ -148,7 +148,7 @@ func (h *CustomerHandler) GetCustomer(c *gin.Context) {
 	lang := middleware.GetLanguage(c)
 	successMessage := i18n.GetErrorMessage("000000", lang)
 	c.JSON(http.StatusOK, models.APIResponse{
-		Code:    0,
+		Code:    "000000",
 		Message: successMessage,
 		Data:    data,
 	})
@@ -175,7 +175,7 @@ func (h *CustomerHandler) CreateCustomer(c *gin.Context) {
 		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
 		c.JSON(status, models.ErrorResponse{
 			Code:      errCode,
-			Message:   message,
+			Message:   message + ": " + err.Error(),
 			Timestamp: time.Now().Format(time.RFC3339),
 		})
 		return
@@ -208,9 +208,221 @@ func (h *CustomerHandler) CreateCustomer(c *gin.Context) {
 	}
 
 	lang := middleware.GetLanguage(c)
-	successMessage := i18n.GetErrorMessage("000001", lang) // 使用客户创建成功的消息
+	successMessage := i18n.GetErrorMessage("000000", lang)
 	c.JSON(http.StatusOK, models.APIResponse{
-		Code:    0,
+		Code:    "000000",
+		Message: successMessage,
+		Data:    data,
+	})
+}
+
+// UpdateCustomer 更新客户信息
+// @Summary 更新客户信息
+// @Description 更新客户信息，所有字段都是可选的
+// @Tags 客户管理
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "客户ID"
+// @Param customer body models.CustomerUpdateRequest true "客户信息"
+// @Success 200 {object} models.APIResponse{data=models.Customer} "更新成功"
+// @Failure 400 {object} models.ErrorResponse "请求参数无效"
+// @Failure 401 {object} models.ErrorResponse "未认证"
+// @Failure 404 {object} models.ErrorResponse "客户不存在"
+// @Failure 500 {object} models.ErrorResponse "服务器内部错误"
+// @Router /api/customers/{id} [put]
+func (h *CustomerHandler) UpdateCustomer(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	var req models.CustomerUpdateRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message + ": " + err.Error(),
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	// 设置语言到Context中
+	ctx := middleware.WithLanguage(c.Request.Context(), c)
+	
+	data, err := h.customerService.UpdateCustomer(ctx, id, &req)
+	if err != nil {
+		// 错误已经在Service层完全包装好了，直接使用
+		var i18nErr *i18n.I18nError
+		if errors.As(err, &i18nErr) {
+			c.JSON(i18nErr.HttpCode, models.ErrorResponse{
+				Code:      i18nErr.Code,
+				Message:   i18nErr.Message,
+				Timestamp: time.Now().Format(time.RFC3339),
+			})
+		} else {
+			// 兜底：理论上不应该到这里，因为Service层应该返回I18nError
+			lang := middleware.GetLanguage(c)
+			status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+			c.JSON(status, models.ErrorResponse{
+				Code:      errCode,
+				Message:   message,
+				Timestamp: time.Now().Format(time.RFC3339),
+			})
+		}
+		return
+	}
+
+	lang := middleware.GetLanguage(c)
+	successMessage := i18n.GetErrorMessage("000000", lang)
+	c.JSON(http.StatusOK, models.APIResponse{
+		Code:    "000000",
+		Message: successMessage,
+		Data:    data,
+	})
+}
+
+// DeleteCustomer 删除客户
+// @Summary 删除客户
+// @Description 软删除客户记录
+// @Tags 客户管理
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "客户ID"
+// @Success 200 {object} models.APIResponse "删除成功"
+// @Failure 400 {object} models.ErrorResponse "请求参数无效"
+// @Failure 401 {object} models.ErrorResponse "未认证"
+// @Failure 404 {object} models.ErrorResponse "客户不存在"
+// @Failure 500 {object} models.ErrorResponse "服务器内部错误"
+// @Router /api/customers/{id} [delete]
+func (h *CustomerHandler) DeleteCustomer(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	// 设置语言到Context中
+	ctx := middleware.WithLanguage(c.Request.Context(), c)
+	
+	err := h.customerService.DeleteCustomer(ctx, id)
+	if err != nil {
+		// 错误已经在Service层完全包装好了，直接使用
+		var i18nErr *i18n.I18nError
+		if errors.As(err, &i18nErr) {
+			c.JSON(i18nErr.HttpCode, models.ErrorResponse{
+				Code:      i18nErr.Code,
+				Message:   i18nErr.Message,
+				Timestamp: time.Now().Format(time.RFC3339),
+			})
+		} else {
+			// 兜底：理论上不应该到这里，因为Service层应该返回I18nError
+			lang := middleware.GetLanguage(c)
+			status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+			c.JSON(status, models.ErrorResponse{
+				Code:      errCode,
+				Message:   message,
+				Timestamp: time.Now().Format(time.RFC3339),
+			})
+		}
+		return
+	}
+
+	lang := middleware.GetLanguage(c)
+	successMessage := i18n.GetErrorMessage("000000", lang)
+	c.JSON(http.StatusOK, models.APIResponse{
+		Code:    "000000",
+		Message: successMessage,
+		Data:    nil,
+	})
+}
+
+// UpdateCustomerStatus 修改客户状态
+// @Summary 修改客户状态
+// @Description 修改客户状态（激活/停用）
+// @Tags 客户管理
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "客户ID"
+// @Param status body models.CustomerStatusUpdateRequest true "状态信息"
+// @Success 200 {object} models.APIResponse{data=models.Customer} "状态更新成功"
+// @Failure 400 {object} models.ErrorResponse "请求参数无效"
+// @Failure 401 {object} models.ErrorResponse "未认证"
+// @Failure 404 {object} models.ErrorResponse "客户不存在"
+// @Failure 500 {object} models.ErrorResponse "服务器内部错误"
+// @Router /api/customers/{id}/status [patch]
+func (h *CustomerHandler) UpdateCustomerStatus(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	var req models.CustomerStatusUpdateRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message + ": " + err.Error(),
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	// 设置语言到Context中
+	ctx := middleware.WithLanguage(c.Request.Context(), c)
+	
+	data, err := h.customerService.UpdateCustomerStatus(ctx, id, &req)
+	if err != nil {
+		// 错误已经在Service层完全包装好了，直接使用
+		var i18nErr *i18n.I18nError
+		if errors.As(err, &i18nErr) {
+			c.JSON(i18nErr.HttpCode, models.ErrorResponse{
+				Code:      i18nErr.Code,
+				Message:   i18nErr.Message,
+				Timestamp: time.Now().Format(time.RFC3339),
+			})
+		} else {
+			// 兜底：理论上不应该到这里，因为Service层应该返回I18nError
+			lang := middleware.GetLanguage(c)
+			status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+			c.JSON(status, models.ErrorResponse{
+				Code:      errCode,
+				Message:   message,
+				Timestamp: time.Now().Format(time.RFC3339),
+			})
+		}
+		return
+	}
+
+	lang := middleware.GetLanguage(c)
+	successMessage := i18n.GetErrorMessage("000000", lang)
+	c.JSON(http.StatusOK, models.APIResponse{
+		Code:    "000000",
 		Message: successMessage,
 		Data:    data,
 	})

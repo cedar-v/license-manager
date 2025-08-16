@@ -133,6 +133,138 @@ func (s *customerService) CreateCustomer(ctx context.Context, req *models.Custom
 	return customer, nil
 }
 
+// UpdateCustomer 更新客户信息
+func (s *customerService) UpdateCustomer(ctx context.Context, id string, req *models.CustomerUpdateRequest) (*models.Customer, error) {
+	lang := pkgcontext.GetLanguageFromContext(ctx)
+	
+	// 业务逻辑：参数验证
+	if id == "" {
+		return nil, i18n.NewI18nError("900001", lang)
+	}
+	if req == nil {
+		return nil, i18n.NewI18nError("900001", lang)
+	}
+
+	// 先查询现有客户
+	existingCustomer, err := s.customerRepo.GetCustomerByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, repository.ErrCustomerNotFound) {
+			return nil, i18n.NewI18nError("200001", lang)
+		}
+		return nil, i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	// 获取当前用户ID
+	currentUserID := "admin_uuid" // TODO: 从JWT token中获取
+
+	// 只更新提供的字段
+	if req.CustomerName != nil {
+		existingCustomer.CustomerName = *req.CustomerName
+	}
+	if req.CustomerType != nil {
+		existingCustomer.CustomerType = *req.CustomerType
+	}
+	if req.ContactPerson != nil {
+		existingCustomer.ContactPerson = *req.ContactPerson
+	}
+	if req.ContactTitle != nil {
+		existingCustomer.ContactTitle = req.ContactTitle
+	}
+	if req.Email != nil {
+		existingCustomer.Email = req.Email
+	}
+	if req.Phone != nil {
+		existingCustomer.Phone = req.Phone
+	}
+	if req.Address != nil {
+		existingCustomer.Address = req.Address
+	}
+	if req.CompanySize != nil {
+		existingCustomer.CompanySize = req.CompanySize
+	}
+	if req.CustomerLevel != nil {
+		existingCustomer.CustomerLevel = *req.CustomerLevel
+	}
+	if req.Status != nil {
+		existingCustomer.Status = *req.Status
+	}
+	if req.Description != nil {
+		existingCustomer.Description = req.Description
+	}
+	
+	// 设置更新者
+	existingCustomer.UpdatedBy = &currentUserID
+
+	// 委托给Repository层进行数据更新
+	if err := s.customerRepo.UpdateCustomer(ctx, existingCustomer); err != nil {
+		return nil, i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	// 填充多语言显示字段
+	s.fillCustomerDisplayFields(existingCustomer, lang)
+
+	return existingCustomer, nil
+}
+
+// DeleteCustomer 删除客户
+func (s *customerService) DeleteCustomer(ctx context.Context, id string) error {
+	lang := pkgcontext.GetLanguageFromContext(ctx)
+	
+	// 业务逻辑：参数验证
+	if id == "" {
+		return i18n.NewI18nError("900001", lang)
+	}
+
+	// 委托给Repository层进行数据删除
+	if err := s.customerRepo.DeleteCustomer(ctx, id); err != nil {
+		if errors.Is(err, repository.ErrCustomerNotFound) {
+			return i18n.NewI18nError("200001", lang)
+		}
+		return i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	return nil
+}
+
+// UpdateCustomerStatus 更新客户状态
+func (s *customerService) UpdateCustomerStatus(ctx context.Context, id string, req *models.CustomerStatusUpdateRequest) (*models.Customer, error) {
+	lang := pkgcontext.GetLanguageFromContext(ctx)
+	
+	// 业务逻辑：参数验证
+	if id == "" {
+		return nil, i18n.NewI18nError("900001", lang)
+	}
+	if req == nil {
+		return nil, i18n.NewI18nError("900001", lang)
+	}
+
+	// 先查询现有客户
+	existingCustomer, err := s.customerRepo.GetCustomerByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, repository.ErrCustomerNotFound) {
+			return nil, i18n.NewI18nError("200001", lang)
+		}
+		return nil, i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	// 获取当前用户ID
+	currentUserID := "admin_uuid" // TODO: 从JWT token中获取
+
+	// 更新状态
+	existingCustomer.Status = req.Status
+	existingCustomer.UpdatedBy = &currentUserID
+
+	// 委托给Repository层进行数据更新
+	if err := s.customerRepo.UpdateCustomer(ctx, existingCustomer); err != nil {
+		return nil, i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	// 填充多语言显示字段
+	s.fillCustomerDisplayFields(existingCustomer, lang)
+
+	return existingCustomer, nil
+}
+
 // fillCustomerDisplayFields 填充完整客户模型的多语言显示字段
 func (s *customerService) fillCustomerDisplayFields(customer *models.Customer, lang string) {
 	customer.CustomerTypeDisplay = i18n.GetEnumMessage("customer_type", customer.CustomerType, lang)

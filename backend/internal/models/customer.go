@@ -3,12 +3,13 @@ package models
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 // Customer 客户信息模型
 type Customer struct {
-	ID                   string         `gorm:"type:varchar(36);primaryKey;default:(UUID())" json:"id"`
+	ID                   string         `gorm:"type:varchar(36);primaryKey" json:"id"`
 	CustomerCode         string         `gorm:"type:varchar(20);uniqueIndex;not null" json:"customer_code"`
 	CustomerName         string         `gorm:"type:varchar(200);not null;index" json:"customer_name"`
 	CustomerType         string         `gorm:"type:varchar(20);not null;default:'enterprise';index" json:"customer_type"`
@@ -43,9 +44,15 @@ func (Customer) TableName() string {
 	return "customers"
 }
 
-// BeforeCreate 创建前自动设置时间戳
+// BeforeCreate 创建前自动设置时间戳和ID
 // 确保数据完整性，避免依赖数据库默认值（符合失败快速原则）
 func (c *Customer) BeforeCreate(tx *gorm.DB) error {
+	// 生成UUID作为主键ID
+	if c.ID == "" {
+		c.ID = uuid.New().String()
+	}
+	
+	// 设置时间戳
 	now := time.Now()
 	if c.CreatedAt.IsZero() {
 		c.CreatedAt = now
@@ -118,4 +125,24 @@ type CustomerCreateRequest struct {
 	CustomerLevel string  `json:"customer_level" binding:"required,oneof=normal vip enterprise strategic"`       // 客户等级，必填
 	Status        string  `json:"status" binding:"required,oneof=active disabled"`                              // 状态，必填
 	Description   *string `json:"description" binding:"omitempty,max=1000"`                                      // 描述，可选
+}
+
+// CustomerUpdateRequest 更新客户请求结构（所有字段都是可选的）
+type CustomerUpdateRequest struct {
+	CustomerName  *string `json:"customer_name" binding:"omitempty,max=200"`                                       // 客户名称，可选
+	CustomerType  *string `json:"customer_type" binding:"omitempty,oneof=individual enterprise government education"` // 客户类型，可选
+	ContactPerson *string `json:"contact_person" binding:"omitempty,max=100"`                                     // 联系人姓名，可选
+	ContactTitle  *string `json:"contact_title" binding:"omitempty,max=100"`                                     // 联系人职位，可选
+	Email         *string `json:"email" binding:"omitempty,email,max=255"`                                       // 邮箱，可选
+	Phone         *string `json:"phone" binding:"omitempty,max=20"`                                              // 电话，可选
+	Address       *string `json:"address" binding:"omitempty,max=500"`                                           // 地址，可选
+	CompanySize   *string `json:"company_size" binding:"omitempty,oneof=small medium large enterprise"`          // 企业规模，可选
+	CustomerLevel *string `json:"customer_level" binding:"omitempty,oneof=normal vip enterprise strategic"`       // 客户等级，可选
+	Status        *string `json:"status" binding:"omitempty,oneof=active disabled"`                              // 状态，可选
+	Description   *string `json:"description" binding:"omitempty,max=1000"`                                      // 描述，可选
+}
+
+// CustomerStatusUpdateRequest 客户状态更新请求结构
+type CustomerStatusUpdateRequest struct {
+	Status string `json:"status" binding:"required,oneof=active disabled"` // 状态，必填
 }

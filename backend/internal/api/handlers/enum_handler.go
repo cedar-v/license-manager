@@ -65,7 +65,7 @@ func (h *EnumHandler) GetAllEnums(c *gin.Context) {
 	lang := middleware.GetLanguage(c)
 	successMessage := i18n.GetErrorMessage("000000", lang)
 	c.JSON(http.StatusOK, models.APIResponse{
-		Code:    0,
+		Code:    "000000",
 		Message: successMessage,
 		Data:    data,
 	})
@@ -91,7 +91,7 @@ func (h *EnumHandler) GetEnumsByType(c *gin.Context) {
 		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
 		c.JSON(status, models.ErrorResponse{
 			Code:      errCode,
-			Message:   message,
+			Message:   message + ": enum type is required",
 			Timestamp: time.Now().Format(time.RFC3339),
 		})
 		return
@@ -126,7 +126,7 @@ func (h *EnumHandler) GetEnumsByType(c *gin.Context) {
 	lang := middleware.GetLanguage(c)
 	successMessage := i18n.GetErrorMessage("000000", lang)
 	c.JSON(http.StatusOK, models.APIResponse{
-		Code:    0,
+		Code:    "000000",
 		Message: successMessage,
 		Data:    data,
 	})

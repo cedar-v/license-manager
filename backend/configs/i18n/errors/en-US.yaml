@@ -5,7 +5,6 @@ system:
 errors:
   # Success status
   "000000": "Success"
-  "000001": "Customer created successfully"
   
   # Authentication module (10xxxx)
   auth:

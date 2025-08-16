@@ -76,6 +76,9 @@ func SetupRouter() *gin.Engine {
 			auth.GET("/customers", customerHandler.GetCustomerList)
 			auth.GET("/customers/:id", customerHandler.GetCustomer)
 			auth.POST("/customers", customerHandler.CreateCustomer)
+			auth.PUT("/customers/:id", customerHandler.UpdateCustomer)
+			auth.DELETE("/customers/:id", customerHandler.DeleteCustomer)
+			auth.PATCH("/customers/:id/status", customerHandler.UpdateCustomerStatus)
 			
 			// 枚举管理
 			auth.GET("/enums", enumHandler.GetAllEnums)

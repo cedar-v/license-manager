@@ -47,7 +47,7 @@ func (h *SystemHandler) GetSystemInfo(c *gin.Context) {
 	systemInfo := h.systemService.GetSystemInfo()
 
 	c.JSON(http.StatusOK, models.APIResponse{
-		Code:    http.StatusOK,
+		Code:    "000000",
 		Message: "获取成功",
 		Data:    systemInfo,
 	})

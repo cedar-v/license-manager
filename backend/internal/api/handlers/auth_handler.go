@@ -67,7 +67,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	lang := middleware.GetLanguage(c)
 	successMessage := i18n.GetErrorMessage("000000", lang)
 	c.JSON(http.StatusOK, models.LoginResponse{
-		Code:    http.StatusOK,
+		Code:    "000000",
 		Message: successMessage,
 		Data:    data,
 	})
@@ -90,7 +90,7 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 	lang := middleware.GetLanguage(c)
 	successMessage := i18n.GetErrorMessage("000000", lang)
 	c.JSON(http.StatusOK, models.APIResponse{
-		Code:    http.StatusOK,
+		Code:    "000000",
 		Message: successMessage,
 	})
 }
@@ -141,7 +141,7 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	lang := middleware.GetLanguage(c)
 	successMessage := i18n.GetErrorMessage("000000", lang)
 	c.JSON(http.StatusOK, models.APIResponse{
-		Code:    http.StatusOK,
+		Code:    "000000",
 		Message: successMessage,
 		Data: map[string]interface{}{
 			"token": newToken,
