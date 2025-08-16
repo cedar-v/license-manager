@@ -55,6 +55,73 @@ definitions:
       updated_by:
         type: string
     type: object
+  models.CustomerCreateRequest:
+    properties:
+      address:
+        description: 地址，可选
+        maxLength: 500
+        type: string
+      company_size:
+        description: 企业规模，可选
+        enum:
+        - small
+        - medium
+        - large
+        - enterprise
+        type: string
+      contact_person:
+        description: 联系人姓名，必填
+        maxLength: 100
+        type: string
+      contact_title:
+        description: 联系人职位，可选
+        maxLength: 100
+        type: string
+      customer_level:
+        description: 客户等级，必填
+        enum:
+        - normal
+        - vip
+        - enterprise
+        - strategic
+        type: string
+      customer_name:
+        description: 客户名称，必填
+        maxLength: 200
+        type: string
+      customer_type:
+        description: 客户类型，必填
+        enum:
+        - individual
+        - enterprise
+        - government
+        - education
+        type: string
+      description:
+        description: 描述，可选
+        maxLength: 1000
+        type: string
+      email:
+        description: 邮箱，可选
+        maxLength: 255
+        type: string
+      phone:
+        description: 电话，可选
+        maxLength: 20
+        type: string
+      status:
+        description: 状态，必填
+        enum:
+        - active
+        - disabled
+        type: string
+    required:
+    - contact_person
+    - customer_level
+    - customer_name
+    - customer_type
+    - status
+    type: object
   models.CustomerListItem:
     properties:
       contact_person:
@@ -287,6 +354,50 @@ paths:
       security:
       - BearerAuth: []
       summary: 查询客户列表
+      tags:
+      - 客户管理
+    post:
+      consumes:
+      - application/json
+      description: 创建新的客户记录，自动生成客户编码
+      parameters:
+      - description: 客户信息
+        in: body
+        name: customer
+        required: true
+        schema:
+          $ref: '#/definitions/models.CustomerCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 创建成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Customer'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: 客户已存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 创建客户
       tags:
       - 客户管理
   /api/customers/{id}:

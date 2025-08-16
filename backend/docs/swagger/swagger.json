@@ -156,6 +156,79 @@
                         }
                     }
                 }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "创建新的客户记录，自动生成客户编码",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "客户管理"
+                ],
+                "summary": "创建客户",
+                "parameters": [
+                    {
+                        "description": "客户信息",
+                        "name": "customer",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CustomerCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "创建成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.Customer"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "客户已存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
             }
         },
         "/api/customers/{id}": {
@@ -627,6 +700,91 @@
                 },
                 "updated_by": {
                     "type": "string"
+                }
+            }
+        },
+        "models.CustomerCreateRequest": {
+            "type": "object",
+            "required": [
+                "contact_person",
+                "customer_level",
+                "customer_name",
+                "customer_type",
+                "status"
+            ],
+            "properties": {
+                "address": {
+                    "description": "地址，可选",
+                    "type": "string",
+                    "maxLength": 500
+                },
+                "company_size": {
+                    "description": "企业规模，可选",
+                    "type": "string",
+                    "enum": [
+                        "small",
+                        "medium",
+                        "large",
+                        "enterprise"
+                    ]
+                },
+                "contact_person": {
+                    "description": "联系人姓名，必填",
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "contact_title": {
+                    "description": "联系人职位，可选",
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "customer_level": {
+                    "description": "客户等级，必填",
+                    "type": "string",
+                    "enum": [
+                        "normal",
+                        "vip",
+                        "enterprise",
+                        "strategic"
+                    ]
+                },
+                "customer_name": {
+                    "description": "客户名称，必填",
+                    "type": "string",
+                    "maxLength": 200
+                },
+                "customer_type": {
+                    "description": "客户类型，必填",
+                    "type": "string",
+                    "enum": [
+                        "individual",
+                        "enterprise",
+                        "government",
+                        "education"
+                    ]
+                },
+                "description": {
+                    "description": "描述，可选",
+                    "type": "string",
+                    "maxLength": 1000
+                },
+                "email": {
+                    "description": "邮箱，可选",
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "phone": {
+                    "description": "电话，可选",
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "status": {
+                    "description": "状态，必填",
+                    "type": "string",
+                    "enum": [
+                        "active",
+                        "disabled"
+                    ]
                 }
             }
         },

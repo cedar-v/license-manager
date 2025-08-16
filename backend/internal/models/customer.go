@@ -104,3 +104,18 @@ type CustomerListResponse struct {
 	PageSize   int                `json:"page_size"`
 	TotalPages int                `json:"total_pages"`
 }
+
+// CustomerCreateRequest 创建客户请求结构
+type CustomerCreateRequest struct {
+	CustomerName  string  `json:"customer_name" binding:"required,max=200"`                                       // 客户名称，必填
+	CustomerType  string  `json:"customer_type" binding:"required,oneof=individual enterprise government education"` // 客户类型，必填
+	ContactPerson string  `json:"contact_person" binding:"required,max=100"`                                     // 联系人姓名，必填
+	ContactTitle  *string `json:"contact_title" binding:"omitempty,max=100"`                                     // 联系人职位，可选
+	Email         *string `json:"email" binding:"omitempty,email,max=255"`                                       // 邮箱，可选
+	Phone         *string `json:"phone" binding:"omitempty,max=20"`                                              // 电话，可选
+	Address       *string `json:"address" binding:"omitempty,max=500"`                                           // 地址，可选
+	CompanySize   *string `json:"company_size" binding:"omitempty,oneof=small medium large enterprise"`          // 企业规模，可选
+	CustomerLevel string  `json:"customer_level" binding:"required,oneof=normal vip enterprise strategic"`       // 客户等级，必填
+	Status        string  `json:"status" binding:"required,oneof=active disabled"`                              // 状态，必填
+	Description   *string `json:"description" binding:"omitempty,max=1000"`                                      // 描述，可选
+}

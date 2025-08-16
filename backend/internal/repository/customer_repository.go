@@ -131,10 +131,54 @@ func (r *customerRepository) GetCustomerByID(ctx context.Context, id string) (*m
 
 // CreateCustomer 创建客户
 func (r *customerRepository) CreateCustomer(ctx context.Context, customer *models.Customer) error {
-	if err := r.db.Create(customer).Error; err != nil {
-		return fmt.Errorf("failed to create customer: %w", err)
+	// 使用事务确保数据一致性
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		// 生成客户编码
+		customerCode, err := r.generateCustomerCode(tx)
+		if err != nil {
+			return fmt.Errorf("failed to generate customer code: %w", err)
+		}
+		customer.CustomerCode = customerCode
+
+		// 创建客户
+		if err := tx.Create(customer).Error; err != nil {
+			return fmt.Errorf("failed to create customer: %w", err)
+		}
+		return nil
+	})
+}
+
+// generateCustomerCode 生成客户编码
+func (r *customerRepository) generateCustomerCode(tx *gorm.DB) (string, error) {
+	currentYear := time.Now().Year()
+	
+	// 查询或创建当年的序列号记录
+	var sequence models.CustomerCodeSequence
+	err := tx.Where("year = ?", currentYear).First(&sequence).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// 创建新年份的序列号记录
+			sequence = models.CustomerCodeSequence{
+				Year:           currentYear,
+				SequenceNumber: 1,
+			}
+			if err := tx.Create(&sequence).Error; err != nil {
+				return "", fmt.Errorf("failed to create sequence: %w", err)
+			}
+		} else {
+			return "", fmt.Errorf("failed to query sequence: %w", err)
+		}
+	} else {
+		// 更新序列号
+		sequence.SequenceNumber++
+		if err := tx.Save(&sequence).Error; err != nil {
+			return "", fmt.Errorf("failed to update sequence: %w", err)
+		}
 	}
-	return nil
+	
+	// 生成客户编码：CUS-YYYY-NNNN
+	customerCode := fmt.Sprintf("CUS-%d-%04d", currentYear, sequence.SequenceNumber)
+	return customerCode, nil
 }
 
 // UpdateCustomer 更新客户信息
