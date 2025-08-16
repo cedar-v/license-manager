@@ -12,14 +12,18 @@ type Customer struct {
 	CustomerCode         string         `gorm:"type:varchar(20);uniqueIndex;not null" json:"customer_code"`
 	CustomerName         string         `gorm:"type:varchar(200);not null;index" json:"customer_name"`
 	CustomerType         string         `gorm:"type:varchar(20);not null;default:'enterprise';index" json:"customer_type"`
+	CustomerTypeDisplay  string         `gorm:"-" json:"customer_type_display,omitempty"`
 	ContactPerson        string         `gorm:"type:varchar(100);not null" json:"contact_person"`
 	ContactTitle         *string        `gorm:"type:varchar(100)" json:"contact_title"`
 	Email                *string        `gorm:"type:varchar(255)" json:"email"`
 	Phone                *string        `gorm:"type:varchar(20)" json:"phone"`
 	Address              *string        `gorm:"type:text" json:"address"`
 	CompanySize          *string        `gorm:"type:varchar(20)" json:"company_size"`
+	CompanySizeDisplay   string         `gorm:"-" json:"company_size_display,omitempty"`
 	CustomerLevel        string         `gorm:"type:varchar(20);not null;default:'normal';index" json:"customer_level"`
+	CustomerLevelDisplay string         `gorm:"-" json:"customer_level_display,omitempty"`
 	Status               string         `gorm:"type:varchar(20);not null;default:'active';index" json:"status"`
+	StatusDisplay        string         `gorm:"-" json:"status_display,omitempty"`
 	Description          *string        `gorm:"type:text" json:"description"`
 	CreatedAt            time.Time      `gorm:"not null;index" json:"created_at"`
 	UpdatedAt            time.Time      `gorm:"not null" json:"updated_at"`
@@ -78,15 +82,18 @@ type CustomerListRequest struct {
 
 // CustomerListItem 客户列表项结构（用于列表展示，包含主要字段）
 type CustomerListItem struct {
-	ID            string `json:"id"`
-	CustomerCode  string `json:"customer_code"`
-	CustomerName  string `json:"customer_name"`
-	CustomerType  string `json:"customer_type"`
-	ContactPerson string `json:"contact_person"`
-	Email         *string `json:"email"`
-	CustomerLevel string `json:"customer_level"`
-	Status        string `json:"status"`
-	CreatedAt     string `json:"created_at"`
+	ID                   string  `json:"id"`
+	CustomerCode         string  `json:"customer_code"`
+	CustomerName         string  `json:"customer_name"`
+	CustomerType         string  `json:"customer_type"`
+	CustomerTypeDisplay  string  `json:"customer_type_display,omitempty"`
+	ContactPerson        string  `json:"contact_person"`
+	Email                *string `json:"email"`
+	CustomerLevel        string  `json:"customer_level"`
+	CustomerLevelDisplay string  `json:"customer_level_display,omitempty"`
+	Status               string  `json:"status"`
+	StatusDisplay        string  `json:"status_display,omitempty"`
+	CreatedAt            string  `json:"created_at"`
 }
 
 // CustomerListResponse 客户列表响应结构

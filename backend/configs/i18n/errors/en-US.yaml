@@ -36,5 +36,29 @@ errors:
     "900003": "Resource conflict"
     "900004": "Internal server error"
 
+# Enum translations
+enums:
+  customer_type:
+    "individual": "Individual"
+    "enterprise": "Enterprise"
+    "government": "Government"
+    "education": "Education"
+  
+  customer_level:
+    "normal": "Normal"
+    "vip": "VIP"
+    "enterprise": "Enterprise"
+    "strategic": "Strategic"
+  
+  customer_status:
+    "active": "Active"
+    "disabled": "Disabled"
+  
+  company_size:
+    "small": "Small"
+    "medium": "Medium"
+    "large": "Large"
+    "enterprise": "Enterprise"
+
 # Default error message
 default_error: "Unknown error"

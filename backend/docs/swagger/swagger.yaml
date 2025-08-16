@@ -10,6 +10,51 @@ definitions:
       timestamp:
         type: string
     type: object
+  models.Customer:
+    properties:
+      address:
+        type: string
+      company_size:
+        type: string
+      company_size_display:
+        type: string
+      contact_person:
+        type: string
+      contact_title:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: string
+      customer_code:
+        type: string
+      customer_level:
+        type: string
+      customer_level_display:
+        type: string
+      customer_name:
+        type: string
+      customer_type:
+        type: string
+      customer_type_display:
+        type: string
+      description:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      phone:
+        type: string
+      status:
+        type: string
+      status_display:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: string
+    type: object
   models.CustomerListItem:
     properties:
       contact_person:
@@ -20,15 +65,21 @@ definitions:
         type: string
       customer_level:
         type: string
+      customer_level_display:
+        type: string
       customer_name:
         type: string
       customer_type:
+        type: string
+      customer_type_display:
         type: string
       email:
         type: string
       id:
         type: string
       status:
+        type: string
+      status_display:
         type: string
     type: object
   models.CustomerListResponse:
@@ -45,6 +96,34 @@ definitions:
         type: integer
       total_pages:
         type: integer
+    type: object
+  models.EnumItem:
+    properties:
+      display:
+        description: 多语言显示文本
+        type: string
+      key:
+        description: 枚举值
+        type: string
+    type: object
+  models.EnumListResponse:
+    properties:
+      enums:
+        description: 所有枚举类型
+        items:
+          $ref: '#/definitions/models.EnumTypeResponse'
+        type: array
+    type: object
+  models.EnumTypeResponse:
+    properties:
+      items:
+        description: 枚举项列表
+        items:
+          $ref: '#/definitions/models.EnumItem'
+        type: array
+      type:
+        description: 枚举类型名称
+        type: string
     type: object
   models.ErrorResponse:
     properties:
@@ -210,6 +289,125 @@ paths:
       summary: 查询客户列表
       tags:
       - 客户管理
+  /api/customers/{id}:
+    get:
+      consumes:
+      - application/json
+      description: 根据客户ID获取客户详细信息
+      parameters:
+      - description: 客户ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Customer'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 客户不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取客户详情
+      tags:
+      - 客户管理
+  /api/enums:
+    get:
+      consumes:
+      - application/json
+      description: 获取系统中所有枚举类型及其对应的多语言显示值
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.EnumListResponse'
+              type: object
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取所有枚举值
+      tags:
+      - 枚举管理
+  /api/enums/{type}:
+    get:
+      consumes:
+      - application/json
+      description: 根据枚举类型获取对应的多语言显示值
+      parameters:
+      - description: 枚举类型
+        enum:
+        - customer_type
+        - customer_level
+        - customer_status
+        - company_size
+        in: path
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.EnumTypeResponse'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取指定类型的枚举值
+      tags:
+      - 枚举管理
   /api/v1/admin/system/info:
     get:
       consumes:

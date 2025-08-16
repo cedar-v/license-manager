@@ -36,5 +36,29 @@ errors:
     "900003": "资源冲突"
     "900004": "服务器内部错误"
 
+# 枚举值多语言
+enums:
+  customer_type:
+    "individual": "个人客户"
+    "enterprise": "企业客户"
+    "government": "政府客户"
+    "education": "教育客户"
+  
+  customer_level:
+    "normal": "普通客户"
+    "vip": "VIP客户"
+    "enterprise": "企业客户"
+    "strategic": "战略客户"
+  
+  customer_status:
+    "active": "激活"
+    "disabled": "停用"
+  
+  company_size:
+    "small": "小型企业"
+    "medium": "中型企业"
+    "large": "大型企业"
+    "enterprise": "超大型企业"
+
 # 默认错误信息
 default_error: "未知错误"

@@ -14,3 +14,22 @@ type ErrorResponse struct {
 	Message   string `json:"message"`   // 错误描述信息
 	Timestamp string `json:"timestamp"` // 错误发生时间
 }
+
+// 枚举相关结构
+
+// EnumItem 枚举项结构
+type EnumItem struct {
+	Key     string `json:"key"`     // 枚举值
+	Display string `json:"display"` // 多语言显示文本
+}
+
+// EnumTypeResponse 单个枚举类型响应
+type EnumTypeResponse struct {
+	Type  string     `json:"type"`  // 枚举类型名称
+	Items []EnumItem `json:"items"` // 枚举项列表
+}
+
+// EnumListResponse 枚举列表响应
+type EnumListResponse struct {
+	Enums []EnumTypeResponse `json:"enums"` // 所有枚举类型
+}

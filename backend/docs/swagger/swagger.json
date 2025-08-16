@@ -158,6 +158,204 @@
                 }
             }
         },
+        "/api/customers/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "根据客户ID获取客户详细信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "客户管理"
+                ],
+                "summary": "获取客户详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "客户ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "查询成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.Customer"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "客户不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/enums": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "获取系统中所有枚举类型及其对应的多语言显示值",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "枚举管理"
+                ],
+                "summary": "获取所有枚举值",
+                "responses": {
+                    "200": {
+                        "description": "查询成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.EnumListResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/enums/{type}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "根据枚举类型获取对应的多语言显示值",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "枚举管理"
+                ],
+                "summary": "获取指定类型的枚举值",
+                "parameters": [
+                    {
+                        "enum": [
+                            "customer_type",
+                            "customer_level",
+                            "customer_status",
+                            "company_size"
+                        ],
+                        "type": "string",
+                        "description": "枚举类型",
+                        "name": "type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "查询成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.EnumTypeResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/admin/system/info": {
             "get": {
                 "security": [
@@ -364,6 +562,74 @@
                 }
             }
         },
+        "models.Customer": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "company_size": {
+                    "type": "string"
+                },
+                "company_size_display": {
+                    "type": "string"
+                },
+                "contact_person": {
+                    "type": "string"
+                },
+                "contact_title": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "string"
+                },
+                "customer_code": {
+                    "type": "string"
+                },
+                "customer_level": {
+                    "type": "string"
+                },
+                "customer_level_display": {
+                    "type": "string"
+                },
+                "customer_name": {
+                    "type": "string"
+                },
+                "customer_type": {
+                    "type": "string"
+                },
+                "customer_type_display": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "status_display": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "string"
+                }
+            }
+        },
         "models.CustomerListItem": {
             "type": "object",
             "properties": {
@@ -379,10 +645,16 @@
                 "customer_level": {
                     "type": "string"
                 },
+                "customer_level_display": {
+                    "type": "string"
+                },
                 "customer_name": {
                     "type": "string"
                 },
                 "customer_type": {
+                    "type": "string"
+                },
+                "customer_type_display": {
                     "type": "string"
                 },
                 "email": {
@@ -392,6 +664,9 @@
                     "type": "string"
                 },
                 "status": {
+                    "type": "string"
+                },
+                "status_display": {
                     "type": "string"
                 }
             }
@@ -416,6 +691,47 @@
                 },
                 "total_pages": {
                     "type": "integer"
+                }
+            }
+        },
+        "models.EnumItem": {
+            "type": "object",
+            "properties": {
+                "display": {
+                    "description": "多语言显示文本",
+                    "type": "string"
+                },
+                "key": {
+                    "description": "枚举值",
+                    "type": "string"
+                }
+            }
+        },
+        "models.EnumListResponse": {
+            "type": "object",
+            "properties": {
+                "enums": {
+                    "description": "所有枚举类型",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.EnumTypeResponse"
+                    }
+                }
+            }
+        },
+        "models.EnumTypeResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "description": "枚举项列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.EnumItem"
+                    }
+                },
+                "type": {
+                    "description": "枚举类型名称",
+                    "type": "string"
                 }
             }
         },

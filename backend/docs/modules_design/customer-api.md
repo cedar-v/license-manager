@@ -22,14 +22,18 @@
   "customer_code": "CUS-2025-0001",
   "customer_name": "北京科技有限公司",
   "customer_type": "enterprise",
+  "customer_type_display": "企业客户",
   "contact_person": "张三",
   "contact_title": "技术总监",
   "email": "zhangsan@example.com",
   "phone": "13800138000",
   "address": "北京市朝阳区科技园区100号",
   "company_size": "medium",
+  "company_size_display": "中型企业",
   "customer_level": "vip",
+  "customer_level_display": "VIP客户",
   "status": "active",
+  "status_display": "激活",
   "description": "重要客户，需要优先技术支持",
   "created_at": "2025-01-15T10:30:00Z",
   "updated_at": "2025-01-20T15:45:00Z",
@@ -40,9 +44,15 @@
 
 ### 字段说明
 - `customer_type`: `individual` | `enterprise` | `government` | `education`
+- `customer_type_display`: 客户类型的多语言显示名称
 - `company_size`: `small` | `medium` | `large` | `enterprise`
+- `company_size_display`: 企业规模的多语言显示名称
 - `customer_level`: `normal` | `vip` | `enterprise` | `strategic`
+- `customer_level_display`: 客户等级的多语言显示名称
 - `status`: `active` | `disabled`
+- `status_display`: 状态的多语言显示名称
+
+> **注意**: `*_display` 字段根据请求头 `Accept-Language` 或查询参数 `lang` 返回对应语言的显示文本
 
 ---
 
@@ -75,10 +85,13 @@ GET /api/customers
         "customer_code": "CUS-2025-0001",
         "customer_name": "北京科技有限公司",
         "customer_type": "enterprise",
+        "customer_type_display": "企业客户",
         "contact_person": "张三",
         "email": "zhangsan@example.com",
         "customer_level": "vip",
+        "customer_level_display": "VIP客户",
         "status": "active",
+        "status_display": "激活",
         "created_at": "2025-01-15T10:30:00Z"
       }
     ],

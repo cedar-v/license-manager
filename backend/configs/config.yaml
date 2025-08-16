@@ -5,7 +5,7 @@ server:
 
 database:
   driver: "mysql"
-  host: "104.156.140.42"
+  host: "raspberrypi.local"
   port: 13306
   username: "root"
   password: "root@123"

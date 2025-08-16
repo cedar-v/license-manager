@@ -20,8 +20,10 @@ type SystemInfo struct {
 type LanguageData struct {
 	System       SystemInfo             `yaml:"system"`
 	Errors       map[string]interface{} `yaml:"errors"` // 灵活结构：支持直接字符串和嵌套对象
+	Enums        map[string]interface{} `yaml:"enums"`  // 枚举值多语言映射
 	DefaultError string                 `yaml:"default_error"`
 	flatErrors   map[string]string      // 扁平化的错误码映射（内部使用）
+	flatEnums    map[string]string      // 扁平化的枚举值映射（内部使用）
 }
 
 // Manager 多语言管理器
@@ -36,6 +38,9 @@ type Manager struct {
 type I18nManager interface {
 	LoadLanguage(lang string) error
 	GetErrorMessage(code, lang string) string
+	GetEnumMessage(enumType, enumValue, lang string) string
+	GetAllEnums(lang string) map[string]map[string]string
+	GetEnumsByType(enumType, lang string) map[string]string
 	SupportedLanguages() []string
 	SetDefaultLanguage(lang string)
 	IsLanguageSupported(lang string) bool
@@ -77,6 +82,7 @@ func (m *Manager) LoadLanguage(lang string) error {
 
 	// 扁平化错误码映射，便于快速查找
 	langData.flatErrors = make(map[string]string)
+	langData.flatEnums = make(map[string]string)
 
 	// 处理错误码映射
 	for key, value := range langData.Errors {
@@ -90,6 +96,21 @@ func (m *Manager) LoadLanguage(lang string) error {
 				if code, ok := subKey.(string); ok {
 					if msg, ok := subValue.(string); ok {
 						langData.flatErrors[code] = msg
+					}
+				}
+			}
+		}
+	}
+
+	// 处理枚举值映射
+	for enumType, enumData := range langData.Enums {
+		if enumMap, ok := enumData.(map[interface{}]interface{}); ok {
+			for enumKey, enumValue := range enumMap {
+				if key, ok := enumKey.(string); ok {
+					if value, ok := enumValue.(string); ok {
+						// 使用 "enumType.enumKey" 作为扁平化的键
+						flatKey := fmt.Sprintf("%s.%s", enumType, key)
+						langData.flatEnums[flatKey] = value
 					}
 				}
 			}
@@ -133,6 +154,123 @@ func (m *Manager) GetErrorMessage(code, lang string) string {
 
 	// 最终降级：返回硬编码的默认错误信息
 	return "Unknown error"
+}
+
+// GetEnumMessage 获取指定语言的枚举值显示文本
+func (m *Manager) GetEnumMessage(enumType, enumValue, lang string) string {
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
+
+	// 构建查找键
+	flatKey := fmt.Sprintf("%s.%s", enumType, enumValue)
+
+	// 首先尝试获取请求语言的枚举值
+	if langData, exists := m.loadedLangs[lang]; exists {
+		if message, found := langData.flatEnums[flatKey]; found {
+			return message
+		}
+	}
+
+	// 如果请求语言不存在，降级到默认语言
+	if lang != m.defaultLang {
+		if langData, exists := m.loadedLangs[m.defaultLang]; exists {
+			if message, found := langData.flatEnums[flatKey]; found {
+				return message
+			}
+		}
+	}
+
+	// 最终降级：返回原始枚举值
+	return enumValue
+}
+
+// GetAllEnums 获取指定语言的所有枚举值
+func (m *Manager) GetAllEnums(lang string) map[string]map[string]string {
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
+
+	result := make(map[string]map[string]string)
+
+	// 首先尝试获取请求语言的枚举值
+	if langData, exists := m.loadedLangs[lang]; exists {
+		result = m.buildEnumMap(langData)
+		if len(result) > 0 {
+			return result
+		}
+	}
+
+	// 如果请求语言不存在，降级到默认语言
+	if lang != m.defaultLang {
+		if langData, exists := m.loadedLangs[m.defaultLang]; exists {
+			result = m.buildEnumMap(langData)
+		}
+	}
+
+	return result
+}
+
+// GetEnumsByType 获取指定类型的枚举值
+func (m *Manager) GetEnumsByType(enumType, lang string) map[string]string {
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
+
+	// 首先尝试获取请求语言的枚举值
+	if langData, exists := m.loadedLangs[lang]; exists {
+		if enumMap := m.getEnumMapByType(langData, enumType); len(enumMap) > 0 {
+			return enumMap
+		}
+	}
+
+	// 如果请求语言不存在，降级到默认语言
+	if lang != m.defaultLang {
+		if langData, exists := m.loadedLangs[m.defaultLang]; exists {
+			return m.getEnumMapByType(langData, enumType)
+		}
+	}
+
+	return make(map[string]string)
+}
+
+// buildEnumMap 构建完整的枚举映射
+func (m *Manager) buildEnumMap(langData *LanguageData) map[string]map[string]string {
+	result := make(map[string]map[string]string)
+
+	for enumType, enumData := range langData.Enums {
+		if enumMap, ok := enumData.(map[interface{}]interface{}); ok {
+			typeMap := make(map[string]string)
+			for enumKey, enumValue := range enumMap {
+				if key, ok := enumKey.(string); ok {
+					if value, ok := enumValue.(string); ok {
+						typeMap[key] = value
+					}
+				}
+			}
+			if len(typeMap) > 0 {
+				result[enumType] = typeMap
+			}
+		}
+	}
+
+	return result
+}
+
+// getEnumMapByType 获取指定类型的枚举映射
+func (m *Manager) getEnumMapByType(langData *LanguageData, enumType string) map[string]string {
+	result := make(map[string]string)
+
+	if enumData, exists := langData.Enums[enumType]; exists {
+		if enumMap, ok := enumData.(map[interface{}]interface{}); ok {
+			for enumKey, enumValue := range enumMap {
+				if key, ok := enumKey.(string); ok {
+					if value, ok := enumValue.(string); ok {
+						result[key] = value
+					}
+				}
+			}
+		}
+	}
+
+	return result
 }
 
 // SupportedLanguages 返回已加载的语言列表
@@ -232,4 +370,28 @@ func LoadLanguage(lang string) error {
 		return fmt.Errorf("I18n not initialized")
 	}
 	return globalManager.LoadLanguage(lang)
+}
+
+// GetEnumMessage 全局函数：获取枚举值显示文本
+func GetEnumMessage(enumType, enumValue, lang string) string {
+	if globalManager == nil {
+		return enumValue
+	}
+	return globalManager.GetEnumMessage(enumType, enumValue, lang)
+}
+
+// GetAllEnums 全局函数：获取所有枚举值
+func GetAllEnums(lang string) map[string]map[string]string {
+	if globalManager == nil {
+		return make(map[string]map[string]string)
+	}
+	return globalManager.GetAllEnums(lang)
+}
+
+// GetEnumsByType 全局函数：获取指定类型的枚举值
+func GetEnumsByType(enumType, lang string) map[string]string {
+	if globalManager == nil {
+		return make(map[string]string)
+	}
+	return globalManager.GetEnumsByType(enumType, lang)
 }

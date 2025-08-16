@@ -41,11 +41,13 @@ func SetupRouter() *gin.Engine {
 	authService := service.NewAuthService()
 	systemService := service.NewSystemService()
 	customerService := service.NewCustomerService(customerRepo)
+	enumService := service.NewEnumService()
 
 	// 初始化处理器层
 	authHandler := handlers.NewAuthHandler(authService)
 	systemHandler := handlers.NewSystemHandler(systemService)
 	customerHandler := handlers.NewCustomerHandler(customerService)
+	enumHandler := handlers.NewEnumHandler(enumService)
 
 	// 健康检测接口（无需认证）
 	router.GET("/health", systemHandler.HealthCheck)
@@ -72,6 +74,11 @@ func SetupRouter() *gin.Engine {
 			
 			// 客户管理
 			auth.GET("/customers", customerHandler.GetCustomerList)
+			auth.GET("/customers/:id", customerHandler.GetCustomer)
+			
+			// 枚举管理
+			auth.GET("/enums", enumHandler.GetAllEnums)
+			auth.GET("/enums/:type", enumHandler.GetEnumsByType)
 		}
 
 		// 管理员接口
