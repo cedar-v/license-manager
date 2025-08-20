@@ -26,7 +26,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/customers",
-    component: () => import("@/views/Customers.vue"),
+    component: () => import("@/views/Customers/index.vue"),
     meta: { title: "客户管理", requiresAuth: true }
   },
   {

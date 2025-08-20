@@ -3,12 +3,13 @@
  * @Date: 2025-08-12 00:00:00
  * @LastEditors: 13895237362 2205451508@qq.com
  * @LastEditTime: 2025-08-14 17:25:52
- * @FilePath: /frontend/src/views/Customers.vue
- * @Description: 客户管理页面
+ * @FilePath: /frontend/src/views/Customers/index.vue
+ * @Description: 客户管理页面  
 -->
 <template>
-  <Layout app-name="Cedar-V" page-title="客户管理">
-    <div class="customers-container">
+  <Layout app-name="Cedar-V" :page-title="getPageTitle()">
+    <!-- 客户列表页面 -->
+    <div v-if="!showCustomerForm && !showCustomerView" class="content-container">
       <!-- 顶部操作区域 -->
       <div class="top-actions">
         <!-- 左侧操作区域 -->
@@ -151,12 +152,32 @@
         />
       </div>
     </div>
+    
+    <!-- 客户表单页面 -->
+    <div v-if="showCustomerForm" class="form-page-container">
+      <CustomerForm 
+        :customer-data="currentCustomer || undefined" 
+        :is-edit="isEditMode"
+        @save="handleFormSave"
+        @cancel="handleFormCancel"
+      />
+    </div>
+
+    <!-- 客户查看页面 -->
+    <div v-if="showCustomerView" class="form-page-container">
+      <CustomerView 
+        :customer-id="currentCustomerId"
+        @back="handleViewBack"
+      />
+    </div>
   </Layout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import Layout from '@/components/common/layout/Layout.vue'
+import CustomerForm from './CustomerForm.vue'
+import CustomerView from './CustomerView.vue'
 import { Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, ElLoading } from 'element-plus'
 import { 
@@ -185,9 +206,21 @@ const total = ref(0)
 const loading = ref(false)
 
 const tableData = ref<Customer[]>([])
+const showCustomerForm = ref(false)
+const showCustomerView = ref(false)
+const isEditMode = ref(false)
+const currentCustomer = ref<Customer | null>(null)
+const currentCustomerId = ref<string>('')
 
 // 获取国际化字典选项
 const customerDictionaries = computed(() => getCustomerDictionaries())
+
+// 页面标题
+const getPageTitle = () => {
+  if (showCustomerView.value) return '查看客户'
+  if (showCustomerForm.value) return isEditMode.value ? '编辑客户' : '添加新客户'
+  return '客户管理'
+}
 
 // 格式化函数已移至 utils/dictionaries.ts
 
@@ -376,11 +409,10 @@ const handleCurrentChange = (val: number) => {
 }
 
 const handleEdit = (row: Customer) => {
-  ElMessage.info(`编辑客户: ${row.customer_name}`)
-}
-
-const handleViewLicense = (row: Customer) => {
-  ElMessage.info(`查看客户授权: ${row.customer_name}`)
+  showCustomerForm.value = true
+  showCustomerView.value = false
+  isEditMode.value = true
+  currentCustomer.value = row
 }
 
 const handleDisable = async (row: Customer) => {
@@ -448,7 +480,16 @@ const getStatusClass = (status: string) => {
 }
 
 const handleAddCustomer = () => {
-  ElMessage.info('打开添加客户对话框')
+  showCustomerForm.value = true
+  showCustomerView.value = false
+  isEditMode.value = false
+  currentCustomer.value = null
+}
+
+const handleViewLicense = (row: Customer) => {
+  showCustomerView.value = true
+  showCustomerForm.value = false
+  currentCustomerId.value = row.id
 }
 
 const handleDelete = async (row: Customer) => {
@@ -505,20 +546,48 @@ const handleDelete = async (row: Customer) => {
   }
 }
 
+// 处理客户表单操作
+const handleFormSave = async (data: any) => {
+  // 这里处理保存逻辑
+  console.log('保存客户数据:', data)
+  showCustomerForm.value = false
+  await loadData() // 重新加载数据
+}
+
+const handleFormCancel = () => {
+  showCustomerForm.value = false
+}
+
+const handleViewBack = () => {
+  showCustomerView.value = false
+}
+
 onMounted(() => {
   loadData()
 })
 </script>
 
 <style scoped>
-.customers-container {
-  padding: 1.25vw; /* 24px/1920 = 1.25vw */
+.content-container {
+  min-height: calc(100vh - 80px); /* 默认使用固定像素的最小高度 */
+  padding: 24px;
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
   background-color: #ffffff;
-  height: 100%; /* 充满容器高度 */
-  width: 100%; /* 确保宽度充满 */
   display: flex;
   flex-direction: column;
-  box-sizing: border-box; /* 包含内边距 */
+}
+
+.form-page-container {
+  min-height: calc(100vh - 80px);
+  padding: 24px;
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+  background: #F7F8FA;
+  display: flex;
+  flex-direction: column;
 }
 
 .top-actions {
@@ -820,9 +889,28 @@ onMounted(() => {
 
 /* 桌面端：使用vw单位实现2K/4K适配 */
 @media (min-width: 1025px) {
-  .customers-container {
+  .content-container {
+    height: calc(100vh - 4.17vw); /* 精确计算可用高度：视口高度减去顶部导航栏高度 */
     padding: 1.25vw; /* 24px/1920 = 1.25vw */
+    width: 100%; /* 充满整个屏幕 */
+    margin: 0;
+    box-sizing: border-box;
+    display: flex; /* 桌面端使用flex布局传递高度给子组件 */
+    flex-direction: column;
+    background-color: #ffffff;
   }
+  
+  .form-page-container {
+    height: calc(100vh - 4.17vw);
+    padding: 1.25vw;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    background: #F7F8FA;
+  }
+
   
   .table-container {
     border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
@@ -949,6 +1037,19 @@ onMounted(() => {
 }
 
 /* 移动端响应式布局 - 修复表头错位 */
+/* content-container和form-page-container响应式样式 */
+@media (max-width: 768px) {
+  .content-container, .form-page-container {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .content-container, .form-page-container {
+    padding: 12px;
+  }
+}
+
 @media (max-width: 768px) {
   /* 表格容器移动端优化 */
   .table-wrapper {

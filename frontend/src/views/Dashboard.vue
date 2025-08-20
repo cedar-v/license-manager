@@ -9,7 +9,7 @@
 <template>
   <Layout app-name="Cedar-V" :page-title="t('dashboard.title')">
     <!-- 页面内容 -->
-    <div class="dashboard">
+    <div class="content-container dashboard">
       <!-- 统计卡片区域 -->
       <div class="stats-section">
         <div class="stats-card" v-for="stat in statsData" :key="stat.id">
@@ -187,8 +187,17 @@ const recentData = [
 </script>
 
 <style lang="scss" scoped>
+/* content-container样式 */
+.content-container {
+  min-height: calc(100vh - 80px);
+  padding: 24px;
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+  background: #F7F8FA;
+}
+
 .dashboard {
-  padding: 0;
   width: 100%;
   height: 100%; /* 使用100%高度充满父容器 */
   display: flex;
@@ -519,9 +528,31 @@ const recentData = [
 
 /* 大屏幕vw适配 - 基于1920*1080设计的视口单位缩放 */
 @media (min-width: 1025px) {
+  .content-container {
+    height: calc(100vh - 4.17vw); /* 精确计算可用高度：视口高度减去顶部导航栏高度 */
+    padding: 1.25vw; /* 24px/1920 = 1.25vw */
+    width: 100%; /* 充满整个屏幕 */
+    margin: 0;
+    box-sizing: border-box;
+    display: flex; /* 桌面端使用flex布局传递高度给子组件 */
+    flex-direction: column;
+  }
+  
   .dashboard {
     /* vw单位确保内容在2K(2560px)和4K(3840px)下按比例缩放充满屏幕 */
     overflow-x: hidden; /* 防止水平滚动条 */
+  }
+}
+
+@media (max-width: 768px) {
+  .content-container {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .content-container {
+    padding: 12px;
   }
 }
 

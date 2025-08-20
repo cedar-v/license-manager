@@ -21,9 +21,7 @@
       
       <!-- 页面内容 -->
       <div class="layout-content">
-        <div class="content-container">
-          <slot />
-        </div>
+        <slot />
       </div>
     </div>
   </div>
@@ -220,13 +218,6 @@ onUnmounted(() => {
   }
 }
 
-.content-container {
-  min-height: calc(100vh - 80px); /* 默认使用固定像素的最小高度 */
-  padding: 24px;
-  width: 100%;
-  margin: 0;
-  box-sizing: border-box;
-}
 
 // 响应式设计 - 统一断点系统
 // 平板以下：768px 及以下为移动端，使用固定px单位
@@ -242,18 +233,6 @@ onUnmounted(() => {
   /* 移动端继承基础样式的min-height设置 */
 }
 
-@media (max-width: 768px) {
-  .content-container {
-    padding: 16px;
-  }
-}
-
-// 小屏手机：480px 及以下
-@media (max-width: 480px) {
-  .content-container {
-    padding: 12px;
-  }
-}
 
 /* 平板：769px - 1024px 之间 */
 @media (min-width: 769px) and (max-width: 1024px) {
@@ -276,15 +255,6 @@ onUnmounted(() => {
     padding-top: 4.17vw; /* 80px/1920 = 4.17vw */
   }
   
-  .content-container {
-    height: calc(100vh - 4.17vw); /* 精确计算可用高度：视口高度减去顶部导航栏高度 */
-    padding: 1.25vw; /* 24px/1920 = 1.25vw */
-    width: 100%; /* 充满整个屏幕 */
-    margin: 0;
-    box-sizing: border-box;
-    display: flex; /* 桌面端使用flex布局传递高度给子组件 */
-    flex-direction: column;
-  }
 }
 
 // 动画效果
