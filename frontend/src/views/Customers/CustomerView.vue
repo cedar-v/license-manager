@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-20 16:00:00
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-08-20 16:00:00
+ * @LastEditTime: 2025-08-21 17:16:11
  * @FilePath: /frontend/src/views/Customers/CustomerView.vue
  * @Description: 客户查看组件
 -->
@@ -86,9 +86,25 @@
     <div class="info-card status-info">
       <h3 class="section-title">状态信息</h3>
       <div class="info-grid">
-        <div class="info-item full-width" v-for="(record, index) in customerData.statusRecords" :key="index">
-          <span class="label">{{ record.action }}：</span>
-          <span class="value">{{ record.user }}，{{ record.action === '创建人' ? '创建时间' : '更新时间' }}：{{ formatDate(record.time) }}</span>
+        <div class="info-item inline-group full-width">
+          <div class="inline-pair">
+            <span class="label">创建人：</span>
+            <span class="value">{{ customerData.statusRecords?.[0]?.user || '--' }}</span>
+          </div>
+          <div class="inline-pair">
+            <span class="label">创建时间：</span>
+            <span class="value">{{ formatDate(customerData.statusRecords?.[0]?.time) }}</span>
+          </div>
+        </div>
+        <div class="info-item inline-group full-width">
+          <div class="inline-pair">
+            <span class="label">更新人：</span>
+            <span class="value">{{ customerData.statusRecords?.[1]?.user || '--' }}</span>
+          </div>
+          <div class="inline-pair">
+            <span class="label">更新时间：</span>
+            <span class="value">{{ formatDate(customerData.statusRecords?.[1]?.time) }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -109,21 +125,25 @@
           <span class="label">最近授权：</span>
           <span class="value">{{ formatDate(customerData.latestLicenseTime) }}</span>
         </div>
-        <div class="info-item">
-          <span class="label">即将过期：</span>
-          <span class="value">{{ customerData.expiringSoonLicenses || 0 }}</span>
+        <div class="info-item inline-group full-width">
+          <div class="inline-pair">
+            <span class="label">即将过期：</span>
+            <span class="value">{{ customerData.expiringSoonLicenses || 0 }}</span>
+          </div>
+          <div class="inline-pair">
+            <span class="label">即将过期时间：</span>
+            <span class="value">{{ formatDate(customerData.expiringSoonTime) }}</span>
+          </div>
         </div>
-        <div class="info-item">
-          <span class="label">即将过期时间：</span>
-          <span class="value">{{ formatDate(customerData.expiringSoonTime) }}</span>
-        </div>
-        <div class="info-item">
-          <span class="label">过期授权：</span>
-          <span class="value">{{ customerData.expiredLicenses || 0 }}</span>
-        </div>
-        <div class="info-item">
-          <span class="label">过期时间：</span>
-          <span class="value">{{ formatDate(customerData.expiredTime) }}</span>
+        <div class="info-item inline-group full-width">
+          <div class="inline-pair">
+            <span class="label">过期授权：</span>
+            <span class="value">{{ customerData.expiredLicenses || 0 }}</span>
+          </div>
+          <div class="inline-pair">
+            <span class="label">过期时间：</span>
+            <span class="value">{{ formatDate(customerData.expiredTime) }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -374,11 +394,35 @@ onMounted(() => {
   grid-column: 1 / -1;
 }
 
+.info-item.inline-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 40px;
+}
+
+.inline-pair {
+  display: flex;
+  align-items: center;
+  min-width: 240px;
+}
+
+.inline-pair .label {
+  min-width: 100px;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.inline-pair .value {
+  min-width: 120px;
+  flex-shrink: 0;
+}
+
 .label {
   font-size: 14px;
   color: #666;
   font-weight: 500;
-  min-width: 80px;
+  min-width: 100px;
   flex-shrink: 0;
   margin-right: 8px;
 }
@@ -388,6 +432,8 @@ onMounted(() => {
   color: #1d1d1d;
   word-break: break-all;
   line-height: 1.5;
+  min-width: 120px;
+  flex-shrink: 0;
 }
 
 .value.description {
