@@ -126,7 +126,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { createCustomer, updateCustomer } from '@/api/customer'
+import { createCustomer, updateCustomer, getCustomerDetail } from '@/api/customer'
 import {
   getCustomerTypeEnums,
   getCustomerLevelEnums,
@@ -150,7 +150,7 @@ interface CustomerFormData {
 }
 
 const props = defineProps<{
-  customerData?: Partial<CustomerFormData>
+  customerId?: string
   isEdit?: boolean
 }>()
 
@@ -186,8 +186,8 @@ const loadEnums = async () => {
     }
     if (statusRes.code === '000000') {
       statusOptions.value = statusRes.data.items
-      // 设置默认状态（如果没有编辑数据）
-      if (!props.customerData && statusRes.data.items.length > 0) {
+      // 设置默认状态（如果是新增模式）
+      if (!props.isEdit && statusRes.data.items.length > 0) {
         formData.status = statusRes.data.items[0].key
       }
     }
@@ -241,9 +241,42 @@ const formRules: FormRules = {
   ]
 }
 
-// 初始化表单数据
-if (props.customerData) {
-  Object.assign(formData, props.customerData)
+// 加载客户详情数据
+const loadCustomerData = async () => {
+  if (!props.customerId || !props.isEdit) return
+  
+  try {
+    loading.value = true
+    const response = await getCustomerDetail(props.customerId)
+    
+    if (response.code === '000000' && response.data) {
+      const customerData = response.data
+      // 将API返回的字段映射到表单字段
+      Object.assign(formData, {
+        id: customerData.id,
+        name: customerData.customer_name,
+        contact: customerData.contact_person,
+        email: customerData.email || '',
+        phone: customerData.phone || '',
+        address: customerData.address || '',
+        type: customerData.customer_type,
+        level: customerData.customer_level,
+        status: customerData.status,
+        companySize: customerData.company_size || '',
+        description: customerData.description || ''
+      })
+    } else {
+      ElMessage.error('获取客户详情失败：' + response.message)
+    }
+  } catch (error: any) {
+    console.error('获取客户详情失败:', error)
+    let errorMessage = error.backendMessage || error.response?.data?.message || error.message
+    if (errorMessage) {
+      ElMessage.error('获取客户详情失败：' + errorMessage)
+    }
+  } finally {
+    loading.value = false
+  }
 }
 
 // 取消操作
@@ -275,8 +308,8 @@ const handleSave = async () => {
     
     // 调用API
     let response
-    if (props.isEdit && props.customerData?.id) {
-      response = await updateCustomer(props.customerData.id, requestData)
+    if (props.isEdit && props.customerId) {
+      response = await updateCustomer(props.customerId, requestData)
     } else {
       response = await createCustomer(requestData)
     }
@@ -299,9 +332,10 @@ const handleSave = async () => {
   }
 }
 
-// 组件挂载时加载枚举数据
-onMounted(() => {
-  loadEnums()
+// 组件挂载时加载枚举数据和客户数据
+onMounted(async () => {
+  await loadEnums()
+  await loadCustomerData()
 })
 </script>
 

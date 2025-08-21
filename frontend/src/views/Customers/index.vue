@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-12 00:00:00
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-08-14 17:25:52
+ * @LastEditTime: 2025-08-21 16:42:53
  * @FilePath: /frontend/src/views/Customers/index.vue
  * @Description: 客户管理页面  
 -->
@@ -158,20 +158,20 @@
     
     <!-- 客户表单页面 -->
     <div v-if="showCustomerForm" class="form-page-container">
-      <!-- <CustomerForm 
-        :customer-data="currentCustomer || undefined" 
+      <CustomerForm 
+        :customer-id="isEditMode ? currentCustomerId : undefined"
         :is-edit="isEditMode"
         @save="handleFormSave"
         @cancel="handleFormCancel"
-      /> -->
+      />
     </div>
 
     <!-- 客户查看页面 -->
     <div v-if="showCustomerView" class="form-page-container">
-      <!-- <CustomerView 
+      <CustomerView 
         :customer-id="currentCustomerId"
         @back="handleViewBack"
-      /> -->
+      />
     </div>
   </Layout>
 </template>
@@ -179,8 +179,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import Layout from '@/components/common/layout/Layout.vue'
-// import CustomerForm from './CustomerForm.vue'
-// import CustomerView from './CustomerView.vue'
+import CustomerForm from './CustomerForm.vue'
+import CustomerView from './CustomerView.vue'
 import { Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, ElLoading } from 'element-plus'
 import { 
@@ -212,7 +212,6 @@ const tableData = ref<Customer[]>([])
 const showCustomerForm = ref(false)
 const showCustomerView = ref(false)
 const isEditMode = ref(false)
-const currentCustomer = ref<Customer | null>(null)
 const currentCustomerId = ref<string>('')
 
 // 获取枚举选项
@@ -335,7 +334,7 @@ const handleEdit = (row: Customer) => {
   showCustomerForm.value = true
   showCustomerView.value = false
   isEditMode.value = true
-  currentCustomer.value = row
+  currentCustomerId.value = row.id  // 设置当前客户ID
 }
 
 const handleDisable = async (row: Customer) => {
@@ -396,7 +395,6 @@ const handleAddCustomer = () => {
   showCustomerForm.value = true
   showCustomerView.value = false
   isEditMode.value = false
-  currentCustomer.value = null
 }
 
 const handleViewLicense = (row: Customer) => {
