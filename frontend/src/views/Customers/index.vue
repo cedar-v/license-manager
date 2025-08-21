@@ -28,39 +28,42 @@
               v-model="filterCustomerType"
               placeholder="客户类型"
               class="filter-select"
+              clearable
               @change="handleFilterChange"
             >
               <el-option 
-                v-for="option in customerDictionaries.customerType" 
-                :key="option.value" 
-                :label="option.label" 
-                :value="option.value" 
+                v-for="option in customerTypeOptions" 
+                :key="option.key" 
+                :label="option.display" 
+                :value="option.key" 
               />
             </el-select>
             <el-select
               v-model="filterCustomerLevel"
               placeholder="客户等级"
               class="filter-select"
+              clearable
               @change="handleFilterChange"
             >
               <el-option 
-                v-for="option in customerDictionaries.customerLevel" 
-                :key="option.value" 
-                :label="option.label" 
-                :value="option.value" 
+                v-for="option in customerLevelOptions" 
+                :key="option.key" 
+                :label="option.display" 
+                :value="option.key" 
               />
             </el-select>
             <el-select
               v-model="filterStatus"
               placeholder="状态"
               class="filter-select"
+              clearable
               @change="handleFilterChange"
             >
               <el-option 
-                v-for="option in customerDictionaries.status" 
-                :key="option.value" 
-                :label="option.label" 
-                :value="option.value" 
+                v-for="option in statusOptions" 
+                :key="option.key" 
+                :label="option.display" 
+                :value="option.key" 
               />
             </el-select>
           </div>
@@ -100,22 +103,16 @@
             </template>
           </el-table-column>
           <el-table-column prop="customer_name" label="客户名称" :width="191" :min-width="180" show-overflow-tooltip align="left" />
-          <el-table-column prop="customer_type" label="客户类型" :width="145" :min-width="120" align="center">
-            <template #default="scope">
-              {{ getCustomerTypeLabel(scope.row.customer_type) }}
-            </template>
+          <el-table-column prop="customer_type_display" label="客户类型" :width="145" :min-width="120" align="center">
           </el-table-column>
           <el-table-column prop="contact_person" label="联系人" :width="130" :min-width="100" show-overflow-tooltip align="center" />
           <el-table-column prop="email" label="邮箱" :width="204" :min-width="180" show-overflow-tooltip align="left" />
-          <el-table-column prop="customer_level" label="客户等级" :width="145" :min-width="120" align="center">
-            <template #default="scope">
-              {{ getCustomerLevelLabel(scope.row.customer_level) }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="status" label="状态" :width="145" :min-width="100" align="center">
+          <el-table-column prop="customer_level_display" label="客户等级" :width="145" :min-width="120" align="center">
+           </el-table-column>
+          <el-table-column prop="status_display" label="状态" :width="145" :min-width="100" align="center">
             <template #default="scope">
               <div class="status-tag" :class="getStatusClass(scope.row.status)">
-                {{ getStatusLabel(scope.row.status) }}
+                {{scope.row.status_display}}
               </div>
             </template>
           </el-table-column>
@@ -129,7 +126,13 @@
               <div class="action-buttons">
                 <button class="action-btn primary" @click="handleViewLicense(scope.row)">查看授权</button>
                 <button class="action-btn primary" @click="handleEdit(scope.row)">编辑</button>
-                <button class="action-btn primary" @click="handleDisable(scope.row)">禁用</button>
+                <button 
+                  class="action-btn" 
+                  :class="scope.row.status === 'active' ? 'warning' : 'success'" 
+                  @click="handleDisable(scope.row)"
+                >
+                  {{ scope.row.status === 'active' ? '禁用' : '启用' }}
+                </button>
                 <button class="action-btn danger" @click="handleDelete(scope.row)">删除</button>
               </div>
             </template>
@@ -155,29 +158,29 @@
     
     <!-- 客户表单页面 -->
     <div v-if="showCustomerForm" class="form-page-container">
-      <CustomerForm 
+      <!-- <CustomerForm 
         :customer-data="currentCustomer || undefined" 
         :is-edit="isEditMode"
         @save="handleFormSave"
         @cancel="handleFormCancel"
-      />
+      /> -->
     </div>
 
     <!-- 客户查看页面 -->
     <div v-if="showCustomerView" class="form-page-container">
-      <CustomerView 
+      <!-- <CustomerView 
         :customer-id="currentCustomerId"
         @back="handleViewBack"
-      />
+      /> -->
     </div>
   </Layout>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import Layout from '@/components/common/layout/Layout.vue'
-import CustomerForm from './CustomerForm.vue'
-import CustomerView from './CustomerView.vue'
+// import CustomerForm from './CustomerForm.vue'
+// import CustomerView from './CustomerView.vue'
 import { Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, ElLoading } from 'element-plus'
 import { 
@@ -188,11 +191,11 @@ import {
   type CustomerQueryRequest 
 } from '@/api/customer'
 import { 
-  getCustomerDictionaries,
-  getCustomerTypeLabel,
-  getCustomerLevelLabel,
-  getStatusLabel
-} from '@/utils/dictionaries'
+  getCustomerTypeEnums,
+  getCustomerLevelEnums,
+  getStatusEnums,
+  type RawEnumItem
+} from '@/api/enum'
 
 // Customer类型已从API文件导入
 
@@ -212,8 +215,35 @@ const isEditMode = ref(false)
 const currentCustomer = ref<Customer | null>(null)
 const currentCustomerId = ref<string>('')
 
-// 获取国际化字典选项
-const customerDictionaries = computed(() => getCustomerDictionaries())
+// 获取枚举选项
+const customerTypeOptions = ref<RawEnumItem[]>([])
+const customerLevelOptions = ref<RawEnumItem[]>([])
+const statusOptions = ref<RawEnumItem[]>([])
+
+// 加载枚举数据
+const loadEnums = async () => {
+  try {
+    const [typeRes, levelRes, statusRes] = await Promise.all([
+      getCustomerTypeEnums(),
+      getCustomerLevelEnums(),
+      getStatusEnums()
+    ])
+    
+    if (typeRes.code === '000000') {
+      customerTypeOptions.value = typeRes.data.items
+   
+    }
+    if (levelRes.code === '000000') {
+      customerLevelOptions.value = levelRes.data.items
+
+    }
+    if (statusRes.code === '000000') {
+      statusOptions.value = statusRes.data.items
+    }
+  } catch (error) {
+    console.error('加载枚举数据失败:', error)
+  }
+}
 
 // 页面标题
 const getPageTitle = () => {
@@ -222,8 +252,7 @@ const getPageTitle = () => {
   return '客户管理'
 }
 
-// 格式化函数已移至 utils/dictionaries.ts
-
+// 时间格式化函数
 const formatDate = (dateStr: string) => {
   if (!dateStr) return ''
   try {
@@ -237,63 +266,6 @@ const formatDate = (dateStr: string) => {
   }
 }
 
-const mockData: Customer[] = [
-  {
-    id: '1',
-    customer_code: 'CUS-2025-001',
-    customer_name: '随州市海留有限公司',
-    customer_type: 'enterprise',
-    contact_person: '祁瑾',
-    email: '13988887963@qq.com',
-    customer_level: 'vip',
-    status: 'active',
-    created_at: '2024-06-03T12:00:00Z'
-  },
-  {
-    id: '2',
-    customer_code: 'CUS-2025-002',
-    customer_name: '北京科技创新有限公司',
-    customer_type: 'enterprise',
-    contact_person: '张经理',
-    email: 'zhang@example.com',
-    customer_level: 'normal',
-    status: 'active',
-    created_at: '2024-01-15T10:30:00Z'
-  },
-  {
-    id: '3',
-    customer_code: 'CUS-2025-003',
-    customer_name: '上海软件开发公司',
-    customer_type: 'enterprise',
-    contact_person: '李总监',
-    email: 'li@example.com',
-    customer_level: 'vip',
-    status: 'disabled',
-    created_at: '2024-02-20T14:20:00Z'
-  },
-  {
-    id: '4',
-    customer_code: 'CUS-2025-004',
-    customer_name: '深圳创新科技',
-    customer_type: 'enterprise',
-    contact_person: '王助理',
-    email: 'wang@example.com',
-    customer_level: 'normal',
-    status: 'active',
-    created_at: '2024-03-10T09:15:00Z'
-  },
-  {
-    id: '5',
-    customer_code: 'CUS-2025-005',
-    customer_name: '广州智能制造',
-    customer_type: 'government',
-    contact_person: '周主管',
-    email: 'zhou@example.com',
-    customer_level: 'normal',
-    status: 'disabled',
-    created_at: '2024-04-05T16:45:00Z'
-  }
-]
 
 const getRowStyle = ({ rowIndex }: { rowIndex: number }) => {
   return rowIndex % 2 === 1 ? { backgroundColor: '#F7F8FA' } : { backgroundColor: '#FFFFFF' }
@@ -314,78 +286,29 @@ const loadData = async () => {
     
     const response = await getCustomers(params)
     
-    if (response.code === 200 || response.code === 0) {
+    if (response.code === '000000') {
       tableData.value = response.data.list
       total.value = response.data.total
     } else {
-      ElMessage.error(response.message || '查询失败')
-      // 如果接口失败，使用mock数据
-      const filtered = getFilteredMockData()
-      const start = (currentPage.value - 1) * pageSize.value
-      const end = start + pageSize.value
-      tableData.value = filtered.slice(start, end)
-      total.value = filtered.length
+      ElMessage.error(response.message)
+      tableData.value = []
+      total.value = 0
     }
   } catch (error: any) {
     console.error('加载数据错误:', error)
     
-    // 优先使用后端返回的错误信息
-    let errorMessage = '网络请求失败，使用本地数据' // 默认错误信息
-    
-    if (error.backendMessage) {
-      // 使用 axios 拦截器处理过的后端错误信息
-      errorMessage = error.backendMessage
-    } else if (error.response?.data?.message) {
-      // 直接从响应中获取后端错误信息
-      errorMessage = error.response.data.message
-    } else if (error.message && error.message !== "Error") {
-      // 使用错误对象的消息（避免显示通用的 "Error"）
-      errorMessage = error.message
+    // 使用后端返回的错误信息
+    let errorMessage = error.backendMessage || error.response?.data?.message || error.message
+    if (errorMessage) {
+      ElMessage.error(errorMessage)
     }
-    
-    ElMessage.warning(errorMessage)
-    // 如果网络错误，使用mock数据
-    const filtered = getFilteredMockData()
-    const start = (currentPage.value - 1) * pageSize.value
-    const end = start + pageSize.value
-    tableData.value = filtered.slice(start, end)
-    total.value = filtered.length
+    tableData.value = []
+    total.value = 0
   } finally {
     loading.value = false
   }
 }
 
-// Mock数据过滤函数(作为备用)
-const getFilteredMockData = () => {
-  let filtered = mockData
-
-  // 搜索过滤
-  if (searchKeyword.value) {
-    filtered = filtered.filter(item => 
-      item.customer_name.includes(searchKeyword.value) || 
-      item.contact_person.includes(searchKeyword.value) ||
-      item.customer_code.includes(searchKeyword.value) ||
-      item.email.includes(searchKeyword.value)
-    )
-  }
-
-  // 状态过滤
-  if (filterStatus.value) {
-    filtered = filtered.filter(item => item.status === filterStatus.value)
-  }
-
-  // 客户类型过滤
-  if (filterCustomerType.value) {
-    filtered = filtered.filter(item => item.customer_type === filterCustomerType.value)
-  }
-
-  // 客户等级过滤
-  if (filterCustomerLevel.value) {
-    filtered = filtered.filter(item => item.customer_level === filterCustomerLevel.value)
-  }
-  
-  return filtered
-}
 
 const handleSearch = () => {
   currentPage.value = 1
@@ -439,31 +362,21 @@ const handleDisable = async (row: Customer) => {
     try {
       const response = await toggleCustomerStatus(row.id, newStatus)
       
-      if (response.code === 200 || response.code === 0) {
-        ElMessage.success(`${actionText}成功`)
+      if (response.code === '000000') {
+        ElMessage.success(response.message)
         // 重新加载数据
         await loadData()
       } else {
-        ElMessage.error(response.message || `${actionText}失败`)
+        ElMessage.error(response.message)
       }
     } catch (error: any) {
       console.error(`${actionText}错误:`, error)
       
-      // 优先使用后端返回的错误信息
-      let errorMessage = `${actionText}失败，请稍后重试` // 默认错误信息
-      
-      if (error.backendMessage) {
-        // 使用 axios 拦截器处理过的后端错误信息
-        errorMessage = error.backendMessage
-      } else if (error.response?.data?.message) {
-        // 直接从响应中获取后端错误信息
-        errorMessage = error.response.data.message
-      } else if (error.message && error.message !== "Error") {
-        // 使用错误对象的消息（避免显示通用的 "Error"）
-        errorMessage = error.message
+      // 使用后端返回的错误信息
+      let errorMessage = error.backendMessage || error.response?.data?.message || error.message
+      if (errorMessage) {
+        ElMessage.error(errorMessage)
       }
-      
-      ElMessage.error(errorMessage)
     } finally {
       loadingInstance.close()
     }
@@ -513,31 +426,21 @@ const handleDelete = async (row: Customer) => {
     try {
       const response = await deleteCustomer(row.id)
       
-      if (response.code === 200 || response.code === 0) {
-        ElMessage.success('删除成功')
+      if (response.code === '000000') {
+        ElMessage.success(response.message)
         // 重新加载数据
         await loadData()
       } else {
-        ElMessage.error(response.message || '删除失败')
+        ElMessage.error(response.message)
       }
     } catch (error: any) {
       console.error('删除错误:', error)
       
-      // 优先使用后端返回的错误信息
-      let errorMessage = '删除失败，请稍后重试' // 默认错误信息
-      
-      if (error.backendMessage) {
-        // 使用 axios 拦截器处理过的后端错误信息
-        errorMessage = error.backendMessage
-      } else if (error.response?.data?.message) {
-        // 直接从响应中获取后端错误信息
-        errorMessage = error.response.data.message
-      } else if (error.message && error.message !== "Error") {
-        // 使用错误对象的消息（避免显示通用的 "Error"）
-        errorMessage = error.message
+      // 使用后端返回的错误信息
+      let errorMessage = error.backendMessage || error.response?.data?.message || error.message
+      if (errorMessage) {
+        ElMessage.error(errorMessage)
       }
-      
-      ElMessage.error(errorMessage)
     } finally {
       loadingInstance.close()
     }
@@ -562,7 +465,8 @@ const handleViewBack = () => {
   showCustomerView.value = false
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await loadEnums()
   loadData()
 })
 </script>
@@ -1516,5 +1420,23 @@ onMounted(() => {
 
 .action-btn.danger:hover {
   background: rgba(240, 20, 47, 0.15);
+}
+
+.action-btn.warning {
+  background: rgba(255, 153, 0, 0.08);
+  color: #FF9900;
+}
+
+.action-btn.warning:hover {
+  background: rgba(255, 153, 0, 0.15);
+}
+
+.action-btn.success {
+  background: rgba(0, 194, 124, 0.08);
+  color: #019C7C;
+}
+
+.action-btn.success:hover {
+  background: rgba(0, 194, 124, 0.15);
 }
 </style>

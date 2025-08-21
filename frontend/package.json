@@ -6,7 +6,6 @@
   "description": "License Manager Frontend built with Vue 3 + TypeScript + Element Plus",
   "author": "License Manager Team",
   "scripts": {
-    "dev": "vite",
     "serve": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "build:test": "vue-tsc --noEmit && vite build --mode test",

@@ -6,11 +6,23 @@ export interface Customer {
   customer_code: string;
   customer_name: string;
   customer_type: string;
+  customer_type_display: string;
   contact_person: string;
+  contact_title?: string;
   email: string;
+  phone?: string;
+  address?: string;
   customer_level: string;
+  customer_level_display: string;
   status: string;
+  status_display: string;
+  company_size?: string;
+  company_size_display?: string;
+  description?: string;
   created_at: string;
+  updated_at: string;
+  created_by: string;
+  updated_by: string;
 }
 
 // 客户查询请求参数
@@ -21,11 +33,48 @@ export interface CustomerQueryRequest {
   customer_type?: 'individual' | 'enterprise' | 'government' | 'education';
   customer_level?: 'normal' | 'vip' | 'enterprise' | 'strategic';
   status?: 'active' | 'disabled';
+  sort?: 'created_at' | 'updated_at' | 'customer_name' | 'customer_code';
+  order?: 'asc' | 'desc';
+}
+
+// 创建客户请求参数
+export interface CustomerCreateRequest {
+  customer_name: string;
+  customer_type: 'individual' | 'enterprise' | 'government' | 'education';
+  contact_person: string;
+  contact_title?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  customer_level: 'normal' | 'vip' | 'enterprise' | 'strategic';
+  status: 'active' | 'disabled';
+  company_size?: 'small' | 'medium' | 'large' | 'enterprise';
+  description?: string;
+}
+
+// 更新客户请求参数
+export interface CustomerUpdateRequest {
+  customer_name?: string;
+  customer_type?: 'individual' | 'enterprise' | 'government' | 'education';
+  contact_person?: string;
+  contact_title?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  customer_level?: 'normal' | 'vip' | 'enterprise' | 'strategic';
+  status?: 'active' | 'disabled';
+  company_size?: 'small' | 'medium' | 'large' | 'enterprise';
+  description?: string;
+}
+
+// 状态更新请求参数
+export interface CustomerStatusUpdateRequest {
+  status: 'active' | 'disabled';
 }
 
 // 客户查询响应
 export interface CustomerQueryResponse {
-  code: number;
+  code: string;
   message: string;
   timestamp: string;
   data: {
@@ -38,30 +87,12 @@ export interface CustomerQueryResponse {
 }
 
 // 客户详情响应
-export interface CustomerDetailResponse {
-  code: number;
+// 通用响应 - 泛型类型
+export interface ApiResponse<T = any> {
+  code: string;
   message: string;
   timestamp: string;
-  data: Customer;
-}
-
-// 客户创建/更新请求
-export interface CustomerRequest {
-  customer_code?: string;
-  customer_name: string;
-  customer_type: 'individual' | 'enterprise' | 'government' | 'education';
-  contact_person: string;
-  email: string;
-  customer_level: 'normal' | 'vip' | 'enterprise' | 'strategic';
-  status: 'active' | 'disabled';
-}
-
-// 通用响应
-export interface ApiResponse {
-  code: number;
-  message: string;
-  timestamp: string;
-  data?: any;
+  data?: T;
 }
 
 /**
@@ -74,21 +105,21 @@ export function getCustomers(params?: CustomerQueryRequest): Promise<CustomerQue
 /**
  * 获取客户详情
  */
-export function getCustomerDetail(id: string): Promise<CustomerDetailResponse> {
+export function getCustomerDetail(id: string): Promise<ApiResponse<Customer>> {
   return Axios.get(`/api/customers/${id}`)
 }
 
 /**
  * 创建客户
  */
-export function createCustomer(data: CustomerRequest): Promise<ApiResponse> {
+export function createCustomer(data: CustomerCreateRequest): Promise<ApiResponse<Customer>> {
   return Axios.post('/api/customers', data)
 }
 
 /**
  * 更新客户
  */
-export function updateCustomer(id: string, data: CustomerRequest): Promise<ApiResponse> {
+export function updateCustomer(id: string, data: CustomerUpdateRequest): Promise<ApiResponse<Customer>> {
   return Axios.put(`/api/customers/${id}`, data)
 }
 
@@ -100,8 +131,8 @@ export function deleteCustomer(id: string): Promise<ApiResponse> {
 }
 
 /**
- * 禁用/启用客户
+ * 切换客户状态
  */
-export function toggleCustomerStatus(id: string, status: 'active' | 'disabled'): Promise<ApiResponse> {
+export function toggleCustomerStatus(id: string, status: 'active' | 'disabled'): Promise<ApiResponse<Customer>> {
   return Axios.patch(`/api/customers/${id}/status`, { status })
 }

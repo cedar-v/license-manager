@@ -38,17 +38,23 @@
           
           <el-form-item label="客户类型" prop="type" required class="field-item">
             <el-select v-model="formData.type" placeholder="请选择" style="width: 100%">
-              <el-option label="企业客户" value="enterprise" />
-              <el-option label="个人客户" value="individual" />
-              <el-option label="政府机构" value="government" />
+              <el-option 
+                v-for="option in customerTypeOptions" 
+                :key="option.key" 
+                :label="option.display" 
+                :value="option.key" 
+              />
             </el-select>
           </el-form-item>
           
           <el-form-item label="客户等级" prop="level" required class="field-item">
             <el-select v-model="formData.level" placeholder="请选择" style="width: 100%">
-              <el-option label="VIP客户" value="vip" />
-              <el-option label="重要客户" value="important" />
-              <el-option label="普通客户" value="normal" />
+              <el-option 
+                v-for="option in customerLevelOptions" 
+                :key="option.key" 
+                :label="option.display" 
+                :value="option.key" 
+              />
             </el-select>
           </el-form-item>
           
@@ -62,8 +68,13 @@
           
           <el-form-item label="状态" prop="status" required class="field-item status-field">
             <el-radio-group v-model="formData.status">
-              <el-radio value="normal">正常</el-radio>
-              <el-radio value="disabled">禁用</el-radio>
+              <el-radio 
+                v-for="option in statusOptions" 
+                :key="option.key" 
+                :value="option.key"
+              >
+                {{ option.display }}
+              </el-radio>
             </el-radio-group>
           </el-form-item>
           
@@ -87,10 +98,12 @@
         <div class="business-fields">
           <el-form-item label="企业规模" prop="companySize" required class="company-size-field">
             <el-select v-model="formData.companySize" placeholder="请选择" style="width: 100%">
-              <el-option label="大型企业(500人以上)" value="large" />
-              <el-option label="中型企业(100-500人)" value="medium" />
-              <el-option label="小型企业(50-100人)" value="small" />
-              <el-option label="微型企业(50人以下)" value="micro" />
+              <el-option 
+                v-for="option in companySizeOptions" 
+                :key="option.key" 
+                :label="option.display" 
+                :value="option.key" 
+              />
             </el-select>
           </el-form-item>
           
@@ -111,10 +124,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { createCustomer, updateCustomer } from '@/api/customer'
+import {
+  getCustomerTypeEnums,
+  getCustomerLevelEnums,
+  getStatusEnums,
+  getCompanySizeEnums,
+  type RawEnumItem
+} from '@/api/enum'
 
 interface CustomerFormData {
+  id?: string
   name: string
   contact: string
   email: string
@@ -140,6 +162,43 @@ const emit = defineEmits<{
 const formRef = ref<FormInstance>()
 const loading = ref(false)
 
+// 枚举选项
+const customerTypeOptions = ref<RawEnumItem[]>([])
+const customerLevelOptions = ref<RawEnumItem[]>([])
+const statusOptions = ref<RawEnumItem[]>([])
+const companySizeOptions = ref<RawEnumItem[]>([])
+
+// 加载枚举数据
+const loadEnums = async () => {
+  try {
+    const [typeRes, levelRes, statusRes, sizeRes] = await Promise.all([
+      getCustomerTypeEnums(),
+      getCustomerLevelEnums(),
+      getStatusEnums(),
+      getCompanySizeEnums()
+    ])
+    
+    if (typeRes.code === '000000') {
+      customerTypeOptions.value = typeRes.data.items
+    }
+    if (levelRes.code === '000000') {
+      customerLevelOptions.value = levelRes.data.items
+    }
+    if (statusRes.code === '000000') {
+      statusOptions.value = statusRes.data.items
+      // 设置默认状态（如果没有编辑数据）
+      if (!props.customerData && statusRes.data.items.length > 0) {
+        formData.status = statusRes.data.items[0].key
+      }
+    }
+    if (sizeRes.code === '000000') {
+      companySizeOptions.value = sizeRes.data.items
+    }
+  } catch (error) {
+    console.error('加载枚举数据失败:', error)
+  }
+}
+
 // 表单数据
 const formData = reactive<CustomerFormData>({
   name: '',
@@ -149,7 +208,7 @@ const formData = reactive<CustomerFormData>({
   address: '',
   type: '',
   level: '',
-  status: 'normal',
+  status: '',
   companySize: '',
   description: ''
 })
@@ -200,17 +259,50 @@ const handleSave = async () => {
     await formRef.value.validate()
     loading.value = true
     
-    // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    // 准备API数据
+    const requestData = {
+      customer_name: formData.name,
+      customer_type: formData.type as any,
+      contact_person: formData.contact,
+      email: formData.email || undefined,
+      phone: formData.phone || undefined,
+      address: formData.address || undefined,
+      customer_level: formData.level as any,
+      status: formData.status as any,
+      company_size: formData.companySize as any || undefined,
+      description: formData.description || undefined
+    }
     
-    emit('save', { ...formData })
-    ElMessage.success(props.isEdit ? '编辑成功' : '添加成功')
-  } catch (error) {
-    console.error('表单验证失败:', error)
+    // 调用API
+    let response
+    if (props.isEdit && props.customerData?.id) {
+      response = await updateCustomer(props.customerData.id, requestData)
+    } else {
+      response = await createCustomer(requestData)
+    }
+    
+    if (response.code === '000000') {
+      emit('save', { ...formData })
+      ElMessage.success(response.message)
+    } else {
+      ElMessage.error(response.message)
+    }
+  } catch (error: any) {
+    console.error('保存失败:', error)
+    // 使用后端返回的错误信息
+    let errorMessage = error.backendMessage || error.response?.data?.message || error.message
+    if (errorMessage) {
+      ElMessage.error(errorMessage)
+    }
   } finally {
     loading.value = false
   }
 }
+
+// 组件挂载时加载枚举数据
+onMounted(() => {
+  loadEnums()
+})
 </script>
 
 <style scoped>

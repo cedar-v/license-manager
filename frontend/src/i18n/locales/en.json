@@ -99,27 +99,5 @@
         "month": "This Month"
       }
     }
-  },
-  "dictionary": {
-    "common": {
-      "all": "All",
-      "unknown": "Unknown"
-    },
-    "customerType": {
-      "individual": "Individual",
-      "enterprise": "Enterprise",
-      "government": "Government",
-      "education": "Education"
-    },
-    "customerLevel": {
-      "normal": "Normal",
-      "vip": "VIP",
-      "enterprise": "Enterprise",
-      "strategic": "Strategic"
-    },
-    "status": {
-      "active": "Active",
-      "disabled": "Disabled"
-    }
   }
 }

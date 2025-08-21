@@ -149,8 +149,8 @@ async function handleLogin() {
     const response = await Login(loginData);
     console.log('登录响应:', response);
 
-    // 检查响应是否成功 (支持 code 200 或 0)
-    if (response.code === 200 || response.code === 0) {
+    // 检查响应是否成功 (支持 code 000000)
+    if (response.code === '000000') {
       // 登录成功
       if (response.data && response.data.token) {
         localStorage.setItem("token", response.data.token);
@@ -168,27 +168,17 @@ async function handleLogin() {
         localStorage.removeItem("loginInfo");
       }
 
-      ElMessage.success(t('login.success'));
+      ElMessage.success(response.message);
       router.push("/dashboard");
     } else {
-      ElMessage.error(response.message || t("login.error.invalid"));
+      ElMessage.error(response.message);
     }
   } catch (error: any) {
-    // 优先使用后端返回的错误信息
-    let errorMessage = t("login.error.general"); // 默认错误信息
-    
-    if (error.backendMessage) {
-      // 使用 axios 拦截器处理过的后端错误信息
-      errorMessage = error.backendMessage;
-    } else if (error.response?.data?.message) {
-      // 直接从响应中获取后端错误信息
-      errorMessage = error.response.data.message;
-    } else if (error.message && error.message !== "Error") {
-      // 使用错误对象的消息（避免显示通用的 "Error"）
-      errorMessage = error.message;
+    // 使用后端返回的错误信息
+    let errorMessage = error.backendMessage || error.response?.data?.message || error.message;
+    if (errorMessage) {
+      ElMessage.error(errorMessage);
     }
-    
-    ElMessage.error(errorMessage);
   } finally {
     loading.value = false;
   }

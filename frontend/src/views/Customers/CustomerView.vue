@@ -69,7 +69,7 @@
       <div class="info-grid">
         <div class="info-item">
           <span class="label">企业规模：</span>
-          <span class="value">{{ getCompanySizeLabel(customerData.companySize) }}</span>
+          <span class="value">{{ enumLabels.companySize || '--' }}</span>
         </div>
         <div class="info-item full-width">
           <span class="label">首选授权：</span>
@@ -133,6 +133,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import { getCustomerDetail } from '@/api/customer'
 
 interface StatusRecord {
   action: string
@@ -173,53 +174,78 @@ const emit = defineEmits<{
 const loading = ref(false)
 const customerData = ref<Partial<CustomerViewData>>({})
 
+// 枚举标签缓存
+const enumLabels = ref({
+  customerType: '',
+  customerLevel: '',
+  status: '',
+  companySize: ''
+})
+
 // 获取客户详情数据
 const fetchCustomerDetail = async () => {
   if (!props.customerId) return
   
   loading.value = true
   try {
-    // TODO: 调用真实API接口
-    // const response = await getCustomerDetail(props.customerId)
-    // customerData.value = response.data
+    // 调用真实API接口
+    const response = await getCustomerDetail(props.customerId)
+    const customer = response.data
     
-    // 模拟数据
-    await new Promise(resolve => setTimeout(resolve, 500))
+    if (!customer) {
+      ElMessage.error('客户数据不存在')
+      return
+    }
+    
+    // 使用原始枚举值作为显示值 (移除映射功能)
+    enumLabels.value = {
+      customerType: customer.customer_type_display || customer.customer_type,
+      customerLevel: customer.customer_level_display || customer.customer_level,
+      status: customer.status_display || customer.status,
+      companySize: customer.company_size_display || customer.company_size || ''
+    }
+    
+    // 转换API数据为组件需要的格式
     customerData.value = {
-      name: '随州市海留有限公司',
-      contact: '祁瑾',
-      email: '13988887963@qq.com',
-      phone: '13988887963',
-      address: '湖北省随州市经济开发区创业大厦A座1001室',
-      type: 'enterprise',
-      level: 'vip',
-      status: 'normal',
-      companySize: 'medium',
-      preferredLicense: '在线授权',
-      description: '专业从事软件开发和技术服务的高新技术企业，主要业务包括企业管理系统开发、移动应用开发等。',
+      name: customer.customer_name,
+      contact: customer.contact_person,
+      email: customer.email || '',
+      phone: customer.phone || '',
+      address: customer.address || '',
+      type: customer.customer_type,
+      level: customer.customer_level,
+      status: customer.status,
+      companySize: customer.company_size || '',
+      preferredLicense: '在线授权', // 暂时写死，等后端添加字段
+      description: customer.description || '',
       statusRecords: [
         {
           action: '创建人',
-          user: '张三',
-          time: '2025-12-01T12:25:51Z'
+          user: customer.created_by,
+          time: customer.created_at
         },
         {
           action: '更新人',
-          user: '李四',
-          time: '2025-12-15T16:30:25Z'
+          user: customer.updated_by,
+          time: customer.updated_at
         }
       ],
-      totalLicenses: 15,
-      activeLicenses: 1200,
-      expiredLicenses: 1,
-      expiringSoonLicenses: 1,
-      latestLicenseTime: '2025-12-01T12:25:51Z',
-      expiringSoonTime: '2025-12-01T12:25:51Z',
-      expiredTime: '2025-12-01T12:25:51Z'
+      // 授权统计数据等待后端接口
+      totalLicenses: 0,
+      activeLicenses: 0,
+      expiredLicenses: 0,
+      expiringSoonLicenses: 0,
+      latestLicenseTime: undefined,
+      expiringSoonTime: undefined,
+      expiredTime: undefined
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('获取客户详情失败:', error)
-    ElMessage.error('获取客户详情失败，请稍后重试')
+    // 使用后端返回的错误信息
+    let errorMessage = error.backendMessage || error.response?.data?.message || error.message
+    if (errorMessage) {
+      ElMessage.error(errorMessage)
+    }
   } finally {
     loading.value = false
   }
@@ -233,46 +259,21 @@ const handleBack = () => {
 // 获取客户类型标签
 const getCustomerTypeLabel = (type: string | undefined) => {
   if (!type) return '--'
-  const typeMap: { [key: string]: string } = {
-    'enterprise': '企业客户',
-    'individual': '个人客户',
-    'government': '政府机构'
-  }
-  return typeMap[type] || '--'
+  return enumLabels.value.customerType || '--'
 }
 
 // 获取客户等级标签
 const getCustomerLevelLabel = (level: string | undefined) => {
   if (!level) return '--'
-  const levelMap: { [key: string]: string } = {
-    'vip': 'VIP客户',
-    'important': '重要客户',
-    'normal': '普通客户'
-  }
-  return levelMap[level] || '--'
+  return enumLabels.value.customerLevel || '--'
 }
 
 // 获取状态标签
 const getStatusLabel = (status: string | undefined) => {
   if (!status) return '--'
-  const statusMap: { [key: string]: string } = {
-    'normal': '正常',
-    'disabled': '禁用'
-  }
-  return statusMap[status] || '--'
+  return enumLabels.value.status || '--'
 }
 
-// 获取企业规模标签
-const getCompanySizeLabel = (size: string | undefined) => {
-  if (!size) return '--'
-  const sizeMap: { [key: string]: string } = {
-    'large': '大型企业(500人以上)',
-    'medium': '中型企业(100-500人)',
-    'small': '小型企业(50-100人)',
-    'micro': '微型企业(50人以下)'
-  }
-  return sizeMap[size] || '--'
-}
 
 // 格式化日期
 const formatDate = (date: string | undefined) => {

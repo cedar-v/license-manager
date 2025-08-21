@@ -9,6 +9,44 @@ import router from '@/router'
 
 const envUrl = import.meta.env.VITE_API_BASE_URL
 
+// 防止重复跳转到登录页的标志
+let isRedirectingToLogin = false
+
+// 清除用户认证信息的函数
+const clearAuthInfo = () => {
+  localStorage.removeItem('token')
+  // 清除其他可能的认证信息
+  localStorage.removeItem('userInfo')
+  localStorage.removeItem('refreshToken')
+}
+
+// 跳转到登录页的函数
+
+const redirectToLogin=()=> {
+  if (!isRedirectingToLogin) {
+    isRedirectingToLogin = true
+    
+    // 立即清除认证信息
+    clearAuthInfo()
+    
+    // 检查当前路径
+    const currentPath = router.currentRoute.value?.path
+    if (currentPath === '/login') {
+      isRedirectingToLogin = false
+      return
+    }
+    
+    // 跳转到登录页
+    setTimeout(() => {
+      router.replace('/login').finally(() => {
+        setTimeout(() => {
+          isRedirectingToLogin = false
+        }, 1000)
+      })
+    }, 50)
+  }
+}
+
 //使用create方法创建axios实例
 const Axios = axios.create({
   timeout: 10000, // 请求超时时间
@@ -45,16 +83,12 @@ Axios.interceptors.response.use(response => {
     return Promise.reject(new Error("非本系统的接口"))
   } else {
     switch (code) {
-      case 200:
-        // code === 200 代表成功
-        return apiData
-      case 0:
-        // code === 0 也代表成功 (兼容)
+      case '000000':
+        // code === '000000' 代表成功
         return apiData
       case 401:
         // code === 401 代表未授权，清除token并跳转到登录页
-        localStorage.removeItem('token')
-        router.push('/login')
+        redirectToLogin()
         const authError = new Error(apiData.message || "未授权访问")
         ;(authError as any).response = { data: apiData }
         return Promise.reject(authError)
@@ -78,9 +112,8 @@ Axios.interceptors.response.use(response => {
     
     // 处理HTTP 401状态码
     if (status === 401) {
-      localStorage.removeItem('token')
-      router.push('/login')
-      ;(error as any).backendMessage = '登录已过期，请重新登录'
+      redirectToLogin()
+      (error as any).backendMessage = data.message || "未授权访问"
       return Promise.reject(error)
     }
     
