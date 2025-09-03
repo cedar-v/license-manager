@@ -30,6 +30,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         scss: {
           api: 'modern-compiler', // 使用现代Sass编译器API
           silenceDeprecations: ['legacy-js-api'],
+          additionalData: `@use "@/assets/styles/variables" as *; @use "@/assets/styles/mixins" as *;`
         }
       }
     },
