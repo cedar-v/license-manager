@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-11 09:07:12
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-08-11 11:07:32
+ * @LastEditTime: 2025-09-03 10:24:43
  * @FilePath: /frontend/docs/Claude + Figma 开发 Vue 3 + TypeScript + Element Plus 应用指南.md
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -157,17 +157,48 @@ $border-radius: 6px;
 - **复用样式**: 将常用样式抽取到 mixins 中
 - **主题支持**: 使用 SCSS 变量配合 Element Plus 主题定制
 
-#### 响应式设计
-```scss
-// 使用 mixins.scss 中的响应式断点
-@include tablet {
-  // 平板样式
-}
 
-@include mobile {
-  // 手机样式
-}
-```
+**一、整体响应式方案（不使用rem）:**
+
+1. **JavaScript 辅助监听**: 在 `src/utils/resize.js` 等文件中监听窗口 resize 事件，动态计算屏幕宽度
+2. **设备类型管理**: 将设备类型（desktop/mobile）等信息存入 Pinia，供组件使用
+3. **CSS 媒体查询**: 定义不同屏幕宽度下的样式规则（核心方案）
+4. **Flex 布局和百分比宽度**: 使用 Flex 布局实现内容弹性流动，使用 % 或 vw/vh 定义容器宽度
+
+**二、移动端体验深度优化:**
+
+1. **点击目标大小**: 确保按钮、链接等可点击元素尺寸不小于 44x44px（苹果HIG标准），适应手指触摸，避免误操作
+
+2. **避免悬停（Hover）事件**: 移动端没有鼠标悬停，所有依赖 `:hover` 状态的功能（工具提示、二级菜单）都必须提供替代交互方式，如点击触发或长按触发
+
+3. **原生控件和滚动**: 
+   - 使用 `<input type="date">` 调用原生日期选择器，体验优于自定义组件
+   - 处理 `-webkit-overflow-scrolling: touch` 启用iOS弹性滚动，让列表滚动更顺滑
+
+4. **视口（Viewport）设置**: 确保 `<meta name="viewport">` 标签正确设置，根据需求决定是否禁止缩放以防止布局错乱
+
+**三、复杂组件的响应策略:**
+
+**1. 表格（Table）:**
+   - **横向滚动**: 为表格容器设置 `overflow-x: auto`，允许用户横向滑动查看隐藏列
+   - **列省略/优先级**: 隐藏次要列，只保留关键信息
+   - **卡片化视图**: 小屏幕下（特别是移动端），将表格行转换为独立卡片，垂直展示数据
+
+**2. 表单（Form）:**
+   - **布局调整**: 将 label 和 input 的左右布局改为上下（block）布局
+
+**3. 图表（Charts）:**
+   - **动态重绘**: 使用 ECharts 等库的 `resize()` 方法，在容器尺寸变化时重绘图表
+   - **简化显示**: 复杂图表在小屏幕下隐藏图例、简化配置，或提示用户"请在更大屏幕上查看此图表"
+
+**4. 模态框（Modal/Dialog）:**
+   - **全屏显示**: 移动端模态框应全屏显示，而非居中弹出浮层，更符合移动端交互习惯
+
+**四、性能优化:**
+
+1. **防抖和节流**: 对 resize、scroll 等频繁触发事件使用防抖或节流，避免性能浪费
+2. **按需加载和代码分割**: 使用 Vue 异步组件和 Webpack 动态 `import()` 语法，将不同设备的组件代码分别加载
+3. **图片和媒体优化**: 使用 `srcset` 和 `sizes` 属性为不同屏幕提供不同分辨率图片，避免移动端加载桌面大图
 
 ## 3. Figma设计转代码
 
@@ -457,7 +488,6 @@ export default defineConfig({
 // 解决方案：使用视口单位和媒体查询
 .container {
   width: 100vw;
-  max-width: 1200px;
   margin: 0 auto;
   padding: 0 4vw;
   

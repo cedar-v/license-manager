@@ -24,7 +24,7 @@ This project is based on Vue 3, TypeScript, and Vite, integrating mainstream fro
 - **State Management**: Integrated vuex
 - **UI Framework**: Supports Element Plus
 - **Internationalization**: Integrated vue-i18n, supports multi-language switching
-- **Responsive Adaptation**: postcss-pxtorem automatically converts px to rem
+- **Responsive Adaptation**: Based on px and media queries
 - **Code Quality**: Integrated ESLint, Prettier
 - **Build Optimization**: gzip compression, bundle analysis, code splitting
 - **Clear Directory Structure**: src contains assets, components, views, router, store, utils, etc.

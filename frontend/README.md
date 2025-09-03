@@ -24,7 +24,7 @@
 - **状态管理**：集成 vuex
 - **UI 框架**：支持 Element Plus
 - **国际化**：集成 vue-i18n，支持多语言切换
-- **响应式适配**：postcss-pxtorem 自动 px 转 rem
+- **响应式适配**：基于 px 和媒体查询 
 - **代码规范**：集成 ESLint、Prettier
 - **打包优化**：gzip 压缩、打包分析、按需分包
 - **目录结构清晰**：src 下分 assets、components、views、router、store、utils 等
