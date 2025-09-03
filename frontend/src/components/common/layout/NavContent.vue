@@ -165,38 +165,38 @@ const handleUserClick = () => {
 .nav-content {
   position: fixed;
   top: 0;
-  left: 14.58vw; /* 280px/1920 = 14.58vw */
+  left: 280px; /* 默认：侧边栏展开状态 */
   right: 0;
-  height: 4.17vw; /* 80px/1920 = 4.17vw */
+  height: 80px; /* 使用固定高度 */
   background: #FFFFFF;
   border-bottom: 1px solid rgba(29, 29, 29, 0.12);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.04vw 1.25vw; /* 20px 24px/1920 = 1.04vw 1.25vw */
+  padding: 20px 24px; /* 使用固定像素值 */
   z-index: 2001;
-  transition: all 0.3s ease;
+  transition: left 0.3s ease; /* 只对left属性做动画 */
 }
 
 /* 左侧区域 */
 .nav-content__left {
   display: flex;
   align-items: center;
-  gap: 0.63vw; /* 12px/1920 = 0.63vw */
+  gap: 12px;
 }
 
 /* 侧边栏切换按钮 */
 .sidebar-toggle-btn {
-  width: 1.67vw; /* 32px/1920 = 1.67vw */
-  height: 1.67vw; /* 32px/1920 = 1.67vw */
+  width: 32px;
+  height: 32px;
   border: none;
   background: transparent;
-  border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
+  border-radius: 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.21vw; /* 4px/1920 = 0.21vw */
+  padding: 4px;
   transition: all 0.2s;
 }
 
@@ -208,15 +208,15 @@ const handleUserClick = () => {
 .breadcrumb-section {
   display: flex;
   flex-direction: column;
-  gap: 0.10vw; /* 2px/1920 = 0.10vw */
+  gap: 2px;
 }
 
 /* 面包屑导航 */
 .breadcrumb {
   display: flex;
   align-items: center;
-  gap: 0.21vw; /* 4px/1920 = 0.21vw */
-  font-size: 0.63vw; /* 12px/1920 = 0.63vw */
+  gap: 4px;
+  font-size: 12px;
   color: #888;
   flex-wrap: wrap;
 }
@@ -224,14 +224,14 @@ const handleUserClick = () => {
 .breadcrumb-item {
   display: flex;
   align-items: center;
-  gap: 0.21vw; /* 4px/1920 = 0.21vw */
+  gap: 4px;
   white-space: nowrap;
 }
 
 /* 面包屑当前页面样式，使用页面标题样式 */
 .breadcrumb-current.page-title {
   font-family: 'OPPOSans', sans-serif;
-  font-size: 1.04vw; /* 20px/1920 = 1.04vw */
+  font-size: 20px;
   font-weight: 400;
   color: #1D1D1D;
   line-height: 1.32;
@@ -241,7 +241,7 @@ const handleUserClick = () => {
   border: none;
   background: none;
   color: #019C7C;
-  font-size: 0.63vw; /* 12px/1920 = 0.63vw */
+  font-size: 12px;
   cursor: pointer;
   padding: 0;
   text-decoration: none;
@@ -255,18 +255,18 @@ const handleUserClick = () => {
 
 .breadcrumb-current {
   color: #666;
-  font-size: 0.63vw; /* 12px/1920 = 0.63vw */
+  font-size: 12px;
 }
 
 .breadcrumb-separator {
   color: #ccc;
-  margin: 0 0.21vw; /* 4px/1920 = 0.21vw */
-  font-size: 0.63vw; /* 12px/1920 = 0.63vw */
+  margin: 0 4px;
+  font-size: 12px;
 }
 
 .page-title {
   font-family: 'OPPOSans', sans-serif;
-  font-size: 1.04vw; /* 20px/1920 = 1.04vw */
+  font-size: 20px;
   font-weight: 400;
   color: #1D1D1D;
   line-height: 1.32;
@@ -276,13 +276,13 @@ const handleUserClick = () => {
 .nav-content__right {
   display: flex;
   align-items: center;
-  gap: 1.25vw; /* 24px/1920 = 1.25vw */
+  gap: 24px;
 }
 
 /* 用户头像 */
 .user-avatar {
-  width: 1.04vw; /* 20px/1920 = 1.04vw */
-  height: 1.04vw; /* 20px/1920 = 1.04vw */
+  width: 20px;
+  height: 20px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -297,25 +297,25 @@ const handleUserClick = () => {
 /* 分割线 */
 .divider {
   width: 1px;
-  height: 1.25vw; /* 24px/1920 = 1.25vw */
+  height: 24px;
   background: rgba(29, 29, 29, 0.12);
-  border-radius: 0.10vw; /* 2px/1920 = 0.10vw */
+  border-radius: 2px;
 }
 
 /* 操作按钮组 */
 .action-buttons {
   display: flex;
-  gap: 0.63vw; /* 12px/1920 = 0.63vw */
+  gap: 12px;
 }
 
 /* 操作按钮 */
 .action-btn {
   position: relative;
-  width: 2.08vw; /* 40px/1920 = 2.08vw */
-  height: 2.08vw; /* 40px/1920 = 2.08vw */
+  width: 40px;
+  height: 40px;
   border: none;
   background: #F7F8FA;
-  border-radius: 1.04vw; /* 20px/1920 = 1.04vw */
+  border-radius: 20px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -330,15 +330,15 @@ const handleUserClick = () => {
 /* 通知徽章 */
 .notification-badge {
   position: absolute;
-  top: -0.16vw; /* -3px/1920 = -0.16vw */
-  right: -0.05vw; /* -1px/1920 = -0.05vw */
-  width: 1.15vw; /* 22px/1920 = 1.15vw */
-  height: 0.83vw; /* 16px/1920 = 0.83vw */
+  top: -3px;
+  right: -1px;
+  width: 22px;
+  height: 16px;
   background: #00C27C;
   color: white;
-  font-size: 0.52vw; /* 10px/1920 = 0.52vw */
+  font-size: 10px;
   font-weight: 700;
-  border-radius: 4.69vw; /* 90px/1920 = 4.69vw */
+  border-radius: 90px;
   border: 1px solid #FFFFFF;
   display: flex;
   align-items: center;
@@ -347,24 +347,24 @@ const handleUserClick = () => {
   line-height: 1.3;
 }
 
-/* 侧边栏状态配合 */
+/* 侧边栏状态配合 - 桌面端 */
 .nav-content--sidebar-collapsed {
-  left: 3.33vw; /* 64px/1920 = 3.33vw */
+  left: 64px !important; /* 侧边栏收起时的宽度，使用!important确保优先级 */
 }
 
 .nav-content--mobile {
-  left: 0;
+  left: 0 !important; /* 移动端从左侧边缘开始 */
 }
 
-/* 响应式设计 - 移动端切换回px单位 */
+/* 响应式设计 - 平板和移动端 */
 @media (max-width: 1024px) {
   .nav-content {
     left: 0;
     padding: 16px 20px;
-    height: 80px; /* 移动端使用固定高度 */
+    height: 80px;
   }
   
-  /* 覆盖侧边栏收起状态，移动端和平板端始终从左侧边缘开始 */
+  /* 覆盖侧边栏收起状态，平板端和移动端始终从左侧边缘开始 */
   .nav-content--sidebar-collapsed {
     left: 0;
   }
@@ -467,5 +467,14 @@ const handleUserClick = () => {
   }
 }
 
-/* 桌面端vw单位在基础样式中已设置，移动端通过媒体查询覆盖为px单位 */
+/* 桌面端确保导航栏正确响应侧边栏状态 */
+@media (min-width: 1025px) {
+  .nav-content {
+    left: 280px; /* 桌面端默认侧边栏展开状态 */
+    
+    &--sidebar-collapsed {
+      left: 64px !important; /* 侧边栏收起状态，使用!important确保生效 */
+    }
+  }
+}
 </style>

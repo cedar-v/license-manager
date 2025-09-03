@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-12 00:00:00
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-08-21 16:42:53
+ * @LastEditTime: 2025-09-03 11:29:37
  * @FilePath: /frontend/src/views/Customers/index.vue
  * @Description: 客户管理页面  
 -->
@@ -95,18 +95,22 @@
             style="width: 100%;"
             :header-cell-style="{ backgroundColor: '#F7F8FA', color: '#1D1D1D' }"
             :row-style="getRowStyle"
-            :max-height="'calc(100vh - 200px)'"
+            :max-height="'calc(100vh - 280px)'"
           >
-          <el-table-column prop="customer_code" label="客户编码" :width="170" :min-width="170" align="left">
+          <el-table-column prop="customer_code" label="客户编码" :width="200" :min-width="200" align="left">
             <template #default="scope">
-              <span class="customer-code">{{ scope.row.customer_code }}</span>
+              <span class="customer-code" style="white-space: nowrap; overflow: visible; text-overflow: initial;">{{ scope.row.customer_code }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="customer_name" label="客户名称" :width="191" :min-width="180" show-overflow-tooltip align="left" />
+          <el-table-column prop="customer_name" label="客户名称" :width="190" :min-width="180" show-overflow-tooltip align="left">
+            <template #default="scope">
+              <span class="ellipsis-text">{{ scope.row.customer_name }}</span>
+            </template>
+          </el-table-column>
           <el-table-column prop="customer_type_display" label="客户类型" :width="145" :min-width="120" align="center">
           </el-table-column>
           <el-table-column prop="contact_person" label="联系人" :width="130" :min-width="100" show-overflow-tooltip align="center" />
-          <el-table-column prop="email" label="邮箱" :width="204" :min-width="180" show-overflow-tooltip align="left" />
+          <el-table-column prop="email" label="邮箱" :width="204" :min-width="180" show-overflow-tooltip align="left"/>
           <el-table-column prop="customer_level_display" label="客户等级" :width="145" :min-width="120" align="center">
            </el-table-column>
           <el-table-column prop="status_display" label="状态" :width="145" :min-width="100" align="center">
@@ -469,86 +473,136 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+// Variables and mixins are auto-injected via Vite configuration
+
 .content-container {
-  min-height: calc(100vh - 80px); /* 默认使用固定像素的最小高度 */
-  padding: 24px;
-  width: 100%;
-  margin: 0;
-  box-sizing: border-box;
-  background-color: #ffffff;
+  // 所有CSS声明放在@include之前
+  max-width: none !important; // 移除最大宽度限制，允许充满整个屏幕
+  height: 100%; // 占满父容器高度
+  padding: 0; // 移除padding，由父容器处理
+  background-color: $background-color-white;
   display: flex;
   flex-direction: column;
+  overflow: hidden; // 防止内容超出
+  box-sizing: border-box;
+  
+  @include responsive-container;
+  
+  @include mobile {
+    padding: $spacing-medium;
+  }
+  
+  @include mobile {
+    padding: $spacing-base;
+  }
 }
 
 .form-page-container {
+  @include responsive-container;
+  max-width: none !important; 
   min-height: calc(100vh - 80px);
-  padding: 24px;
-  width: 100%;
-  margin: 0;
-  box-sizing: border-box;
-  background: #F7F8FA;
+  padding: $spacing-large;
+  background: $background-color-base;
   display: flex;
   flex-direction: column;
+  
+  @include mobile {
+    padding: $spacing-medium;
+  }
+  
+  @include mobile {
+    padding: $spacing-base;
+  }
 }
 
 .top-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 1.04vw; /* 20px/1920 = 1.04vw */
-  margin-bottom: 0.83vw; /* 16px/1920 = 0.83vw */
+  @include flex-between;
+  gap: $spacing-large;
+  margin-bottom: $spacing-medium;
+  padding: $spacing-large $spacing-large 0 $spacing-large; // 只在顶部和两侧添加padding
   flex-shrink: 0;
+  
+  @include mobile {
+    @include flex-responsive;
+    align-items: stretch;
+  }
 }
 
-/* 桌面端vw单位在基础样式中已设置 */
-
 .left-actions {
-  display: flex;
-  gap: 1.04vw; /* 20px/1920 = 1.04vw */
+  @include flex-center-vertical;
+  gap: $spacing-large;
+  
+  @include mobile {
+    justify-content: flex-start;
+    width: 100%;
+  }
 }
 
 .add-customer-btn {
-  height: 1.67vw; /* 32px/1920 = 1.67vw */
-  padding: 0.31vw 0.83vw; /* 6px 16px/1920 */
-  background-color: #019C7C;
-  border-color: #019C7C;
-  border-radius: 0.10vw; /* 2px/1920 = 0.10vw */
-  font-family: 'Source Han Sans CN', sans-serif;
-  font-weight: 500;
-  font-size: 0.73vw; /* 14px/1920 = 0.73vw */
-  line-height: 1.09vw; /* 21px/1920 = 1.09vw */
+  @include button-primary;
+  height: 32px;
+  padding: $spacing-small $spacing-medium;
+  font-size: $font-size-base;
+  font-weight: $font-weight-primary;
+  border-radius: $border-radius-small;
 }
 
 .right-actions {
-  display: flex;
-  align-items: center;
-  gap: 2.08vw; /* 40px/1920 = 2.08vw */
+  @include flex-center-vertical;
+  gap: $spacing-extra-large;
   min-width: 0;
   flex-shrink: 1;
+  
+  @include mobile {
+    flex-direction: column;
+    gap: $spacing-medium;
+    width: 100%;
+  }
 }
 
 .filter-section {
-  display: flex;
-  align-items: center;
-  gap: 0.21vw; /* 4px/1920 = 0.21vw */
-  min-width: 14.58vw; /* 280px/1920 = 14.58vw */
+  @include flex-center-vertical;
+  gap: $spacing-small;
+  min-width: 280px;
   flex-shrink: 1;
+  
+  @include mobile {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: $spacing-small;
+  }
+  
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 .filter-label {
-  font-family: 'Source Han Sans CN', sans-serif;
-  font-weight: 500;
-  font-size: 0.73vw; /* 14px/1920 = 0.73vw */
-  line-height: 1.15vw; /* 22px/1920 = 1.15vw */
-  color: #1D1D1D;
-  margin-right: 0.21vw; /* 4px/1920 = 0.21vw */
-  width: 2.6vw; /* 50px/1920 = 2.6vw */
+  font-size: $font-size-base;
+  font-weight: $font-weight-primary;
+  color: $text-color-primary;
+  margin-right: $spacing-small;
+  min-width: 50px;
+  
+  @include mobile {
+    width: auto;
+    margin-right: $spacing-small;
+  }
+  
+  @include mobile {
+    align-self: flex-start;
+  }
 }
 
 .search-section {
-  min-width: 14.58vw; /* 280px/1920 = 14.58vw */
+  min-width: 280px;
   flex-shrink: 1;
+  
+  @include mobile {
+    width: 100%;
+  }
 }
 
 .search-input {
@@ -556,27 +610,45 @@ onMounted(async () => {
 }
 
 .table-container {
-  width: 100%; /* 确保宽度铺满 */
-  background: #FFFFFF;
-  border: 1px solid #F5F7FA;
-  border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
+  @include card-base;
+  width: calc(100% - #{$spacing-large * 2}); // 计算宽度减去左右padding
+  margin: 0 $spacing-large; // 水平居中并添加左右边距
+  border: 1px solid $border-color-light;
+  border-radius: $border-radius-base;
   overflow: hidden;
-  margin-bottom: 0.83vw; /* 16px/1920 = 0.83vw */
-  /* 高度跟随内容，但设置最大值 */
-  max-height: calc(100vh - 200px); /* 保留空间给顶部操作和分页 */
+  margin-bottom: $spacing-medium;
+  flex: 1; // 自动占满剩余空间
+  display: flex;
+  flex-direction: column;
+  
+  @include mobile {
+    @include table-responsive;
+  }
 }
 
 .pagination-container {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 0.42vw; /* 8px/1920 = 0.42vw */
+  @include flex-end;
+  gap: $spacing-small;
+  padding: 0 $spacing-large $spacing-large $spacing-large; // 添加下部和两侧padding
+  flex-shrink: 0;
+  
+  @include mobile {
+    @include flex-center;
+    flex-wrap: wrap;
+    gap: $spacing-extra-small;
+  }
 }
 
 .table-wrapper {
   width: 100%;
-  overflow-x: auto; /* 水平滚动 */
+  height: 100%; // 占满表格容器高度
+  overflow-x: auto;
   position: relative;
+  @include smooth-scroll;
+  
+  @include mobile {
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 :deep(.el-table) {
@@ -594,26 +666,11 @@ onMounted(async () => {
   
   .el-table__body-wrapper {
     overflow-y: auto !important;
-    max-height: calc(100vh - 250px) !important;
+    /* 使用flex布局自动计算高度 */
+    flex: 1 !important;
     /* 预留滚动条宽度空间 */
     margin-right: 0 !important;
     padding-right: 0 !important;
-  }
-  
-  /* 修复滚动条宽度问题 */
-  .el-table__body-wrapper::-webkit-scrollbar {
-    width: 8px;
-    background-color: transparent;
-  }
-  
-  .el-table__body-wrapper::-webkit-scrollbar-track {
-    background-color: #f5f5f5;
-    border-radius: 4px;
-  }
-  
-  .el-table__body-wrapper::-webkit-scrollbar-thumb {
-    background-color: #c1c1c1;
-    border-radius: 4px;
   }
   
   /* 表格主体和表头宽度一致 */
@@ -792,14 +849,15 @@ onMounted(async () => {
 /* 桌面端：使用vw单位实现2K/4K适配 */
 @media (min-width: 1025px) {
   .content-container {
-    height: calc(100vh - 4.17vw); /* 精确计算可用高度：视口高度减去顶部导航栏高度 */
-    padding: 1.25vw; /* 24px/1920 = 1.25vw */
+    height: 100% !important; /* 占满父容器高度 */
+    padding: 0 !important; /* 移除padding */
     width: 100%; /* 充满整个屏幕 */
     margin: 0;
     box-sizing: border-box;
     display: flex; /* 桌面端使用flex布局传递高度给子组件 */
     flex-direction: column;
     background-color: #ffffff;
+    overflow: hidden; /* 防止内容超出 */
   }
   
   .form-page-container {
@@ -817,17 +875,27 @@ onMounted(async () => {
   .table-container {
     border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
     margin-bottom: 0.83vw; /* 16px/1920 = 0.83vw */
-    max-height: calc(100vh - 10.42vw); /* 200px/1920 = 10.42vw */
-    width: 100%;
+    margin-left: 1.25vw; /* 24px/1920 = 1.25vw */
+    margin-right: 1.25vw;
+    width: calc(100% - 2.5vw); /* 减去左右边距 */
+    flex: 1; /* 自动占满剩余空间 */
+    display: flex;
+    flex-direction: column;
   }
   
   .table-wrapper {
     width: 100%;
+    flex: 1; /* 占满表格容器高度 */
   }
   
   .pagination-container {
     flex-shrink: 0;
     gap: 0.42vw; /* 8px/1920 = 0.42vw */
+    padding: 0 1.25vw 1.25vw 1.25vw; /* 添加padding */
+  }
+  
+  .top-actions {
+    padding: 1.25vw 1.25vw 0 1.25vw; /* 添加padding */
   }
   
   .right-actions {
@@ -871,7 +939,7 @@ onMounted(async () => {
     
     .el-table__body-wrapper {
       overflow-y: auto !important;
-      max-height: calc(100vh - 13.02vw) !important; /* 250px/1920 = 13.02vw */
+      flex: 1 !important; /* 使用flex自动计算高度 */
     }
     
     .el-table__header,
@@ -1342,99 +1410,133 @@ onMounted(async () => {
 
 /* 状态标签样式 */
 .status-tag {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1px 4px;
-  border-radius: 3px;
-  font-family: 'Source Han Sans CN', sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 22px;
+  @include flex-center;
+  padding: $spacing-extra-small $spacing-small;
+  border-radius: $border-radius-small;
+  font-size: $font-size-base;
+  font-weight: $font-weight-secondary;
   height: 22px;
   min-width: fit-content;
-  white-space: nowrap;
+  @include text-ellipsis;
+  
+  &.status-normal {
+    background: rgba($primary-color, 0.08);
+    color: $primary-color;
+  }
+  
+  &.status-disabled {
+    background: rgba($danger-color, 0.08);
+    color: $danger-color;
+  }
+  
+  &.status-paused {
+    background: rgba($warning-color, 0.08);
+    color: $warning-color;
+  }
 }
 
-.status-tag.status-normal {
-  background: rgba(0, 194, 124, 0.08);
-  color: #019C7C;
-}
-
-.status-tag.status-disabled {
-  background: #FFE5E5;
-  color: #F0142F;
-}
-
-.status-tag.status-paused {
-  background: #FFF7E6;
-  color: #FA8C16;
-}
-
-/* 操作按钮组样式 - 桌面端默认一行布局 */
+/* 操作按钮组样式 */
 .action-buttons {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 0;
+  @include flex-center-vertical;
+  gap: $spacing-small;
+  padding: $spacing-base 0;
   width: 100%;
   justify-content: flex-start;
   flex-wrap: nowrap;
   overflow: visible;
+  
+  @include mobile {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: $spacing-extra-small !important;
+    width: 100% !important;
+    max-width: 150px !important;
+    justify-content: space-between !important;
+    align-content: flex-start !important;
+    padding: $spacing-small 0 !important;
+  }
+  
+  @include mobile {
+    max-width: 130px !important;
+    gap: $spacing-extra-small / 2 !important;
+  }
 }
 
 .action-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 3px 12px;
+  @include button-base;
+  padding: $spacing-extra-small $spacing-base;
   height: 28px;
-  border-radius: 2px;
-  border: none;
-  cursor: pointer;
-  font-family: 'Source Han Sans CN', sans-serif;
-  font-weight: 500;
-  font-size: 12px;
+  border-radius: $border-radius-small;
+  font-size: $font-size-small;
+  font-weight: $font-weight-primary;
   line-height: 18px;
-  transition: all 0.2s ease;
-  white-space: nowrap;
+  @include text-ellipsis;
   flex-shrink: 0;
   min-width: fit-content;
+  
+  @include mobile {
+    flex: 0 0 calc(50% - #{$spacing-extra-small / 2}) !important;
+    width: calc(50% - #{$spacing-extra-small / 2}) !important;
+    max-width: calc(50% - #{$spacing-extra-small / 2}) !important;
+    padding: $spacing-extra-small / 2 $spacing-extra-small !important;
+    font-size: 9px !important;
+    height: 20px !important;
+    min-width: 0 !important;
+  }
+  
+  @include mobile {
+    padding: 1px 2px !important;
+    font-size: 8px !important;
+    height: 18px !important;
+    flex: 0 0 calc(50% - 1.5px) !important;
+    width: calc(50% - 1.5px) !important;
+    max-width: calc(50% - 1.5px) !important;
+  }
 }
 
-.action-btn.primary {
-  background: rgba(0, 194, 124, 0.08);
-  color: #019C7C;
-}
-
-.action-btn.primary:hover {
-  background: rgba(0, 194, 124, 0.15);
-}
-
-.action-btn.danger {
-  background: rgba(240, 20, 47, 0.08);
-  color: #F0142F;
-}
-
-.action-btn.danger:hover {
-  background: rgba(240, 20, 47, 0.15);
-}
-
-.action-btn.warning {
-  background: rgba(255, 153, 0, 0.08);
-  color: #FF9900;
-}
-
-.action-btn.warning:hover {
-  background: rgba(255, 153, 0, 0.15);
-}
-
-.action-btn.success {
-  background: rgba(0, 194, 124, 0.08);
-  color: #019C7C;
-}
-
-.action-btn.success:hover {
-  background: rgba(0, 194, 124, 0.15);
+.action-btn {
+  &.primary {
+    background: rgba($primary-color, 0.08);
+    color: $primary-color;
+    
+    @include non-touch-device {
+      &:hover {
+        background: rgba($primary-color, 0.15);
+      }
+    }
+  }
+  
+  &.danger {
+    background: rgba($danger-color, 0.08);
+    color: $danger-color;
+    
+    @include non-touch-device {
+      &:hover {
+        background: rgba($danger-color, 0.15);
+      }
+    }
+  }
+  
+  &.warning {
+    background: rgba($warning-color, 0.08);
+    color: $warning-color;
+    
+    @include non-touch-device {
+      &:hover {
+        background: rgba($warning-color, 0.15);
+      }
+    }
+  }
+  
+  &.success {
+    background: rgba($success-color, 0.08);
+    color: $success-color;
+    
+    @include non-touch-device {
+      &:hover {
+        background: rgba($success-color, 0.15);
+      }
+    }
+  }
 }
 </style>

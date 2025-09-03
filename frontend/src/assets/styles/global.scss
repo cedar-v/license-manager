@@ -1,46 +1,5 @@
-@use './variables.scss' as *;
-
-/* 响应式根字体大小设置 */
-html {
-  /* 移动端和平板保持固定16px基准 */
-  font-size: 16px;
-}
-
-/* 桌面端动态缩放 - 以1920*1080为基准 */
-@media (min-width: 1025px) {
-  html {
-    font-size: 16px; /* 1920px基准 */
-  }
-}
-
-/* 2K屏幕自适应放大33% */
-@media (min-width: 2560px) {
-  html {
-    font-size: 21.33px; /* 16px * (2560/1920) = 21.33px */
-  }
-}
-
-/* 4K屏幕自适应放大100% */
-@media (min-width: 3840px) {
-  html {
-    font-size: 32px; /* 16px * (3840/1920) = 32px */
-  }
-}
-
-/* 调试：在页面右上角显示当前根字体大小 */
-body::before {
-  content: "Font Size: " attr(data-font-size);
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 4px 8px;
-  font-size: 12px;
-  border-radius: 4px;
-  z-index: 9999;
-  pointer-events: none;
-}
+@use './variables' as *;
+@use './mixins' as *;
 
 /* 全局样式重置 */
 * {
@@ -49,18 +8,39 @@ body::before {
   box-sizing: border-box;
 }
 
-html, body {
+html {
+  font-size: 16px;
+  @include smooth-scroll;
+  
+  // 高DPI屏幕适配
+  @media (min-width: 2560px) {
+    font-size: 18px;
+  }
+  
+  @media (min-width: 3840px) {
+    font-size: 20px;
+  }
+}
+
+body {
   height: 100%;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-size: 0.875rem; /* 14px → 0.875rem，让body也使用rem */
-  color: #303133;
-  background-color: #F5F7FA;
+  font-size: $font-size-base;
+  line-height: 1.6;
+  color: $text-color-primary;
+  background-color: $background-color-base;
+  
+  @include mobile {
+    font-size: $font-size-small;
+    line-height: 1.5;
+  }
 }
 
 #app {
   height: 100%;
+  min-height: 100vh;
 }
 
 /* Element Plus 主题色自定义 */
@@ -77,31 +57,54 @@ html, body {
 }
 
 /* 工具类样式 */
+
+// 响应式容器
+.container {
+  @include responsive-container;
+}
+
 // 间距工具类
 .m-0 { margin: 0; }
-.m-1 { margin: 8px; }
-.m-2 { margin: 12px; }
-.m-3 { margin: 16px; }
-.m-4 { margin: 24px; }
-.m-5 { margin: 32px; }
+.m-1 { margin: $spacing-small; }
+.m-2 { margin: $spacing-base; }
+.m-3 { margin: $spacing-medium; }
+.m-4 { margin: $spacing-large; }
+.m-5 { margin: $spacing-extra-large; }
 
 .p-0 { padding: 0; }
-.p-1 { padding: 8px; }
-.p-2 { padding: 12px; }
-.p-3 { padding: 16px; }
-.p-4 { padding: 24px; }
-.p-5 { padding: 32px; }
+.p-1 { padding: $spacing-small; }
+.p-2 { padding: $spacing-base; }
+.p-3 { padding: $spacing-medium; }
+.p-4 { padding: $spacing-large; }
+.p-5 { padding: $spacing-extra-large; }
+
+// 响应式间距
+.m-responsive {
+  margin: $spacing-medium;
+  
+  @include mobile {
+    margin: $spacing-base;
+  }
+}
+
+.p-responsive {
+  padding: $spacing-medium;
+  
+  @include mobile {
+    padding: $spacing-base;
+  }
+}
 
 // 文本工具类
 .text-left { text-align: left; }
 .text-center { text-align: center; }
 .text-right { text-align: right; }
 
-.text-primary { color: #019C7C; }
-.text-success { color: #67C23A; }
-.text-warning { color: #E6A23C; }
-.text-danger { color: #F56C6C; }
-.text-info { color: #909399; }
+.text-primary { color: $primary-color; }
+.text-success { color: $success-color; }
+.text-warning { color: $warning-color; }
+.text-danger { color: $danger-color; }
+.text-info { color: $info-color; }
 
 // 显示工具类
 .d-none { display: none; }
@@ -111,17 +114,9 @@ html, body {
 .d-inline-block { display: inline-block; }
 
 // Flex 布局工具类
-.flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.flex-between {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+.flex-center { @include flex-center; }
+.flex-between { @include flex-between; }
+.flex-around { @include flex-around; }
 
 .flex-start {
   display: flex;
@@ -135,37 +130,15 @@ html, body {
   justify-content: flex-end;
 }
 
+
 // 文本省略
-.ellipsis {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.ellipsis-2 {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.ellipsis-3 {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+.ellipsis { @include text-ellipsis; }
+.ellipsis-2 { @include text-ellipsis-multiline(2); }
+.ellipsis-3 { @include text-ellipsis-multiline(3); }
 
 // 卡片样式
-.card {
-  background: #FFFFFF;
-  border: 1px solid #EBEEF5;
-  border-radius: 4px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-  padding: 16px;
-}
+.card { @include card-base; }
+.card-hover { @include card-clickable; }
 
 // 滚动条样式
 .scrollbar {
@@ -189,15 +162,38 @@ html, body {
   }
 }
 
-// 响应式工具类
-@media (max-width: 768px) {
+// 响应式显示工具类
+@include mobile {
   .hide-mobile { display: none !important; }
   .show-mobile { display: block !important; }
+  .show-mobile-flex { display: flex !important; }
+  .show-mobile-inline { display: inline !important; }
 }
 
-@media (min-width: 769px) {
+@include mobile-up {
   .hide-desktop { display: none !important; }
   .show-desktop { display: block !important; }
+  .show-desktop-flex { display: flex !important; }
+  .show-desktop-inline { display: inline !important; }
+}
+
+@include tablet {
+  .hide-tablet { display: none !important; }
+  .show-tablet { display: block !important; }
+}
+
+
+// 响应式文字大小
+.text-responsive {
+  font-size: $font-size-base;
+  
+  @include mobile {
+    font-size: $font-size-small;
+  }
+  
+  @include desktop-up {
+    font-size: $font-size-medium;
+  }
 }
 
 // 动画过渡

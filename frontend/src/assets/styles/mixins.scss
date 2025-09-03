@@ -1,0 +1,454 @@
+// 导入断点变量和颜色函数
+@use './variables' as *;
+@use 'sass:color';
+
+// ====================
+// 响应式混入
+// ====================
+
+// 移动端 (< 768px)
+@mixin mobile {
+  @media (max-width: #{$breakpoint-mobile - 1px}) {
+    @content;
+  }
+}
+
+// 移动端及以上 (>= 768px)
+@mixin mobile-up {
+  @media (min-width: #{$breakpoint-mobile}) {
+    @content;
+  }
+}
+
+// 平板端 (768px - 991px)
+@mixin tablet {
+  @media (min-width: #{$breakpoint-mobile}) and (max-width: #{$breakpoint-tablet - 1px}) {
+    @content;
+  }
+}
+
+// 平板端及以上 (>= 992px)
+@mixin tablet-up {
+  @media (min-width: #{$breakpoint-tablet}) {
+    @content;
+  }
+}
+
+// 桌面端 (992px - 1199px)
+@mixin desktop {
+  @media (min-width: #{$breakpoint-tablet}) and (max-width: #{$breakpoint-desktop - 1px}) {
+    @content;
+  }
+}
+
+// 桌面端及以上 (>= 1200px)
+@mixin desktop-up {
+  @media (min-width: #{$breakpoint-desktop}) {
+    @content;
+  }
+}
+
+// 大屏 (>= 1920px)
+@mixin wide {
+  @media (min-width: #{$breakpoint-wide}) {
+    @content;
+  }
+}
+
+
+// 横屏 
+@mixin landscape {
+  @media (orientation: landscape) {
+    @content;
+  }
+}
+
+// 竖屏
+@mixin portrait {
+  @media (orientation: portrait) {
+    @content;
+  }
+}
+
+// 触摸设备
+@mixin touch-device {
+  @media (hover: none) and (pointer: coarse) {
+    @content;
+  }
+}
+
+// 非触摸设备
+@mixin non-touch-device {
+  @media (hover: hover) and (pointer: fine) {
+    @content;
+  }
+}
+
+// ====================
+// 布局混入
+// ====================
+
+// Flex 居中
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// Flex 垂直居中
+@mixin flex-center-vertical {
+  display: flex;
+  align-items: center;
+}
+
+// Flex 水平居中
+@mixin flex-center-horizontal {
+  display: flex;
+  justify-content: center;
+}
+
+// Flex 右对齐
+@mixin flex-end {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+// Flex 间距分布
+@mixin flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+// Flex 环绕分布
+@mixin flex-around {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+// 响应式flex方向
+@mixin flex-responsive {
+  display: flex;
+  gap: $spacing-medium;
+  
+  @include mobile {
+    flex-direction: column;
+    gap: $spacing-base;
+  }
+}
+
+// 响应式网格容器
+@mixin responsive-container($max-width: $breakpoint-desktop) {
+  width: 100%;
+  max-width: $max-width;
+  margin: 0 auto;
+  padding: 0 $spacing-medium;
+  
+  @include mobile {
+    padding: 0 $spacing-base;
+  }
+}
+
+// ====================
+// 文本混入
+// ====================
+
+// 单行文本省略
+@mixin text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// 多行文本省略
+@mixin text-ellipsis-multiline($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// 文本不可选择
+@mixin no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+// ====================
+// 视觉效果混入
+// ====================
+
+// 清除浮动
+@mixin clearfix {
+  &::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+// 圆形头像
+@mixin avatar($size: 40px) {
+  width: $size;
+  height: $size;
+  border-radius: 50%;
+  overflow: hidden;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+// 悬浮效果
+@mixin hover-effect {
+  transition: all 0.3s ease;
+  
+  @include non-touch-device {
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: $box-shadow-light;
+    }
+  }
+  
+  // 触摸设备上的点击效果
+  @include touch-device {
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+}
+
+// 加载动画
+@mixin loading-animation {
+  &::after {
+    content: "";
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// ====================
+// 表单混入
+// ====================
+
+// 表单标签样式
+@mixin form-label {
+  display: block;
+  font-size: $font-size-base;
+  font-weight: $font-weight-primary;
+  color: $text-color-primary;
+  margin-bottom: $spacing-small;
+  
+  @include mobile {
+    font-size: $font-size-small;
+  }
+}
+
+// 输入框样式
+@mixin input-style {
+  width: 100%;
+  padding: $spacing-base $spacing-medium;
+  border: 1px solid $border-color-base;
+  border-radius: $border-radius-base;
+  font-size: $font-size-base;
+  transition: border-color 0.3s ease;
+  
+  &:focus {
+    border-color: $primary-color;
+    outline: none;
+  }
+  
+  @include mobile {
+    padding: $spacing-base;
+    font-size: $font-size-small;
+    
+    // 移动端输入框优化
+    min-height: 44px; // 保证触摸目标大小
+  }
+}
+
+// ====================
+// 按钮混入
+// ====================
+
+// 基础按钮样式
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-base $spacing-medium;
+  border: none;
+  border-radius: $border-radius-base;
+  font-size: $font-size-base;
+  font-weight: $font-weight-primary;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  
+  // 移动端优化
+  @include mobile {
+    min-height: 44px;
+    min-width: 44px;
+    padding: $spacing-base $spacing-large;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// 主要按钮样式
+@mixin button-primary {
+  @include button-base;
+  background-color: $primary-color;
+  color: white;
+  
+  @include non-touch-device {
+    &:hover:not(:disabled) {
+      background-color: color.adjust($primary-color, $lightness: 10%);
+    }
+  }
+  
+  &:active:not(:disabled) {
+    background-color: color.adjust($primary-color, $lightness: -5%);
+  }
+}
+
+// ====================
+// 卡片混入
+// ====================
+
+// 基础卡片样式
+@mixin card-base {
+  background-color: $background-color-white;
+  border: 1px solid $border-color-base;
+  border-radius: $border-radius-base;
+  box-shadow: $box-shadow-base;
+  padding: $spacing-large;
+  
+  @include mobile {
+    padding: $spacing-medium;
+    border-radius: $border-radius-small;
+  }
+}
+
+// 可点击卡片
+@mixin card-clickable {
+  @include card-base;
+  @include hover-effect;
+  
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+// ====================
+// 表格响应式混入
+// ====================
+
+// 表格响应式容器
+@mixin table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  
+  table {
+    min-width: 600px;
+    
+    @include mobile {
+      font-size: $font-size-small;
+      
+      th, td {
+        padding: $spacing-small;
+      }
+    }
+  }
+}
+
+// 表格卡片化（移动端）
+@mixin table-cards {
+  @include mobile {
+    .el-table {
+      display: block;
+      
+      .el-table__header-wrapper,
+      .el-table__fixed-header-wrapper {
+        display: none;
+      }
+      
+      .el-table__body-wrapper {
+        display: block;
+        
+        .el-table__body {
+          display: block;
+          
+          .el-table__row {
+            display: block;
+            border: 1px solid $border-color-light;
+            border-radius: $border-radius-base;
+            margin-bottom: $spacing-medium;
+            padding: $spacing-medium;
+            background: white;
+            
+            .el-table__cell {
+              display: block;
+              border: none;
+              padding: $spacing-small 0;
+              
+              &::before {
+                content: attr(data-label) ": ";
+                font-weight: bold;
+                display: inline-block;
+                width: 100px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// ====================
+// 实用混入
+// ====================
+
+// 绝对定位居中
+@mixin absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+// 全屏覆盖
+@mixin full-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: $z-index-dialog;
+}
+
+// iOS 滚动优化
+@mixin smooth-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}

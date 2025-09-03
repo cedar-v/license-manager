@@ -4,7 +4,7 @@
     <div 
       v-if="appStore.isMobile && !appStore.sidebarCollapsed" 
       class="layout-overlay"
-      @click="appStore.setSidebarCollapsed(true)"
+      @click="handleMobileOverlay"
     ></div>
     
     <!-- 侧边栏 -->
@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from 'vue'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/store/modules/app'
@@ -105,88 +105,68 @@ const mainClasses = computed(() => ({
   'layout-main--sidebar-collapsed': appStore.sidebarCollapsed
 }))
 
-// 响应式设备检测 - 简化版本
-const checkResponsive = () => {
-  const width = window.innerWidth
-  const isMobile = width <= 768      // 768px 及以下为移动端
-  const isTablet = width > 768 && width <= 1024  // 769-1024px 为平板
-  const isDesktop = width > 1024  // 1025px+ 桌面端（包含2K、4K）
-  
-  appStore.setMobile(isMobile)
-  
-  // 移动端和小平板自动折叠侧边栏
-  if (isMobile || isTablet) {
+// 移动端自动关闭侧边栏
+const handleMobileOverlay = () => {
+  if (appStore.isMobile) {
     appStore.setSidebarCollapsed(true)
-  } else if (isDesktop) {
-    // 桌面端默认展开侧边栏（rem会自动缩放）
-    appStore.setSidebarCollapsed(false)
-  }
-  
-  // 调试信息：显示当前根字体大小
-  if (isDesktop) {
-    const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize)
-    console.log(`桌面屏幕: ${width}px, 根字体: ${rootFontSize}px`)
-    
-    // 更新页面调试信息
-    document.body.setAttribute('data-font-size', `${rootFontSize}px (${width}px)`)
-    
-    // 额外调试：检测屏幕类型
-    if (width >= 3840) {
-      console.log('🖥️ 4K屏幕检测')
-    } else if (width >= 2560) {
-      console.log('🖥️ 2K屏幕检测')
-    } else {
-      console.log('🖥️ 1080p屏幕检测')
-    }
   }
 }
-
-// 生命周期
-onMounted(() => {
-  checkResponsive()
-  window.addEventListener('resize', checkResponsive)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', checkResponsive)
-})
 </script>
 
 <style lang="scss" scoped>
+// Variables and mixins are auto-injected via Vite configuration
+
 .app-layout {
   position: relative;
   width: 100vw;
   height: 100vh;
-  background: #F5F7FA;
+  background: $background-color-base;
   overflow: hidden;
-  
+  display: flex;
 }
 
 // 遮罩层
 .layout-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  @include full-overlay;
   background: rgba(0, 0, 0, 0.5);
   z-index: 1998;
   backdrop-filter: blur(2px);
 }
 
-// 主内容区域 - 桌面端使用vw单位适配2K/4K
+// 主内容区域
 .layout-main {
-  margin-left: 14.58vw; /* 280px/1920 = 14.58vw */
+  margin-left: 280px;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
+  transition: margin-left 0.3s ease;
+  flex: 1;
+  min-width: 0; // 防止 flex 溢出
   
   &--sidebar-collapsed {
-    margin-left: 3.33vw; /* 64px/1920 = 3.33vw */
+    margin-left: 64px;
   }
   
   &--mobile {
+    margin-left: 0;
+  }
+  
+  // 桌面端响应式
+  @include desktop-up {
+    margin-left: 280px;
+    
+    &--sidebar-collapsed {
+      margin-left: 64px;
+    }
+  }
+  
+  // 平板端
+  @include tablet {
+    margin-left: 64px;
+  }
+  
+  // 移动端
+  @include mobile {
     margin-left: 0;
   }
 }
@@ -194,17 +174,28 @@ onUnmounted(() => {
 // 页面内容
 .layout-content {
   flex: 1;
-  padding-top: 4.17vw; /* 80px/1920 = 4.17vw */
-  overflow-y: auto;
+  padding: $spacing-large;
+  padding-top: calc($spacing-large + 80px); // 为固定导航栏预留空间
+  overflow: auto; 
   position: relative;
+  min-height: 0; // 防止 flex 溢出
+  display: flex; // 添加flex布局传递给子组件
+  flex-direction: column;
   
-  /* 滚动条样式 */
+  // 移动端优化
+  @include mobile {
+    padding: $spacing-medium;
+    padding-top: calc($spacing-medium + 80px); // 移动端也要为导航栏预留空间
+  }
+  
+  
+  // 滚动条样式
   &::-webkit-scrollbar {
     width: 6px;
   }
   
   &::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: $background-color-base;
     border-radius: 3px;
   }
   
@@ -212,53 +203,36 @@ onUnmounted(() => {
     background: rgba(0, 0, 0, 0.2);
     border-radius: 3px;
     
-    &:hover {
-      background: rgba(0, 0, 0, 0.3);
+    @include non-touch-device {
+      &:hover {
+        background: rgba(0, 0, 0, 0.3);
+      }
     }
   }
 }
 
-
-// 响应式设计 - 统一断点系统
-// 平板以下：768px 及以下为移动端，使用固定px单位
-@media (max-width: 1024px) {
-  .layout-main {
-    margin-left: 0; /* 移动端和平板从左边缘开始 */
-  }
-  
-  .layout-content {
-    padding-top: 80px; /* 移动端使用固定高度 */
-  }
-  
-  /* 移动端继承基础样式的min-height设置 */
-}
-
-
-/* 平板：769px - 1024px 之间 */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .layout-main {
-    margin-left: 64px; /* 平板显示折叠侧边栏 */
-  }
-}
-
-/* 桌面端：使用vw单位统一适配2K/4K，使用flex布局充满高度 */
-@media (min-width: 1025px) {
-  .layout-main {
-    margin-left: 14.58vw; /* 280px/1920 = 14.58vw */
-    
-    &--sidebar-collapsed {
-      margin-left: 3.33vw; /* 64px/1920 = 3.33vw */
+// 响应式布局类
+.app-layout {
+  &--mobile {
+    .layout-main {
+      margin-left: 0;
     }
   }
   
-  .layout-content {
-    padding-top: 4.17vw; /* 80px/1920 = 4.17vw */
+  &--sidebar-collapsed {
+    .layout-main {
+      margin-left: 64px;
+      
+      @include mobile {
+        margin-left: 0;
+      }
+    }
   }
-  
 }
 
 // 动画效果
-.app-layout * {
+.layout-main,
+.layout-overlay {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -269,29 +243,31 @@ onUnmounted(() => {
   }
   
   .layout-main {
-    margin-left: 0;
+    margin-left: 0 !important;
   }
   
   .layout-content {
-    padding-top: 0;
+    padding: 0;
     overflow: visible;
   }
 }
 
-// 高对比度模式支持
+// 无障碍访问
 @media (prefers-contrast: high) {
   .app-layout {
     background: white;
+  }
+  
+  .layout-overlay {
+    background: rgba(0, 0, 0, 0.8);
   }
 }
 
 // 减少动画模式
 @media (prefers-reduced-motion: reduce) {
-  .app-layout *,
   .layout-main,
   .layout-overlay {
     transition: none !important;
-    animation: none !important;
   }
 }
 </style>

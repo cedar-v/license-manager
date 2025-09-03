@@ -112,7 +112,7 @@ Axios.interceptors.response.use(response => {
     
     // 处理HTTP 401状态码
     if (status === 401) {
-      redirectToLogin()
+      redirectToLogin();
       (error as any).backendMessage = data.message || "未授权访问"
       return Promise.reject(error)
     }

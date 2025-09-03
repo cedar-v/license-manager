@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-20 16:00:00
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-08-21 17:16:11
+ * @LastEditTime: 2025-09-03 11:41:35
  * @FilePath: /frontend/src/views/Customers/CustomerView.vue
  * @Description: 客户查看组件
 -->
@@ -351,7 +351,7 @@ onMounted(() => {
 .info-card {
   background: #fff;
   border-radius: 4px;
-  padding: 20px;
+  padding: 15px;
 }
 
 .basic-info {
