@@ -65,13 +65,6 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       hmr: {
         overlay: true
       },
-      // 代理配置 (已直接配置 API 基础地址，不需要代理)
-      // proxy: { 
-      //   "/": {
-      //     target: "http://104.156.140.42:18888/", 
-      //     changeOrigin: true, 
-      //   },
-      // }
     },
 
     // 依赖优化配置
