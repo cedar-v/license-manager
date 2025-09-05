@@ -3,6 +3,7 @@ import viteCompression from 'vite-plugin-compression'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
 import { visualizer } from 'rollup-plugin-visualizer' // 打包分析插件
+import { constants } from 'zlib' // 静态引入zlib常量
 
 // 获取当前时间戳，用于构建输出的文件名
 const Timestamp = new Date().getTime();
@@ -63,7 +64,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         ext: '.br',
         compressionOptions: {
           params: {
-            [require('zlib').constants.BROTLI_PARAM_QUALITY]: 11, // 最高质量
+            [constants.BROTLI_PARAM_QUALITY]: 11, // 最高质量
           }
         }
       }),
