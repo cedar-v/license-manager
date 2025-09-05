@@ -58,6 +58,28 @@ jobs:
         echo "Build completed, checking production directory:"
         ls -la production/
 
+    # 预处理部署目录权限
+    - name: Prepare deployment directory
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST_PI }}
+        username: pi
+        password: ${{ secrets.PASS_PI }}
+        port: 22
+        script: |
+          echo "Preparing deployment directory..."
+          
+          # 停止nginx避免文件占用
+          sudo nginx -s quit 2>/dev/null || true
+          
+          # 清理旧文件并重建目录结构
+          sudo rm -rf /home/pi/lm-www/frontend
+          sudo mkdir -p /home/pi/lm-www/frontend
+          
+          # 设置正确的目录权限供文件传输
+          sudo chown -R pi:pi /home/pi/lm-www/frontend
+          sudo chmod -R 755 /home/pi/lm-www/frontend
+
     # 将构建产物传输到服务器
     - name: Copy build files to server
       uses: appleboy/scp-action@v0.1.7
@@ -68,9 +90,10 @@ jobs:
         port: 22
         source: "frontend/production/*"
         target: "/home/pi/lm-www/"
+        overwrite: true
 
-    # 一次性完成部署和配置
-    - name: Deploy and configure server
+    # 完成部署配置
+    - name: Finalize deployment
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.HOST_PI }}
@@ -78,30 +101,25 @@ jobs:
         password: ${{ secrets.PASS_PI }}
         port: 22
         script: |
-          echo "Starting deployment configuration..."
+          echo "Finalizing deployment..."
           
-          # 设置目录权限
-          echo "Setting directory permissions..."
-          sudo chown -R pi:www-data /home/pi/lm-www/frontend
-          sudo chmod -R 775 /home/pi/lm-www/frontend
-          
-          # 等待文件传输完成后设置最终权限
-          echo "Setting final permissions..."
+          # 设置Web服务器权限
           sudo chown -R www-data:www-data /home/pi/lm-www/frontend/
-          sudo chmod -R 755 /home/pi/lm-www/frontend/
+          sudo chmod -R 644 /home/pi/lm-www/frontend/
+          sudo find /home/pi/lm-www/frontend/ -type d -exec chmod 755 {} \;
           
-          # 检查nginx配置并重载
-          echo "Testing and reloading nginx..."
+          # 启动nginx并验证
+          echo "Starting nginx..."
           if sudo nginx -t; then
-            sudo nginx -s reload
-            echo "Nginx reloaded successfully"
+            sudo systemctl start nginx
+            sudo systemctl reload nginx
             
-            # 验证nginx状态
             if sudo systemctl is-active --quiet nginx; then
               echo "✅ Frontend deployment completed successfully!"
             else
-              echo "⚠️  Warning: Nginx service may have issues"
+              echo "❌ Nginx failed to start"
               sudo systemctl status nginx --no-pager -l
+              exit 1
             fi
           else
             echo "❌ Nginx configuration test failed!"
