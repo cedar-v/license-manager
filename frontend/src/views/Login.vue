@@ -20,7 +20,7 @@
 
     <!-- 语言切换器 -->
     <div class="language-switcher">
-      <el-select v-model="currentLanguage" @change="handleLanguageChange" size="default" popper-class="language-popper">
+      <el-select v-model="currentLanguage" @change="handleLanguageChange" size="default">
         <el-option label="English" value="en" />
         <el-option label="中文" value="zh" />
         <el-option label="日本語" value="ja" />
@@ -562,29 +562,6 @@ async function handleLogin() {
   }
 }
 
-/* Element Plus 组件样式自定义 */
-:global(.language-popper) {
-  border-radius: $border-radius-base;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  
-  .el-select-dropdown__item {
-    font-size: $font-size-base;
-    padding: $spacing-small $spacing-medium;
-    
-    @include non-touch-device {
-      &:hover {
-        background-color: rgba($primary-color, 0.1);
-        color: $primary-color;
-      }
-    }
-    
-    &.selected {
-      background-color: $primary-color;
-      color: white;
-    }
-  }
-}
-
 /* Element Plus checkbox 自定义样式 */
 .login-form :deep(.el-checkbox__input.is-checked + .el-checkbox__label) {
   color: $primary-color;
@@ -595,5 +572,36 @@ async function handleLogin() {
   font-size: $font-size-base;
   line-height: 1;
   padding-left: $spacing-small;
+}
+
+/* 覆盖语言切换器背景色 - 使用深度选择器 */
+.language-switcher :deep(.el-select-dropdown) {
+  background-color: white !important;
+}
+
+.language-switcher :deep(.el-popper) {
+  background-color: white !important;
+}
+
+/* 更具体的选择器 */
+:global(body) {
+  .el-select-dropdown {
+    background-color: white !important;
+  }
+  
+  .el-popper {
+    background-color: white !important;
+  }
+  
+  [class*="el-popper-container"] {
+    background-color: white !important;
+  }
+}
+:global([class*="el-popper-container"] .language-popper) {
+  background-color: white !important;
+}
+
+:global(.language-popper) {
+  background-color: white !important;
 }
 </style>
