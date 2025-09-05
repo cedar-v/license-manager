@@ -28,27 +28,35 @@ jobs:
         cache: 'npm'
         cache-dependency-path: frontend/package-lock.json
 
-    # 安装依赖并构建
-    - name: Install dependencies and build
+    # 缓存node_modules和构建输出
+    - name: Cache dependencies and build
+      uses: actions/cache@v4
+      with:
+        path: |
+          frontend/node_modules
+          frontend/production
+        key: ${{ runner.os }}-frontend-${{ hashFiles('frontend/package-lock.json', 'frontend/src/**/*', 'frontend/vite.config.ts') }}
+        restore-keys: |
+          ${{ runner.os }}-frontend-${{ hashFiles('frontend/package-lock.json') }}
+          ${{ runner.os }}-frontend-
+
+    # 安装依赖
+    - name: Install dependencies
       run: |
         cd frontend
         npm ci
-        npm run build:prod
+
+    # 并行执行类型检查和构建
+    - name: Type check and build
+      run: |
+        cd frontend
+        # 并行执行类型检查和构建以节省时间
+        npm run type-check &
+        npm run build:prod &
+        wait
         # 检查构建结果
         echo "Build completed, checking production directory:"
         ls -la production/
-
-    # 设置目录权限以允许写入
-    - name: Set directory permissions
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.HOST_PI }}
-        username: pi
-        password: ${{ secrets.PASS_PI }}
-        port: 22
-        script: |
-          sudo chown -R pi:www-data /home/pi/lm-www/frontend
-          sudo chmod -R 775 /home/pi/lm-www/frontend
 
     # 将构建产物传输到服务器
     - name: Copy build files to server
@@ -61,8 +69,8 @@ jobs:
         source: "frontend/production/*"
         target: "/home/pi/lm-www/"
 
-    # 设置文件权限并重载nginx配置
-    - name: Set permissions and reload nginx
+    # 一次性完成部署和配置
+    - name: Deploy and configure server
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.HOST_PI }}
@@ -70,21 +78,32 @@ jobs:
         password: ${{ secrets.PASS_PI }}
         port: 22
         script: |
-          # 设置正确的文件权限
-          echo "Setting correct file permissions..."
+          echo "Starting deployment configuration..."
+          
+          # 设置目录权限
+          echo "Setting directory permissions..."
+          sudo chown -R pi:www-data /home/pi/lm-www/frontend
+          sudo chmod -R 775 /home/pi/lm-www/frontend
+          
+          # 等待文件传输完成后设置最终权限
+          echo "Setting final permissions..."
           sudo chown -R www-data:www-data /home/pi/lm-www/frontend/
           sudo chmod -R 755 /home/pi/lm-www/frontend/
           
-          # 检查nginx配置文件语法
-          echo "Checking nginx configuration..."
-          sudo nginx -t
-          
-          # 重载nginx配置
-          echo "Reloading nginx..."
-          sudo nginx -s reload
-          
-          # 检查nginx状态
-          echo "Checking nginx status..."
-          sudo systemctl status nginx --no-pager -l
-          
-          echo "Frontend deployment completed successfully!"
+          # 检查nginx配置并重载
+          echo "Testing and reloading nginx..."
+          if sudo nginx -t; then
+            sudo nginx -s reload
+            echo "Nginx reloaded successfully"
+            
+            # 验证nginx状态
+            if sudo systemctl is-active --quiet nginx; then
+              echo "✅ Frontend deployment completed successfully!"
+            else
+              echo "⚠️  Warning: Nginx service may have issues"
+              sudo systemctl status nginx --no-pager -l
+            fi
+          else
+            echo "❌ Nginx configuration test failed!"
+            exit 1
+          fi
