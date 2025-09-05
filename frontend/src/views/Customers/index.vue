@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-12 00:00:00
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-09-03 11:29:37
+ * @LastEditTime: 2025-09-05 13:10:42
  * @FilePath: /frontend/src/views/Customers/index.vue
  * @Description: 客户管理页面  
 -->
@@ -475,6 +475,7 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 // Variables and mixins are auto-injected via Vite configuration
+@use 'sass:math';
 
 .content-container {
   // 所有CSS声明放在@include之前
@@ -486,12 +487,8 @@ onMounted(async () => {
   flex-direction: column;
   overflow: hidden; // 防止内容超出
   box-sizing: border-box;
-  
-  @include responsive-container;
-  
-  @include mobile {
-    padding: $spacing-medium;
-  }
+  width: 100%;
+  margin: 0 auto;
   
   @include mobile {
     padding: $spacing-base;
@@ -499,7 +496,6 @@ onMounted(async () => {
 }
 
 .form-page-container {
-  @include responsive-container;
   max-width: none !important; 
   min-height: calc(100vh - 80px);
   padding: $spacing-large;
@@ -507,12 +503,13 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   
-  @include mobile {
-    padding: $spacing-medium;
-  }
+  width: 100%;
+  max-width: $breakpoint-desktop;
+  margin: 0 auto;
+  padding: 0 $spacing-medium;
   
   @include mobile {
-    padding: $spacing-base;
+    padding: 0 $spacing-base;
   }
 }
 
@@ -642,7 +639,6 @@ onMounted(async () => {
 .table-wrapper {
   width: 100%;
   height: 100%; // 占满表格容器高度
-  overflow-x: auto;
   position: relative;
   @include smooth-scroll;
   
@@ -1458,7 +1454,7 @@ onMounted(async () => {
   
   @include mobile {
     max-width: 130px !important;
-    gap: $spacing-extra-small / 2 !important;
+    gap: math.div($spacing-extra-small, 2) !important;
   }
 }
 
@@ -1475,10 +1471,10 @@ onMounted(async () => {
   min-width: fit-content;
   
   @include mobile {
-    flex: 0 0 calc(50% - #{$spacing-extra-small / 2}) !important;
-    width: calc(50% - #{$spacing-extra-small / 2}) !important;
-    max-width: calc(50% - #{$spacing-extra-small / 2}) !important;
-    padding: $spacing-extra-small / 2 $spacing-extra-small !important;
+    flex: 0 0 calc(50% - #{math.div($spacing-extra-small, 2)}) !important;
+    width: calc(50% - #{math.div($spacing-extra-small, 2)}) !important;
+    max-width: calc(50% - #{math.div($spacing-extra-small, 2)}) !important;
+    padding: math.div($spacing-extra-small, 2) $spacing-extra-small !important;
     font-size: 9px !important;
     height: 20px !important;
     min-width: 0 !important;

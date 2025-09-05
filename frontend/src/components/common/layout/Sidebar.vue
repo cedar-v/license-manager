@@ -212,8 +212,9 @@ const handleNavClick = (item: NavItem, event: Event) => {
   border-radius: $border-radius-base;
   color: $text-color-secondary;
   
-  @include button-base;
   box-shadow: $box-shadow-base;
+  
+  @include button-base;
   
   @include non-touch-device {
     &:hover {

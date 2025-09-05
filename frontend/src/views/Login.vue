@@ -244,9 +244,6 @@ async function handleLogin() {
     top: $spacing-medium;
     left: $spacing-medium;
     z-index: 300;
-  }
-  
-  @include mobile {
     transform: scale(0.8);
     transform-origin: left top;
   }
@@ -307,12 +304,8 @@ async function handleLogin() {
     background: rgba($background-color-white, 0.95);
     backdrop-filter: blur(20px);
     position: relative;
-    padding: $spacing-medium;
-    min-height: 100vh;
-  }
-  
-  @include mobile {
     padding: $spacing-medium $spacing-small;
+    min-height: 100vh;
   }
 }
 
@@ -322,20 +315,12 @@ async function handleLogin() {
   margin: 0 auto;
   
   @include mobile {
-    max-width: 90vw;
-  }
-  
-  @include mobile {
     max-width: 100%;
   }
 }
 
 .login-card {
   padding: $spacing-large;
-  
-  @include mobile {
-    padding: $spacing-medium;
-  }
   
   @include mobile {
     padding: $spacing-base;
@@ -350,11 +335,6 @@ async function handleLogin() {
   line-height: 1.2;
   color: $text-color-primary;
   text-align: center;
-  
-  @include mobile {
-    font-size: 24px;
-    margin-bottom: $spacing-base;
-  }
   
   @include mobile {
     font-size: 20px;
@@ -373,10 +353,6 @@ async function handleLogin() {
   
   @include mobile {
     font-size: $font-size-base;
-    margin-bottom: $spacing-medium;
-  }
-  
-  @include mobile {
     margin-bottom: $spacing-base;
   }
 }
@@ -387,13 +363,14 @@ async function handleLogin() {
 }
 
 .login-input :deep(.el-input__wrapper) {
-  @include input-style;
   height: 55px;
   border-radius: 10px;
   background-color: $background-color-white;
   box-shadow: none;
   transition: all 0.3s ease;
   padding: 0 $spacing-base;
+  
+  @include input-style;
   
   @include mobile {
     height: 48px;
@@ -499,9 +476,6 @@ async function handleLogin() {
     top: $spacing-medium;
     right: $spacing-medium;
     z-index: 300;
-  }
-  
-  @include mobile {
     transform: scale(0.8);
     transform-origin: right top;
   }

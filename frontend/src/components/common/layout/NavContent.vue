@@ -472,9 +472,10 @@ const handleUserClick = () => {
   .nav-content {
     left: 280px; /* 桌面端默认侧边栏展开状态 */
     
-    &--sidebar-collapsed {
-      left: 64px !important; /* 侧边栏收起状态，使用!important确保生效 */
-    }
+  }
+  
+  .nav-content--sidebar-collapsed {
+    left: 64px !important; /* 侧边栏收起状态，使用!important确保生效 */
   }
 }
 </style>

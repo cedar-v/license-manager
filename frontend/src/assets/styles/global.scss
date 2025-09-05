@@ -60,7 +60,14 @@ body {
 
 // 响应式容器
 .container {
-  @include responsive-container;
+  width: 100%;
+  max-width: $breakpoint-desktop;
+  margin: 0 auto;
+  padding: 0 $spacing-medium;
+  
+  @include mobile {
+    padding: 0 $spacing-base;
+  }
 }
 
 // 间距工具类
@@ -138,7 +145,12 @@ body {
 
 // 卡片样式
 .card { @include card-base; }
-.card-hover { @include card-clickable; }
+.card-hover { 
+  cursor: pointer;
+  
+  @include card-base;
+  @include hover-effect;
+}
 
 // 滚动条样式
 .scrollbar {
