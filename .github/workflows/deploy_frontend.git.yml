@@ -38,6 +38,18 @@ jobs:
         echo "Build completed, checking production directory:"
         ls -la production/
 
+    # 设置目录权限以允许写入
+    - name: Set directory permissions
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST_PI }}
+        username: pi
+        password: ${{ secrets.PASS_PI }}
+        port: 22
+        script: |
+          sudo chown -R pi:www-data /home/pi/lm-www/frontend
+          sudo chmod -R 775 /home/pi/lm-www/frontend
+
     # 将构建产物传输到服务器
     - name: Copy build files to server
       uses: appleboy/scp-action@v0.1.7
