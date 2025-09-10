@@ -36,9 +36,10 @@ func SetupRouter() *gin.Engine {
 	// 初始化数据访问层
 	db := database.GetDB()
 	customerRepo := repository.NewCustomerRepository(db)
+	userRepo := repository.NewUserRepository(db)
 
 	// 初始化服务层
-	authService := service.NewAuthService()
+	authService := service.NewAuthService(userRepo)
 	systemService := service.NewSystemService()
 	customerService := service.NewCustomerService(customerRepo)
 	enumService := service.NewEnumService()

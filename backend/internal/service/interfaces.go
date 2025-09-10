@@ -7,7 +7,7 @@ import (
 
 // AuthService 认证服务接口
 type AuthService interface {
-	Login(req *models.LoginRequest) (*models.LoginData, error)
+	Login(ctx context.Context, req *models.LoginRequest, clientIP string) (*models.LoginData, error)
 	RefreshToken(token string) (string, error)
 	ValidateToken(token string) error
 }

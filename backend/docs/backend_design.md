@@ -19,52 +19,88 @@
 ```
 backend/
 ├── cmd/
-│   └── server/
-│       └── main.go              # 程序入口
+│   ├── main.go                  # 程序入口
+│   └── license_manager.sh       # 启动脚本
 ├── internal/
 │   ├── api/
 │   │   ├── handlers/            # HTTP处理器
-│   │   │   ├── auth.go
-│   │   │   ├── customer.go
-│   │   │   ├── license.go
-│   │   │   └── system.go
+│   │   │   ├── auth_handler.go
+│   │   │   ├── customer_handler.go
+│   │   │   ├── enum_handler.go
+│   │   │   └── system_handler.go
 │   │   ├── middleware/          # 中间件
 │   │   │   ├── auth.go
 │   │   │   ├── cors.go
+│   │   │   ├── i18n.go
 │   │   │   └── logging.go
 │   │   └── routes/              # 路由定义
 │   │       └── router.go
 │   ├── service/                 # 业务逻辑层
 │   │   ├── auth_service.go
 │   │   ├── customer_service.go
-│   │   ├── license_service.go
+│   │   ├── enum_service.go
+│   │   ├── system_service.go
 │   │   └── interfaces.go        # 接口定义
 │   ├── repository/              # 数据访问层
-│   │   ├── customer_repo.go
-│   │   ├── license_repo.go
+│   │   ├── customer_repository.go
+│   │   ├── errors.go
 │   │   └── interfaces.go
 │   ├── models/                  # 数据模型
+│   │   ├── auth.go
 │   │   ├── customer.go
-│   │   ├── license.go
+│   │   ├── system.go
 │   │   └── common.go
 │   ├── config/                  # 配置管理
 │   │   └── config.go
-│   └── cache/                   # 缓存层
-│       ├── memory.go
-│       └── redis.go
+│   └── database/                # 数据库连接和迁移
+│       ├── connection.go
+│       └── migration.go
 ├── pkg/
+│   ├── context/                 # 上下文封装
+│   │   └── context.go
+│   ├── i18n/                    # 国际化
+│   │   ├── errors.go
+│   │   └── manager.go
 │   ├── utils/                   # 工具函数
 │   │   ├── crypto.go
-│   │   ├── hardware.go
-│   │   └── validator.go
+│   │   └── jwt.go
 │   └── logger/                  # 日志封装
 │       └── logger.go
 ├── configs/
-│   ├── config.yaml
-│   └── config.example.yaml
+│   ├── config.dev.yaml          # 开发环境配置
+│   ├── config.prod.yaml         # 生产环境配置
+│   ├── config.yaml              # 默认配置
+│   ├── config.example.yaml      # 配置示例
+│   └── i18n/                    # 国际化配置
+│       └── errors/
+│           ├── en-US.yaml
+│           ├── ja-JP.yaml
+│           └── zh-CN.yaml
+├── docs/                        # 文档目录
+│   ├── api_development_guide.md
+│   ├── backend_design.md
+│   ├── design_philosophy.md
+│   ├── error_i18n_design.md
+│   ├── install/
+│   │   ├── db_install.md
+│   │   └── swagger_install.md
+│   ├── modules_design/
+│   │   ├── customer-api.md
+│   │   ├── customer.md
+│   │   ├── login&auth.md
+│   │   ├── user_story.md
+│   │   ├── 产品原型设计方案.md
+│   │   └── 授权模块属性设计.md
+│   └── swagger/                 # Swagger文档
+│       ├── docs.go
+│       ├── swagger.json
+│       └── swagger.yaml
 ├── migrations/                  # 数据库迁移
-├── tools/                       # 硬件信息工具
-└── go.mod
+│   ├── 001_create_customers_table.sql
+│   ├── 002_insert_sample_data.sql
+│   └── README.md
+├── go.mod
+└── go.sum
 ```
 
 **核心设计原则：**
