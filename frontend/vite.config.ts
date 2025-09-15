@@ -3,6 +3,7 @@ import viteCompression from 'vite-plugin-compression'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
 import { visualizer } from 'rollup-plugin-visualizer' // 打包分析插件
+import { constants } from 'zlib' // 静态引入zlib常量
 
 // 获取当前时间戳，用于构建输出的文件名
 const Timestamp = new Date().getTime();
@@ -45,9 +46,27 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         verbose: true, // 显示压缩日志
         disable: !isProd, // 非生产环境禁用
         deleteOriginFile: false, // 不删除源文件
-        threshold: 10240, // 文件大小10KB才压缩
+        threshold: 1024, // 文件大小1KB才压缩（降低阈值）
         algorithm: 'gzip', // 压缩算法
         ext: '.gz', // 压缩文件扩展名
+        compressionOptions: {
+          level: 9, // 最高压缩级别
+        }
+      }),
+
+      // 添加Brotli压缩支持（更高效的压缩算法）
+      isProd && viteCompression({
+        verbose: true,
+        disable: !isProd,
+        deleteOriginFile: false,
+        threshold: 1024,
+        algorithm: 'brotliCompress',
+        ext: '.br',
+        compressionOptions: {
+          params: {
+            [constants.BROTLI_PARAM_QUALITY]: 11, // 最高质量
+          }
+        }
       }),
 
       // 打包分析插件（仅在显式启用时生效；容器/CI 默认不打开浏览器）
@@ -65,13 +84,6 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       hmr: {
         overlay: true
       },
-      // 代理配置 (已直接配置 API 基础地址，不需要代理)
-      // proxy: { 
-      //   "/": {
-      //     target: "http://104.156.140.42:18888/", 
-      //     changeOrigin: true, 
-      //   },
-      // }
     },
 
     // 依赖优化配置
@@ -119,10 +131,19 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         compress: {
           drop_console: isProd, // 生产环境移除console
           drop_debugger: isProd, // 生产环境移除debugger
-          pure_funcs: isProd ? ['console.log'] : [] // 移除纯函数调用
+          pure_funcs: isProd ? ['console.log'] : [], // 移除纯函数调用
+          // 额外的压缩优化
+          dead_code: true, // 移除无用代码
+          keep_infinity: true, // 保持Infinity
+          toplevel: isProd, // 顶级作用域压缩
+        },
+        mangle: {
+          toplevel: isProd, // 顶级作用域变量名压缩
         }
       },
       rollupOptions: { // Rollup打包配置
+        // 启用构建缓存以提升重复构建速度
+        cache: isProd, // 生产环境启用Rollup缓存
         output: {
           // 优化的手动分块策略
           manualChunks: {

@@ -47,7 +47,10 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	data, err := h.authService.Login(&req)
+	// 获取客户端IP
+	clientIP := c.ClientIP()
+	
+	data, err := h.authService.Login(c.Request.Context(), &req, clientIP)
 	if err != nil {
 		errorCode := "100003" // 登录失败
 		if err.Error() == "配置未初始化" {

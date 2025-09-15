@@ -9,7 +9,7 @@ import (
 )
 
 type Claims struct {
-	UserID   int    `json:"user_id"`
+	UserID   string `json:"user_id"`
 	Username string `json:"username"`
 	Role     string `json:"role"`
 	jwt.RegisteredClaims
@@ -23,7 +23,7 @@ var (
 )
 
 // GenerateToken 生成JWT Token
-func GenerateToken(userID int, username, role string) (string, error) {
+func GenerateToken(userID string, username, role string) (string, error) {
 	cfg := config.GetConfig()
 	if cfg == nil {
 		return "", errors.New("config not initialized")
