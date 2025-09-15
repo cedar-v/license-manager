@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-01 09:32:42
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-08-14 09:12:33
+ * @LastEditTime: 2025-09-12 10:36:03
  * @FilePath: /frontend/src/views/Dashboard.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -26,8 +26,8 @@
             </div>
           </div>
           <div class="stat-content">
-            <div class="stat-value">{{ stat.value }}</div>
             <div class="stat-label">{{ stat.label }}</div>
+            <div class="stat-value">{{ stat.value }}</div>
           </div>
           <div class="stat-trend">
             <svg class="trend-icon" width="16" height="16" viewBox="0 0 16 16">
@@ -276,16 +276,17 @@ const recentData = [
 
 .stat-content {
   flex: 1;
-  
-  .stat-value {
-    font-size: 1.46vw; /* 28px/1920 = 1.46vw */
-    font-weight: 600;
-    color: #FFFFFF;
-    line-height: 1.2;
-  }
+  min-width: 64px;
   
   .stat-label {
-    font-size: 0.73vw; /* 14px/1920 = 0.73vw */
+    font-size: 0.83vw; /* 16px/1920 = 1.46vw */
+    font-weight: 500;
+    color: #FFFFFF;
+    line-height: 1;
+  }
+  
+  .stat-value {
+    font-size: 1.25vw; /* 24px/1920 = 0.73vw */
     color: rgba(255, 255, 255, 0.9);
     margin-top: 0.21vw; /* 4px/1920 = 0.21vw */
   }

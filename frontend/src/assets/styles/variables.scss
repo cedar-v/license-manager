@@ -21,12 +21,12 @@ $border-color-extra-light: #F2F6FC;
 $background-color-base: #F5F7FA;
 $background-color-white: #FFFFFF;
 
-// 字体大小
+// 字体大小 - 符合8px栅格系统
 $font-size-extra-large: 20px;
-$font-size-large: 18px;
+$font-size-large: 16px;        // 改为16px
 $font-size-medium: 16px;
-$font-size-base: 14px;
-$font-size-small: 13px;
+$font-size-base: 14px;         // 保持14px（UI常用）
+$font-size-small: 12px;        // 改为12px
 $font-size-extra-small: 12px;
 
 // 字体粗细
@@ -37,27 +37,27 @@ $font-weight-secondary: 400;
 $line-height-primary: 24px;
 $line-height-secondary: 16px;
 
-// 间距变量
+// 间距变量 - 符合8px栅格系统
 $spacing-extra-large: 32px;
 $spacing-large: 24px;
 $spacing-medium: 16px;
-$spacing-base: 12px;
+$spacing-base: 16px;           // 改为16px
 $spacing-small: 8px;
 $spacing-extra-small: 4px;
 
-// 圆角
+// 圆角 - 符合8px栅格系统
 $border-radius-base: 4px;
-$border-radius-small: 2px;
-$border-radius-round: 20px;
+$border-radius-small: 4px;     // 改为4px
+$border-radius-round: 24px;    // 改为24px
 $border-radius-circle: 100%;
 
 // 阴影
 $box-shadow-base: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
 $box-shadow-light: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 
-// 响应式断点
+// 响应式断点 - 符合8px栅格系统
 $breakpoint-mobile: 768px;
-$breakpoint-tablet: 992px;
+$breakpoint-tablet: 1024px;    // 改为1024px
 $breakpoint-desktop: 1200px;
 $breakpoint-wide: 1920px;
 

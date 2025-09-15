@@ -13,7 +13,7 @@
   }">
     <!-- Logo区域 -->
     <div class="sidebar__header">
-      <div class="sidebar__logo" v-show="!isCollapsed">
+      <div class="sidebar__logo">
         <div class="logo-container">
           <div class="logo-icon">
             <svg width="41" height="40" viewBox="0 0 41 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -21,15 +21,9 @@
               <path d="M34.5498 39.9996H28.75L24.5938 32.8864L27.125 27.6246L34.5498 39.9996ZM41 39.9996H36.2705L27.9346 25.941L30.7188 20.1559L41 39.9996Z" fill="#146B59"/>
             </svg>
           </div>
-          <span class="logo-text">Cedar-V</span>
+          <span class="logo-text" v-show="!isCollapsed">Cedar-V</span>
         </div>
       </div>
-      <button v-if="collapsible" class="sidebar__toggle" :class="{ 'sidebar__toggle--collapsed': isCollapsed }"
-        @click="toggleSidebar" :aria-label="isCollapsed ? t('sidebar.expand') : t('sidebar.collapse')">
-        <el-icon class="toggle-icon">
-          <component :is="isCollapsed ? 'ArrowRight' : 'ArrowLeft'" />
-        </el-icon>
-      </button>
     </div>
 
     <!-- 导航菜单 -->
@@ -56,13 +50,6 @@
         </slot>
       </div>
     </nav>
-
-    <!-- 底部区域 -->
-    <div class="sidebar__footer">
-      <slot name="footer">
-        <!-- 用户信息等 -->
-      </slot>
-    </div>
   </aside>
 </template>
 
@@ -167,13 +154,13 @@ const handleNavClick = (item: NavItem, event: Event) => {
 .sidebar__header {
   height: 80px;
   @include flex-between;
-  padding: 0 $spacing-medium;
   border-bottom: 1px solid $border-color-lighter;
 }
 
 .sidebar__logo {
   @include flex-center-vertical;
   flex: 1;
+  justify-content: center;
 }
 
 .logo-container {
@@ -305,7 +292,6 @@ const handleNavClick = (item: NavItem, event: Event) => {
     background: rgba($primary-color, 0.12);
     color: $primary-color;
     font-weight: $font-weight-primary;
-    box-shadow: $box-shadow-light;
     
     .nav-text {
       color: $primary-color;

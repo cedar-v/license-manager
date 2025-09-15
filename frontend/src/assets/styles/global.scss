@@ -10,15 +10,16 @@
 
 html {
   font-size: 16px;
+  
   @include smooth-scroll;
   
   // 高DPI屏幕适配
   @media (min-width: 2560px) {
-    font-size: 18px;
+    font-size: 16px;  // 改为16px符合8px栅格
   }
   
   @media (min-width: 3840px) {
-    font-size: 20px;
+    font-size: 20px;  // 符合8px栅格
   }
 }
 
@@ -145,9 +146,10 @@ body {
 
 // 卡片样式
 .card { @include card-base; }
-.card-hover { 
+.card-hover {
   cursor: pointer;
-  
+  transition: all 0.3s ease;
+
   @include card-base;
   @include hover-effect;
 }
@@ -155,18 +157,18 @@ body {
 // 滚动条样式
 .scrollbar {
   &::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 8px;  // 改为8px符合8px栅格
+    height: 8px;  // 改为8px符合8px栅格
   }
   
   &::-webkit-scrollbar-track {
     background: #F5F7FA;
-    border-radius: 3px;
+    border-radius: 4px;  // 改为4px符合8px栅格
   }
   
   &::-webkit-scrollbar-thumb {
     background: #c1c1c1;
-    border-radius: 3px;
+    border-radius: 4px;  // 改为4px符合8px栅格
     
     &:hover {
       background: #a8a8a8;

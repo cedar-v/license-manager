@@ -158,7 +158,7 @@ $border-radius: 6px;
 - **主题支持**: 使用 SCSS 变量配合 Element Plus 主题定制
 
 
-**一、整体响应式方案（不使用rem）:**
+**整体响应式方案（不使用rem）:**
 
 1. **JavaScript 辅助监听**: 在 `src/utils/resize.js` 等文件中监听窗口 resize 事件，动态计算屏幕宽度
 2. **设备类型管理**: 将设备类型（desktop/mobile）等信息存入 Pinia，供组件使用

@@ -251,21 +251,21 @@ async function handleLogin() {
 
 .logo-icon {
   position: relative;
-  width: 54px;
-  height: 52px;
+  width: 56px;  // 改为56px符合8px栅格
+  height: 56px;  // 改为56px符合8px栅格
   flex-shrink: 0;
 }
 
 .logo-text {
   font-family: 'Swis721 BlkCn BT', Arial, sans-serif;
   font-weight: 400;
-  font-size: 26px;
+  font-size: 24px;  // 改为24px符合8px栅格
   line-height: 1.2;
   color: $text-color-primary;
   @include text-ellipsis;
   
   @include mobile {
-    font-size: 22px;
+    font-size: 24px;  // 改为24px符合8px栅格
   }
 }
 
@@ -311,7 +311,7 @@ async function handleLogin() {
 
 .login-container {
   width: 100%;
-  max-width: 450px;
+  max-width: 448px;  // 改为448px (56*8)
   margin: 0 auto;
   
   @include mobile {
@@ -331,13 +331,13 @@ async function handleLogin() {
   margin: 0 0 $spacing-medium 0;
   font-family: 'Source Han Sans CN', sans-serif;
   font-weight: 700;
-  font-size: 30px;
+  font-size: 32px;  // 改为32px符合8px栅格
   line-height: 1.2;
   color: $text-color-primary;
   text-align: center;
   
   @include mobile {
-    font-size: 20px;
+    font-size: 24px;  // 改为24px符合8px栅格
     margin-bottom: $spacing-small;
   }
 }
@@ -363,8 +363,8 @@ async function handleLogin() {
 }
 
 .login-input :deep(.el-input__wrapper) {
-  height: 55px;
-  border-radius: 10px;
+  height: 56px;  // 改为56px符合8px栅格
+  border-radius: 8px;  // 改为8px符合8px栅格
   background-color: $background-color-white;
   box-shadow: none;
   transition: all 0.3s ease;
@@ -405,18 +405,19 @@ async function handleLogin() {
 }
 
 .login-button {
-  @include button-primary;
   width: 100%;
-  height: 60px;
+  height: 64px;  // 改为64px符合8px栅格
   font-size: $font-size-medium;
   font-weight: 600;
-  border-radius: 10px;
+  border-radius: 8px;  // 改为8px符合8px栅格
   background: linear-gradient(135deg, $primary-color 0%, color.adjust($primary-color, $lightness: -5%) 100%);
   border: none;
   margin-top: $spacing-medium;
+
+  @include button-primary;
   
   @include mobile {
-    height: 50px;
+    height: 48px;  // 改为48px符合8px栅格
     min-height: 44px; // 触摸目标大小
     font-size: $font-size-base;
   }
@@ -482,10 +483,10 @@ async function handleLogin() {
 }
 
 .language-switcher :deep(.el-select) {
-  width: 150px;
+  width: 152px;  // 改为152px (19*8)
   
   @include mobile {
-    width: 100px;
+    width: 96px;  // 改为96px (12*8)
   }
 }
 
@@ -514,13 +515,13 @@ async function handleLogin() {
   .login-section {
     padding: $spacing-medium;
     align-items: flex-start;
-    padding-top: 80px;
+    padding-top: 80px;  // 符合8px栅格
   }
 }
 
 @media (max-height: 600px) {
   .login-section {
-    padding-top: 48px;
+    padding-top: 48px;  // 符合8px栅格
   }
   
   .title {

@@ -174,8 +174,7 @@ const handleMobileOverlay = () => {
 // 页面内容
 .layout-content {
   flex: 1;
-  padding: $spacing-large;
-  padding-top: calc($spacing-large + 80px); // 为固定导航栏预留空间
+  padding-top: 80px; // 为固定导航栏预留空间
   overflow: auto; 
   position: relative;
   min-height: 0; // 防止 flex 溢出

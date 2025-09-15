@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-12 00:00:00
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-09-05 13:10:42
+ * @LastEditTime: 2025-09-15 10:17:45
  * @FilePath: /frontend/src/views/Customers/index.vue
  * @Description: 客户管理页面  
 -->
@@ -97,35 +97,39 @@
             :row-style="getRowStyle"
             :max-height="'calc(100vh - 280px)'"
           >
-          <el-table-column prop="customer_code" label="客户编码" :width="200" :min-width="200" align="left">
+          <el-table-column prop="customer_code" label="客户编码" :width="170" show-overflow-tooltip  align="left">
             <template #default="scope">
               <span class="customer-code" style="white-space: nowrap; overflow: visible; text-overflow: initial;">{{ scope.row.customer_code }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="customer_name" label="客户名称" :width="190" :min-width="180" show-overflow-tooltip align="left">
+          <el-table-column prop="customer_name" label="客户名称" :width="180" show-overflow-tooltip  align="center">
             <template #default="scope">
               <span class="ellipsis-text">{{ scope.row.customer_name }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="customer_type_display" label="客户类型" :width="145" :min-width="120" align="center">
+          <el-table-column prop="customer_type_display" label="客户类型" :width="130"  align="center">
           </el-table-column>
-          <el-table-column prop="contact_person" label="联系人" :width="130" :min-width="100" show-overflow-tooltip align="center" />
-          <el-table-column prop="email" label="邮箱" :width="204" :min-width="180" show-overflow-tooltip align="left"/>
-          <el-table-column prop="customer_level_display" label="客户等级" :width="145" :min-width="120" align="center">
+          <el-table-column prop="contact_person" label="联系人" :width="140"    align="center" />
+          <el-table-column prop="email" label="邮箱" :width="160" show-overflow-tooltip  align="center">
+             <template #default="scope">
+              <span class="ellipsis-text">{{ scope.row.email }}</span>
+            </template>
+            </el-table-column>
+          <el-table-column prop="customer_level_display" label="客户等级" :width="130" align="center">
            </el-table-column>
-          <el-table-column prop="status_display" label="状态" :width="145" :min-width="100" align="center">
+          <el-table-column prop="status_display" label="状态" :width="100"  align="center">
             <template #default="scope">
               <div class="status-tag" :class="getStatusClass(scope.row.status)">
                 {{scope.row.status_display}}
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="创建时间" :width="145" :min-width="120" show-overflow-tooltip align="center">
+          <el-table-column label="创建时间" :width="135"  align="center">
             <template #default="scope">
               {{ formatDate(scope.row.created_at) }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" :width="300" :min-width="280" fixed="right" class-name="action-column" align="center">
+          <el-table-column label="操作"  :width="340" fixed="right" class-name="action-column" align="center">
             <template #default="scope">
               <div class="action-buttons">
                 <button class="action-btn primary" @click="handleViewLicense(scope.row)">查看授权</button>
@@ -537,12 +541,13 @@ onMounted(async () => {
 }
 
 .add-customer-btn {
-  @include button-primary;
-  height: 32px;
+  height: 32px;  // 符合8px栅格
   padding: $spacing-small $spacing-medium;
   font-size: $font-size-base;
   font-weight: $font-weight-primary;
   border-radius: $border-radius-small;
+
+  @include button-primary;
 }
 
 .right-actions {
@@ -561,7 +566,7 @@ onMounted(async () => {
 .filter-section {
   @include flex-center-vertical;
   gap: $spacing-small;
-  min-width: 280px;
+  min-width: 288px;  // 改为288px (36*8)
   flex-shrink: 1;
   
   @include mobile {
@@ -581,7 +586,7 @@ onMounted(async () => {
   font-weight: $font-weight-primary;
   color: $text-color-primary;
   margin-right: $spacing-small;
-  min-width: 50px;
+  min-width: 48px;   // 改为48px (6*8)
   
   @include mobile {
     width: auto;
@@ -594,7 +599,7 @@ onMounted(async () => {
 }
 
 .search-section {
-  min-width: 280px;
+  min-width: 288px;  // 改为288px (36*8)
   flex-shrink: 1;
   
   @include mobile {
@@ -607,16 +612,16 @@ onMounted(async () => {
 }
 
 .table-container {
-  @include card-base;
   width: calc(100% - #{$spacing-large * 2}); // 计算宽度减去左右padding
   margin: 0 $spacing-large; // 水平居中并添加左右边距
-  border: 1px solid $border-color-light;
   border-radius: $border-radius-base;
   overflow: hidden;
   margin-bottom: $spacing-medium;
   flex: 1; // 自动占满剩余空间
   display: flex;
   flex-direction: column;
+
+  // @include card-base;
   
   @include mobile {
     @include table-responsive;
@@ -649,7 +654,7 @@ onMounted(async () => {
 
 :deep(.el-table) {
   width: 100% !important;
-  min-width: 1400px; /* 设置最小宽度防止列压缩 */
+  min-width: 1408px; /* 改为1408px (176*8) */
   border: 1px solid #F5F7FA;
   table-layout: fixed; /* 固定表格布局防止错位 */
   
@@ -749,7 +754,7 @@ onMounted(async () => {
 
 /* 每页条数选择器 */
 :deep(.el-pagination .el-pagination__sizes .el-select) {
-  width: 88px;
+  width: 88px;  // 88px符合8px栅格(11*8)
 }
 
 :deep(.el-pagination .el-pagination__sizes .el-select .el-select__wrapper) {
@@ -769,7 +774,7 @@ onMounted(async () => {
 }
 
 :deep(.el-pagination .el-pagination__jump .el-input) {
-  width: 48px;
+  width: 48px;  // 符合8px栅格
   margin: 0 8px;
 }
 
@@ -790,7 +795,7 @@ onMounted(async () => {
 /* 桌面端响应式 - 中等屏幕 */
 @media (max-width: 1200px) and (min-width: 769px) {
   .right-actions {
-    gap: 20px;
+    gap: 24px;  // 改为24px符合8px栅格
   }
   
   .filter-section {
@@ -803,7 +808,7 @@ onMounted(async () => {
   
   /* 平板端保持一行布局 */
   .action-buttons {
-    gap: 6px;
+    gap: 8px;  // 改为8px符合8px栅格
     flex-wrap: nowrap;
   }
   
@@ -955,8 +960,8 @@ onMounted(async () => {
     
     /* 确保操作列在桌面端的正确宽度 */
     .action-column {
-      width: 15.625vw !important; /* 300px/1920 = 15.625vw */
-      min-width: 15.625vw !important;
+      width: 17.708vw !important; /* 300px/1920 = 15.625vw */
+      min-width: 17.708vw !important;
     }
   }
   
@@ -1236,8 +1241,8 @@ onMounted(async () => {
 
 /* 筛选器样式 */
 :deep(.filter-select) {
-  width: 120px;
-  height: 36px;
+  width: 120px;  // 符合8px栅格(15*8)
+  height: 40px;  // 改为40px符合8px栅格
 }
 
 :deep(.filter-select .el-select__wrapper) {
@@ -1249,7 +1254,7 @@ onMounted(async () => {
   cursor: pointer;
   display: flex;
   font-size: 14px;
-  gap: 6px;
+  gap: 8px;  // 改为8px符合8px栅格
   line-height: 24px;
   min-height: 36px;
   padding: 0px 12px;
@@ -1296,11 +1301,11 @@ onMounted(async () => {
 
 /* 搜索框样式 */
 :deep(.search-input) {
-  height: 36px;
+  height: 40px;  // 改为40px符合8px栅格
 }
 
 :deep(.search-input .el-input__wrapper) {
-  height: 36px;
+  height: 40px;  // 改为40px符合8px栅格
   border-color: #DCDEE2;
   border-radius: 4px 0 0 4px;
   background-color: #FFFFFF;
@@ -1313,7 +1318,7 @@ onMounted(async () => {
   font-family: 'Source Han Sans CN', sans-serif;
   font-weight: 400;
   font-size: 14px;
-  line-height: 21px;
+  line-height: 24px;  // 改为24px符合8px栅格
   color: #1D1D1D;
 }
 
@@ -1334,8 +1339,8 @@ onMounted(async () => {
   border-color: #019C7C;
   border-radius: 0 4px 4px 0;
   padding: 10px;
-  width: 48px;
-  height: 36px;
+  width: 48px;  // 符合8px栅格
+  height: 40px;  // 改为40px符合8px栅格
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1364,7 +1369,7 @@ onMounted(async () => {
   font-family: 'Source Han Sans CN', sans-serif;
   font-weight: 400;
   font-size: 14px;
-  line-height: 22px;
+  line-height: 24px;  // 改为24px符合8px栅格
 }
 
 /* 表格精确样式 - 匹配Figma设计 */
@@ -1406,13 +1411,14 @@ onMounted(async () => {
 
 /* 状态标签样式 */
 .status-tag {
-  @include flex-center;
   padding: $spacing-extra-small $spacing-small;
   border-radius: $border-radius-small;
   font-size: $font-size-base;
   font-weight: $font-weight-secondary;
-  height: 22px;
+  height: 24px;  // 改为24px符合8px栅格
   min-width: fit-content;
+
+  @include flex-center;
   @include text-ellipsis;
   
   &.status-normal {
@@ -1433,10 +1439,11 @@ onMounted(async () => {
 
 /* 操作按钮组样式 */
 .action-buttons {
-  @include flex-center-vertical;
   gap: $spacing-small;
   padding: $spacing-base 0;
   width: 100%;
+
+  @include flex-center-vertical;
   justify-content: flex-start;
   flex-wrap: nowrap;
   overflow: visible;
@@ -1459,16 +1466,17 @@ onMounted(async () => {
 }
 
 .action-btn {
-  @include button-base;
   padding: $spacing-extra-small $spacing-base;
-  height: 28px;
+  height: 32px;  // 改为32px符合8px栅格
   border-radius: $border-radius-small;
   font-size: $font-size-small;
   font-weight: $font-weight-primary;
-  line-height: 18px;
-  @include text-ellipsis;
+  line-height: 20px;  // 改为20px符合8px栅格
   flex-shrink: 0;
   min-width: fit-content;
+
+  @include button-base;
+  @include text-ellipsis;
   
   @include mobile {
     flex: 0 0 calc(50% - #{math.div($spacing-extra-small, 2)}) !important;

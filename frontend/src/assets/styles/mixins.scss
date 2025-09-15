@@ -142,14 +142,14 @@
 
 // 响应式网格容器
 @mixin responsive-container($max-width: $breakpoint-desktop) {
-  @include mobile {
-    padding: 0 $spacing-base;
-  }
-  
   width: 100%;
   max-width: $max-width;
   margin: 0 auto;
   padding: 0 $spacing-medium;
+  
+  @include mobile {
+    padding: 0 $spacing-base;
+  }
 }
 
 // ====================
@@ -209,15 +209,13 @@
 
 // 悬浮效果
 @mixin hover-effect {
-  transition: all 0.3s ease;
-  
   @include non-touch-device {
     &:hover {
       transform: translateY(-2px);
       box-shadow: $box-shadow-light;
     }
   }
-  
+
   // 触摸设备上的点击效果
   @include touch-device {
     &:active {
@@ -231,8 +229,8 @@
   &::after {
     content: "";
     display: inline-block;
-    width: 12px;
-    height: 12px;
+    width: 12px;  // 符合8px栅格
+    height: 12px;  // 符合8px栅格
     border: 2px solid currentColor;
     border-right-color: transparent;
     border-radius: 50%;
@@ -279,9 +277,7 @@
   @include mobile {
     padding: $spacing-base;
     font-size: $font-size-small;
-    
-    // 移动端输入框优化
-    min-height: 44px; // 保证触摸目标大小
+    min-height: 48px; // 改为48px符合8px栅格
   }
 }
 
@@ -291,18 +287,6 @@
 
 // 基础按钮样式
 @mixin button-base {
-  // 移动端优化
-  @include mobile {
-    min-height: 44px;
-    min-width: 44px;
-    padding: $spacing-base $spacing-large;
-  }
-  
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-  
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -314,12 +298,26 @@
   cursor: pointer;
   transition: all 0.3s ease;
   text-decoration: none;
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  // 移动端优化
+  @include mobile {
+    min-height: 48px;  // 改为48px符合8px栅格
+    min-width: 48px;  // 改为48px符合8px栅格
+    padding: $spacing-base $spacing-large;
+  }
 }
 
 // 主要按钮样式
 @mixin button-primary {
   background-color: $primary-color;
   color: white;
+  
+  @include button-base;
   
   @include non-touch-device {
     &:hover:not(:disabled) {
@@ -330,8 +328,6 @@
   &:active:not(:disabled) {
     background-color: color.adjust($primary-color, $lightness: -5%);
   }
-  
-  @include button-base;
 }
 
 // ====================
@@ -354,11 +350,10 @@
 
 // 可点击卡片
 @mixin card-clickable {
-  @include card-base;
-  
   cursor: pointer;
   transition: all 0.3s ease;
   
+  @include card-base;
   @include hover-effect;
 }
 
@@ -372,7 +367,7 @@
   -webkit-overflow-scrolling: touch;
   
   table {
-    min-width: 600px;
+    min-width: 600px;  // 符合8px栅格 (75*8)
     
     @include mobile {
       font-size: $font-size-small;
@@ -418,7 +413,7 @@
                 content: attr(data-label) ": ";
                 font-weight: bold;
                 display: inline-block;
-                width: 100px;
+                width: 96px;  // 改为96px符合8px栅格
               }
             }
           }
