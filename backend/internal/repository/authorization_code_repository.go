@@ -139,6 +139,16 @@ func (r *authorizationCodeRepository) GetAuthorizationCodeList(ctx context.Conte
 	}, nil
 }
 
+// UpdateAuthorizationCode 更新授权码
+func (r *authorizationCodeRepository) UpdateAuthorizationCode(ctx context.Context, authCode *models.AuthorizationCode) error {
+	return r.db.WithContext(ctx).Save(authCode).Error
+}
+
+// DeleteAuthorizationCode 删除授权码（软删除）
+func (r *authorizationCodeRepository) DeleteAuthorizationCode(ctx context.Context, id string) error {
+	return r.db.WithContext(ctx).Delete(&models.AuthorizationCode{}, "id = ?", id).Error
+}
+
 // CheckCustomerExists 检查客户是否存在
 func (r *authorizationCodeRepository) CheckCustomerExists(ctx context.Context, customerID string) (bool, error) {
 	var count int64

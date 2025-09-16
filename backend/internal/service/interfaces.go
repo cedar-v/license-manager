@@ -38,4 +38,8 @@ type EnumService interface {
 type AuthorizationCodeService interface {
 	CreateAuthorizationCode(ctx context.Context, req *models.AuthorizationCodeCreateRequest) (*models.AuthorizationCodeCreateResponse, error)
 	GetAuthorizationCodeList(ctx context.Context, req *models.AuthorizationCodeListRequest) (*models.AuthorizationCodeListResponse, error)
+	GetAuthorizationCode(ctx context.Context, id string) (*models.AuthorizationCode, error)
+	UpdateAuthorizationCode(ctx context.Context, id string, req *models.AuthorizationCodeUpdateRequest) (*models.AuthorizationCode, error)
+	LockUnlockAuthorizationCode(ctx context.Context, id string, req *models.AuthorizationCodeLockRequest) (*models.AuthorizationCode, error)
+	DeleteAuthorizationCode(ctx context.Context, id string) error
 }

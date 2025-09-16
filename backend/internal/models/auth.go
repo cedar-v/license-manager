@@ -56,9 +56,9 @@ type AuthorizationCode struct {
 	LockReason           *string        `gorm:"type:text" json:"lock_reason"`
 	LockedAt             *time.Time     `gorm:"type:datetime(3)" json:"locked_at"`
 	LockedBy             *string        `gorm:"type:varchar(36)" json:"locked_by"`
-	FeatureConfig        JSON           `gorm:"type:json" json:"feature_config"`
-	UsageLimits          JSON           `gorm:"type:json" json:"usage_limits"`
-	CustomParameters     JSON           `gorm:"type:json" json:"custom_parameters"`
+	FeatureConfig        JSON           `gorm:"type:json" json:"feature_config" swaggertype:"object"`
+	UsageLimits          JSON           `gorm:"type:json" json:"usage_limits" swaggertype:"object"`
+	CustomParameters     JSON           `gorm:"type:json" json:"custom_parameters" swaggertype:"object"`
 	Status               string         `gorm:"-" json:"status,omitempty"`
 	StatusDisplay        string         `gorm:"-" json:"status_display,omitempty"`
 	CreatedAt            time.Time      `gorm:"type:datetime(3);not null" json:"created_at"`
@@ -152,4 +152,27 @@ type AuthorizationCodeListResponse struct {
 	Page       int                         `json:"page"`
 	PageSize   int                         `json:"page_size"`
 	TotalPages int                         `json:"total_pages"`
+}
+
+// AuthorizationCodeUpdateRequest 更新授权码请求结构
+type AuthorizationCodeUpdateRequest struct {
+	SoftwareID       *string     `json:"software_id" binding:"omitempty"`
+	Description      *string     `json:"description" binding:"omitempty,max=1000"`
+	ValidityDays     *int        `json:"validity_days" binding:"omitempty,min=1,max=36500"`
+	DeploymentType   *string     `json:"deployment_type" binding:"omitempty,oneof=standalone cloud hybrid"`
+	EncryptionType   *string     `json:"encryption_type" binding:"omitempty,oneof=standard advanced"`
+	SoftwareVersion  *string     `json:"software_version" binding:"omitempty"`
+	MaxActivations   *int        `json:"max_activations" binding:"omitempty,min=1"`
+	FeatureConfig    interface{} `json:"feature_config" binding:"omitempty"`
+	UsageLimits      interface{} `json:"usage_limits" binding:"omitempty"`
+	CustomParameters interface{} `json:"custom_parameters" binding:"omitempty"`
+	ChangeType       string      `json:"change_type" binding:"required,oneof=renewal upgrade limit_change feature_toggle lock unlock other"`
+	Reason           *string     `json:"reason" binding:"omitempty,max=500"`
+}
+
+// AuthorizationCodeLockRequest 锁定/解锁授权码请求结构
+type AuthorizationCodeLockRequest struct {
+	IsLocked   bool    `json:"is_locked" binding:""`                       // true-锁定，false-解锁
+	LockReason *string `json:"lock_reason" binding:"omitempty,max=500"`    // 锁定原因
+	Reason     *string `json:"reason" binding:"omitempty,max=500"`         // 变更原因（记录到变更历史）
 }

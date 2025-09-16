@@ -58,6 +58,12 @@ type AuthorizationCodeRepository interface {
 	// GetAuthorizationCodeList 查询授权码列表
 	GetAuthorizationCodeList(ctx context.Context, req *models.AuthorizationCodeListRequest) (*models.AuthorizationCodeListResponse, error)
 	
+	// UpdateAuthorizationCode 更新授权码
+	UpdateAuthorizationCode(ctx context.Context, authCode *models.AuthorizationCode) error
+	
+	// DeleteAuthorizationCode 删除授权码（软删除）
+	DeleteAuthorizationCode(ctx context.Context, id string) error
+	
 	// CheckCustomerExists 检查客户是否存在
 	CheckCustomerExists(ctx context.Context, customerID string) (bool, error)
 }

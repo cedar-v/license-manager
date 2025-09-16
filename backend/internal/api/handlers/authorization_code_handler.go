@@ -154,3 +154,276 @@ func (h *AuthorizationCodeHandler) GetAuthorizationCodeList(c *gin.Context) {
 		Data:    data,
 	})
 }
+
+// GetAuthorizationCode 获取授权码详情
+// @Summary 获取授权码详情
+// @Description 根据授权码ID获取授权码详细信息
+// @Tags 授权码管理
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "授权码ID"
+// @Success 200 {object} models.APIResponse{data=models.AuthorizationCode} "查询成功"
+// @Failure 400 {object} models.ErrorResponse "请求参数无效"
+// @Failure 401 {object} models.ErrorResponse "未认证"
+// @Failure 404 {object} models.ErrorResponse "授权码不存在"
+// @Failure 500 {object} models.ErrorResponse "服务器内部错误"
+// @Router /api/v1/authorization-codes/{id} [get]
+func (h *AuthorizationCodeHandler) GetAuthorizationCode(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	// 设置语言到Context中
+	ctx := middleware.WithLanguage(c.Request.Context(), c)
+
+	data, err := h.authCodeService.GetAuthorizationCode(ctx, id)
+	if err != nil {
+		// 错误已经在Service层完全包装好了，直接使用
+		var i18nErr *i18n.I18nError
+		if errors.As(err, &i18nErr) {
+			c.JSON(i18nErr.HttpCode, models.ErrorResponse{
+				Code:      i18nErr.Code,
+				Message:   i18nErr.Message,
+				Timestamp: time.Now().Format(time.RFC3339),
+			})
+		} else {
+			// 兜底：理论上不应该到这里，因为Service层应该返回I18nError
+			lang := middleware.GetLanguage(c)
+			status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+			c.JSON(status, models.ErrorResponse{
+				Code:      errCode,
+				Message:   message,
+				Timestamp: time.Now().Format(time.RFC3339),
+			})
+		}
+		return
+	}
+
+	lang := middleware.GetLanguage(c)
+	successMessage := i18n.GetErrorMessage("000000", lang)
+	c.JSON(http.StatusOK, models.APIResponse{
+		Code:    "000000",
+		Message: successMessage,
+		Data:    data,
+	})
+}
+
+// UpdateAuthorizationCode 更新授权码
+// @Summary 更新授权码
+// @Description 更新授权码信息，所有字段都是可选的，需要指定变更类型和原因
+// @Tags 授权码管理
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "授权码ID"
+// @Param authorization_code body models.AuthorizationCodeUpdateRequest true "授权码信息"
+// @Success 200 {object} models.APIResponse{data=models.AuthorizationCode} "更新成功"
+// @Failure 400 {object} models.ErrorResponse "请求参数无效"
+// @Failure 401 {object} models.ErrorResponse "未认证"
+// @Failure 404 {object} models.ErrorResponse "授权码不存在"
+// @Failure 500 {object} models.ErrorResponse "服务器内部错误"
+// @Router /api/v1/authorization-codes/{id} [put]
+func (h *AuthorizationCodeHandler) UpdateAuthorizationCode(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	var req models.AuthorizationCodeUpdateRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message + ": " + err.Error(),
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	// 设置语言到Context中
+	ctx := middleware.WithLanguage(c.Request.Context(), c)
+
+	data, err := h.authCodeService.UpdateAuthorizationCode(ctx, id, &req)
+	if err != nil {
+		// 错误已经在Service层完全包装好了，直接使用
+		var i18nErr *i18n.I18nError
+		if errors.As(err, &i18nErr) {
+			c.JSON(i18nErr.HttpCode, models.ErrorResponse{
+				Code:      i18nErr.Code,
+				Message:   i18nErr.Message,
+				Timestamp: time.Now().Format(time.RFC3339),
+			})
+		} else {
+			// 兜底：理论上不应该到这里，因为Service层应该返回I18nError
+			lang := middleware.GetLanguage(c)
+			status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+			c.JSON(status, models.ErrorResponse{
+				Code:      errCode,
+				Message:   message,
+				Timestamp: time.Now().Format(time.RFC3339),
+			})
+		}
+		return
+	}
+
+	lang := middleware.GetLanguage(c)
+	successMessage := i18n.GetErrorMessage("000000", lang)
+	c.JSON(http.StatusOK, models.APIResponse{
+		Code:    "000000",
+		Message: successMessage,
+		Data:    data,
+	})
+}
+// LockUnlockAuthorizationCode 锁定/解锁授权码
+// @Summary 锁定/解锁授权码
+// @Description 锁定或解锁指定的授权码，可以设置锁定原因
+// @Tags 授权码管理
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "授权码ID"
+// @Param lock_request body models.AuthorizationCodeLockRequest true "锁定/解锁信息"
+// @Success 200 {object} models.APIResponse{data=models.AuthorizationCode} "操作成功"
+// @Failure 400 {object} models.ErrorResponse "请求参数无效"
+// @Failure 401 {object} models.ErrorResponse "未认证"
+// @Failure 404 {object} models.ErrorResponse "授权码不存在"
+// @Failure 500 {object} models.ErrorResponse "服务器内部错误"
+// @Router /api/v1/authorization-codes/{id}/lock [put]
+func (h *AuthorizationCodeHandler) LockUnlockAuthorizationCode(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	var req models.AuthorizationCodeLockRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message + ": " + err.Error(),
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	// 设置语言到Context中
+	ctx := middleware.WithLanguage(c.Request.Context(), c)
+
+	data, err := h.authCodeService.LockUnlockAuthorizationCode(ctx, id, &req)
+	if err != nil {
+		// 错误已经在Service层完全包装好了，直接使用
+		var i18nErr *i18n.I18nError
+		if errors.As(err, &i18nErr) {
+			c.JSON(i18nErr.HttpCode, models.ErrorResponse{
+				Code:      i18nErr.Code,
+				Message:   i18nErr.Message,
+				Timestamp: time.Now().Format(time.RFC3339),
+			})
+		} else {
+			// 兜底：理论上不应该到这里，因为Service层应该返回I18nError
+			lang := middleware.GetLanguage(c)
+			status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+			c.JSON(status, models.ErrorResponse{
+				Code:      errCode,
+				Message:   message,
+				Timestamp: time.Now().Format(time.RFC3339),
+			})
+		}
+		return
+	}
+
+	lang := middleware.GetLanguage(c)
+	successMessage := i18n.GetErrorMessage("000000", lang)
+	c.JSON(http.StatusOK, models.APIResponse{
+		Code:    "000000",
+		Message: successMessage,
+		Data:    data,
+	})
+}
+
+// DeleteAuthorizationCode 删除授权码
+// @Summary 删除授权码
+// @Description 删除指定的授权码（软删除）
+// @Tags 授权码管理
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "授权码ID"
+// @Success 200 {object} models.APIResponse "删除成功"
+// @Failure 400 {object} models.ErrorResponse "请求参数无效"
+// @Failure 401 {object} models.ErrorResponse "未认证"
+// @Failure 404 {object} models.ErrorResponse "授权码不存在"
+// @Failure 500 {object} models.ErrorResponse "服务器内部错误"
+// @Router /api/v1/authorization-codes/{id} [delete]
+func (h *AuthorizationCodeHandler) DeleteAuthorizationCode(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	// 设置语言到Context中
+	ctx := middleware.WithLanguage(c.Request.Context(), c)
+
+	err := h.authCodeService.DeleteAuthorizationCode(ctx, id)
+	if err != nil {
+		// 错误已经在Service层完全包装好了，直接使用
+		var i18nErr *i18n.I18nError
+		if errors.As(err, &i18nErr) {
+			c.JSON(i18nErr.HttpCode, models.ErrorResponse{
+				Code:      i18nErr.Code,
+				Message:   i18nErr.Message,
+				Timestamp: time.Now().Format(time.RFC3339),
+			})
+		} else {
+			// 兜底：理论上不应该到这里，因为Service层应该返回I18nError
+			lang := middleware.GetLanguage(c)
+			status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+			c.JSON(status, models.ErrorResponse{
+				Code:      errCode,
+				Message:   message,
+				Timestamp: time.Now().Format(time.RFC3339),
+			})
+		}
+		return
+	}
+
+	lang := middleware.GetLanguage(c)
+	successMessage := i18n.GetErrorMessage("000000", lang)
+	c.JSON(http.StatusOK, models.APIResponse{
+		Code:    "000000",
+		Message: successMessage,
+		Data:    nil,
+	})
+}

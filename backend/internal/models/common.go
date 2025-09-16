@@ -7,6 +7,7 @@ import (
 )
 
 // JSON 类型用于GORM JSON字段
+// swagger:type object
 type JSON json.RawMessage
 
 // 实现 driver.Valuer 接口

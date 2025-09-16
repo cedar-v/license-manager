@@ -91,6 +91,10 @@ func SetupRouter() *gin.Engine {
 			// 授权码管理
 			auth.GET("/v1/authorization-codes", authCodeHandler.GetAuthorizationCodeList)
 			auth.POST("/v1/authorization-codes", authCodeHandler.CreateAuthorizationCode)
+			auth.GET("/v1/authorization-codes/:id", authCodeHandler.GetAuthorizationCode)
+			auth.PUT("/v1/authorization-codes/:id", authCodeHandler.UpdateAuthorizationCode)
+			auth.PUT("/v1/authorization-codes/:id/lock", authCodeHandler.LockUnlockAuthorizationCode)
+			auth.DELETE("/v1/authorization-codes/:id", authCodeHandler.DeleteAuthorizationCode)
 		}
 
 		// 管理员接口
