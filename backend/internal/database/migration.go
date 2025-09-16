@@ -23,6 +23,7 @@ func AutoMigrate() error {
 		&models.Customer{},
 		&models.CustomerCodeSequence{},
 		&models.User{},
+		&models.AuthorizationCode{},
 	)
 	if err != nil {
 		return fmt.Errorf("failed to migrate database: %w", err)

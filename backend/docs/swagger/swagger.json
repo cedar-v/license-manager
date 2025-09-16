@@ -730,6 +730,87 @@
                 }
             }
         },
+        "/api/v1/authorization-codes": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "创建新的授权码，自动生成授权码字符串。有效期从当天00:00:00开始，到指定天数后的23:59:59结束",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "授权码管理"
+                ],
+                "summary": "创建授权码",
+                "parameters": [
+                    {
+                        "description": "授权码信息",
+                        "name": "authorization_code",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.AuthorizationCodeCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "创建成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.AuthorizationCodeCreateResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "客户不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "授权码已存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/login": {
             "post": {
                 "description": "管理员用户登录接口",
@@ -852,6 +933,68 @@
                     "type": "string"
                 },
                 "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.AuthorizationCodeCreateRequest": {
+            "type": "object",
+            "required": [
+                "customer_id",
+                "deployment_type",
+                "max_activations",
+                "validity_days"
+            ],
+            "properties": {
+                "custom_parameters": {},
+                "customer_id": {
+                    "type": "string"
+                },
+                "deployment_type": {
+                    "type": "string",
+                    "enum": [
+                        "standalone",
+                        "cloud",
+                        "hybrid"
+                    ]
+                },
+                "description": {
+                    "type": "string",
+                    "maxLength": 1000
+                },
+                "encryption_type": {
+                    "type": "string",
+                    "enum": [
+                        "standard",
+                        "advanced"
+                    ]
+                },
+                "feature_config": {},
+                "max_activations": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "software_id": {
+                    "type": "string"
+                },
+                "software_version": {
+                    "type": "string"
+                },
+                "usage_limits": {},
+                "validity_days": {
+                    "type": "integer",
+                    "maximum": 36500,
+                    "minimum": 1
+                }
+            }
+        },
+        "models.AuthorizationCodeCreateResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "id": {
                     "type": "string"
                 }
             }

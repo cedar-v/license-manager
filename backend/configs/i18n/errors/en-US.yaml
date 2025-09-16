@@ -22,12 +22,18 @@ errors:
     "200004": "Invalid customer information format"
     "200005": "Failed to query customer list"
   
-  # License module (30xxxx) - Reserved
-  license:
-    "300001": "Invalid license key"
-    "300002": "License expired"
-    "300003": "License key is required"
-    "300004": "License key already used"
+  # Authorization module (30xxxx)
+  authorization:
+    "300001": "Authorization code not found"
+    "300002": "Authorization code already exists"
+    "300003": "Authorization code is locked"
+    "300004": "Maximum activation limit reached"
+    "300005": "Invalid hardware fingerprint format"
+    "300006": "License not found"
+    "300007": "License has been revoked"
+    "300008": "Hardware fingerprint mismatch"
+    "300009": "Failed to generate license file"
+    "300010": "Invalid configuration parameters"
   
   # System general (90xxxx)
   system:
@@ -59,6 +65,20 @@ enums:
     "medium": "Medium"
     "large": "Large"
     "enterprise": "Enterprise"
+  
+  deployment_type:
+    "standalone": "Standalone"
+    "cloud": "Cloud"
+    "hybrid": "Hybrid"
+  
+  encryption_type:
+    "standard": "Standard"
+    "advanced": "Advanced"
+  
+  authorization_status:
+    "normal": "Normal"
+    "locked": "Locked"
+    "expired": "Expired"
 
 # Default error message
 default_error: "Unknown error"

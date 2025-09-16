@@ -10,6 +10,51 @@ definitions:
       timestamp:
         type: string
     type: object
+  models.AuthorizationCodeCreateRequest:
+    properties:
+      custom_parameters: {}
+      customer_id:
+        type: string
+      deployment_type:
+        enum:
+        - standalone
+        - cloud
+        - hybrid
+        type: string
+      description:
+        maxLength: 1000
+        type: string
+      encryption_type:
+        enum:
+        - standard
+        - advanced
+        type: string
+      feature_config: {}
+      max_activations:
+        minimum: 1
+        type: integer
+      software_id:
+        type: string
+      software_version:
+        type: string
+      usage_limits: {}
+      validity_days:
+        maximum: 36500
+        minimum: 1
+        type: integer
+    required:
+    - customer_id
+    - deployment_type
+    - max_activations
+    - validity_days
+    type: object
+  models.AuthorizationCodeCreateResponse:
+    properties:
+      code:
+        type: string
+      id:
+        type: string
+    type: object
   models.Customer:
     properties:
       address:
@@ -778,6 +823,55 @@ paths:
       summary: 刷新Token
       tags:
       - 认证
+  /api/v1/authorization-codes:
+    post:
+      consumes:
+      - application/json
+      description: 创建新的授权码，自动生成授权码字符串。有效期从当天00:00:00开始，到指定天数后的23:59:59结束
+      parameters:
+      - description: 授权码信息
+        in: body
+        name: authorization_code
+        required: true
+        schema:
+          $ref: '#/definitions/models.AuthorizationCodeCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 创建成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.AuthorizationCodeCreateResponse'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 客户不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: 授权码已存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 创建授权码
+      tags:
+      - 授权码管理
   /api/v1/login:
     post:
       consumes:

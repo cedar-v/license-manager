@@ -46,3 +46,18 @@ type UserRepository interface {
 	// LockUser 锁定用户账号
 	LockUser(ctx context.Context, id string, lockDuration int) error
 }
+
+// AuthorizationCodeRepository 授权码数据访问接口
+type AuthorizationCodeRepository interface {
+	// CreateAuthorizationCode 创建授权码
+	CreateAuthorizationCode(ctx context.Context, authCode *models.AuthorizationCode) error
+	
+	// GetAuthorizationCodeByID 根据ID获取授权码
+	GetAuthorizationCodeByID(ctx context.Context, id string) (*models.AuthorizationCode, error)
+	
+	// GetAuthorizationCodeList 查询授权码列表
+	GetAuthorizationCodeList(ctx context.Context, req *models.AuthorizationCodeListRequest) (*models.AuthorizationCodeListResponse, error)
+	
+	// CheckCustomerExists 检查客户是否存在
+	CheckCustomerExists(ctx context.Context, customerID string) (bool, error)
+}
