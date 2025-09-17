@@ -9,6 +9,13 @@ var (
 	ErrCustomerCodeDuplicate = errors.New("customer code already exists")
 )
 
+// 授权码领域的业务错误
+var (
+	ErrAuthorizationCodeNotFound      = errors.New("authorization code not found")
+	ErrAuthorizationCodeAlreadyExists = errors.New("authorization code already exists")
+	ErrAuthorizationCodeDuplicate     = errors.New("authorization code already exists")
+)
+
 // 通用的数据库/系统错误（给开发者看的）
 var (
 	ErrDatabaseConnection = errors.New("database connection failed")

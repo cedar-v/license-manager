@@ -33,3 +33,13 @@ type EnumService interface {
 	GetAllEnums(ctx context.Context) (*models.EnumListResponse, error)
 	GetEnumsByType(ctx context.Context, enumType string) (*models.EnumTypeResponse, error)
 }
+
+// AuthorizationCodeService 授权码服务接口
+type AuthorizationCodeService interface {
+	CreateAuthorizationCode(ctx context.Context, req *models.AuthorizationCodeCreateRequest) (*models.AuthorizationCodeCreateResponse, error)
+	GetAuthorizationCodeList(ctx context.Context, req *models.AuthorizationCodeListRequest) (*models.AuthorizationCodeListResponse, error)
+	GetAuthorizationCode(ctx context.Context, id string) (*models.AuthorizationCode, error)
+	UpdateAuthorizationCode(ctx context.Context, id string, req *models.AuthorizationCodeUpdateRequest) (*models.AuthorizationCode, error)
+	LockUnlockAuthorizationCode(ctx context.Context, id string, req *models.AuthorizationCodeLockRequest) (*models.AuthorizationCode, error)
+	DeleteAuthorizationCode(ctx context.Context, id string) error
+}

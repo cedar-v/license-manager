@@ -37,18 +37,21 @@ func SetupRouter() *gin.Engine {
 	db := database.GetDB()
 	customerRepo := repository.NewCustomerRepository(db)
 	userRepo := repository.NewUserRepository(db)
+	authCodeRepo := repository.NewAuthorizationCodeRepository(db)
 
 	// 初始化服务层
 	authService := service.NewAuthService(userRepo)
 	systemService := service.NewSystemService()
 	customerService := service.NewCustomerService(customerRepo)
 	enumService := service.NewEnumService()
+	authCodeService := service.NewAuthorizationCodeService(authCodeRepo)
 
 	// 初始化处理器层
 	authHandler := handlers.NewAuthHandler(authService)
 	systemHandler := handlers.NewSystemHandler(systemService)
 	customerHandler := handlers.NewCustomerHandler(customerService)
 	enumHandler := handlers.NewEnumHandler(enumService)
+	authCodeHandler := handlers.NewAuthorizationCodeHandler(authCodeService)
 
 	// 健康检测接口（无需认证）
 	router.GET("/health", systemHandler.HealthCheck)
@@ -84,6 +87,14 @@ func SetupRouter() *gin.Engine {
 			// 枚举管理
 			auth.GET("/enums", enumHandler.GetAllEnums)
 			auth.GET("/enums/:type", enumHandler.GetEnumsByType)
+			
+			// 授权码管理
+			auth.GET("/v1/authorization-codes", authCodeHandler.GetAuthorizationCodeList)
+			auth.POST("/v1/authorization-codes", authCodeHandler.CreateAuthorizationCode)
+			auth.GET("/v1/authorization-codes/:id", authCodeHandler.GetAuthorizationCode)
+			auth.PUT("/v1/authorization-codes/:id", authCodeHandler.UpdateAuthorizationCode)
+			auth.PUT("/v1/authorization-codes/:id/lock", authCodeHandler.LockUnlockAuthorizationCode)
+			auth.DELETE("/v1/authorization-codes/:id", authCodeHandler.DeleteAuthorizationCode)
 		}
 
 		// 管理员接口

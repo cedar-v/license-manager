@@ -10,6 +10,220 @@ definitions:
       timestamp:
         type: string
     type: object
+  models.AuthorizationCode:
+    properties:
+      code:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: string
+      current_activations:
+        type: integer
+      custom_parameters:
+        type: object
+      customer_id:
+        type: string
+      customer_name:
+        type: string
+      customer_name_display:
+        type: string
+      deployment_type:
+        type: string
+      deployment_type_display:
+        type: string
+      description:
+        type: string
+      encryption_type:
+        type: string
+      encryption_type_display:
+        type: string
+      end_date:
+        type: string
+      feature_config:
+        type: object
+      id:
+        type: string
+      is_locked:
+        type: boolean
+      lock_reason:
+        type: string
+      locked_at:
+        type: string
+      locked_by:
+        type: string
+      max_activations:
+        type: integer
+      software_id:
+        type: string
+      software_version:
+        type: string
+      start_date:
+        type: string
+      status:
+        type: string
+      status_display:
+        type: string
+      updated_at:
+        type: string
+      usage_limits:
+        type: object
+    type: object
+  models.AuthorizationCodeCreateRequest:
+    properties:
+      custom_parameters: {}
+      customer_id:
+        type: string
+      deployment_type:
+        enum:
+        - standalone
+        - cloud
+        - hybrid
+        type: string
+      description:
+        maxLength: 1000
+        type: string
+      encryption_type:
+        enum:
+        - standard
+        - advanced
+        type: string
+      feature_config: {}
+      max_activations:
+        minimum: 1
+        type: integer
+      software_id:
+        type: string
+      software_version:
+        type: string
+      usage_limits: {}
+      validity_days:
+        maximum: 36500
+        minimum: 1
+        type: integer
+    required:
+    - customer_id
+    - deployment_type
+    - max_activations
+    - validity_days
+    type: object
+  models.AuthorizationCodeCreateResponse:
+    properties:
+      code:
+        type: string
+      id:
+        type: string
+    type: object
+  models.AuthorizationCodeListItem:
+    properties:
+      code:
+        type: string
+      created_at:
+        type: string
+      current_activations:
+        type: integer
+      customer_id:
+        type: string
+      customer_name:
+        type: string
+      customer_name_display:
+        type: string
+      deployment_type:
+        type: string
+      deployment_type_display:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: string
+      is_locked:
+        type: boolean
+      max_activations:
+        type: integer
+      start_date:
+        type: string
+      status:
+        type: string
+      status_display:
+        type: string
+    type: object
+  models.AuthorizationCodeListResponse:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/models.AuthorizationCodeListItem'
+        type: array
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  models.AuthorizationCodeLockRequest:
+    properties:
+      is_locked:
+        description: true-锁定，false-解锁
+        type: boolean
+      lock_reason:
+        description: 锁定原因
+        maxLength: 500
+        type: string
+      reason:
+        description: 变更原因（记录到变更历史）
+        maxLength: 500
+        type: string
+    type: object
+  models.AuthorizationCodeUpdateRequest:
+    properties:
+      change_type:
+        enum:
+        - renewal
+        - upgrade
+        - limit_change
+        - feature_toggle
+        - lock
+        - unlock
+        - other
+        type: string
+      custom_parameters: {}
+      deployment_type:
+        enum:
+        - standalone
+        - cloud
+        - hybrid
+        type: string
+      description:
+        maxLength: 1000
+        type: string
+      encryption_type:
+        enum:
+        - standard
+        - advanced
+        type: string
+      feature_config: {}
+      max_activations:
+        minimum: 1
+        type: integer
+      reason:
+        maxLength: 500
+        type: string
+      software_id:
+        type: string
+      software_version:
+        type: string
+      usage_limits: {}
+      validity_days:
+        maximum: 36500
+        minimum: 1
+        type: integer
+    required:
+    - change_type
+    type: object
   models.Customer:
     properties:
       address:
@@ -778,6 +992,316 @@ paths:
       summary: 刷新Token
       tags:
       - 认证
+  /api/v1/authorization-codes:
+    get:
+      consumes:
+      - application/json
+      description: 分页查询授权码列表，支持筛选和排序
+      parameters:
+      - description: 页码，默认1
+        in: query
+        minimum: 1
+        name: page
+        type: integer
+      - description: 每页条数，默认20，最大100
+        in: query
+        maximum: 100
+        minimum: 1
+        name: page_size
+        type: integer
+      - description: 客户ID筛选
+        in: query
+        name: customer_id
+        type: string
+      - description: 状态筛选
+        enum:
+        - normal
+        - locked
+        - expired
+        in: query
+        name: status
+        type: string
+      - description: 创建开始时间
+        in: query
+        name: start_date
+        type: string
+      - description: 创建结束时间
+        in: query
+        name: end_date
+        type: string
+      - description: 排序字段，默认created_at
+        enum:
+        - created_at
+        - updated_at
+        - code
+        in: query
+        name: sort
+        type: string
+      - description: 排序方向，默认desc
+        enum:
+        - asc
+        - desc
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.AuthorizationCodeListResponse'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 查询授权码列表
+      tags:
+      - 授权码管理
+    post:
+      consumes:
+      - application/json
+      description: 创建新的授权码，自动生成授权码字符串。有效期从当天00:00:00开始，到指定天数后的23:59:59结束
+      parameters:
+      - description: 授权码信息
+        in: body
+        name: authorization_code
+        required: true
+        schema:
+          $ref: '#/definitions/models.AuthorizationCodeCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 创建成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.AuthorizationCodeCreateResponse'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 客户不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: 授权码已存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 创建授权码
+      tags:
+      - 授权码管理
+  /api/v1/authorization-codes/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除指定的授权码（软删除）
+      parameters:
+      - description: 授权码ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除成功
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 授权码不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 删除授权码
+      tags:
+      - 授权码管理
+    get:
+      consumes:
+      - application/json
+      description: 根据授权码ID获取授权码详细信息
+      parameters:
+      - description: 授权码ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.AuthorizationCode'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 授权码不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取授权码详情
+      tags:
+      - 授权码管理
+    put:
+      consumes:
+      - application/json
+      description: 更新授权码信息，所有字段都是可选的，需要指定变更类型和原因
+      parameters:
+      - description: 授权码ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 授权码信息
+        in: body
+        name: authorization_code
+        required: true
+        schema:
+          $ref: '#/definitions/models.AuthorizationCodeUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 更新成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.AuthorizationCode'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 授权码不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 更新授权码
+      tags:
+      - 授权码管理
+  /api/v1/authorization-codes/{id}/lock:
+    put:
+      consumes:
+      - application/json
+      description: 锁定或解锁指定的授权码，可以设置锁定原因
+      parameters:
+      - description: 授权码ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 锁定/解锁信息
+        in: body
+        name: lock_request
+        required: true
+        schema:
+          $ref: '#/definitions/models.AuthorizationCodeLockRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.AuthorizationCode'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 授权码不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 锁定/解锁授权码
+      tags:
+      - 授权码管理
   /api/v1/login:
     post:
       consumes:
