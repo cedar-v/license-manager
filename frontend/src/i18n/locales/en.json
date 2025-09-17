@@ -99,5 +99,137 @@
         "month": "This Month"
       }
     }
+  },
+  "pages": {
+    "users": {
+      "title": "System Users",
+      "welcome": "Welcome to the System Users page"
+    },
+    "roles": {
+      "title": "Roles & Permissions",
+      "welcome": "Welcome to the Roles & Permissions page"
+    },
+    "licenses": {
+      "title": "License Management",
+      "welcome": "Welcome to the License Management page"
+    }
+  },
+  "customers": {
+    "title": "Customer Management",
+    "viewCustomer": "View Customer",
+    "addCustomer": "Add New Customer",
+    "editCustomer": "Edit Customer",
+    "actions": {
+      "add": "Add New Customer",
+      "edit": "Edit",
+      "delete": "Delete",
+      "enable": "Enable",
+      "disable": "Disable",
+      "viewLicense": "View License",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "table": {
+      "customerCode": "Customer Code",
+      "customerName": "Customer Name",
+      "customerType": "Customer Type",
+      "contactPerson": "Contact Person",
+      "email": "Email",
+      "customerLevel": "Customer Level",
+      "status": "Status",
+      "createTime": "Create Time",
+      "operation": "Operation",
+      "loading": "Loading..."
+    },
+    "form": {
+      "basicInfo": "Basic Information",
+      "businessInfo": "Business Information",
+      "customerName": "Customer Name",
+      "customerType": "Customer Type",
+      "customerLevel": "Customer Level",
+      "contactPerson": "Contact Person",
+      "email": "Email",
+      "status": "Status",
+      "phone": "Phone",
+      "address": "Address",
+      "industry": "Industry",
+      "companySize": "Company Size",
+      "businessScope": "Business Scope",
+      "establishedDate": "Established Date",
+      "registrationNumber": "Registration Number",
+      "taxNumber": "Tax Number",
+      "legalRepresentative": "Legal Representative",
+      "website": "Website",
+      "description": "Description",
+      "preferredLicense": "Preferred License",
+      "placeholder": {
+        "enter": "Please enter",
+        "select": "Please select"
+      }
+    },
+    "filter": {
+      "label": "Filter:",
+      "customerType": "Customer Type",
+      "customerLevel": "Customer Level",
+      "status": "Status"
+    },
+    "search": {
+      "placeholder": "Search customer code, name, contact, email"
+    },
+    "breadcrumb": {
+      "customerManagement": "Customer Management",
+      "addCustomer": "Add New Customer",
+      "editCustomer": "Edit Customer"
+    },
+    "confirm": {
+      "deleteTitle": "Confirm Delete",
+      "deleteMessage": "Are you sure you want to delete customer \"{name}\"?",
+      "disableTitle": "Confirm Disable",
+      "disableMessage": "Are you sure you want to disable customer \"{name}\"?",
+      "enableTitle": "Confirm Enable",
+      "enableMessage": "Are you sure you want to enable customer \"{name}\"?",
+      "confirm": "Confirm",
+      "cancel": "Cancel"
+    },
+    "message": {
+      "deleteSuccess": "Delete successful",
+      "deleteCancel": "Delete cancelled",
+      "deleteLoading": "Deleting...",
+      "disableLoading": "Disabling...",
+      "enableLoading": "Enabling...",
+      "statusChangeCancel": "{action} cancelled",
+      "loadEnumError": "Failed to load enum data",
+      "getDetailError": "Failed to get customer detail: "
+    },
+    "validation": {
+      "nameRequired": "Please enter customer name",
+      "typeRequired": "Please select customer type",
+      "levelRequired": "Please select customer level",
+      "contactRequired": "Please enter contact person",
+      "statusRequired": "Please select status",
+      "companySizeRequired": "Please select company size",
+      "emailFormat": "Please enter valid email format",
+      "phoneFormat": "Please enter valid phone format",
+      "websiteFormat": "Please enter valid website format"
+    },
+    "view": {
+      "back": "Back",
+      "statusInfo": "Status Information",
+      "licenseStats": "License Statistics",
+      "creator": "Creator",
+      "createTime": "Create Time",
+      "updater": "Updater",
+      "updateTime": "Update Time",
+      "totalLicenses": "Total Licenses",
+      "activeLicenses": "Active Licenses",
+      "recentLicense": "Recent License",
+      "expiringSoon": "Expiring Soon",
+      "expiringSoonTime": "Expiring Soon Time",
+      "expiredLicenses": "Expired Licenses",
+      "expiredTime": "Expired Time",
+      "noData": "--",
+      "onlineLicense": "Online License",
+      "customerNotExist": "Customer data does not exist"
+    }
   }
 }

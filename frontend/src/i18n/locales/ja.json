@@ -99,5 +99,137 @@
         "month": "今月"
       }
     }
+  },
+  "pages": {
+    "users": {
+      "title": "システムユーザー",
+      "welcome": "システムユーザーページへようこそ"
+    },
+    "roles": {
+      "title": "ロールと権限",
+      "welcome": "ロールと権限ページへようこそ"
+    },
+    "licenses": {
+      "title": "ライセンス管理",
+      "welcome": "ライセンス管理ページへようこそ"
+    }
+  },
+  "customers": {
+    "title": "顧客管理",
+    "viewCustomer": "顧客表示",
+    "addCustomer": "新規顧客追加",
+    "editCustomer": "顧客編集",
+    "actions": {
+      "add": "新規顧客追加",
+      "edit": "編集",
+      "delete": "削除",
+      "enable": "有効化",
+      "disable": "無効化",
+      "viewLicense": "ライセンス表示",
+      "save": "保存",
+      "cancel": "キャンセル"
+    },
+    "table": {
+      "customerCode": "顧客コード",
+      "customerName": "顧客名",
+      "customerType": "顧客タイプ",
+      "contactPerson": "担当者",
+      "email": "メール",
+      "customerLevel": "顧客レベル",
+      "status": "ステータス",
+      "createTime": "作成日時",
+      "operation": "操作",
+      "loading": "読み込み中..."
+    },
+    "form": {
+      "basicInfo": "基本情報",
+      "businessInfo": "ビジネス情報",
+      "customerName": "顧客名",
+      "customerType": "顧客タイプ",
+      "customerLevel": "顧客レベル",
+      "contactPerson": "担当者",
+      "email": "メール",
+      "status": "ステータス",
+      "phone": "電話番号",
+      "address": "住所",
+      "industry": "業界",
+      "companySize": "会社規模",
+      "businessScope": "事業範囲",
+      "establishedDate": "設立日",
+      "registrationNumber": "登録番号",
+      "taxNumber": "税務番号",
+      "legalRepresentative": "法定代表者",
+      "website": "ウェブサイト",
+      "description": "説明",
+      "preferredLicense": "優先ライセンス",
+      "placeholder": {
+        "enter": "入力してください",
+        "select": "選択してください"
+      }
+    },
+    "filter": {
+      "label": "フィルター：",
+      "customerType": "顧客タイプ",
+      "customerLevel": "顧客レベル",
+      "status": "ステータス"
+    },
+    "search": {
+      "placeholder": "顧客コード、顧客名、担当者、メールで検索"
+    },
+    "breadcrumb": {
+      "customerManagement": "顧客管理",
+      "addCustomer": "新規顧客追加",
+      "editCustomer": "顧客編集"
+    },
+    "confirm": {
+      "deleteTitle": "削除確認",
+      "deleteMessage": "顧客 \"{name}\" を削除してもよろしいですか？",
+      "disableTitle": "無効化確認",
+      "disableMessage": "顧客 \"{name}\" を無効化してもよろしいですか？",
+      "enableTitle": "有効化確認",
+      "enableMessage": "顧客 \"{name}\" を有効化してもよろしいですか？",
+      "confirm": "確認",
+      "cancel": "キャンセル"
+    },
+    "message": {
+      "deleteSuccess": "削除しました",
+      "deleteCancel": "削除をキャンセルしました",
+      "deleteLoading": "削除中...",
+      "disableLoading": "無効化中...",
+      "enableLoading": "有効化中...",
+      "statusChangeCancel": "{action}をキャンセルしました",
+      "loadEnumError": "列挙データの読み込みに失敗しました",
+      "getDetailError": "顧客詳細の取得に失敗しました："
+    },
+    "validation": {
+      "nameRequired": "顧客名を入力してください",
+      "typeRequired": "顧客タイプを選択してください",
+      "levelRequired": "顧客レベルを選択してください",
+      "contactRequired": "担当者を入力してください",
+      "statusRequired": "ステータスを選択してください",
+      "companySizeRequired": "会社規模を選択してください",
+      "emailFormat": "正しいメール形式を入力してください",
+      "phoneFormat": "正しい電話番号形式を入力してください",
+      "websiteFormat": "正しいウェブサイト形式を入力してください"
+    },
+    "view": {
+      "back": "戻る",
+      "statusInfo": "ステータス情報",
+      "licenseStats": "ライセンス統計",
+      "creator": "作成者",
+      "createTime": "作成日時",
+      "updater": "更新者",
+      "updateTime": "更新日時",
+      "totalLicenses": "総ライセンス数",
+      "activeLicenses": "アクティブライセンス",
+      "recentLicense": "最近のライセンス",
+      "expiringSoon": "期限近し",
+      "expiringSoonTime": "期限近し日時",
+      "expiredLicenses": "期限切れライセンス",
+      "expiredTime": "期限切れ日時",
+      "noData": "--",
+      "onlineLicense": "オンラインライセンス",
+      "customerNotExist": "顧客データが存在しません"
+    }
   }
 }

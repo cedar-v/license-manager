@@ -11,15 +11,15 @@
   <div class="top-section">
     <!-- 面包屑导航 -->
     <div class="breadcrumb">
-      <span class="breadcrumb-item">客户管理</span>
+      <span class="breadcrumb-item">{{ t('customers.breadcrumb.customerManagement') }}</span>
       <span class="breadcrumb-separator">></span>
-      <span class="breadcrumb-current">{{ isEdit ? '编辑客户' : '添加新客户' }}</span>
+      <span class="breadcrumb-current">{{ isEdit ? t('customers.breadcrumb.editCustomer') : t('customers.breadcrumb.addCustomer') }}</span>
     </div>
     
     <!-- 操作按钮 -->
     <div class="form-actions">
-      <el-button @click="handleCancel">取 消</el-button>
-      <el-button type="primary" @click="handleSave" :loading="loading">保 存</el-button>
+      <el-button @click="handleCancel">{{ t('customers.actions.cancel') }}</el-button>
+      <el-button type="primary" @click="handleSave" :loading="loading">{{ t('customers.actions.save') }}</el-button>
     </div>
   </div>
 
@@ -28,16 +28,16 @@
     <el-form :model="formData" :rules="formRules" ref="formRef" label-position="top">
       <!-- 基本信息 -->
       <div  class="customer-form">
-        <h3 class="section-title">基本信息</h3>
+        <h3 class="section-title">{{ t('customers.form.basicInfo') }}</h3>
         
         <!-- Flex布局 - 7个字段横向排列 -->
         <div class="fields-row-flex">
-          <el-form-item label="客户名称" prop="name" required class="field-item">
-            <el-input v-model="formData.name" placeholder="请输入" />
+          <el-form-item :label="t('customers.form.customerName')" prop="name" required class="field-item">
+            <el-input v-model="formData.name" :placeholder="t('customers.form.placeholder.enter')" />
           </el-form-item>
           
-          <el-form-item label="客户类型" prop="type" required class="field-item">
-            <el-select v-model="formData.type" placeholder="请选择" style="width: 100%">
+          <el-form-item :label="t('customers.form.customerType')" prop="type" required class="field-item">
+            <el-select v-model="formData.type" :placeholder="t('customers.form.placeholder.select')" style="width: 100%">
               <el-option 
                 v-for="option in customerTypeOptions" 
                 :key="option.key" 
@@ -47,8 +47,8 @@
             </el-select>
           </el-form-item>
           
-          <el-form-item label="客户等级" prop="level" required class="field-item">
-            <el-select v-model="formData.level" placeholder="请选择" style="width: 100%">
+          <el-form-item :label="t('customers.form.customerLevel')" prop="level" required class="field-item">
+            <el-select v-model="formData.level" :placeholder="t('customers.form.placeholder.select')" style="width: 100%">
               <el-option 
                 v-for="option in customerLevelOptions" 
                 :key="option.key" 
@@ -58,15 +58,15 @@
             </el-select>
           </el-form-item>
           
-          <el-form-item label="联系人" prop="contact" required class="field-item">
-            <el-input v-model="formData.contact" placeholder="请输入" />
+          <el-form-item :label="t('customers.form.contactPerson')" prop="contact" required class="field-item">
+            <el-input v-model="formData.contact" :placeholder="t('customers.form.placeholder.enter')" />
           </el-form-item>
           
-          <el-form-item label="邮箱" prop="email" class="field-item">
-            <el-input v-model="formData.email" placeholder="请输入" />
+          <el-form-item :label="t('customers.form.email')" prop="email" class="field-item">
+            <el-input v-model="formData.email" :placeholder="t('customers.form.placeholder.enter')" />
           </el-form-item>
           
-          <el-form-item label="状态" prop="status" required class="field-item status-field">
+          <el-form-item :label="t('customers.form.status')" prop="status" required class="field-item status-field">
             <el-radio-group v-model="formData.status">
               <el-radio 
                 v-for="option in statusOptions" 
@@ -78,26 +78,26 @@
             </el-radio-group>
           </el-form-item>
           
-          <el-form-item label="联系电话" prop="phone" class="field-item">
-            <el-input v-model="formData.phone" placeholder="请输入" />
+          <el-form-item :label="t('customers.form.phone')" prop="phone" class="field-item">
+            <el-input v-model="formData.phone" :placeholder="t('customers.form.placeholder.enter')" />
           </el-form-item>
         </div>
         
         <!-- Grid布局 - 地址跨列 -->
         <div class="fields-row-grid">
-          <el-form-item label="地址" prop="address" class="address-field">
-            <el-input v-model="formData.address" placeholder="请输入" />
+          <el-form-item :label="t('customers.form.address')" prop="address" class="address-field">
+            <el-input v-model="formData.address" :placeholder="t('customers.form.placeholder.enter')" />
           </el-form-item>
         </div>
       </div>
 
       <!-- 商业信息 -->
       <div  class="customer-form">
-        <h3 class="section-title">商业信息</h3>
+        <h3 class="section-title">{{ t('customers.form.businessInfo') }}</h3>
         
         <div class="business-fields">
-          <el-form-item label="企业规模" prop="companySize" required class="company-size-field">
-            <el-select v-model="formData.companySize" placeholder="请选择" style="width: 100%">
+          <el-form-item :label="t('customers.form.companySize')" prop="companySize" required class="company-size-field">
+            <el-select v-model="formData.companySize" :placeholder="t('customers.form.placeholder.select')" style="width: 100%">
               <el-option 
                 v-for="option in companySizeOptions" 
                 :key="option.key" 
@@ -107,12 +107,12 @@
             </el-select>
           </el-form-item>
           
-          <el-form-item label="客户描述" prop="description" class="description-field">
+          <el-form-item :label="t('customers.form.description')" prop="description" class="description-field">
             <el-input
               v-model="formData.description"
               type="textarea"
               :rows="4"
-              placeholder="请输入"
+              :placeholder="t('customers.form.placeholder.enter')"
               :maxlength="500"
               show-word-limit
             />
@@ -126,6 +126,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import { createCustomer, updateCustomer, getCustomerDetail } from '@/api/customer'
 import {
   getCustomerTypeEnums,
@@ -158,6 +159,8 @@ const emit = defineEmits<{
   save: [data: CustomerFormData]
   cancel: []
 }>()
+
+const { t } = useI18n()
 
 const formRef = ref<FormInstance>()
 const loading = ref(false)
@@ -195,7 +198,7 @@ const loadEnums = async () => {
       companySizeOptions.value = sizeRes.data.items
     }
   } catch (error) {
-    console.error('加载枚举数据失败:', error)
+    console.error(t('customers.message.loadEnumError'), error)
   }
 }
 
@@ -216,28 +219,28 @@ const formData = reactive<CustomerFormData>({
 // 表单验证规则
 const formRules: FormRules = {
   name: [
-    { required: true, message: '请输入客户名称', trigger: 'blur' }
+    { required: true, message: t('customers.validation.nameRequired'), trigger: 'blur' }
   ],
   contact: [
-    { required: true, message: '请输入联系人', trigger: 'blur' }
+    { required: true, message: t('customers.validation.contactRequired'), trigger: 'blur' }
   ],
   type: [
-    { required: true, message: '请选择客户类型', trigger: 'change' }
+    { required: true, message: t('customers.validation.typeRequired'), trigger: 'change' }
   ],
   level: [
-    { required: true, message: '请选择客户等级', trigger: 'change' }
+    { required: true, message: t('customers.validation.levelRequired'), trigger: 'change' }
   ],
   status: [
-    { required: true, message: '请选择状态', trigger: 'change' }
+    { required: true, message: t('customers.validation.statusRequired'), trigger: 'change' }
   ],
   companySize: [
-    { required: true, message: '请选择企业规模', trigger: 'change' }
+    { required: true, message: t('customers.validation.companySizeRequired'), trigger: 'change' }
   ],
   email: [
-    { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
+    { type: 'email', message: t('customers.validation.emailFormat'), trigger: 'blur' }
   ],
   phone: [
-    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur' }
+    { pattern: /^1[3-9]\d{9}$/, message: t('customers.validation.phoneFormat'), trigger: 'blur' }
   ]
 }
 
@@ -266,13 +269,13 @@ const loadCustomerData = async () => {
         description: customerData.description || ''
       })
     } else {
-      ElMessage.error('获取客户详情失败：' + response.message)
+      ElMessage.error(t('customers.message.getDetailError') + response.message)
     }
   } catch (error: any) {
-    console.error('获取客户详情失败:', error)
+    console.error('Get customer detail error:', error)
     let errorMessage = error.backendMessage || error.response?.data?.message || error.message
     if (errorMessage) {
-      ElMessage.error('获取客户详情失败：' + errorMessage)
+      ElMessage.error(t('customers.message.getDetailError') + errorMessage)
     }
   } finally {
     loading.value = false
@@ -321,7 +324,7 @@ const handleSave = async () => {
       ElMessage.error(response.message)
     }
   } catch (error: any) {
-    console.error('保存失败:', error)
+    console.error('Save failed:', error)
     // 使用后端返回的错误信息
     let errorMessage = error.backendMessage || error.response?.data?.message || error.message
     if (errorMessage) {

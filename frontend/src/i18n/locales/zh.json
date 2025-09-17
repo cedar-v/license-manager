@@ -99,5 +99,137 @@
         "month": "本月"
       }
     }
+  },
+  "pages": {
+    "users": {
+      "title": "系统用户",
+      "welcome": "欢迎你来到系统用户页面"
+    },
+    "roles": {
+      "title": "角色权限",
+      "welcome": "欢迎你来到角色权限页面"
+    },
+    "licenses": {
+      "title": "授权管理",
+      "welcome": "欢迎你来到授权管理页面"
+    }
+  },
+  "customers": {
+    "title": "客户管理",
+    "viewCustomer": "查看客户",
+    "addCustomer": "添加新客户",
+    "editCustomer": "编辑客户",
+    "actions": {
+      "add": "添加新客户",
+      "edit": "编辑",
+      "delete": "删除",
+      "enable": "启用",
+      "disable": "禁用",
+      "viewLicense": "查看授权",
+      "save": "保 存",
+      "cancel": "取 消"
+    },
+    "table": {
+      "customerCode": "客户编码",
+      "customerName": "客户名称",
+      "customerType": "客户类型",
+      "contactPerson": "联系人",
+      "email": "邮箱",
+      "customerLevel": "客户等级",
+      "status": "状态",
+      "createTime": "创建时间",
+      "operation": "操作",
+      "loading": "加载中..."
+    },
+    "form": {
+      "basicInfo": "基本信息",
+      "businessInfo": "商业信息",
+      "customerName": "客户名称",
+      "customerType": "客户类型",
+      "customerLevel": "客户等级",
+      "contactPerson": "联系人",
+      "email": "邮箱",
+      "status": "状态",
+      "phone": "联系电话",
+      "address": "地址",
+      "industry": "所属行业",
+      "companySize": "公司规模",
+      "businessScope": "经营范围",
+      "establishedDate": "成立时间",
+      "registrationNumber": "工商注册号",
+      "taxNumber": "税务登记号",
+      "legalRepresentative": "法定代表人",
+      "website": "公司网址",
+      "description": "客户描述",
+      "preferredLicense": "首选授权",
+      "placeholder": {
+        "enter": "请输入",
+        "select": "请选择"
+      }
+    },
+    "filter": {
+      "label": "筛选：",
+      "customerType": "客户类型",
+      "customerLevel": "客户等级",
+      "status": "状态"
+    },
+    "search": {
+      "placeholder": "搜索客户编码、客户名称、联系人、邮箱"
+    },
+    "breadcrumb": {
+      "customerManagement": "客户管理",
+      "addCustomer": "添加新客户",
+      "editCustomer": "编辑客户"
+    },
+    "confirm": {
+      "deleteTitle": "确认删除",
+      "deleteMessage": "确定要删除客户 \"{name}\" 吗？",
+      "disableTitle": "确认禁用",
+      "disableMessage": "确定要禁用客户 \"{name}\" 吗？",
+      "enableTitle": "确认启用",
+      "enableMessage": "确定要启用客户 \"{name}\" 吗？",
+      "confirm": "确定",
+      "cancel": "取消"
+    },
+    "message": {
+      "deleteSuccess": "删除成功",
+      "deleteCancel": "已取消删除",
+      "deleteLoading": "删除中...",
+      "disableLoading": "禁用中...",
+      "enableLoading": "启用中...",
+      "statusChangeCancel": "已取消{action}",
+      "loadEnumError": "加载枚举数据失败",
+      "getDetailError": "获取客户详情失败："
+    },
+    "validation": {
+      "nameRequired": "请输入客户名称",
+      "typeRequired": "请选择客户类型",
+      "levelRequired": "请选择客户等级",
+      "contactRequired": "请输入联系人",
+      "statusRequired": "请选择状态",
+      "companySizeRequired": "请选择企业规模",
+      "emailFormat": "请输入正确的邮箱格式",
+      "phoneFormat": "请输入正确的手机号码",
+      "websiteFormat": "请输入正确的网址格式"
+    },
+    "view": {
+      "back": "返 回",
+      "statusInfo": "状态信息",
+      "licenseStats": "授权统计",
+      "creator": "创建人",
+      "createTime": "创建时间",
+      "updater": "更新人",
+      "updateTime": "更新时间",
+      "totalLicenses": "总授权数",
+      "activeLicenses": "活跃授权",
+      "recentLicense": "最近授权",
+      "expiringSoon": "即将过期",
+      "expiringSoonTime": "即将过期时间",
+      "expiredLicenses": "过期授权",
+      "expiredTime": "过期时间",
+      "noData": "--",
+      "onlineLicense": "在线授权",
+      "customerNotExist": "客户数据不存在"
+    }
   }
 }

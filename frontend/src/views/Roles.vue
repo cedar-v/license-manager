@@ -7,16 +7,19 @@
  * @Description: 角色权限页面
 -->
 <template>
-  <Layout app-name="Cedar-V" page-title="角色权限">
+  <Layout app-name="Cedar-V" :page-title="t('pages.roles.title')">
     <!-- 页面内容 -->
     <div class="content-container">
-      <h1>欢迎你来到角色权限页面</h1>
+      <h1>{{ t('pages.roles.welcome') }}</h1>
     </div>
   </Layout>
 </template>
 
 <script setup lang="ts">
 import Layout from '@/components/common/layout/Layout.vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 </script>
 
 <style scoped>

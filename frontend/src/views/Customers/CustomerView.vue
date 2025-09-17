@@ -11,14 +11,14 @@
   <div class="top-section">
     <!-- 面包屑导航 -->
     <div class="breadcrumb">
-      <span class="breadcrumb-item">客户管理</span>
+      <span class="breadcrumb-item">{{ t('customers.breadcrumb.customerManagement') }}</span>
       <span class="breadcrumb-separator">></span>
-      <span class="breadcrumb-current">查看客户</span>
+      <span class="breadcrumb-current">{{ t('customers.viewCustomer') }}</span>
     </div>
     
     <!-- 返回按钮 -->
     <div class="form-actions">
-      <el-button @click="handleBack">返 回</el-button>
+      <el-button @click="handleBack">{{ t('customers.view.back') }}</el-button>
     </div>
   </div>
 
@@ -26,83 +26,83 @@
   <div class="customer-view" v-loading="loading">
     <!-- 基本信息卡片 -->
     <div class="info-card basic-info">
-      <h3 class="section-title">基本信息</h3>
+      <h3 class="section-title">{{ t('customers.form.basicInfo') }}</h3>
       <div class="info-grid">
         <div class="info-item">
-          <span class="label">客户名称：</span>
-          <span class="value">{{ customerData.name || '--' }}</span>
+          <span class="label">{{ t('customers.form.customerName') }}：</span>
+          <span class="value">{{ customerData.name || t('customers.view.noData') }}</span>
         </div>
         <div class="info-item">
-          <span class="label">客户类型：</span>
+          <span class="label">{{ t('customers.form.customerType') }}：</span>
           <span class="value">{{ getCustomerTypeLabel(customerData.type) }}</span>
         </div>
         <div class="info-item">
-          <span class="label">客户等级：</span>
+          <span class="label">{{ t('customers.form.customerLevel') }}：</span>
           <span class="value">{{ getCustomerLevelLabel(customerData.level) }}</span>
         </div>
         <div class="info-item">
-          <span class="label">联系人：</span>
-          <span class="value">{{ customerData.contact || '--' }}</span>
+          <span class="label">{{ t('customers.form.contactPerson') }}：</span>
+          <span class="value">{{ customerData.contact || t('customers.view.noData') }}</span>
         </div>
         <div class="info-item">
-          <span class="label">邮箱：</span>
-          <span class="value">{{ customerData.email || '--' }}</span>
+          <span class="label">{{ t('customers.form.email') }}：</span>
+          <span class="value">{{ customerData.email || t('customers.view.noData') }}</span>
         </div>
         <div class="info-item">
-          <span class="label">状态：</span>
+          <span class="label">{{ t('customers.form.status') }}：</span>
           <span class="value">{{ getStatusLabel(customerData.status) }}</span>
         </div>
         <div class="info-item">
-          <span class="label">联系电话：</span>
-          <span class="value">{{ customerData.phone || '--' }}</span>
+          <span class="label">{{ t('customers.form.phone') }}：</span>
+          <span class="value">{{ customerData.phone || t('customers.view.noData') }}</span>
         </div>
         <div class="info-item full-width">
-          <span class="label">地址：</span>
-          <span class="value">{{ customerData.address || '--' }}</span>
+          <span class="label">{{ t('customers.form.address') }}：</span>
+          <span class="value">{{ customerData.address || t('customers.view.noData') }}</span>
         </div>
       </div>
     </div>
 
     <!-- 商业信息卡片 -->
     <div class="info-card business-info">
-      <h3 class="section-title">商业信息</h3>
+      <h3 class="section-title">{{ t('customers.form.businessInfo') }}</h3>
       <div class="info-grid">
         <div class="info-item">
-          <span class="label">企业规模：</span>
-          <span class="value">{{ enumLabels.companySize || '--' }}</span>
+          <span class="label">{{ t('customers.form.companySize') }}：</span>
+          <span class="value">{{ enumLabels.companySize || t('customers.view.noData') }}</span>
         </div>
         <div class="info-item full-width">
-          <span class="label">首选授权：</span>
-          <span class="value">{{ customerData.preferredLicense || '--' }}</span>
+          <span class="label">{{ t('customers.form.preferredLicense') }}：</span>
+          <span class="value">{{ customerData.preferredLicense || t('customers.view.noData') }}</span>
         </div>
         <div class="info-item full-width">
-          <span class="label">客户描述：</span>
-          <span class="value description">{{ customerData.description || '--' }}</span>
+          <span class="label">{{ t('customers.form.description') }}：</span>
+          <span class="value description">{{ customerData.description || t('customers.view.noData') }}</span>
         </div>
       </div>
     </div>
 
     <!-- 状态信息卡片 -->
     <div class="info-card status-info">
-      <h3 class="section-title">状态信息</h3>
+      <h3 class="section-title">{{ t('customers.view.statusInfo') }}</h3>
       <div class="info-grid">
         <div class="info-item inline-group full-width">
           <div class="inline-pair">
-            <span class="label">创建人：</span>
-            <span class="value">{{ customerData.statusRecords?.[0]?.user || '--' }}</span>
+            <span class="label">{{ t('customers.view.creator') }}：</span>
+            <span class="value">{{ customerData.statusRecords?.[0]?.user || t('customers.view.noData') }}</span>
           </div>
           <div class="inline-pair">
-            <span class="label">创建时间：</span>
+            <span class="label">{{ t('customers.view.createTime') }}：</span>
             <span class="value">{{ formatDate(customerData.statusRecords?.[0]?.time) }}</span>
           </div>
         </div>
         <div class="info-item inline-group full-width">
           <div class="inline-pair">
-            <span class="label">更新人：</span>
-            <span class="value">{{ customerData.statusRecords?.[1]?.user || '--' }}</span>
+            <span class="label">{{ t('customers.view.updater') }}：</span>
+            <span class="value">{{ customerData.statusRecords?.[1]?.user || t('customers.view.noData') }}</span>
           </div>
           <div class="inline-pair">
-            <span class="label">更新时间：</span>
+            <span class="label">{{ t('customers.view.updateTime') }}：</span>
             <span class="value">{{ formatDate(customerData.statusRecords?.[1]?.time) }}</span>
           </div>
         </div>
@@ -111,37 +111,37 @@
 
     <!-- 授权统计卡片 -->
     <div class="info-card license-stats">
-      <h3 class="section-title">授权统计</h3>
+      <h3 class="section-title">{{ t('customers.view.licenseStats') }}</h3>
       <div class="info-grid">
         <div class="info-item">
-          <span class="label">总授权数：</span>
+          <span class="label">{{ t('customers.view.totalLicenses') }}：</span>
           <span class="value">{{ customerData.totalLicenses || 0 }}</span>
         </div>
         <div class="info-item">
-          <span class="label">活跃授权：</span>
+          <span class="label">{{ t('customers.view.activeLicenses') }}：</span>
           <span class="value">{{ customerData.activeLicenses || 0 }}</span>
         </div>
         <div class="info-item">
-          <span class="label">最近授权：</span>
+          <span class="label">{{ t('customers.view.recentLicense') }}：</span>
           <span class="value">{{ formatDate(customerData.latestLicenseTime) }}</span>
         </div>
         <div class="info-item inline-group full-width">
           <div class="inline-pair">
-            <span class="label">即将过期：</span>
+            <span class="label">{{ t('customers.view.expiringSoon') }}：</span>
             <span class="value">{{ customerData.expiringSoonLicenses || 0 }}</span>
           </div>
           <div class="inline-pair">
-            <span class="label">即将过期时间：</span>
+            <span class="label">{{ t('customers.view.expiringSoonTime') }}：</span>
             <span class="value">{{ formatDate(customerData.expiringSoonTime) }}</span>
           </div>
         </div>
         <div class="info-item inline-group full-width">
           <div class="inline-pair">
-            <span class="label">过期授权：</span>
+            <span class="label">{{ t('customers.view.expiredLicenses') }}：</span>
             <span class="value">{{ customerData.expiredLicenses || 0 }}</span>
           </div>
           <div class="inline-pair">
-            <span class="label">过期时间：</span>
+            <span class="label">{{ t('customers.view.expiredTime') }}：</span>
             <span class="value">{{ formatDate(customerData.expiredTime) }}</span>
           </div>
         </div>
@@ -154,6 +154,7 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getCustomerDetail } from '@/api/customer'
+import { useI18n } from 'vue-i18n'
 
 interface StatusRecord {
   action: string
@@ -191,6 +192,7 @@ const emit = defineEmits<{
   back: []
 }>()
 
+const { t } = useI18n()
 const loading = ref(false)
 const customerData = ref<Partial<CustomerViewData>>({})
 
@@ -213,7 +215,7 @@ const fetchCustomerDetail = async () => {
     const customer = response.data
     
     if (!customer) {
-      ElMessage.error('客户数据不存在')
+      ElMessage.error(t('customers.view.customerNotExist'))
       return
     }
     
@@ -236,16 +238,16 @@ const fetchCustomerDetail = async () => {
       level: customer.customer_level,
       status: customer.status,
       companySize: customer.company_size || '',
-      preferredLicense: '在线授权', // 暂时写死，等后端添加字段
+      preferredLicense: t('customers.view.onlineLicense'), // 暂时写死，等后端添加字段
       description: customer.description || '',
       statusRecords: [
         {
-          action: '创建人',
+          action: t('customers.view.creator'),
           user: customer.created_by,
           time: customer.created_at
         },
         {
-          action: '更新人',
+          action: t('customers.view.updater'),
           user: customer.updated_by,
           time: customer.updated_at
         }
@@ -260,7 +262,7 @@ const fetchCustomerDetail = async () => {
       expiredTime: undefined
     }
   } catch (error: any) {
-    console.error('获取客户详情失败:', error)
+    console.error('Get customer detail failed:', error)
     // 使用后端返回的错误信息
     let errorMessage = error.backendMessage || error.response?.data?.message || error.message
     if (errorMessage) {
@@ -278,26 +280,26 @@ const handleBack = () => {
 
 // 获取客户类型标签
 const getCustomerTypeLabel = (type: string | undefined) => {
-  if (!type) return '--'
-  return enumLabels.value.customerType || '--'
+  if (!type) return t('customers.view.noData')
+  return enumLabels.value.customerType || t('customers.view.noData')
 }
 
 // 获取客户等级标签
 const getCustomerLevelLabel = (level: string | undefined) => {
-  if (!level) return '--'
-  return enumLabels.value.customerLevel || '--'
+  if (!level) return t('customers.view.noData')
+  return enumLabels.value.customerLevel || t('customers.view.noData')
 }
 
 // 获取状态标签
 const getStatusLabel = (status: string | undefined) => {
-  if (!status) return '--'
-  return enumLabels.value.status || '--'
+  if (!status) return t('customers.view.noData')
+  return enumLabels.value.status || t('customers.view.noData')
 }
 
 
 // 格式化日期
 const formatDate = (date: string | undefined) => {
-  if (!date) return '--'
+  if (!date) return t('customers.view.noData')
   return new Date(date).toLocaleString('zh-CN')
 }
 

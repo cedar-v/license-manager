@@ -25,14 +25,14 @@ html {
 
 body {
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: $font-family-primary;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: $font-size-base;
   line-height: 1.6;
   color: $text-color-primary;
   background-color: $background-color-base;
-  
+
   @include mobile {
     font-size: $font-size-small;
     line-height: 1.5;
@@ -55,6 +55,7 @@ body {
   --el-color-primary-dark-2: #0e8a71 !important;
   --el-border-radius-base: 4px;
   --el-font-size-base: 14px;
+  --el-font-family: #{$font-family-primary};
 }
 
 /* 工具类样式 */

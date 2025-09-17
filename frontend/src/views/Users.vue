@@ -7,16 +7,19 @@
  * @Description: 系统用户页面
 -->
 <template>
-  <Layout app-name="Cedar-V" page-title="系统用户">
+  <Layout app-name="Cedar-V" :page-title="t('pages.users.title')">
     <!-- 页面内容 -->
     <div class="content-container">
-      <h1>欢迎你来到系统用户页面</h1>
+      <h1>{{ t('pages.users.welcome') }}</h1>
     </div>
   </Layout>
 </template>
 
 <script setup lang="ts">
 import Layout from '@/components/common/layout/Layout.vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 </script>
 
 <style scoped>

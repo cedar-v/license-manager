@@ -15,7 +15,7 @@
         <!-- 左侧操作区域 -->
         <div class="left-actions">
           <el-button type="primary" class="add-customer-btn" @click="handleAddCustomer">
-            添加新客户
+            {{ t('customers.actions.add') }}
           </el-button>
         </div>
         
@@ -23,10 +23,10 @@
         <div class="right-actions">
           <!-- 筛选区域 -->
           <div class="filter-section">
-            <span class="filter-label">筛选：</span>
+            <span class="filter-label">{{ t('customers.filter.label') }}</span>
             <el-select
               v-model="filterCustomerType"
-              placeholder="客户类型"
+              :placeholder="t('customers.filter.customerType')"
               class="filter-select"
               clearable
               @change="handleFilterChange"
@@ -40,7 +40,7 @@
             </el-select>
             <el-select
               v-model="filterCustomerLevel"
-              placeholder="客户等级"
+              :placeholder="t('customers.filter.customerLevel')"
               class="filter-select"
               clearable
               @change="handleFilterChange"
@@ -54,7 +54,7 @@
             </el-select>
             <el-select
               v-model="filterStatus"
-              placeholder="状态"
+              :placeholder="t('customers.filter.status')"
               class="filter-select"
               clearable
               @change="handleFilterChange"
@@ -72,7 +72,7 @@
           <div class="search-section">
             <el-input
               v-model="searchKeyword"
-              placeholder="搜索客户编码、客户名称、联系人、邮箱"
+              :placeholder="t('customers.search.placeholder')"
               class="search-input"
             >
               <template #append>
@@ -89,7 +89,7 @@
           <el-table
             :data="tableData"
             v-loading="loading"
-            element-loading-text="加载中..."
+            :element-loading-text="t('customers.table.loading')"
             stripe
             border
             style="width: 100%;"
@@ -97,51 +97,51 @@
             :row-style="getRowStyle"
             :max-height="'calc(100vh - 280px)'"
           >
-          <el-table-column prop="customer_code" label="客户编码" :width="170" show-overflow-tooltip  align="left">
+          <el-table-column prop="customer_code" :label="t('customers.table.customerCode')" :width="170" show-overflow-tooltip  align="left">
             <template #default="scope">
               <span class="customer-code" style="white-space: nowrap; overflow: visible; text-overflow: initial;">{{ scope.row.customer_code }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="customer_name" label="客户名称" :width="180" show-overflow-tooltip  align="center">
+          <el-table-column prop="customer_name" :label="t('customers.table.customerName')" :width="180" show-overflow-tooltip  align="center">
             <template #default="scope">
               <span class="ellipsis-text">{{ scope.row.customer_name }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="customer_type_display" label="客户类型" :width="130"  align="center">
+          <el-table-column prop="customer_type_display" :label="t('customers.table.customerType')" :width="130"  align="center">
           </el-table-column>
-          <el-table-column prop="contact_person" label="联系人" :width="140"    align="center" />
-          <el-table-column prop="email" label="邮箱" :width="160" show-overflow-tooltip  align="center">
+          <el-table-column prop="contact_person" :label="t('customers.table.contactPerson')" :width="140"    align="center" />
+          <el-table-column prop="email" :label="t('customers.table.email')" :width="160" show-overflow-tooltip  align="center">
              <template #default="scope">
               <span class="ellipsis-text">{{ scope.row.email }}</span>
             </template>
             </el-table-column>
-          <el-table-column prop="customer_level_display" label="客户等级" :width="130" align="center">
+          <el-table-column prop="customer_level_display" :label="t('customers.table.customerLevel')" :width="130" align="center">
            </el-table-column>
-          <el-table-column prop="status_display" label="状态" :width="100"  align="center">
+          <el-table-column prop="status_display" :label="t('customers.table.status')" :width="100"  align="center">
             <template #default="scope">
               <div class="status-tag" :class="getStatusClass(scope.row.status)">
                 {{scope.row.status_display}}
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="创建时间" :width="135"  align="center">
+          <el-table-column :label="t('customers.table.createTime')" :width="140"  align="center">
             <template #default="scope">
               {{ formatDate(scope.row.created_at) }}
             </template>
           </el-table-column>
-          <el-table-column label="操作"  :width="340" fixed="right" class-name="action-column" align="center">
+          <el-table-column :label="t('customers.table.operation')" fixed="right" class-name="action-column" align="center">
             <template #default="scope">
               <div class="action-buttons">
-                <button class="action-btn primary" @click="handleViewLicense(scope.row)">查看授权</button>
-                <button class="action-btn primary" @click="handleEdit(scope.row)">编辑</button>
+                <button class="action-btn primary" @click="handleViewLicense(scope.row)">{{ t('customers.actions.viewLicense') }}</button>
+                <button class="action-btn primary" @click="handleEdit(scope.row)">{{ t('customers.actions.edit') }}</button>
                 <button 
                   class="action-btn" 
                   :class="scope.row.status === 'active' ? 'warning' : 'success'" 
                   @click="handleDisable(scope.row)"
                 >
-                  {{ scope.row.status === 'active' ? '禁用' : '启用' }}
+                  {{ scope.row.status === 'active' ? t('customers.actions.disable') : t('customers.actions.enable') }}
                 </button>
-                <button class="action-btn danger" @click="handleDelete(scope.row)">删除</button>
+                <button class="action-btn danger" @click="handleDelete(scope.row)">{{ t('customers.actions.delete') }}</button>
               </div>
             </template>
           </el-table-column>
@@ -191,6 +191,7 @@ import CustomerForm from './CustomerForm.vue'
 import CustomerView from './CustomerView.vue'
 import { Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, ElLoading } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import { 
   getCustomers, 
   deleteCustomer, 
@@ -207,6 +208,7 @@ import {
 
 // Customer类型已从API文件导入
 
+const { t } = useI18n()
 const searchKeyword = ref('')
 const filterCustomerType = ref('')
 const filterCustomerLevel = ref('')
@@ -248,15 +250,15 @@ const loadEnums = async () => {
       statusOptions.value = statusRes.data.items
     }
   } catch (error) {
-    console.error('加载枚举数据失败:', error)
+    console.error(t('customers.message.loadEnumError'), error)
   }
 }
 
 // 页面标题
 const getPageTitle = () => {
-  if (showCustomerView.value) return '查看客户'
-  if (showCustomerForm.value) return isEditMode.value ? '编辑客户' : '添加新客户'
-  return '客户管理'
+  if (showCustomerView.value) return t('customers.viewCustomer')
+  if (showCustomerForm.value) return isEditMode.value ? t('customers.editCustomer') : t('customers.addCustomer')
+  return t('customers.title')
 }
 
 // 时间格式化函数
@@ -302,7 +304,7 @@ const loadData = async () => {
       total.value = 0
     }
   } catch (error: any) {
-    console.error('加载数据错误:', error)
+    console.error('Load data error:', error)
     
     // 使用后端返回的错误信息
     let errorMessage = error.backendMessage || error.response?.data?.message || error.message
@@ -347,22 +349,28 @@ const handleEdit = (row: Customer) => {
 
 const handleDisable = async (row: Customer) => {
   const newStatus = row.status === 'active' ? 'disabled' : 'active'
-  const actionText = newStatus === 'disabled' ? '禁用' : '启用'
+  const actionText = newStatus === 'disabled' ? t('customers.actions.disable') : t('customers.actions.enable')
   
   try {
     await ElMessageBox.confirm(
-      `确定要${actionText}客户 "${row.customer_name}" 吗？`,
-      `确认${actionText}`,
+      newStatus === 'disabled'
+        ? t('customers.confirm.disableMessage', { name: row.customer_name })
+        : t('customers.confirm.enableMessage', { name: row.customer_name }),
+      newStatus === 'disabled'
+        ? t('customers.confirm.disableTitle')
+        : t('customers.confirm.enableTitle'),
       {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: t('customers.confirm.confirm'),
+        cancelButtonText: t('customers.confirm.cancel'),
         type: 'warning'
       }
     )
     
     const loadingInstance = ElLoading.service({
       lock: true,
-      text: `${actionText}中...`,
+      text: newStatus === 'disabled'
+        ? t('customers.message.disableLoading')
+        : t('customers.message.enableLoading'),
       background: 'rgba(0, 0, 0, 0.7)'
     })
     
@@ -377,7 +385,7 @@ const handleDisable = async (row: Customer) => {
         ElMessage.error(response.message)
       }
     } catch (error: any) {
-      console.error(`${actionText}错误:`, error)
+      console.error(`${actionText} error:`, error)
       
       // 使用后端返回的错误信息
       let errorMessage = error.backendMessage || error.response?.data?.message || error.message
@@ -388,7 +396,7 @@ const handleDisable = async (row: Customer) => {
       loadingInstance.close()
     }
   } catch {
-    ElMessage.info(`已取消${actionText}`)
+    ElMessage.info(t('customers.message.statusChangeCancel', { action: actionText }))
   }
 }
 
@@ -414,18 +422,18 @@ const handleViewLicense = (row: Customer) => {
 const handleDelete = async (row: Customer) => {
   try {
     await ElMessageBox.confirm(
-      `确定要删除客户 "${row.customer_name}" 吗？`,
-      '确认删除',
+      t('customers.confirm.deleteMessage', { name: row.customer_name }),
+      t('customers.confirm.deleteTitle'),
       {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: t('customers.confirm.confirm'),
+        cancelButtonText: t('customers.confirm.cancel'),
         type: 'warning'
       }
     )
     
     const loadingInstance = ElLoading.service({
       lock: true,
-      text: '删除中...',
+      text: t('customers.message.deleteLoading'),
       background: 'rgba(0, 0, 0, 0.7)'
     })
     
@@ -440,7 +448,7 @@ const handleDelete = async (row: Customer) => {
         ElMessage.error(response.message)
       }
     } catch (error: any) {
-      console.error('删除错误:', error)
+      console.error('Delete error:', error)
       
       // 使用后端返回的错误信息
       let errorMessage = error.backendMessage || error.response?.data?.message || error.message
@@ -451,14 +459,14 @@ const handleDelete = async (row: Customer) => {
       loadingInstance.close()
     }
   } catch {
-    ElMessage.info('已取消删除')
+    ElMessage.info(t('customers.message.deleteCancel'))
   }
 }
 
 // 处理客户表单操作
 const handleFormSave = async (data: any) => {
   // 这里处理保存逻辑
-  console.log('保存客户数据:', data)
+  console.log('Save customer data:', data)
   showCustomerForm.value = false
   await loadData() // 重新加载数据
 }
@@ -645,8 +653,9 @@ onMounted(async () => {
   width: 100%;
   height: 100%; // 占满表格容器高度
   position: relative;
+  overflow: auto; // 启用滚动以支持固定列
   @include smooth-scroll;
-  
+
   @include mobile {
     -webkit-overflow-scrolling: touch;
   }
@@ -662,7 +671,7 @@ onMounted(async () => {
   .el-table__header-wrapper,
   .el-table__body-wrapper {
     width: 100% !important;
-    overflow-x: hidden !important; /* 防止水平滚动条影响对齐 */
+    overflow-x: auto !important; /* 允许水平滚动以支持固定列 */
   }
   
   .el-table__body-wrapper {
@@ -810,6 +819,8 @@ onMounted(async () => {
   .action-buttons {
     gap: 8px;  // 改为8px符合8px栅格
     flex-wrap: nowrap;
+    justify-content: center;
+    width: auto;
   }
   
   .action-btn {
@@ -914,6 +925,8 @@ onMounted(async () => {
   
   .action-buttons {
     gap: 0.42vw; /* 8px/1920 = 0.42vw */
+    justify-content: center;
+    width: auto;
   }
   
   .action-btn {
@@ -958,10 +971,10 @@ onMounted(async () => {
       box-sizing: border-box !important;
     }
     
-    /* 确保操作列在桌面端的正确宽度 */
+    /* 操作列自适应宽度 */
     .action-column {
-      width: 17.708vw !important; /* 300px/1920 = 15.625vw */
-      min-width: 17.708vw !important;
+      width: auto !important;
+      min-width: max-content !important;
     }
   }
   
@@ -1057,10 +1070,10 @@ onMounted(async () => {
       padding: 8px 12px !important;
     }
     
-    /* 移动端操作列宽度修复 */
+    /* 移动端操作列自适应宽度 */
     .action-column {
-      width: 160px !important;
-      min-width: 160px !important;
+      width: auto !important;
+      min-width: max-content !important;
     }
   }
   /* 设置表格容器 */
@@ -1441,10 +1454,11 @@ onMounted(async () => {
 .action-buttons {
   gap: $spacing-small;
   padding: $spacing-base 0;
-  width: 100%;
+  width: auto;
+  min-width: max-content;
 
   @include flex-center-vertical;
-  justify-content: flex-start;
+  justify-content: center;
   flex-wrap: nowrap;
   overflow: visible;
   
@@ -1473,10 +1487,11 @@ onMounted(async () => {
   font-weight: $font-weight-primary;
   line-height: 20px;  // 改为20px符合8px栅格
   flex-shrink: 0;
+  width: auto;
   min-width: fit-content;
+  white-space: nowrap;
 
   @include button-base;
-  @include text-ellipsis;
   
   @include mobile {
     flex: 0 0 calc(50% - #{math.div($spacing-extra-small, 2)}) !important;
