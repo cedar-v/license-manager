@@ -317,10 +317,10 @@ const recentData = [
   min-height: 0; /* 防止flex子元素溢出 */
 }
 
-// 图表区域 - 占据40%高度
+// 图表区域 - 占据50%高度
 .chart-section {
-  flex: 0.4; /* 40%高度 */
-  min-height: 0;
+  flex: 0.5; /* 50%高度 */
+  min-height: 300px; /* 确保最小高度 */
   display: flex;
   flex-direction: column;
 }
