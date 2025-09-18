@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-01 09:32:42
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-09-12 10:36:03
+ * @LastEditTime: 2025-09-18 16:28:39
  * @FilePath: /frontend/src/views/Dashboard.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -40,7 +40,7 @@
 
       <!-- 图表和表格区域 -->
       <div class="content-section">
-        <!-- 授权趋势图表 - 占据40%高度 -->
+        <!-- 授权趋势图表-->
         <div class="chart-section">
           <LicenseTrendChart />
         </div>

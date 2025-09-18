@@ -55,7 +55,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/store/modules/app'
 import SidebarIcon from '@/components/common/icons/SidebarIcon.vue'
 
@@ -91,20 +90,11 @@ const emit = defineEmits<{
   toggle: [collapsed: boolean]
 }>()
 
-// 使用国际化
-const { t } = useI18n()
-
 // 使用全局状态管理
 const appStore = useAppStore()
 
 // 从 store 获取折叠状态
 const isCollapsed = computed(() => appStore.sidebarCollapsed)
-
-// 切换侧边栏折叠状态
-const toggleSidebar = () => {
-  appStore.toggleSidebar()
-  emit('toggle', !appStore.sidebarCollapsed)
-}
 
 // 处理导航项点击事件
 const handleNavClick = (item: NavItem, event: Event) => {
