@@ -10,7 +10,7 @@ License Manager is an independent software licensing platform that provides lice
 
 ## Demo Environment
 
-Access URL: [lm.cedar-v.com](http://lm.cedar-v.com)  
+Access URL: [lm.cedar-v.com:18080](http://lm.cedar-v.com:18080)  
 **Login Credentials:**  
 - Username: `admin`  
 - Password: `admin@123`

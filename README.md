@@ -10,7 +10,7 @@
 
 ## Demo环境
 
-访问地址：[lm.cedar-v.com](http://lm.cedar-v.com)  
+访问地址：[lm.cedar-v.com:18080](http://lm.cedar-v.com:18080)  
 **登录凭证：**  
 - 用户名：`admin`  
 - 密码：`admin@123`
