@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"math"
+	"time"
 	"license-manager/internal/models"
 
 	"gorm.io/gorm"
@@ -61,8 +63,7 @@ func (r *authorizationCodeRepository) GetAuthorizationCodeList(ctx context.Conte
 		Select(`ac.id, ac.code, ac.customer_id, c.customer_name, 
 				ac.start_date, ac.end_date, ac.max_activations, 
 				ac.deployment_type, ac.is_locked, ac.description, ac.created_at`).
-		Joins("LEFT JOIN customers c ON ac.customer_id = c.id AND c.deleted_at IS NULL").
-		Where("ac.deleted_at IS NULL")
+		Joins("LEFT JOIN customers c ON ac.customer_id = c.id AND c.deleted_at IS NULL")
 
 	// 添加筛选条件
 	if req.CustomerID != "" {
@@ -157,4 +158,110 @@ func (r *authorizationCodeRepository) CheckCustomerExists(ctx context.Context, c
 		return false, err
 	}
 	return count > 0, nil
+}
+
+// GetAuthorizationChangeList 查询授权变更历史列表
+func (r *authorizationCodeRepository) GetAuthorizationChangeList(ctx context.Context, authCodeID string, req *models.AuthorizationChangeListRequest) (*models.AuthorizationChangeListResponse, error) {
+	// 设置默认值
+	if req.Page <= 0 {
+		req.Page = 1
+	}
+	if req.PageSize <= 0 {
+		req.PageSize = 20
+	}
+	if req.PageSize > 100 {
+		req.PageSize = 100
+	}
+	if req.Sort == "" {
+		req.Sort = "created_at"
+	}
+	if req.Order == "" {
+		req.Order = "desc"
+	}
+
+	// 构建查询
+	query := r.db.WithContext(ctx).Model(&models.AuthorizationChange{}).
+		Select(`authorization_changes.id, authorization_changes.change_type, 
+			authorization_changes.operator_id, users.username as operator_name,
+			authorization_changes.reason, authorization_changes.created_at`).
+		Joins("LEFT JOIN users ON authorization_changes.operator_id = users.id").
+		Where("authorization_changes.authorization_code_id = ?", authCodeID)
+
+	// 变更类型筛选
+	if req.ChangeType != "" {
+		query = query.Where("authorization_changes.change_type = ?", req.ChangeType)
+	}
+
+	// 操作人筛选
+	if req.OperatorID != "" {
+		query = query.Where("authorization_changes.operator_id = ?", req.OperatorID)
+	}
+
+	// 时间范围筛选
+	if req.StartDate != "" {
+		startTime, err := time.Parse("2006-01-02", req.StartDate)
+		if err == nil {
+			query = query.Where("authorization_changes.created_at >= ?", startTime)
+		}
+	}
+	if req.EndDate != "" {
+		endTime, err := time.Parse("2006-01-02", req.EndDate)
+		if err == nil {
+			// 结束时间加一天，以包含当天的所有时间
+			endTime = endTime.AddDate(0, 0, 1)
+			query = query.Where("authorization_changes.created_at < ?", endTime)
+		}
+	}
+
+	// 获取总数
+	var total int64
+	if err := query.Count(&total).Error; err != nil {
+		return nil, err
+	}
+
+	// 排序和分页
+	orderBy := "authorization_changes." + req.Sort + " " + req.Order
+	offset := (req.Page - 1) * req.PageSize
+
+	var changes []struct {
+		ID                string     `json:"id"`
+		ChangeType        string     `json:"change_type"`
+		OperatorID        string     `json:"operator_id"`
+		OperatorName      *string    `json:"operator_name"`
+		Reason            *string    `json:"reason"`
+		CreatedAt         time.Time  `json:"created_at"`
+	}
+
+	if err := query.Order(orderBy).Limit(req.PageSize).Offset(offset).Scan(&changes).Error; err != nil {
+		return nil, err
+	}
+
+	// 转换为响应格式
+	list := make([]models.AuthorizationChangeListItem, len(changes))
+	for i, change := range changes {
+		var operatorName string
+		if change.OperatorName != nil {
+			operatorName = *change.OperatorName
+		}
+
+		list[i] = models.AuthorizationChangeListItem{
+			ID:           change.ID,
+			ChangeType:   change.ChangeType,
+			OperatorID:   change.OperatorID,
+			OperatorName: operatorName,
+			Reason:       change.Reason,
+			CreatedAt:    change.CreatedAt.Format(time.RFC3339),
+		}
+	}
+
+	// 计算总页数
+	totalPages := int(math.Ceil(float64(total) / float64(req.PageSize)))
+
+	return &models.AuthorizationChangeListResponse{
+		List:       list,
+		Total:      total,
+		Page:       req.Page,
+		PageSize:   req.PageSize,
+		TotalPages: totalPages,
+	}, nil
 }

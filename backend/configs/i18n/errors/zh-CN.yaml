@@ -79,6 +79,24 @@ enums:
     "normal": "正常"
     "locked": "已锁定"
     "expired": "已过期"
+  
+  license_status:
+    "active": "激活"
+    "inactive": "未激活"
+    "revoked": "已撤销"
+  
+  license_online_status:
+    "online": "在线"
+    "offline": "离线"
+  
+  authorization_change_type:
+    "renewal": "续期"
+    "upgrade": "升级"
+    "limit_change": "限制变更"
+    "feature_toggle": "功能切换"
+    "lock": "锁定"
+    "unlock": "解锁"
+    "other": "其他"
 
 # 默认错误信息
 default_error: "未知错误"

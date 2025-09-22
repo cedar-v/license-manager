@@ -11,27 +11,29 @@ GET /api/v1/authorization-codes
 - `customer_id` - 客户ID
 - `status` - 状态 (normal/locked/expired)
 - `page` - 页码
-- `limit` - 每页数量
+- `page_size` - 每页数量（默认20，最大100）
 - `start_date` - 创建开始时间
 - `end_date` - 创建结束时间
+- `sort` - 排序字段 (created_at/updated_at/code)
+- `order` - 排序方向 (asc/desc)
 
 **响应**
 ```json
 {
-  "code": 0,
-  "message": "success",
+  "code": "000000",
+  "message": "成功",
   "data": {
     "list": [
       {
-        "id": 1,
+        "id": "uuid-string",
         "code": "LIC-COMP001-A7B9X2-C8F4",
-        "customer_id": 1,
+        "customer_id": "customer-uuid",
         "customer_name": "张三公司",
         "customer_name_display": "张三公司",
         "status": "normal",
         "status_display": "正常",
-        "start_date": "2024-01-01",
-        "end_date": "2024-12-31",
+        "start_date": "2024-01-01T00:00:00Z",
+        "end_date": "2024-12-31T23:59:59Z",
         "max_activations": 10,
         "current_activations": 7,
         "deployment_type": "standalone",
@@ -43,7 +45,8 @@ GET /api/v1/authorization-codes
     ],
     "total": 100,
     "page": 1,
-    "limit": 20
+    "page_size": 20,
+    "total_pages": 5
   }
 }
 ```
@@ -93,10 +96,10 @@ POST /api/v1/authorization-codes
 **响应**
 ```json
 {
-  "code": 0,
-  "message": "success",
+  "code": "000000",
+  "message": "成功",
   "data": {
-    "id": 1,
+    "id": "uuid-string",
     "code": "LIC-COMP001-A7B9X2-C8F4"
   }
 }
@@ -110,17 +113,17 @@ GET /api/v1/authorization-codes/{id}
 **响应**
 ```json
 {
-  "code": 0,
-  "message": "success",
+  "code": "000000",
+  "message": "成功",
   "data": {
-    "id": 1,
+    "id": "uuid-string",
     "code": "LIC-COMP001-A7B9X2-C8F4",
-    "customer_id": 1,
+    "customer_id": "customer-uuid",
     "customer_name": "张三公司",
     "status": "normal",
     "status_display": "正常",
-    "start_date": "2024-01-01",
-    "end_date": "2024-12-31",
+    "start_date": "2024-01-01T00:00:00Z",
+    "end_date": "2024-12-31T23:59:59Z",
     "max_activations": 10,
     "current_activations": 7,
     "deployment_type": "standalone",
@@ -197,18 +200,22 @@ GET /api/v1/licenses
 - `customer_id` - 客户ID
 - `status` - 状态 (active/inactive/revoked)
 - `is_online` - 在线状态
+- `page` - 页码（默认1）
+- `page_size` - 每页数量（默认20，最大100）
+- `sort` - 排序字段 (created_at/updated_at/activated_at/last_heartbeat)
+- `order` - 排序方向 (asc/desc)
 
 **响应**
 ```json
 {
-  "code": 0,
-  "message": "success",
+  "code": "000000",
+  "message": "成功",
   "data": {
     "list": [
       {
-        "id": 1,
-        "license_key": "LIC-DEVICE-ABC123",
-        "authorization_code_id": 1,
+        "id": "license-uuid",
+        "license_key": "LIC-DEVICE-ABC123456789",
+        "authorization_code_id": "auth-code-uuid",
         "authorization_code": "LIC-COMP001-A7B9X2-C8F4",
         "customer_name": "张三公司",
         "hardware_fingerprint": "CPU:ABC123,MB:DEF456",
@@ -224,7 +231,8 @@ GET /api/v1/licenses
     ],
     "total": 50,
     "page": 1,
-    "limit": 20
+    "page_size": 20,
+    "total_pages": 3
   }
 }
 ```
@@ -232,6 +240,44 @@ GET /api/v1/licenses
 ### 2.2 许可证详情
 ```http
 GET /api/v1/licenses/{id}
+```
+
+**响应**
+```json
+{
+  "code": "000000",
+  "message": "成功",
+  "data": {
+    "id": "license-uuid",
+    "license_key": "LIC-DEVICE-ABC123456789",
+    "authorization_code_id": "auth-code-uuid",
+    "authorization_code": "LIC-COMP001-A7B9X2-C8F4",
+    "customer_id": "customer-uuid",
+    "customer_name": "张三公司",
+    "hardware_fingerprint": "CPU:ABC123,MB:DEF456,MAC:00:11:22:33:44:55",
+    "device_info": {
+      "cpu": "Intel i7-8700",
+      "memory": "16GB",
+      "disk": "512GB SSD",
+      "os": "Windows 10 Pro"
+    },
+    "activation_ip": "192.168.1.100",
+    "status": "active",
+    "status_display": "激活",
+    "is_online": true,
+    "is_online_display": "在线",
+    "activated_at": "2024-01-01T10:00:00Z",
+    "last_heartbeat": "2024-01-01T14:30:00Z",
+    "last_online_ip": "192.168.1.100",
+    "config_updated_at": "2024-01-01T10:00:00Z",
+    "usage_data": {
+      "active_users": 50,
+      "api_calls_today": 5000
+    },
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-01T14:30:00Z"
+  }
+}
 ```
 
 ### 2.3 手动添加许可证
@@ -242,7 +288,7 @@ POST /api/v1/licenses
 **请求体**
 ```json
 {
-  "authorization_code_id": 1,
+  "authorization_code_id": "auth-code-uuid",
   "hardware_fingerprint": "CPU:ABC123,MB:DEF456,MAC:00:11:22:33:44:55",
   "device_info": {
     "cpu": "Intel i7-8700",
@@ -251,6 +297,31 @@ POST /api/v1/licenses
     "os": "Windows 10 Pro"
   },
   "activation_ip": "192.168.1.100"
+}
+```
+
+**响应**
+```json
+{
+  "code": "000000",
+  "message": "成功",
+  "data": {
+    "id": "license-uuid",
+    "license_key": "LIC-DEVICE-ABC123456789",
+    "authorization_code_id": "auth-code-uuid",
+    "customer_id": "customer-uuid",
+    "hardware_fingerprint": "CPU:ABC123,MB:DEF456,MAC:00:11:22:33:44:55",
+    "device_info": {
+      "cpu": "Intel i7-8700",
+      "memory": "16GB",
+      "disk": "512GB SSD",
+      "os": "Windows 10 Pro"
+    },
+    "activation_ip": "192.168.1.100",
+    "status": "inactive",
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-01T10:00:00Z"
+  }
 }
 ```
 
@@ -297,10 +368,10 @@ POST /api/v1/activate
 **响应**
 ```json
 {
-  "code": 0,
-  "message": "success",
+  "code": "000000",
+  "message": "成功",
   "data": {
-    "license_key": "LIC-DEVICE-ABC123",
+    "license_key": "LIC-DEVICE-ABC123456789",
     "license_file": "base64编码的加密许可证文件",
     "heartbeat_interval": 300
   }
@@ -315,8 +386,8 @@ POST /api/v1/heartbeat
 **请求体**
 ```json
 {
-  "license_key": "LIC-DEVICE-ABC123",
-  "hardware_fingerprint": "CPU:ABC123,MB:DEF456",
+  "license_key": "LIC-DEVICE-ABC123456789",
+  "hardware_fingerprint": "CPU:ABC123,MB:DEF456,MAC:00:11:22:33:44:55",
   "config_updated_at": "2024-01-01T10:00:00Z",
   "usage_data": {
     "active_users": 50,
@@ -329,8 +400,8 @@ POST /api/v1/heartbeat
 **响应**
 ```json
 {
-  "code": 0,
-  "message": "success",
+  "code": "000000",
+  "message": "成功",
   "data": {
     "status": "active",
     "config_updated": true,
@@ -350,8 +421,8 @@ GET /api/v1/stats/overview
 **响应**
 ```json
 {
-  "code": 0,
-  "message": "success",
+  "code": "000000",
+  "message": "成功",
   "data": {
     "total_auth_codes": 1234,
     "active_licenses": 856,
@@ -370,22 +441,37 @@ GET /api/v1/stats/overview
 GET /api/v1/authorization-codes/{id}/changes
 ```
 
+**查询参数**
+- `page` - 页码（默认1）
+- `page_size` - 每页数量（默认20，最大100）
+- `change_type` - 变更类型筛选 (renewal/upgrade/limit_change/feature_toggle/lock/unlock/other)
+- `operator_id` - 操作人筛选
+- `start_date` - 开始时间 (YYYY-MM-DD格式)
+- `end_date` - 结束时间 (YYYY-MM-DD格式)
+- `sort` - 排序字段 (created_at/change_type)
+- `order` - 排序方向 (asc/desc)
+
 **响应**
 ```json
 {
-  "code": 0,
-  "message": "success",
+  "code": "000000",
+  "message": "成功",
   "data": {
     "list": [
       {
-        "id": 1,
+        "id": "change-uuid",
         "change_type": "upgrade",
         "change_type_display": "升级",
-        "reason": "客户升级套餐",
+        "operator_id": "user-uuid",
         "operator_name": "张三",
+        "reason": "客户升级套餐",
         "created_at": "2024-01-01T10:00:00Z"
       }
-    ]
+    ],
+    "total": 25,
+    "page": 1,
+    "page_size": 20,
+    "total_pages": 2
   }
 }
 ```

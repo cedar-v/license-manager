@@ -79,6 +79,24 @@ enums:
     "normal": "正常"
     "locked": "ロック済み"
     "expired": "期限切れ"
+  
+  license_status:
+    "active": "アクティブ"
+    "inactive": "非アクティブ"
+    "revoked": "取り消し済み"
+  
+  license_online_status:
+    "online": "オンライン"
+    "offline": "オフライン"
+  
+  authorization_change_type:
+    "renewal": "更新"
+    "upgrade": "アップグレード"
+    "limit_change": "制限変更"
+    "feature_toggle": "機能切り替え"
+    "lock": "ロック"
+    "unlock": "アンロック"
+    "other": "その他"
 
 # デフォルトエラーメッセージ
 default_error: "不明なエラー"

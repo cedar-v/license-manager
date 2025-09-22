@@ -13,6 +13,7 @@ type Config struct {
 	Auth     AuthConfig     `mapstructure:"auth"`
 	Log      LogConfig      `mapstructure:"log"`
 	I18n     I18nConfig     `mapstructure:"i18n"`
+	License  LicenseConfig  `mapstructure:"license"`
 }
 
 type ServerConfig struct {
@@ -69,6 +70,13 @@ type I18nConfig struct {
 	DefaultLang  string   `mapstructure:"default_lang"`  // 默认语言
 	ConfigPath   string   `mapstructure:"config_path"`   // 语言包路径
 	SupportLangs []string `mapstructure:"support_langs"` // 支持的语言列表
+}
+
+type LicenseConfig struct {
+	EncryptionKey    string `mapstructure:"encryption_key"`    // 许可证文件加密密钥
+	HeartbeatTimeout int    `mapstructure:"heartbeat_timeout"` // 心跳超时时间(秒)
+	OfflineTimeout   int    `mapstructure:"offline_timeout"`   // 离线超时时间(分钟)
+	ExpiringDays     int    `mapstructure:"expiring_days"`     // 即将过期天数
 }
 
 var AppConfig *Config
@@ -144,6 +152,12 @@ func setDefaults() {
 	viper.SetDefault("i18n.default_lang", "zh-CN")
 	viper.SetDefault("i18n.config_path", "../configs/i18n/errors")
 	viper.SetDefault("i18n.support_langs", []string{"zh-CN", "en-US", "ja-JP"})
+
+	// License defaults
+	viper.SetDefault("license.encryption_key", "license-manager-secret-key-32b")
+	viper.SetDefault("license.heartbeat_timeout", 300)
+	viper.SetDefault("license.offline_timeout", 1440)
+	viper.SetDefault("license.expiring_days", 30)
 }
 
 func GetConfig() *Config {

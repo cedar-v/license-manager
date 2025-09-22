@@ -8,6 +8,7 @@ import (
 	"license-manager/internal/database"
 	"license-manager/internal/repository"
 	"license-manager/internal/service"
+	"license-manager/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -38,6 +39,10 @@ func SetupRouter() *gin.Engine {
 	customerRepo := repository.NewCustomerRepository(db)
 	userRepo := repository.NewUserRepository(db)
 	authCodeRepo := repository.NewAuthorizationCodeRepository(db)
+	licenseRepo := repository.NewLicenseRepository(db)
+
+	// 获取logger实例
+	log := logger.GetLogger()
 
 	// 初始化服务层
 	authService := service.NewAuthService(userRepo)
@@ -45,6 +50,7 @@ func SetupRouter() *gin.Engine {
 	customerService := service.NewCustomerService(customerRepo)
 	enumService := service.NewEnumService()
 	authCodeService := service.NewAuthorizationCodeService(authCodeRepo)
+	licenseService := service.NewLicenseService(licenseRepo, db, log)
 
 	// 初始化处理器层
 	authHandler := handlers.NewAuthHandler(authService)
@@ -52,6 +58,7 @@ func SetupRouter() *gin.Engine {
 	customerHandler := handlers.NewCustomerHandler(customerService)
 	enumHandler := handlers.NewEnumHandler(enumService)
 	authCodeHandler := handlers.NewAuthorizationCodeHandler(authCodeService)
+	licenseHandler := handlers.NewLicenseHandler(licenseService)
 
 	// 健康检测接口（无需认证）
 	router.GET("/health", systemHandler.HealthCheck)
@@ -66,6 +73,10 @@ func SetupRouter() *gin.Engine {
 		public := api.Group("")
 		{
 			public.POST("/v1/login", authHandler.Login)
+			
+			// 许可证激活接口（客户端软件使用）
+			public.POST("/v1/activate", licenseHandler.ActivateLicense)
+			public.POST("/v1/heartbeat", licenseHandler.Heartbeat)
 		}
 
 		// 需要认证的接口
@@ -95,6 +106,17 @@ func SetupRouter() *gin.Engine {
 			auth.PUT("/v1/authorization-codes/:id", authCodeHandler.UpdateAuthorizationCode)
 			auth.PUT("/v1/authorization-codes/:id/lock", authCodeHandler.LockUnlockAuthorizationCode)
 			auth.DELETE("/v1/authorization-codes/:id", authCodeHandler.DeleteAuthorizationCode)
+			auth.GET("/v1/authorization-codes/:id/changes", authCodeHandler.GetAuthorizationChangeList)
+			
+			// 许可证管理
+			auth.GET("/v1/licenses", licenseHandler.GetLicenseList)
+			auth.GET("/v1/licenses/:id", licenseHandler.GetLicense)
+			auth.POST("/v1/licenses", licenseHandler.CreateLicense)
+			auth.PUT("/v1/licenses/:id/revoke", licenseHandler.RevokeLicense)
+			auth.GET("/v1/licenses/:id/download", licenseHandler.DownloadLicenseFile)
+			
+			// 统计分析
+			auth.GET("/v1/stats/overview", licenseHandler.GetStatsOverview)
 		}
 
 		// 管理员接口

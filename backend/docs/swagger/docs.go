@@ -653,6 +653,82 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/activate": {
+            "post": {
+                "description": "客户端使用授权码激活软件，获取许可证文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "许可证激活"
+                ],
+                "summary": "激活许可证",
+                "parameters": [
+                    {
+                        "description": "激活请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ActivateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "激活成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.ActivateResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "授权码不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "授权码已锁定或已过期",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "429": {
+                        "description": "激活数量已达上限",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/admin/system/info": {
             "get": {
                 "security": [
@@ -1149,6 +1225,138 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/authorization-codes/{id}/changes": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "分页查询指定授权码的变更历史，支持筛选",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "授权码管理"
+                ],
+                "summary": "查询授权变更历史列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "授权码ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "页码，默认1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "每页条数，默认20，最大100",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "变更类型筛选",
+                        "name": "change_type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "操作人筛选",
+                        "name": "operator_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "开始时间 (YYYY-MM-DD格式)",
+                        "name": "start_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "结束时间 (YYYY-MM-DD格式)",
+                        "name": "end_date",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "created_at",
+                            "change_type"
+                        ],
+                        "type": "string",
+                        "description": "排序字段，默认created_at",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "排序方向，默认desc",
+                        "name": "order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "查询成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.AuthorizationChangeListResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "授权码不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/authorization-codes/{id}/lock": {
             "put": {
                 "security": [
@@ -1218,6 +1426,503 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "授权码不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/heartbeat": {
+            "post": {
+                "description": "客户端定期发送心跳，更新在线状态和使用数据",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "许可证激活"
+                ],
+                "summary": "心跳检测",
+                "parameters": [
+                    {
+                        "description": "心跳请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.HeartbeatRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "心跳成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.HeartbeatResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "许可证不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "许可证已被撤销",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/licenses": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "分页查询许可证列表，支持筛选",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "许可证管理"
+                ],
+                "summary": "查询许可证列表",
+                "parameters": [
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "页码，默认1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "每页条数，默认20，最大100",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "授权码ID筛选",
+                        "name": "authorization_code_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "客户ID筛选",
+                        "name": "customer_id",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "active",
+                            "inactive",
+                            "revoked"
+                        ],
+                        "type": "string",
+                        "description": "状态筛选",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "在线状态筛选",
+                        "name": "is_online",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "created_at",
+                            "updated_at",
+                            "activated_at",
+                            "last_heartbeat"
+                        ],
+                        "type": "string",
+                        "description": "排序字段，默认created_at",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "排序方向，默认desc",
+                        "name": "order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "查询成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.LicenseListResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "为指定授权码手动创建许可证",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "许可证管理"
+                ],
+                "summary": "手动添加许可证",
+                "parameters": [
+                    {
+                        "description": "许可证创建信息",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.LicenseCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "创建成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.License"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "授权码不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/licenses/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "根据许可证ID获取许可证详细信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "许可证管理"
+                ],
+                "summary": "获取许可证详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "许可证ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "查询成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.LicenseDetailResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "许可证不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/licenses/{id}/download": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "下载加密的许可证文件，用于客户端软件激活",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "许可证管理"
+                ],
+                "summary": "下载许可证文件",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "许可证ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "许可证文件",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "许可证不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "许可证已被撤销",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/licenses/{id}/revoke": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "撤销指定的许可证，撤销后无法再使用",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "许可证管理"
+                ],
+                "summary": "撤销许可证",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "许可证ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "撤销原因",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.LicenseRevokeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "撤销成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.License"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "许可证不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "许可证已被撤销",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -1317,6 +2022,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/stats/overview": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "获取授权码、许可证的总体统计信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "统计分析"
+                ],
+                "summary": "获取授权概览统计",
+                "responses": {
+                    "200": {
+                        "description": "查询成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.StatsOverviewResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/health": {
             "get": {
                 "description": "系统健康状态检查",
@@ -1354,6 +2111,98 @@ const docTemplate = `{
                 },
                 "timestamp": {
                     "type": "string"
+                }
+            }
+        },
+        "models.ActivateRequest": {
+            "type": "object",
+            "required": [
+                "authorization_code",
+                "hardware_fingerprint"
+            ],
+            "properties": {
+                "authorization_code": {
+                    "description": "授权码，必填",
+                    "type": "string"
+                },
+                "device_info": {
+                    "description": "设备信息，可选",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "hardware_fingerprint": {
+                    "description": "硬件指纹，必填",
+                    "type": "string"
+                },
+                "software_version": {
+                    "description": "软件版本，可选",
+                    "type": "string"
+                }
+            }
+        },
+        "models.ActivateResponse": {
+            "type": "object",
+            "properties": {
+                "heartbeat_interval": {
+                    "description": "心跳间隔(秒)",
+                    "type": "integer"
+                },
+                "license_file": {
+                    "description": "base64编码的加密许可证文件",
+                    "type": "string"
+                },
+                "license_key": {
+                    "description": "许可证密钥",
+                    "type": "string"
+                }
+            }
+        },
+        "models.AuthorizationChangeListItem": {
+            "type": "object",
+            "properties": {
+                "change_type": {
+                    "type": "string"
+                },
+                "change_type_display": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "operator_id": {
+                    "type": "string"
+                },
+                "operator_name": {
+                    "type": "string"
+                },
+                "reason": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.AuthorizationChangeListResponse": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.AuthorizationChangeListItem"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
                 }
             }
         },
@@ -2033,6 +2882,19 @@ const docTemplate = `{
                 }
             }
         },
+        "models.GrowthRate": {
+            "type": "object",
+            "properties": {
+                "auth_codes": {
+                    "description": "授权码增长率(%)",
+                    "type": "number"
+                },
+                "licenses": {
+                    "description": "许可证增长率(%)",
+                    "type": "number"
+                }
+            }
+        },
         "models.HealthResponse": {
             "type": "object",
             "properties": {
@@ -2056,6 +2918,300 @@ const docTemplate = `{
                 },
                 "version": {
                     "type": "string"
+                }
+            }
+        },
+        "models.HeartbeatRequest": {
+            "type": "object",
+            "required": [
+                "hardware_fingerprint",
+                "license_key"
+            ],
+            "properties": {
+                "config_updated_at": {
+                    "description": "客户端配置更新时间，可选",
+                    "type": "string"
+                },
+                "hardware_fingerprint": {
+                    "description": "硬件指纹，必填",
+                    "type": "string"
+                },
+                "license_key": {
+                    "description": "许可证密钥，必填",
+                    "type": "string"
+                },
+                "software_version": {
+                    "description": "软件版本，可选",
+                    "type": "string"
+                },
+                "usage_data": {
+                    "description": "使用数据，可选",
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            }
+        },
+        "models.HeartbeatResponse": {
+            "type": "object",
+            "properties": {
+                "config_updated": {
+                    "description": "配置是否有更新",
+                    "type": "boolean"
+                },
+                "heartbeat_interval": {
+                    "description": "下次心跳间隔(秒)",
+                    "type": "integer"
+                },
+                "license_file": {
+                    "description": "base64编码的新许可证文件(如有更新)",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "许可证状态",
+                    "type": "string"
+                }
+            }
+        },
+        "models.License": {
+            "type": "object",
+            "properties": {
+                "activated_at": {
+                    "type": "string"
+                },
+                "activation_ip": {
+                    "type": "string"
+                },
+                "authorization_code": {
+                    "description": "关联字段（用于查询时的JOIN）",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.AuthorizationCode"
+                        }
+                    ]
+                },
+                "authorization_code_id": {
+                    "type": "string"
+                },
+                "config_updated_at": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "customer": {
+                    "$ref": "#/definitions/models.Customer"
+                },
+                "customer_id": {
+                    "type": "string"
+                },
+                "device_info": {
+                    "type": "object"
+                },
+                "hardware_fingerprint": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_online": {
+                    "type": "boolean"
+                },
+                "is_online_display": {
+                    "type": "string"
+                },
+                "last_heartbeat": {
+                    "type": "string"
+                },
+                "last_online_ip": {
+                    "type": "string"
+                },
+                "license_key": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "status_display": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "usage_data": {
+                    "type": "object"
+                }
+            }
+        },
+        "models.LicenseCreateRequest": {
+            "type": "object",
+            "required": [
+                "authorization_code_id",
+                "hardware_fingerprint"
+            ],
+            "properties": {
+                "activation_ip": {
+                    "description": "激活IP，可选",
+                    "type": "string"
+                },
+                "authorization_code_id": {
+                    "description": "授权码ID，必填",
+                    "type": "string"
+                },
+                "device_info": {
+                    "description": "设备信息，可选",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "hardware_fingerprint": {
+                    "description": "硬件指纹，必填",
+                    "type": "string"
+                }
+            }
+        },
+        "models.LicenseDetailResponse": {
+            "type": "object",
+            "properties": {
+                "activated_at": {
+                    "type": "string"
+                },
+                "activation_ip": {
+                    "type": "string"
+                },
+                "authorization_code": {
+                    "type": "string"
+                },
+                "authorization_code_id": {
+                    "type": "string"
+                },
+                "config_updated_at": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "customer_id": {
+                    "type": "string"
+                },
+                "customer_name": {
+                    "type": "string"
+                },
+                "device_info": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "hardware_fingerprint": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_online": {
+                    "type": "boolean"
+                },
+                "is_online_display": {
+                    "type": "string"
+                },
+                "last_heartbeat": {
+                    "type": "string"
+                },
+                "last_online_ip": {
+                    "type": "string"
+                },
+                "license_key": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "status_display": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "usage_data": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            }
+        },
+        "models.LicenseListItem": {
+            "type": "object",
+            "properties": {
+                "activated_at": {
+                    "type": "string"
+                },
+                "activation_ip": {
+                    "type": "string"
+                },
+                "authorization_code": {
+                    "type": "string"
+                },
+                "authorization_code_id": {
+                    "type": "string"
+                },
+                "customer_name": {
+                    "type": "string"
+                },
+                "hardware_fingerprint": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_online": {
+                    "type": "boolean"
+                },
+                "is_online_display": {
+                    "type": "string"
+                },
+                "last_heartbeat": {
+                    "type": "string"
+                },
+                "last_online_ip": {
+                    "type": "string"
+                },
+                "license_key": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "status_display": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.LicenseListResponse": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.LicenseListItem"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.LicenseRevokeRequest": {
+            "type": "object",
+            "properties": {
+                "reason": {
+                    "description": "撤销原因，可选",
+                    "type": "string",
+                    "maxLength": 500
                 }
             }
         },
@@ -2083,6 +3239,35 @@ const docTemplate = `{
                 "data": {},
                 "message": {
                     "type": "string"
+                }
+            }
+        },
+        "models.StatsOverviewResponse": {
+            "type": "object",
+            "properties": {
+                "abnormal_alerts": {
+                    "description": "异常告警数量",
+                    "type": "integer"
+                },
+                "active_licenses": {
+                    "description": "活跃许可证数量",
+                    "type": "integer"
+                },
+                "expiring_soon": {
+                    "description": "即将过期数量",
+                    "type": "integer"
+                },
+                "growth_rate": {
+                    "description": "增长率",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.GrowthRate"
+                        }
+                    ]
+                },
+                "total_auth_codes": {
+                    "description": "总授权码数量",
+                    "type": "integer"
                 }
             }
         },

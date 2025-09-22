@@ -16,6 +16,13 @@ var (
 	ErrAuthorizationCodeDuplicate     = errors.New("authorization code already exists")
 )
 
+// 许可证领域的业务错误
+var (
+	ErrLicenseNotFound      = errors.New("license not found")
+	ErrLicenseAlreadyExists = errors.New("license already exists")
+	ErrLicenseDuplicate     = errors.New("license already exists")
+)
+
 // 通用的数据库/系统错误（给开发者看的）
 var (
 	ErrDatabaseConnection = errors.New("database connection failed")
