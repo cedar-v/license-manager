@@ -60,3 +60,12 @@ type LicenseService interface {
 	// 统计接口
 	GetStatsOverview(ctx context.Context) (*models.StatsOverviewResponse, error)
 }
+
+// DashboardService 仪表盘服务接口
+type DashboardService interface {
+	// 获取授权趋势数据
+	GetAuthorizationTrend(ctx context.Context, req *models.DashboardAuthorizationTrendRequest) (*models.DashboardAuthorizationTrendResponse, error)
+	
+	// 获取最近授权列表
+	GetRecentAuthorizations(ctx context.Context, req *models.DashboardRecentAuthorizationsRequest) (*models.DashboardRecentAuthorizationsResponse, error)
+}

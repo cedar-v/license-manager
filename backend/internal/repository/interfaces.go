@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 	"license-manager/internal/models"
 )
 
@@ -99,4 +100,13 @@ type LicenseRepository interface {
 	
 	// GetActiveLicenseCount 获取指定授权码的激活许可证数量
 	GetActiveLicenseCount(ctx context.Context, authCodeID string) (int64, error)
+}
+
+// DashboardRepository 仪表盘数据访问接口
+type DashboardRepository interface {
+	// GetAuthorizationTrendData 获取授权趋势数据
+	GetAuthorizationTrendData(ctx context.Context, startDate, endDate time.Time) ([]models.TrendData, error)
+	
+	// GetRecentAuthorizations 获取最近授权列表
+	GetRecentAuthorizations(ctx context.Context, req *models.DashboardRecentAuthorizationsRequest) (*models.DashboardRecentAuthorizationsResponse, error)
 }

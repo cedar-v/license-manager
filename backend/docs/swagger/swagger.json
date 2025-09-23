@@ -1436,6 +1436,185 @@
                 }
             }
         },
+        "/api/v1/dashboard/authorization-trend": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "根据时间类型（本周/本月/自定义）获取授权趋势统计数据",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "仪表盘"
+                ],
+                "summary": "获取授权趋势数据",
+                "parameters": [
+                    {
+                        "enum": [
+                            "week",
+                            "month",
+                            "custom"
+                        ],
+                        "type": "string",
+                        "description": "时间类型",
+                        "name": "type",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "开始日期(YYYY-MM-DD格式，当type为custom时必填)",
+                        "name": "start_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "结束日期(YYYY-MM-DD格式，当type为custom时必填)",
+                        "name": "end_date",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "授权趋势数据",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.DashboardAuthorizationTrendResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "权限不足",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/dashboard/recent-authorizations": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "获取最近创建的授权码列表，支持按客户ID和状态筛选",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "仪表盘"
+                ],
+                "summary": "获取最近授权列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "返回数量限制（默认20，最大100）",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "客户ID筛选",
+                        "name": "customer_id",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "normal",
+                            "locked",
+                            "expired"
+                        ],
+                        "type": "string",
+                        "description": "状态筛选",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "最近授权列表",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.DashboardRecentAuthorizationsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "权限不足",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/heartbeat": {
             "post": {
                 "description": "客户端定期发送心跳，更新在线状态和使用数据",
@@ -2821,6 +3000,50 @@
                 }
             }
         },
+        "models.DashboardAuthorizationTrendResponse": {
+            "type": "object",
+            "properties": {
+                "period": {
+                    "description": "时间段信息",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.TrendPeriod"
+                        }
+                    ]
+                },
+                "summary": {
+                    "description": "汇总信息",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.TrendSummary"
+                        }
+                    ]
+                },
+                "trend_data": {
+                    "description": "趋势数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.TrendData"
+                    }
+                }
+            }
+        },
+        "models.DashboardRecentAuthorizationsResponse": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "description": "授权列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.RecentAuthorization"
+                    }
+                },
+                "total": {
+                    "description": "符合条件的授权总数量",
+                    "type": "integer"
+                }
+            }
+        },
         "models.EnumItem": {
             "type": "object",
             "properties": {
@@ -3239,6 +3462,63 @@
                 }
             }
         },
+        "models.RecentAuthorization": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "授权码",
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
+                "current_activations": {
+                    "description": "当前激活数量",
+                    "type": "integer"
+                },
+                "customer_id": {
+                    "description": "客户ID",
+                    "type": "string"
+                },
+                "customer_name": {
+                    "description": "客户名称",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "授权描述",
+                    "type": "string"
+                },
+                "end_date": {
+                    "description": "到期时间",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "授权码ID",
+                    "type": "string"
+                },
+                "max_activations": {
+                    "description": "最大激活数量",
+                    "type": "integer"
+                },
+                "start_date": {
+                    "description": "生效时间",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "状态 (normal/locked/expired)",
+                    "type": "string"
+                },
+                "status_display": {
+                    "description": "状态显示文本(多语言)",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "更新时间",
+                    "type": "string"
+                }
+            }
+        },
         "models.StatsOverviewResponse": {
             "type": "object",
             "properties": {
@@ -3285,6 +3565,69 @@
                 },
                 "version": {
                     "type": "string"
+                }
+            }
+        },
+        "models.TrendData": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "description": "日期 (YYYY-MM-DD)",
+                    "type": "string"
+                },
+                "expired_authorizations": {
+                    "description": "当日过期授权数",
+                    "type": "integer"
+                },
+                "new_authorizations": {
+                    "description": "当日新增授权数",
+                    "type": "integer"
+                },
+                "total_authorizations": {
+                    "description": "当日授权总数",
+                    "type": "integer"
+                }
+            }
+        },
+        "models.TrendPeriod": {
+            "type": "object",
+            "properties": {
+                "description_display": {
+                    "description": "多语言描述",
+                    "type": "string"
+                },
+                "end_date": {
+                    "description": "结束日期",
+                    "type": "string"
+                },
+                "start_date": {
+                    "description": "开始日期",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "时间类型",
+                    "type": "string"
+                }
+            }
+        },
+        "models.TrendSummary": {
+            "type": "object",
+            "properties": {
+                "expired_count": {
+                    "description": "期间过期授权数",
+                    "type": "integer"
+                },
+                "growth_rate": {
+                    "description": "增长率(百分比)",
+                    "type": "number"
+                },
+                "new_count": {
+                    "description": "期间新增授权数",
+                    "type": "integer"
+                },
+                "total_count": {
+                    "description": "期间总授权数",
+                    "type": "integer"
                 }
             }
         }

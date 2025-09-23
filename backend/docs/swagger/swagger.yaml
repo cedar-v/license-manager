@@ -513,6 +513,33 @@ definitions:
         - disabled
         type: string
     type: object
+  models.DashboardAuthorizationTrendResponse:
+    properties:
+      period:
+        allOf:
+        - $ref: '#/definitions/models.TrendPeriod'
+        description: 时间段信息
+      summary:
+        allOf:
+        - $ref: '#/definitions/models.TrendSummary'
+        description: 汇总信息
+      trend_data:
+        description: 趋势数据
+        items:
+          $ref: '#/definitions/models.TrendData'
+        type: array
+    type: object
+  models.DashboardRecentAuthorizationsResponse:
+    properties:
+      list:
+        description: 授权列表
+        items:
+          $ref: '#/definitions/models.RecentAuthorization'
+        type: array
+      total:
+        description: 符合条件的授权总数量
+        type: integer
+    type: object
   models.EnumItem:
     properties:
       display:
@@ -796,6 +823,48 @@ definitions:
       message:
         type: string
     type: object
+  models.RecentAuthorization:
+    properties:
+      code:
+        description: 授权码
+        type: string
+      created_at:
+        description: 创建时间
+        type: string
+      current_activations:
+        description: 当前激活数量
+        type: integer
+      customer_id:
+        description: 客户ID
+        type: string
+      customer_name:
+        description: 客户名称
+        type: string
+      description:
+        description: 授权描述
+        type: string
+      end_date:
+        description: 到期时间
+        type: string
+      id:
+        description: 授权码ID
+        type: string
+      max_activations:
+        description: 最大激活数量
+        type: integer
+      start_date:
+        description: 生效时间
+        type: string
+      status:
+        description: 状态 (normal/locked/expired)
+        type: string
+      status_display:
+        description: 状态显示文本(多语言)
+        type: string
+      updated_at:
+        description: 更新时间
+        type: string
+    type: object
   models.StatsOverviewResponse:
     properties:
       abnormal_alerts:
@@ -827,6 +896,51 @@ definitions:
         type: string
       version:
         type: string
+    type: object
+  models.TrendData:
+    properties:
+      date:
+        description: 日期 (YYYY-MM-DD)
+        type: string
+      expired_authorizations:
+        description: 当日过期授权数
+        type: integer
+      new_authorizations:
+        description: 当日新增授权数
+        type: integer
+      total_authorizations:
+        description: 当日授权总数
+        type: integer
+    type: object
+  models.TrendPeriod:
+    properties:
+      description_display:
+        description: 多语言描述
+        type: string
+      end_date:
+        description: 结束日期
+        type: string
+      start_date:
+        description: 开始日期
+        type: string
+      type:
+        description: 时间类型
+        type: string
+    type: object
+  models.TrendSummary:
+    properties:
+      expired_count:
+        description: 期间过期授权数
+        type: integer
+      growth_rate:
+        description: 增长率(百分比)
+        type: number
+      new_count:
+        description: 期间新增授权数
+        type: integer
+      total_count:
+        description: 期间总授权数
+        type: integer
     type: object
 info:
   contact:
@@ -1724,6 +1838,117 @@ paths:
       summary: 锁定/解锁授权码
       tags:
       - 授权码管理
+  /api/v1/dashboard/authorization-trend:
+    get:
+      consumes:
+      - application/json
+      description: 根据时间类型（本周/本月/自定义）获取授权趋势统计数据
+      parameters:
+      - description: 时间类型
+        enum:
+        - week
+        - month
+        - custom
+        in: query
+        name: type
+        required: true
+        type: string
+      - description: 开始日期(YYYY-MM-DD格式，当type为custom时必填)
+        in: query
+        name: start_date
+        type: string
+      - description: 结束日期(YYYY-MM-DD格式，当type为custom时必填)
+        in: query
+        name: end_date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 授权趋势数据
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.DashboardAuthorizationTrendResponse'
+              type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取授权趋势数据
+      tags:
+      - 仪表盘
+  /api/v1/dashboard/recent-authorizations:
+    get:
+      consumes:
+      - application/json
+      description: 获取最近创建的授权码列表，支持按客户ID和状态筛选
+      parameters:
+      - description: 返回数量限制（默认20，最大100）
+        in: query
+        name: limit
+        type: integer
+      - description: 客户ID筛选
+        in: query
+        name: customer_id
+        type: string
+      - description: 状态筛选
+        enum:
+        - normal
+        - locked
+        - expired
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 最近授权列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.DashboardRecentAuthorizationsResponse'
+              type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取最近授权列表
+      tags:
+      - 仪表盘
   /api/v1/heartbeat:
     post:
       consumes:

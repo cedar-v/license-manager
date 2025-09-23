@@ -40,6 +40,7 @@ func SetupRouter() *gin.Engine {
 	userRepo := repository.NewUserRepository(db)
 	authCodeRepo := repository.NewAuthorizationCodeRepository(db)
 	licenseRepo := repository.NewLicenseRepository(db)
+	dashboardRepo := repository.NewDashboardRepository(db)
 
 	// 获取logger实例
 	log := logger.GetLogger()
@@ -51,6 +52,7 @@ func SetupRouter() *gin.Engine {
 	enumService := service.NewEnumService()
 	authCodeService := service.NewAuthorizationCodeService(authCodeRepo)
 	licenseService := service.NewLicenseService(licenseRepo, db, log)
+	dashboardService := service.NewDashboardService(dashboardRepo)
 
 	// 初始化处理器层
 	authHandler := handlers.NewAuthHandler(authService)
@@ -59,6 +61,7 @@ func SetupRouter() *gin.Engine {
 	enumHandler := handlers.NewEnumHandler(enumService)
 	authCodeHandler := handlers.NewAuthorizationCodeHandler(authCodeService)
 	licenseHandler := handlers.NewLicenseHandler(licenseService)
+	dashboardHandler := handlers.NewDashboardHandler(dashboardService)
 
 	// 健康检测接口（无需认证）
 	router.GET("/health", systemHandler.HealthCheck)
@@ -117,6 +120,10 @@ func SetupRouter() *gin.Engine {
 			
 			// 统计分析
 			auth.GET("/v1/stats/overview", licenseHandler.GetStatsOverview)
+			
+			// 仪表盘接口
+			auth.GET("/v1/dashboard/authorization-trend", dashboardHandler.GetAuthorizationTrend)
+			auth.GET("/v1/dashboard/recent-authorizations", dashboardHandler.GetRecentAuthorizations)
 		}
 
 		// 管理员接口

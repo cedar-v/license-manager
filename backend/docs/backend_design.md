@@ -25,8 +25,10 @@ backend/
 │   ├── api/
 │   │   ├── handlers/            # HTTP处理器
 │   │   │   ├── auth_handler.go
+│   │   │   ├── authorization_code_handler.go
 │   │   │   ├── customer_handler.go
 │   │   │   ├── enum_handler.go
+│   │   │   ├── license_handler.go
 │   │   │   └── system_handler.go
 │   │   ├── middleware/          # 中间件
 │   │   │   ├── auth.go
@@ -37,19 +39,26 @@ backend/
 │   │       └── router.go
 │   ├── service/                 # 业务逻辑层
 │   │   ├── auth_service.go
+│   │   ├── authorization_code_service.go
 │   │   ├── customer_service.go
 │   │   ├── enum_service.go
+│   │   ├── license_service.go
 │   │   ├── system_service.go
 │   │   └── interfaces.go        # 接口定义
 │   ├── repository/              # 数据访问层
+│   │   ├── authorization_code_repository.go
 │   │   ├── customer_repository.go
+│   │   ├── license_repository.go
+│   │   ├── user_repository.go
 │   │   ├── errors.go
 │   │   └── interfaces.go
 │   ├── models/                  # 数据模型
 │   │   ├── auth.go
+│   │   ├── common.go
 │   │   ├── customer.go
+│   │   ├── license.go
 │   │   ├── system.go
-│   │   └── common.go
+│   │   └── user.go
 │   ├── config/                  # 配置管理
 │   │   └── config.go
 │   └── database/                # 数据库连接和迁移
@@ -85,9 +94,11 @@ backend/
 │   │   ├── db_install.md
 │   │   └── swagger_install.md
 │   ├── modules_design/
+│   │   ├── auth_api.md
 │   │   ├── customer-api.md
 │   │   ├── customer.md
 │   │   ├── login&auth.md
+│   │   ├── user.md
 │   │   ├── user_story.md
 │   │   ├── 产品原型设计方案.md
 │   │   └── 授权模块属性设计.md
@@ -98,6 +109,10 @@ backend/
 ├── migrations/                  # 数据库迁移
 │   ├── 001_create_customers_table.sql
 │   ├── 002_insert_sample_data.sql
+│   ├── 003_create_authorization_codes_table.sql
+│   ├── 004_create_licenses_table.sql
+│   ├── 005_create_authorization_changes_table.sql
+│   ├── 006_create_users_table.sql
 │   └── README.md
 ├── go.mod
 └── go.sum
