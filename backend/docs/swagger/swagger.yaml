@@ -1861,6 +1861,10 @@ paths:
         in: query
         name: end_date
         type: string
+      - description: 时区(如:Asia/Shanghai,UTC等，默认使用服务器本地时区)
+        in: query
+        name: timezone
+        type: string
       produces:
       - application/json
       responses:

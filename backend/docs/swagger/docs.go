@@ -1481,6 +1481,12 @@ const docTemplate = `{
                         "description": "结束日期(YYYY-MM-DD格式，当type为custom时必填)",
                         "name": "end_date",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "时区(如:Asia/Shanghai,UTC等，默认使用服务器本地时区)",
+                        "name": "timezone",
+                        "in": "query"
                     }
                 ],
                 "responses": {

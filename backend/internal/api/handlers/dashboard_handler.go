@@ -33,6 +33,7 @@ func NewDashboardHandler(dashboardService service.DashboardService) *DashboardHa
 // @Param type query string true "时间类型" Enums(week,month,custom)
 // @Param start_date query string false "开始日期(YYYY-MM-DD格式，当type为custom时必填)"
 // @Param end_date query string false "结束日期(YYYY-MM-DD格式，当type为custom时必填)"
+// @Param timezone query string false "时区(如:Asia/Shanghai,UTC等，默认使用服务器本地时区)"
 // @Success 200 {object} models.APIResponse{data=models.DashboardAuthorizationTrendResponse} "授权趋势数据"
 // @Failure 400 {object} models.ErrorResponse "请求参数错误"
 // @Failure 401 {object} models.ErrorResponse "未认证"
