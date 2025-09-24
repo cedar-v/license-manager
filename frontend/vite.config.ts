@@ -76,7 +76,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     // 开发服务器配置
     server: {
       host: '0.0.0.0', // 监听所有IP
-      port: 8080, // 端口号
+      port: 3000, // 端口号
       open: true, // 自动打开浏览器
       // https: false, // 不启用HTTPS
       cors: true, // 启用CORS
