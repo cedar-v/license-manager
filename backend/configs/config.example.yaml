@@ -40,3 +40,9 @@ i18n:
   default_lang: "zh-CN" # 默认语言
   config_path: "../configs/i18n/errors" # 语言包文件路径（相对于backend目录）
   support_langs: ["zh-CN", "en-US", "ja-JP"] # 支持的语言列表
+
+license:
+  encryption_key: "your-32-byte-secret-key-here!!" # 32字节许可证文件加密密钥
+  heartbeat_timeout: 300 # 心跳超时时间(秒) - 5分钟内为在线
+  offline_timeout: 1440 # 离线超时时间(分钟) - 24小时后为异常
+  expiring_days: 30 # 即将过期天数 - 30天内到期算即将过期

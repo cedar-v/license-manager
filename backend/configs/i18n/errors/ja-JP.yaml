@@ -35,6 +35,15 @@ errors:
     "300009": "ライセンスファイルの生成に失敗しました"
     "300010": "無効な設定パラメータ"
   
+  # ダッシュボードモジュール (40xxxx)
+  dashboard:
+    "400001": "無効な時間タイプパラメータ"
+    "400002": "無効な開始日付形式"
+    "400003": "無効な終了日付形式"
+    "400004": "時間範囲が制限を超えています（1年以上）"
+    "400005": "開始日は終了日より後にできません"
+    "400006": "無効な制限パラメータ"
+  
   # システム共通 (90xxxx)
   system:
     "900001": "無効なリクエストパラメータ"
@@ -42,13 +51,25 @@ errors:
     "900003": "リソースの競合"
     "900004": "内部サーバーエラー"
 
+# 共通テキスト
+common:
+  success: "成功"
+
 # 列挙値多言語
 enums:
+  dashboard_period:
+    week: "今週"
+    month: "今月"
   customer_type:
     "individual": "個人顧客"
     "enterprise": "企業顧客"
     "government": "政府顧客"
     "education": "教育顧客"
+  
+  authorization_code_status:
+    normal: "正常"
+    locked: "ロック済み"
+    expired: "期限切れ"
   
   customer_level:
     "normal": "一般顧客"
@@ -79,6 +100,24 @@ enums:
     "normal": "正常"
     "locked": "ロック済み"
     "expired": "期限切れ"
+  
+  license_status:
+    "active": "アクティブ"
+    "inactive": "非アクティブ"
+    "revoked": "取り消し済み"
+  
+  license_online_status:
+    "online": "オンライン"
+    "offline": "オフライン"
+  
+  authorization_change_type:
+    "renewal": "更新"
+    "upgrade": "アップグレード"
+    "limit_change": "制限変更"
+    "feature_toggle": "機能切り替え"
+    "lock": "ロック"
+    "unlock": "アンロック"
+    "other": "その他"
 
 # デフォルトエラーメッセージ
 default_error: "不明なエラー"

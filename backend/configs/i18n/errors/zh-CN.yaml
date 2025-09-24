@@ -35,6 +35,15 @@ errors:
     "300009": "许可证文件生成失败"
     "300010": "配置参数错误"
   
+  # 仪表盘模块 (40xxxx)
+  dashboard:
+    "400001": "时间类型参数错误"
+    "400002": "开始日期格式错误"
+    "400003": "结束日期格式错误"
+    "400004": "时间范围超过限制（超过一年）"
+    "400005": "开始日期不能晚于结束日期"
+    "400006": "数量限制参数错误"
+  
   # 系统通用 (90xxxx)
   system:
     "900001": "请求参数无效"
@@ -42,13 +51,25 @@ errors:
     "900003": "资源冲突"
     "900004": "服务器内部错误"
 
+# 通用文本
+common:
+  success: "成功"
+
 # 枚举值多语言
 enums:
+  dashboard_period:
+    week: "本周"
+    month: "本月"
   customer_type:
     "individual": "个人客户"
     "enterprise": "企业客户"
     "government": "政府客户"
     "education": "教育客户"
+  
+  authorization_code_status:
+    normal: "正常"
+    locked: "已锁定"
+    expired: "已过期"
   
   customer_level:
     "normal": "普通客户"
@@ -79,6 +100,24 @@ enums:
     "normal": "正常"
     "locked": "已锁定"
     "expired": "已过期"
+  
+  license_status:
+    "active": "激活"
+    "inactive": "未激活"
+    "revoked": "已撤销"
+  
+  license_online_status:
+    "online": "在线"
+    "offline": "离线"
+  
+  authorization_change_type:
+    "renewal": "续期"
+    "upgrade": "升级"
+    "limit_change": "限制变更"
+    "feature_toggle": "功能切换"
+    "lock": "锁定"
+    "unlock": "解锁"
+    "other": "其他"
 
 # 默认错误信息
 default_error: "未知错误"

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 	"license-manager/internal/models"
 )
 
@@ -66,4 +67,46 @@ type AuthorizationCodeRepository interface {
 	
 	// CheckCustomerExists 检查客户是否存在
 	CheckCustomerExists(ctx context.Context, customerID string) (bool, error)
+	
+	// GetAuthorizationChangeList 查询授权变更历史列表
+	GetAuthorizationChangeList(ctx context.Context, authCodeID string, req *models.AuthorizationChangeListRequest) (*models.AuthorizationChangeListResponse, error)
+}
+
+// LicenseRepository 许可证数据访问接口
+type LicenseRepository interface {
+	// GetLicenseList 查询许可证列表
+	GetLicenseList(ctx context.Context, req *models.LicenseListRequest) (*models.LicenseListResponse, error)
+	
+	// GetLicenseByID 根据ID获取许可证信息
+	GetLicenseByID(ctx context.Context, id string) (*models.License, error)
+	
+	// CreateLicense 创建许可证
+	CreateLicense(ctx context.Context, license *models.License) error
+	
+	// UpdateLicense 更新许可证信息
+	UpdateLicense(ctx context.Context, license *models.License) error
+	
+	// CheckAuthorizationCodeExists 检查授权码是否存在
+	CheckAuthorizationCodeExists(ctx context.Context, authCodeID string) (bool, error)
+	
+	// GetAuthorizationCodeByID 根据ID获取授权码信息
+	GetAuthorizationCodeByID(ctx context.Context, authCodeID string) (*models.AuthorizationCode, error)
+	
+	// GetAuthorizationCodeByCode 根据授权码获取授权码信息
+	GetAuthorizationCodeByCode(ctx context.Context, code string) (*models.AuthorizationCode, error)
+	
+	// GetLicenseByKey 根据许可证密钥获取许可证信息
+	GetLicenseByKey(ctx context.Context, licenseKey string) (*models.License, error)
+	
+	// GetActiveLicenseCount 获取指定授权码的激活许可证数量
+	GetActiveLicenseCount(ctx context.Context, authCodeID string) (int64, error)
+}
+
+// DashboardRepository 仪表盘数据访问接口
+type DashboardRepository interface {
+	// GetAuthorizationTrendData 获取授权趋势数据
+	GetAuthorizationTrendData(ctx context.Context, startDate, endDate time.Time) ([]models.TrendData, error)
+	
+	// GetRecentAuthorizations 获取最近授权列表
+	GetRecentAuthorizations(ctx context.Context, req *models.DashboardRecentAuthorizationsRequest) (*models.DashboardRecentAuthorizationsResponse, error)
 }

@@ -457,3 +457,44 @@ func (s *authorizationCodeService) generateChecksum(input string) string {
 	}
 	return checksum
 }
+
+// GetAuthorizationChangeList 查询授权变更历史列表
+func (s *authorizationCodeService) GetAuthorizationChangeList(ctx context.Context, authCodeID string, req *models.AuthorizationChangeListRequest) (*models.AuthorizationChangeListResponse, error) {
+	lang := pkgcontext.GetLanguageFromContext(ctx)
+
+	// 业务逻辑：参数验证
+	if authCodeID == "" {
+		return nil, i18n.NewI18nError("900001", lang)
+	}
+	if req == nil {
+		return nil, i18n.NewI18nError("900001", lang)
+	}
+
+	// 验证授权码是否存在
+	_, err := s.authCodeRepo.GetAuthorizationCodeByID(ctx, authCodeID)
+	if err != nil {
+		if errors.Is(err, repository.ErrAuthorizationCodeNotFound) {
+			return nil, i18n.NewI18nError("300001", lang) // 授权码不存在
+		}
+		return nil, i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	// 委托给Repository层进行数据访问
+	result, err := s.authCodeRepo.GetAuthorizationChangeList(ctx, authCodeID, req)
+	if err != nil {
+		return nil, i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	// 业务逻辑：添加多语言显示字段
+	for i := range result.List {
+		s.fillChangeDisplayFields(&result.List[i], lang)
+	}
+
+	return result, nil
+}
+
+// fillChangeDisplayFields 填充变更历史列表项多语言显示字段
+func (s *authorizationCodeService) fillChangeDisplayFields(item *models.AuthorizationChangeListItem, lang string) {
+	// 填充变更类型显示字段
+	item.ChangeTypeDisplay = i18n.GetEnumMessage("authorization_change_type", item.ChangeType, lang)
+}

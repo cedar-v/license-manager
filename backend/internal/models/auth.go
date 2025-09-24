@@ -176,3 +176,70 @@ type AuthorizationCodeLockRequest struct {
 	LockReason *string `json:"lock_reason" binding:"omitempty,max=500"`    // 锁定原因
 	Reason     *string `json:"reason" binding:"omitempty,max=500"`         // 变更原因（记录到变更历史）
 }
+
+// AuthorizationChange 授权变更历史模型
+type AuthorizationChange struct {
+	ID                   string         `gorm:"type:varchar(36);primaryKey" json:"id"`
+	AuthorizationCodeID  string         `gorm:"type:varchar(36);not null;index" json:"authorization_code_id"`
+	ChangeType           string         `gorm:"type:varchar(30);not null;index" json:"change_type"`
+	ChangeTypeDisplay    string         `gorm:"-" json:"change_type_display,omitempty"`
+	OldConfig            JSON           `gorm:"type:json" json:"old_config,omitempty" swaggertype:"object"`
+	NewConfig            JSON           `gorm:"type:json" json:"new_config,omitempty" swaggertype:"object"`
+	OperatorID           string         `gorm:"type:varchar(36);not null;index" json:"operator_id"`
+	OperatorName         string         `gorm:"-" json:"operator_name,omitempty"`
+	Reason               *string        `gorm:"type:text" json:"reason"`
+	CreatedAt            time.Time      `gorm:"type:datetime(3);not null;index" json:"created_at"`
+
+	// 关联字段
+	AuthorizationCode    *AuthorizationCode `gorm:"foreignKey:AuthorizationCodeID" json:"authorization_code,omitempty"`
+	Operator             *User              `gorm:"foreignKey:OperatorID" json:"operator,omitempty"`
+}
+
+// TableName 指定表名
+func (AuthorizationChange) TableName() string {
+	return "authorization_changes"
+}
+
+// BeforeCreate 创建前自动设置时间戳和ID
+func (a *AuthorizationChange) BeforeCreate(tx *gorm.DB) error {
+	if a.ID == "" {
+		a.ID = uuid.New().String()
+	}
+	
+	if a.CreatedAt.IsZero() {
+		a.CreatedAt = time.Now()
+	}
+	return nil
+}
+
+// AuthorizationChangeListRequest 授权变更历史列表查询请求结构
+type AuthorizationChangeListRequest struct {
+	Page       int    `form:"page" binding:"omitempty,min=1"`                       // 页码，默认1
+	PageSize   int    `form:"page_size" binding:"omitempty,min=1,max=100"`         // 每页条数，默认20，最大100
+	ChangeType string `form:"change_type" binding:"omitempty"`                     // 变更类型筛选
+	OperatorID string `form:"operator_id" binding:"omitempty"`                     // 操作人筛选
+	StartDate  string `form:"start_date" binding:"omitempty"`                      // 开始时间
+	EndDate    string `form:"end_date" binding:"omitempty"`                        // 结束时间
+	Sort       string `form:"sort" binding:"omitempty,oneof=created_at change_type"` // 排序字段，默认created_at
+	Order      string `form:"order" binding:"omitempty,oneof=asc desc"`            // 排序方向，默认desc
+}
+
+// AuthorizationChangeListItem 授权变更历史列表项结构
+type AuthorizationChangeListItem struct {
+	ID                string  `json:"id"`
+	ChangeType        string  `json:"change_type"`
+	ChangeTypeDisplay string  `json:"change_type_display,omitempty"`
+	OperatorID        string  `json:"operator_id"`
+	OperatorName      string  `json:"operator_name,omitempty"`
+	Reason            *string `json:"reason"`
+	CreatedAt         string  `json:"created_at"`
+}
+
+// AuthorizationChangeListResponse 授权变更历史列表响应结构
+type AuthorizationChangeListResponse struct {
+	List       []AuthorizationChangeListItem `json:"list"`
+	Total      int64                          `json:"total"`
+	Page       int                            `json:"page"`
+	PageSize   int                            `json:"page_size"`
+	TotalPages int                            `json:"total_pages"`
+}

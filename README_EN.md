@@ -8,6 +8,15 @@
 
 License Manager is an independent software licensing platform that provides license code generation, distribution, validation, and management services for IoT platforms and other software systems. It offers both online and offline licensing modes with hardware-based binding for enhanced security.
 
+## Demo Environment
+
+Access URL: [lm.cedar-v.com:18080](http://lm.cedar-v.com:18080)  
+**Login Credentials:**  
+- Username: `admin`  
+- Password: `admin@123`
+
+> 💡 This is a demo environment showcasing our current features. You can experience the implemented core functionalities while we continue active development with more features coming soon.
+
 ## System Interface
 
 ### Login Page
@@ -15,6 +24,11 @@ License Manager is an independent software licensing platform that provides lice
 
 ### Management Dashboard
 ![Dashboard](docs/images/home.png)
+
+### Customer Management
+![Customer Management Page](docs/images/customer.png)
+
+The customer management module provides comprehensive customer information management features, including CRUD operations for customer data, status management, and authorization associations.
 
 ## Key Features
 

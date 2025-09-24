@@ -35,6 +35,15 @@ errors:
     "300009": "Failed to generate license file"
     "300010": "Invalid configuration parameters"
   
+  # Dashboard module (40xxxx)
+  dashboard:
+    "400001": "Invalid time type parameter"
+    "400002": "Invalid start date format"
+    "400003": "Invalid end date format"
+    "400004": "Time range exceeds limit (over one year)"
+    "400005": "Start date cannot be later than end date"
+    "400006": "Invalid limit parameter"
+  
   # System general (90xxxx)
   system:
     "900001": "Invalid request parameters"
@@ -42,13 +51,25 @@ errors:
     "900003": "Resource conflict"
     "900004": "Internal server error"
 
+# Common text
+common:
+  success: "Success"
+
 # Enum translations
 enums:
+  dashboard_period:
+    week: "This Week"
+    month: "This Month"
   customer_type:
     "individual": "Individual"
     "enterprise": "Enterprise"
     "government": "Government"
     "education": "Education"
+  
+  authorization_code_status:
+    normal: "Normal"
+    locked: "Locked"
+    expired: "Expired"
   
   customer_level:
     "normal": "Normal"
@@ -79,6 +100,24 @@ enums:
     "normal": "Normal"
     "locked": "Locked"
     "expired": "Expired"
+  
+  license_status:
+    "active": "Active"
+    "inactive": "Inactive"
+    "revoked": "Revoked"
+  
+  license_online_status:
+    "online": "Online"
+    "offline": "Offline"
+  
+  authorization_change_type:
+    "renewal": "Renewal"
+    "upgrade": "Upgrade"
+    "limit_change": "Limit Change"
+    "feature_toggle": "Feature Toggle"
+    "lock": "Lock"
+    "unlock": "Unlock"
+    "other": "Other"
 
 # Default error message
 default_error: "Unknown error"
