@@ -50,6 +50,7 @@
           <div class="table-container">
             <el-table
               :data="recentData"
+              :loading="loading"
               style="width: 100%; height: 100%;"
               :header-row-class-name="'table-header'"
               :row-class-name="(params: any) => params.rowIndex % 2 === 1 ? 'stripe-row' : ''"
@@ -82,10 +83,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Layout from '@/components/common/layout/Layout.vue';
 import LicenseTrendChart from '@/components/charts/LicenseTrendChart.vue';
+import { getRecentAuthorizations, type RecentAuthorizationItem } from '@/api/dashboard'
+import { ElMessage } from 'element-plus'
 
 // 导入dashboard目录中的图标
 import icon1 from '@/assets/icons/dashboard/icon1.png'
@@ -153,57 +156,47 @@ const statsData = computed(() => [
   }
 ]);
 
-// 最近授权数据 
-const recentData = [
-  {
-    id: 1,
-    customer: '石狮市潢安有限公司',
-    description: '落魄山一哥',
-    status: 1, // 1代表有效，0代表失效
-    expiry: '2023-05-26 12:12:00',
-    createTime: '2023-05-26 12:12:00'
-  },
-  {
-    id: 2,
-    customer: '石狮市潢安有限公司',
-    description: '落魄山一哥',
-    status: 0,
-    expiry: '2023-05-26 12:12:00',
-    createTime: '2023-05-26 12:12:00'
-  },
-  {
-    id: 3,
-    customer: '石狮市潢安有限公司',
-    description: '落魄山一哥',
-    status: 1,
-    expiry: '2023-05-26 12:12:00',
-    createTime: '2023-05-26 12:12:00'
-  },
-  {
-    id: 4,
-    customer: '石狮市潢安有限公司',
-    description: '落魄山一哥',
-    status: 0,
-    expiry: '2023-05-26 12:12:00',
-    createTime: '2023-05-26 12:12:00'
-  },
-  {
-    id: 5,
-    customer: '石狮市潢安有限公司',
-    description: '落魄山一哥',
-    status: 1,
-    expiry: '2023-05-26 12:12:00',
-    createTime: '2023-05-26 12:12:00'
-  },
-  {
-    id: 6,
-    customer: '石狮市潢安有限公司',
-    description: '落魄山一哥',
-    status: 0,
-    expiry: '2023-05-26 12:12:00',
-    createTime: '2023-05-26 12:12:00'
+// 最近授权数据 - 响应式数据
+const recentData = ref<RecentAuthorizationItem[]>([])
+const loading = ref(false)
+
+// 获取最近授权数据
+const fetchRecentAuthorizations = async () => {
+  try {
+    loading.value = true
+    const response = await getRecentAuthorizations()
+    recentData.value = response.data
+  } catch (error: any) {
+    console.error('获取最近授权数据失败:', error)
+    ElMessage.error(error?.backendMessage || '获取最近授权数据失败')
+    // 如果API调用失败，使用默认数据
+    recentData.value = [
+      {
+        id: 1,
+        customer: '石狮市潢安有限公司',
+        description: '落魄山一哥',
+        status: 1,
+        expiry: '2023-05-26 12:12:00',
+        createTime: '2023-05-26 12:12:00'
+      },
+      {
+        id: 2,
+        customer: '石狮市潢安有限公司',
+        description: '落魄山一哥',
+        status: 0,
+        expiry: '2023-05-26 12:12:00',
+        createTime: '2023-05-26 12:12:00'
+      }
+    ]
+  } finally {
+    loading.value = false
   }
-];
+}
+
+// 组件挂载时获取数据
+onMounted(() => {
+  fetchRecentAuthorizations()
+})
 </script>
 
 <style lang="scss" scoped>

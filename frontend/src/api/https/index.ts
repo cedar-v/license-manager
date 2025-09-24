@@ -8,6 +8,7 @@ import { generateAcceptLanguageHeader } from '@/utils/language'
 import router from '@/router'
 
 const envUrl = import.meta.env.VITE_API_BASE_URL
+console.log('API Base URL:', envUrl)
 
 // 防止重复跳转到登录页的标志
 let isRedirectingToLogin = false
