@@ -26,12 +26,13 @@
   "dashboard": {
     "title": "仪表盘",
     "stats": {
-      "totalLicenses": "总授权数",
-      "activeLicenses": "活跃授权",
-      "expiringSoon": "即将到期",
-      "expired": "已过期",
-      "newThisMonth": "本月新增",
-      "totalCustomers": "客户总数"
+      "totalCustomers": "客户总数",
+      "totalLicenses": "总授权",
+      "activeLicenses": "有效授权",
+      "expired": "过期授权",
+      "onlineClients": "在线客户端数量",
+      "expiringSoon": "到期提醒",
+      "authSuccessRate24h": "近24小时授权验证成功率"
     },
     "recentLicenses": {
       "title": "最近授权",

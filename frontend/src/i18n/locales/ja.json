@@ -26,12 +26,13 @@
   "dashboard": {
     "title": "ダッシュボード",
     "stats": {
+      "totalCustomers": "顧客総数",
       "totalLicenses": "総ライセンス数",
       "activeLicenses": "アクティブライセンス",
-      "expiringSoon": "期限近し",
       "expired": "期限切れ",
-      "newThisMonth": "今月新規",
-      "totalCustomers": "顧客総数"
+      "onlineClients": "オンラインクライアント数",
+      "expiringSoon": "期限近し",
+      "authSuccessRate24h": "24時間認証成功率"
     },
     "recentLicenses": {
       "title": "最近のライセンス",

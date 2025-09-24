@@ -26,12 +26,13 @@
   "dashboard": {
     "title": "Dashboard",
     "stats": {
+      "totalCustomers": "Total Customers",
       "totalLicenses": "Total Licenses",
       "activeLicenses": "Active Licenses",
-      "expiringSoon": "Expiring Soon",
       "expired": "Expired",
-      "newThisMonth": "New This Month",
-      "totalCustomers": "Total Customers"
+      "onlineClients": "Online Clients",
+      "expiringSoon": "Expiring Soon",
+      "authSuccessRate24h": "24h Auth Success Rate"
     },
     "recentLicenses": {
       "title": "Recent Licenses",

@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-01 09:32:42
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-09-18 16:28:39
+ * @LastEditTime: 2025-09-23 14:37:21
  * @FilePath: /frontend/src/views/Dashboard.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -12,28 +12,25 @@
     <div class="content-container dashboard">
       <!-- 统计卡片区域 -->
       <div class="stats-section">
-        <div class="stats-card" v-for="stat in statsData" :key="stat.id">
+        <div class="stats-card" :class="{ 'compact-card': stat.id === 6, 'large-card': stat.id === 7 }" v-for="stat in statsData" :key="stat.id">
           <div class="stat-icon">
             <div class="icon-circle">
-              <svg class="stat-icon-svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path v-if="stat.id === 1" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" fill="currentColor"/>
-                <path v-else-if="stat.id === 2" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
-                <path v-else-if="stat.id === 3" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
-                <path v-else-if="stat.id === 4" d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" fill="currentColor"/>
-                <path v-else-if="stat.id === 5" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" fill="currentColor"/>
-                <path v-else="stat.id === 6" d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zM4 18v-1c0-1.1.9-2 2-2h2.5c.91 0 1.73.35 2.35.95C11.85 15.35 12.09 15 12.5 15H15c1.1 0 2 .9 2 2v1h3v-6H4v6z" fill="currentColor"/>
-              </svg>
+              <img
+                :src="stat.icon"
+                :alt="stat.label"
+                class="stat-icon-img"
+              />
             </div>
           </div>
           <div class="stat-content">
             <div class="stat-label">{{ stat.label }}</div>
-            <div class="stat-value">{{ stat.value }}</div>
-          </div>
-          <div class="stat-trend">
-            <svg class="trend-icon" width="16" height="16" viewBox="0 0 16 16">
-              <path d="M4.5 7.5L7 5L9.5 7.5L14 3" stroke="currentColor" stroke-width="1.5" fill="none"/>
-            </svg>
-            <span class="trend-value">{{ stat.trend }}</span>
+            <div class="stat-value-row">
+              <div class="stat-value">{{ stat.value }}</div>
+              <div class="stat-trend" v-if="stat.trend">
+                <img :src="upIcon" alt="trend up" class="trend-icon" width="16" height="16" />
+                <span class="trend-value">{{ stat.trend }}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -57,8 +54,8 @@
               :header-row-class-name="'table-header'"
               :row-class-name="(params: any) => params.rowIndex % 2 === 1 ? 'stripe-row' : ''"
             >
-              <el-table-column :label="t('dashboard.recentLicenses.columns.serialNumber')"  min-width="90">
-                <template #default="{ $index }" style="min-width: 90px;">
+              <el-table-column :label="t('dashboard.recentLicenses.columns.serialNumber')"  min-width="90" align="center">
+                <template #default="{ $index }">
                   {{ $index + 1 }}
                 </template>
               </el-table-column>
@@ -90,6 +87,16 @@ import { useI18n } from 'vue-i18n'
 import Layout from '@/components/common/layout/Layout.vue';
 import LicenseTrendChart from '@/components/charts/LicenseTrendChart.vue';
 
+// 导入dashboard目录中的图标
+import icon1 from '@/assets/icons/dashboard/icon1.png'
+import icon2 from '@/assets/icons/dashboard/icon2.png'
+import icon3 from '@/assets/icons/dashboard/icon3.png'
+import icon4 from '@/assets/icons/dashboard/icon4.png'
+import icon5 from '@/assets/icons/dashboard/icon5.png'
+import icon6 from '@/assets/icons/dashboard/icon6.png'
+import icon7 from '@/assets/icons/dashboard/icon7.png'
+import upIcon from '@/assets/icons/up-icon.svg'
+
 // 使用国际化
 const { t } = useI18n()
 
@@ -97,39 +104,52 @@ const { t } = useI18n()
 const statsData = computed(() => [
   {
     id: 1,
-    value: '1,234',
-    label: t('dashboard.stats.totalLicenses'),
-    trend: '8.5%',
+    value: '100',
+    label: t('dashboard.stats.totalCustomers'),
+    trend: '+1.5%',
+    icon: icon1
   },
   {
     id: 2,
-    value: '856',
-    label: t('dashboard.stats.activeLicenses'),
-    trend: '8.5%',
+    value: '100',
+    label: t('dashboard.stats.totalLicenses'),
+    trend: '+8.5%',
+    icon: icon2
   },
   {
     id: 3,
-    value: '123',
-    label: t('dashboard.stats.expiringSoon'),
-    trend: '8.5%',
+    value: '98',
+    label: t('dashboard.stats.activeLicenses'),
+    trend: '+15.6%',
+    icon: icon3
   },
   {
     id: 4,
-    value: '45',
+    value: '2',
     label: t('dashboard.stats.expired'),
-    trend: '8.5%',
+    trend: '+8.6%',
+    icon: icon4
   },
   {
     id: 5,
-    value: '678',
-    label: t('dashboard.stats.newThisMonth'),
-    trend: '8.5%',
+    value: '600',
+    label: t('dashboard.stats.onlineClients'),
+    trend: '',
+    icon: icon5
   },
   {
     id: 6,
-    value: '234',
-    label: t('dashboard.stats.totalCustomers'),
-    trend: '8.5%',
+    value: '50',
+    label: t('dashboard.stats.expiringSoon'),
+    trend: '',
+    icon: icon6
+  },
+  {
+    id: 7,
+    value: '98%',
+    label: t('dashboard.stats.authSuccessRate24h'),
+    trend: '',
+    icon: icon7
   }
 ]);
 
@@ -207,11 +227,11 @@ const recentData = [
 // 统计卡片区域 - 基于1920*1080设计的vw适配
 .stats-section {
   display: grid;
-  grid-template-columns: repeat(6, 1fr); /* 6个统计卡片 */
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 0.8fr 1.5fr; /* 前5个正常，第6个缩小，第7个放大 */
   gap: 1.04vw; /* 20px/1920 = 1.04vw */
   margin-bottom: 2.08vw; /* 40px/1920 = 2.08vw */
   padding: 1.25vw; /* 24px/1920 = 1.25vw */
-  background: linear-gradient(135deg, #019C7C 0%, #5AD8A6 100%);
+  background: linear-gradient(135deg, #1DB584 0%, #5AD8A6 100%);
   border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
   position: relative;
   
@@ -237,9 +257,9 @@ const recentData = [
   display: flex;
   align-items: center;
   gap: 0.83vw; /* 16px/1920 = 0.83vw */
-  padding: 1.25vw 0; /* 24px/1920 = 1.25vw */
   position: relative;
   z-index: 1;
+  min-width: 0;
   
   &:not(:last-child)::after {
     content: '';
@@ -258,37 +278,45 @@ const recentData = [
 
 .stat-icon {
   .icon-circle {
-    width: 2.92vw; /* 56px/1920 = 2.92vw */
-    height: 2.92vw; /* 56px/1920 = 2.92vw */
+    width: 2.08vw; /* 40px/1920 = 2.08vw */
+    height: 2.08vw; /* 40px/1920 = 2.08vw */
     background: rgba(255, 255, 255, 0.2);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     
-    .stat-icon-svg {
-      color: rgba(255, 255, 255, 0.9);
-      width: 1.25vw; /* 24px/1920 = 1.25vw */
-      height: 1.25vw; /* 24px/1920 = 1.25vw */
+    .stat-icon-img {
+      width: 0.83vw; /* 16px/1920 = 0.83vw */
+      height: 0.83vw; /* 16px/1920 = 0.83vw */
+      filter: brightness(0) invert(1) opacity(0.9); /* 将图标转为白色半透明 */
+      object-fit: contain;
     }
   }
 }
 
 .stat-content {
-  flex: 1;
-  min-width: 64px;
+  flex: 0 1 auto;
+  min-width: 4.17vw; /* 80px/1920 = 4.17vw */
   
   .stat-label {
-    font-size: 0.83vw; /* 16px/1920 = 1.46vw */
+    font-size: 0.83vw; /* 16px/1920 = 0.83vw */
     font-weight: 500;
     color: #FFFFFF;
     line-height: 1;
+    white-space: nowrap;
   }
   
+  .stat-value-row {
+    display: flex;
+    align-items: center;
+    gap: 0.42vw; /* 8px/1920 = 0.42vw */
+    margin-top: 0.21vw; /* 4px/1920 = 0.21vw */
+  }
+
   .stat-value {
     font-size: 1.25vw; /* 24px/1920 = 0.73vw */
     color: rgba(255, 255, 255, 0.9);
-    margin-top: 0.21vw; /* 4px/1920 = 0.21vw */
   }
 }
 
@@ -297,14 +325,29 @@ const recentData = [
   align-items: center;
   gap: 0.21vw; /* 4px/1920 = 0.21vw */
   color: rgba(255, 255, 255, 0.8);
-  
+
   .trend-icon {
-    color: rgba(255, 255, 255, 0.8);
+    filter: brightness(0) invert(1) opacity(0.8);
+    object-fit: contain;
   }
-  
+
   .trend-value {
     font-size: 0.73vw; /* 14px/1920 = 0.73vw */
     font-weight: 500;
+  }
+}
+
+// 紧凑型卡片样式（专门针对到期提醒）
+.stats-card.compact-card {
+  .stat-content {
+    min-width: 2.5vw !important; /* 48px/1920 = 2.5vw */
+  }
+}
+
+// 大型卡片样式（专门针对近24小时授权验证成功率）
+.stats-card.large-card {
+  .stat-content {
+    min-width: 6vw !important; /* 115px/1920 = 6vw */
   }
 }
 
@@ -457,23 +500,31 @@ const recentData = [
   }
   
   .stat-icon .icon-circle {
-    width: 48px; /* 移动端固定大小 */
-    height: 48px;
+    width: 36px; /* 移动端固定大小 */
+    height: 36px;
     
-    .stat-icon-svg {
-      width: 20px;
-      height: 20px;
+    .stat-icon-img {
+      width: 14px;
+      height: 14px;
+      filter: brightness(0) invert(1) opacity(0.9); /* 将图标转为白色半透明 */
+      object-fit: contain;
     }
   }
   
   .stat-content {
+    .stat-value-row {
+      gap: 6px;
+      margin-top: 4px;
+    }
+
     .stat-value {
       font-size: 24px; /* 移动端固定字体大小 */
     }
-    
+
     .stat-label {
       font-size: 12px;
       margin-top: 4px;
+      white-space: nowrap;
     }
   }
   
