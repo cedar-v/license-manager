@@ -321,20 +321,20 @@ onMounted(() => {
 
 .breadcrumb {
   font-size: 14px;
-  color: #888;
+  color: var(--app-text-secondary);
 }
 
 .breadcrumb-item {
-  color: #888;
+  color: var(--app-text-secondary);
 }
 
 .breadcrumb-separator {
   margin: 0 8px;
-  color: #b6bad2;
+  color: var(--app-text-secondary);
 }
 
 .breadcrumb-current {
-  color: #1d1d1d;
+  color: var(--app-text-primary);
 }
 
 .form-actions {
@@ -351,7 +351,7 @@ onMounted(() => {
 
 /* 信息卡片 */
 .info-card {
-  background: #fff;
+  background: var(--app-content-bg);
   border-radius: 4px;
   padding: 15px;
 }
@@ -375,7 +375,7 @@ onMounted(() => {
 .section-title {
   font-size: 16px;
   font-weight: 700;
-  color: #1d1d1d;
+  color: var(--app-text-primary);
   margin: 0 0 20px 0;
 }
 
@@ -422,7 +422,7 @@ onMounted(() => {
 
 .label {
   font-size: 14px;
-  color: #666;
+  color: var(--app-text-regular);
   font-weight: 500;
   min-width: 100px;
   flex-shrink: 0;
@@ -431,7 +431,7 @@ onMounted(() => {
 
 .value {
   font-size: 14px;
-  color: #1d1d1d;
+  color: var(--app-text-primary);
   word-break: break-all;
   line-height: 1.5;
   min-width: 120px;
@@ -448,13 +448,13 @@ onMounted(() => {
 :deep(.el-button) {
   font-size: 14px;
   padding: 6px 16px;
-  border: 1px solid #c2c6ce;
-  color: #1d1d1d;
+  border: 1px solid var(--app-border-color);
+  color: var(--app-text-primary);
 }
 
 :deep(.el-button:hover) {
-  border-color: #019c7c;
-  color: #019c7c;
+  border-color: var(--el-color-primary);
+  color: var(--el-color-primary);
 }
 
 /* 响应式设计 */

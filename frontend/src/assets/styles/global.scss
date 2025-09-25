@@ -30,8 +30,9 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-size: $font-size-base;
   line-height: 1.6;
-  color: $text-color-primary;
-  background-color: $background-color-base;
+  color: var(--app-text-primary);
+  background-color: var(--app-bg-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
 
   @include mobile {
     font-size: $font-size-small;
@@ -44,8 +45,9 @@ body {
   min-height: 100vh;
 }
 
-/* Element Plus 主题色自定义 */
+/* Theme Variables */
 :root {
+  /* Element Plus 主题色自定义 */
   --el-color-primary: #019C7C !important;
   --el-color-primary-light-3: rgba(1, 156, 124, 0.7) !important;
   --el-color-primary-light-5: rgba(1, 156, 124, 0.5) !important;
@@ -56,6 +58,47 @@ body {
   --el-border-radius-base: 4px;
   --el-font-size-base: 14px;
   --el-font-family: #{$font-family-primary};
+
+  /* Light Theme Variables */
+  --app-bg-color: #F5F7FA;
+  --app-content-bg: #FFFFFF;
+  --app-text-primary: #303133;
+  --app-text-regular: #606266;
+  --app-text-secondary: #909399;
+  --app-border-color: #DCDFE6;
+  --app-border-light: #E4E7ED;
+  --app-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+  --app-nav-bg: #FFFFFF;
+  --app-sidebar-bg: #FFFFFF;
+  --app-action-btn-bg: #F7F8FA;
+}
+
+/* Dark Theme Variables */
+[data-theme="dark"] {
+  --app-bg-color: #1a1a1a;
+  --app-content-bg: #2d2d2d;
+  --app-text-primary: #e5eaf3;
+  --app-text-regular: #cfd3dc;
+  --app-text-secondary: #a3a6ad;
+  --app-border-color: #414243;
+  --app-border-light: #363637;
+  --app-shadow: 0 2px 4px rgba(0, 0, 0, 0.24), 0 0 6px rgba(0, 0, 0, 0.08);
+  --app-nav-bg: #2d2d2d;
+  --app-sidebar-bg: #2d2d2d;
+  --app-action-btn-bg: #3c3c3c;
+
+  /* Element Plus Dark Theme Adjustments */
+  --el-bg-color: #2d2d2d !important;
+  --el-bg-color-page: #1a1a1a !important;
+  --el-text-color-primary: #e5eaf3 !important;
+  --el-text-color-regular: #cfd3dc !important;
+  --el-text-color-secondary: #a3a6ad !important;
+  --el-border-color: #414243 !important;
+  --el-border-color-light: #363637 !important;
+  --el-border-color-lighter: #2d2d2d !important;
+  --el-fill-color-blank: #2d2d2d !important;
+  --el-fill-color: #3c3c3c !important;
+  --el-fill-color-light: #414243 !important;
 }
 
 /* 工具类样式 */

@@ -113,8 +113,8 @@ const handleNavClick = (item: NavItem, event: Event) => {
   top: 0;
   width: 280px;
   height: 100vh;
-  background: linear-gradient(180deg, $background-color-base 0%, $background-color-white 100%);
-  border-right: 1px solid $border-color-light;
+  background: var(--app-sidebar-bg);
+  border-right: 1px solid var(--app-border-light);
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
@@ -144,7 +144,7 @@ const handleNavClick = (item: NavItem, event: Event) => {
 .sidebar__header {
   height: 80px;
   @include flex-between;
-  border-bottom: 1px solid $border-color-lighter;
+  border-bottom: 1px solid var(--app-border-light);
 }
 
 .sidebar__logo {
@@ -168,10 +168,10 @@ const handleNavClick = (item: NavItem, event: Event) => {
   font-family: 'Swis721 BlkCn BT', sans-serif;
   font-size: 30px;
   font-weight: 400;
-  color: $text-color-primary;
+  color: var(--app-text-primary);
   @include text-ellipsis;
   line-height: 1.2;
-  
+
   @include mobile {
     font-size: 24px;
   }
@@ -184,34 +184,34 @@ const handleNavClick = (item: NavItem, event: Event) => {
   min-width: 36px;
   min-height: 36px;
   padding: 0;
-  background: $background-color-white;
-  border: 1px solid $border-color-light;
-  border-radius: $border-radius-base;
-  color: $text-color-secondary;
-  
-  box-shadow: $box-shadow-base;
+  background: var(--app-content-bg);
+  border: 1px solid var(--app-border-light);
+  border-radius: 8px;
+  color: var(--app-text-secondary);
+
+  box-shadow: var(--app-shadow);
   
   @include button-base;
   
   @include non-touch-device {
     &:hover {
-      background: $background-color-base;
-      color: $primary-color;
-      border-color: rgba($primary-color, 0.2);
+      background: var(--app-bg-color);
+      color: var(--el-color-primary);
+      border-color: var(--el-color-primary-light-8);
       transform: scale(1.02);
     }
   }
   
   &--collapsed {
-    background: linear-gradient(135deg, $primary-color 0%, color.adjust($primary-color, $lightness: 5%) 100%);
+    background: var(--el-color-primary);
     color: white;
-    border-color: $primary-color;
-    box-shadow: 0 2px 8px rgba($primary-color, 0.24);
-    
+    border-color: var(--el-color-primary);
+    box-shadow: 0 2px 8px var(--el-color-primary-light-7);
+
     @include non-touch-device {
       &:hover {
-        background: linear-gradient(135deg, color.adjust($primary-color, $lightness: -5%) 0%, $primary-color 100%);
-        box-shadow: 0 4px 12px rgba($primary-color, 0.32);
+        background: var(--el-color-primary-dark-2);
+        box-shadow: 0 4px 12px var(--el-color-primary-light-5);
       }
     }
   }
@@ -237,58 +237,58 @@ const handleNavClick = (item: NavItem, event: Event) => {
 /* 导航区域 */
 .sidebar__nav {
   flex: 1;
-  padding: $spacing-small 0;
+  padding: 8px 0;
   overflow-y: auto;
   @include smooth-scroll;
 }
 
 .nav-section {
-  padding: $spacing-small $spacing-medium;
+  padding: 8px 16px;
 }
 
 .nav-item {
-  margin-bottom: $spacing-base;
+  margin-bottom: 16px;
 }
 
 .nav-link {
   @include flex-center-vertical;
-  gap: $spacing-base;
-  padding: $spacing-base $spacing-large;
-  color: $text-color-primary;
+  gap: 16px;
+  padding: 16px 24px;
+  color: var(--app-text-primary);
   text-decoration: none;
-  border-radius: $border-radius-round;
+  border-radius: 24px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: $font-size-base;
-  font-weight: $font-weight-secondary;
+  font-size: 14px;
+  font-weight: 400;
   line-height: 1;
   
   @include mobile {
     min-height: 44px; // 触摸目标大小
-    padding: $spacing-base $spacing-medium;
+    padding: 16px;
   }
-  
+
   @include non-touch-device {
     &:hover {
-      background: rgba($primary-color, 0.08);
-      color: $primary-color;
-      
+      background: var(--el-color-primary-light-9);
+      color: var(--el-color-primary);
+
       .nav-icon {
-        color: $primary-color;
+        color: var(--el-color-primary);
       }
     }
   }
-  
+
   &--active {
-    background: rgba($primary-color, 0.12);
-    color: $primary-color;
-    font-weight: $font-weight-primary;
-    
+    background: var(--el-color-primary-light-8);
+    color: var(--el-color-primary);
+    font-weight: 500;
+
     .nav-text {
-      color: $primary-color;
+      color: var(--el-color-primary);
     }
-    
+
     .nav-icon {
-      color: $primary-color;
+      color: var(--el-color-primary);
     }
   }
 }
@@ -297,15 +297,15 @@ const handleNavClick = (item: NavItem, event: Event) => {
   width: 20px;
   height: 20px;
   @include flex-center;
-  border-radius: $border-radius-small;
+  border-radius: 4px;
   flex-shrink: 0;
 }
 
 .nav-icon {
   width: 20px;
   height: 20px;
-  font-size: $font-size-base;
-  color: $text-color-secondary;
+  font-size: 14px;
+  color: var(--app-text-secondary);
 }
 
 .nav-text {
@@ -314,19 +314,19 @@ const handleNavClick = (item: NavItem, event: Event) => {
 
 /* 子菜单 */
 .nav-submenu {
-  margin-left: $spacing-extra-large;
-  margin-top: $spacing-extra-small;
+  margin-left: 32px;
+  margin-top: 4px;
 }
 
 .nav-sublink {
   display: block;
-  padding: $spacing-small $spacing-medium;
-  color: $text-color-secondary;
+  padding: 8px 16px;
+  color: var(--app-text-secondary);
   text-decoration: none;
-  border-radius: $border-radius-small;
-  font-size: $font-size-small;
+  border-radius: 4px;
+  font-size: 12px;
   transition: all 0.2s;
-  margin-bottom: $spacing-extra-small;
+  margin-bottom: 4px;
   
   @include mobile {
     min-height: 40px;
@@ -334,15 +334,15 @@ const handleNavClick = (item: NavItem, event: Event) => {
   
   @include non-touch-device {
     &:hover {
-      background: rgba($primary-color, 0.06);
-      color: $primary-color;
+      background: var(--el-color-primary-light-9);
+      color: var(--el-color-primary);
     }
   }
-  
+
   &--active {
-    background: rgba($primary-color, 0.08);
-    color: $primary-color;
-    font-weight: $font-weight-primary;
+    background: var(--el-color-primary-light-9);
+    color: var(--el-color-primary);
+    font-weight: 500;
   }
 }
 
@@ -352,8 +352,8 @@ const handleNavClick = (item: NavItem, event: Event) => {
 
 /* 底部区域 */
 .sidebar__footer {
-  padding: $spacing-medium;
-  border-top: 1px solid $border-color-lighter;
+  padding: 16px;
+  border-top: 1px solid var(--app-border-light);
 }
 
 /* 收起状态下的样式调整 */
@@ -372,7 +372,7 @@ const handleNavClick = (item: NavItem, event: Event) => {
   
   .nav-link {
     @include flex-center;
-    padding: $spacing-extra-small $spacing-base;
+    padding: 4px 16px;
   }
   
   .nav-text {

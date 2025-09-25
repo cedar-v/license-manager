@@ -354,20 +354,20 @@ onMounted(async () => {
 
 .breadcrumb {
   font-size: 14px;
-  color: #888;
+  color: var(--app-text-secondary);
 }
 
 .breadcrumb-item {
-  color: #888;
+  color: var(--app-text-secondary);
 }
 
 .breadcrumb-separator {
   margin: 0 8px;
-  color: #b6bad2;
+  color: var(--app-text-secondary);
 }
 
 .breadcrumb-current {
-  color: #1d1d1d;
+  color: var(--app-text-primary);
 }
 
 .form-actions {
@@ -378,7 +378,7 @@ onMounted(async () => {
 /* 主表单区域 */
 .customer-form {
   padding: 20px;
-  background: #fff;
+  background: var(--app-content-bg);
   border-radius: 4px;
   width: 100%;
   margin-bottom: 20px;
@@ -387,7 +387,7 @@ onMounted(async () => {
 .section-title {
   font-size: 16px;
   font-weight: 700;
-  color: #1d1d1d;
+  color: var(--app-text-primary);
   margin: 0 0 20px 0;
 }
 
@@ -444,7 +444,7 @@ onMounted(async () => {
 /* Element Plus 样式覆盖 */
 :deep(.el-form-item__label) {
   font-weight: 400;
-  color: #1d1d1d;
+  color: var(--app-text-primary);
   font-size: 14px;
   line-height: 1.5714285714285714em;
   margin-bottom: 8px;
@@ -452,41 +452,41 @@ onMounted(async () => {
 
 :deep(.el-form-item.is-required .el-form-item__label::before) {
   content: '*';
-  color: #eb3737;
+  color: #F56C6C;
   margin-right: 4px;
 }
 
 :deep(.el-input__wrapper) {
-  border: 1px solid #c2c6ce;
+  border: 1px solid var(--app-border-color);
   border-radius: 4px;
   height: 32px;
 }
 
 :deep(.el-input__inner) {
-  color: #1d1d1d;
+  color: var(--app-text-primary);
   font-size: 14px;
   line-height: 1.5em;
 }
 
 :deep(.el-input__inner::placeholder) {
-  color: #b2b8c2;
+  color: var(--app-text-secondary);
   font-size: 14px;
 }
 
 :deep(.el-select .el-input__wrapper) {
-  border: 1px solid #c2c6ce;
+  border: 1px solid var(--app-border-color);
   height: 32px;
 }
 
 :deep(.el-textarea__inner) {
-  border: 1px solid #c2c6ce;
+  border: 1px solid var(--app-border-color);
   border-radius: 4px;
   font-size: 14px;
-  color: #1d1d1d;
+  color: var(--app-text-primary);
 }
 
 :deep(.el-textarea__inner::placeholder) {
-  color: #b2b8c2;
+  color: var(--app-text-secondary);
 }
 
 :deep(.el-radio-group) {
@@ -504,29 +504,29 @@ onMounted(async () => {
 
 
 :deep(.el-radio__label) {
-  color: #1d1d1d;
+  color: var(--app-text-primary);
   font-size: 14px;
 }
 
 :deep(.el-radio__input.is-checked .el-radio__inner) {
-  background-color: #00c27c;
-  border-color: #00c27c;
+  background-color: var(--el-color-primary);
+  border-color: var(--el-color-primary);
 }
 
 :deep(.el-radio__input.is-checked .el-radio__inner::after) {
-  background-color: #ffffff;
+  background-color: var(--app-content-bg);
 }
 
 :deep(.el-button--primary) {
-  background-color: #019c7c;
-  border-color: #019c7c;
+  background-color: var(--el-color-primary-dark-2);
+  border-color: var(--el-color-primary-dark-2);
   font-size: 14px;
   padding: 6px 16px;
 }
 
 :deep(.el-button--primary:hover) {
-  background-color: #00c27c;
-  border-color: #00c27c;
+  background-color: var(--el-color-primary);
+  border-color: var(--el-color-primary);
 }
 
 :deep(.el-button) {

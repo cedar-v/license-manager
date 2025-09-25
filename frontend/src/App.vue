@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import en from 'element-plus/es/locale/lang/en'
@@ -51,6 +51,23 @@ watch([
     isTouchDevice
   })
 }, { immediate: true })
+
+// 监听主题变化并应用到HTML根元素
+watch(() => appStore.theme, (newTheme) => {
+  document.documentElement.setAttribute('data-theme', newTheme)
+}, { immediate: true })
+
+// 初始化主题
+onMounted(() => {
+  // 从localStorage获取保存的主题，如果没有则使用默认的light
+  const savedTheme = localStorage.getItem('app-theme') as 'light' | 'dark' | 'auto' || 'light'
+  appStore.setTheme(savedTheme)
+})
+
+// 监听主题变化并保存到localStorage
+watch(() => appStore.theme, (newTheme) => {
+  localStorage.setItem('app-theme', newTheme)
+})
 </script>
 
 <style>

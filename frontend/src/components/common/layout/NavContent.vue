@@ -151,6 +151,9 @@ const handleLanguageClick = () => {
 
 // 处理主题切换点击
 const handleThemeClick = () => {
+  const currentTheme = appStore.theme
+  const nextTheme = currentTheme === 'light' ? 'dark' : 'light'
+  appStore.setTheme(nextTheme)
   emit('themeClick')
 }
 
@@ -168,14 +171,14 @@ const handleUserClick = () => {
   left: 280px; /* 默认：侧边栏展开状态 */
   right: 0;
   height: 80px; /* 使用固定高度 */
-  background: #FFFFFF;
-  border-bottom: 1px solid rgba(29, 29, 29, 0.12);
+  background: var(--app-nav-bg);
+  border-bottom: 1px solid var(--app-border-light);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 20px 24px; /* 使用固定像素值 */
   z-index: 2001;
-  transition: left 0.3s ease; /* 只对left属性做动画 */
+  transition: left 0.3s ease, background-color 0.3s ease, border-color 0.3s ease; /* 只对left属性做动画 */
 }
 
 /* 左侧区域 */
@@ -201,7 +204,7 @@ const handleUserClick = () => {
 }
 
 .sidebar-toggle-btn:hover {
-  background: rgba(1, 156, 124, 0.1);
+  background: var(--el-color-primary-light-9);
 }
 
 /* 面包屑区域 */
@@ -217,7 +220,7 @@ const handleUserClick = () => {
   align-items: center;
   gap: 4px;
   font-size: 12px;
-  color: #888;
+  color: var(--app-text-secondary);
   flex-wrap: wrap;
 }
 
@@ -233,14 +236,14 @@ const handleUserClick = () => {
   font-family: 'OPPOSans', sans-serif;
   font-size: 20px;
   font-weight: 400;
-  color: #1D1D1D;
+  color: var(--app-text-primary);
   line-height: 1.32;
 }
 
 .breadcrumb-link {
   border: none;
   background: none;
-  color: #019C7C;
+  color: var(--el-color-primary);
   font-size: 12px;
   cursor: pointer;
   padding: 0;
@@ -249,17 +252,17 @@ const handleUserClick = () => {
 }
 
 .breadcrumb-link:hover {
-  color: #017A63;
+  color: var(--el-color-primary-dark-2);
   text-decoration: underline;
 }
 
 .breadcrumb-current {
-  color: #666;
+  color: var(--app-text-regular);
   font-size: 12px;
 }
 
 .breadcrumb-separator {
-  color: #ccc;
+  color: var(--app-border-color);
   margin: 0 4px;
   font-size: 12px;
 }
@@ -268,7 +271,7 @@ const handleUserClick = () => {
   font-family: 'OPPOSans', sans-serif;
   font-size: 20px;
   font-weight: 400;
-  color: #1D1D1D;
+  color: var(--app-text-primary);
   line-height: 1.32;
 }
 
@@ -298,7 +301,7 @@ const handleUserClick = () => {
 .divider {
   width: 1px;
   height: 24px;
-  background: rgba(29, 29, 29, 0.12);
+  background: var(--app-border-light);
   border-radius: 2px;
 }
 
@@ -314,7 +317,7 @@ const handleUserClick = () => {
   width: 40px;
   height: 40px;
   border: none;
-  background: #F7F8FA;
+  background: var(--app-action-btn-bg);
   border-radius: 20px;
   cursor: pointer;
   display: flex;
@@ -324,7 +327,7 @@ const handleUserClick = () => {
 }
 
 .action-btn:hover {
-  background: rgba(1, 156, 124, 0.1);
+  background: var(--el-color-primary-light-9);
 }
 
 /* 通知徽章 */

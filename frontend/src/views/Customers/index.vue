@@ -93,7 +93,7 @@
             stripe
             border
             style="width: 100%;"
-            :header-cell-style="{ backgroundColor: '#F7F8FA', color: '#1D1D1D' }"
+            :header-cell-style="{ backgroundColor: 'var(--app-bg-color)', color: 'var(--app-text-primary)' }"
             :row-style="getRowStyle"
             :max-height="'calc(100vh - 280px)'"
           >
@@ -277,7 +277,7 @@ const formatDate = (dateStr: string) => {
 
 
 const getRowStyle = ({ rowIndex }: { rowIndex: number }) => {
-  return rowIndex % 2 === 1 ? { backgroundColor: '#F7F8FA' } : { backgroundColor: '#FFFFFF' }
+  return rowIndex % 2 === 1 ? { backgroundColor: 'var(--app-bg-color)' } : { backgroundColor: 'var(--app-content-bg)' }
 }
 
 // 加载数据
@@ -494,7 +494,7 @@ onMounted(async () => {
   max-width: none !important; // 移除最大宽度限制，允许充满整个屏幕
   height: 100%; // 占满父容器高度
   padding: 0; // 移除padding，由父容器处理
-  background-color: $background-color-white;
+  background-color: var(--app-content-bg);
   display: flex;
   flex-direction: column;
   overflow: hidden; // 防止内容超出
@@ -511,7 +511,7 @@ onMounted(async () => {
   max-width: none !important; 
   min-height: calc(100vh - 80px);
   padding: $spacing-large;
-  background: $background-color-base;
+  background: var(--app-bg-color);
   display: flex;
   flex-direction: column;
   
@@ -592,7 +592,7 @@ onMounted(async () => {
 .filter-label {
   font-size: $font-size-base;
   font-weight: $font-weight-primary;
-  color: $text-color-primary;
+  color: var(--app-text-primary);
   margin-right: $spacing-small;
   min-width: 48px;   // 改为48px (6*8)
   
@@ -664,7 +664,7 @@ onMounted(async () => {
 :deep(.el-table) {
   width: 100% !important;
   min-width: 1408px; /* 改为1408px (176*8) */
-  border: 1px solid #F5F7FA;
+  border: 1px solid var(--app-border-light);
   table-layout: fixed; /* 固定表格布局防止错位 */
   
   /* 表头和表体宽度一致 */
@@ -709,9 +709,9 @@ onMounted(async () => {
   justify-content: flex-end;
   gap: 8px;
   --el-pagination-font-size: 14px;
-  --el-pagination-bg-color: #FFFFFF;
-  --el-pagination-text-color: #1D1D1D;
-  --el-pagination-border-color: #B2B8C2;
+  --el-pagination-bg-color: var(--app-content-bg);
+  --el-pagination-text-color: var(--app-text-primary);
+  --el-pagination-border-color: var(--app-border-color);
   --el-pagination-hover-color: #019C7C;
   font-family: 'Source Han Sans CN', sans-serif;
 }
@@ -723,11 +723,11 @@ onMounted(async () => {
   width: 32px;
   height: 32px;
   min-width: 32px;
-  border: 1px solid #B2B8C2;
+  border: 1px solid var(--app-border-color);
   border-radius: 4px;
   margin: 0 4px;
-  background: #FFFFFF;
-  color: #1D1D1D;
+  background: var(--app-content-bg);
+  color: var(--app-text-primary);
   font-family: 'Segoe UI', sans-serif;
   font-weight: 400;
   font-size: 14px;
@@ -739,17 +739,17 @@ onMounted(async () => {
 
 /* 当前页样式 */
 :deep(.el-pagination .el-pager li.is-active) {
-  background: #019C7C !important;
-  border-color: #019C7C !important;
-  color: #FFFFFF !important;
+  background: var(--el-color-primary) !important;
+  border-color: var(--el-color-primary) !important;
+  color: white !important;
 }
 
 /* 悬停效果 */
 :deep(.el-pagination .btn-prev:hover),
 :deep(.el-pagination .btn-next:hover),
 :deep(.el-pagination .el-pager li:hover) {
-  color: #019C7C;
-  border-color: #019C7C;
+  color: var(--el-color-primary);
+  border-color: var(--el-color-primary);
 }
 
 /* 总数和每页条数样式 */
@@ -758,7 +758,7 @@ onMounted(async () => {
   font-family: 'Source Han Sans CN', sans-serif;
   font-weight: 350;
   font-size: 14px;
-  color: #1D1D1D;
+  color: var(--app-text-primary);
 }
 
 /* 每页条数选择器 */
@@ -768,9 +768,9 @@ onMounted(async () => {
 
 :deep(.el-pagination .el-pagination__sizes .el-select .el-select__wrapper) {
   height: 32px;
-  border: 1px solid #B2B8C2;
+  border: 1px solid var(--app-border-color);
   border-radius: 4px;
-  background: #FFFFFF;
+  background: var(--app-content-bg);
 }
 
 /* 跳转输入框 */
@@ -778,7 +778,7 @@ onMounted(async () => {
   font-family: 'Source Han Sans CN', sans-serif;
   font-weight: 350;
   font-size: 14px;
-  color: #1D1D1D;
+  color: var(--app-text-primary);
   margin-left: 8px;
 }
 
@@ -789,16 +789,16 @@ onMounted(async () => {
 
 :deep(.el-pagination .el-pagination__jump .el-input__wrapper) {
   height: 32px;
-  border: 1px solid #B2B8C2;
+  border: 1px solid var(--app-border-color);
   border-radius: 4px;
-  background: #FFFFFF;
+  background: var(--app-content-bg);
 }
 
 :deep(.el-pagination .el-pagination__jump .el-input__inner) {
   text-align: center;
   font-family: 'Source Han Sans CN', sans-serif;
   font-size: 14px;
-  color: #1D1D1D;
+  color: var(--app-text-primary);
 }
 
 /* 桌面端响应式 - 中等屏幕 */
@@ -868,7 +868,7 @@ onMounted(async () => {
     box-sizing: border-box;
     display: flex; /* 桌面端使用flex布局传递高度给子组件 */
     flex-direction: column;
-    background-color: #ffffff;
+    background-color: var(--app-content-bg);
     overflow: hidden; /* 防止内容超出 */
   }
   
@@ -880,7 +880,7 @@ onMounted(async () => {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    background: #F7F8FA;
+    background: var(--app-bg-color);
   }
 
   
@@ -1279,7 +1279,7 @@ onMounted(async () => {
 
 :deep(.filter-select .el-select__selected-item) {
   font-size: 14px;
-  color: #B2B8C2;
+  color: var(--app-text-secondary);
   font-family: 'Source Han Sans CN', sans-serif;
   font-weight: 400;
   line-height: 24px;
@@ -1287,7 +1287,7 @@ onMounted(async () => {
 
 :deep(.filter-select .el-select__placeholder) {
   font-size: 14px;
-  color: #B2B8C2;
+  color: var(--app-text-secondary);
   font-family: 'Source Han Sans CN', sans-serif;
   font-weight: 400;
   line-height: 24px;
@@ -1301,7 +1301,7 @@ onMounted(async () => {
 :deep(.filter-select .el-select__icon) {
   width: 14px;
   height: 14px;
-  color: #B2B8C2;
+  color: var(--app-text-secondary);
 }
 
 :deep(.filter-select.is-focus .el-select__wrapper) {
@@ -1319,9 +1319,9 @@ onMounted(async () => {
 
 :deep(.search-input .el-input__wrapper) {
   height: 40px;  // 改为40px符合8px栅格
-  border-color: #DCDEE2;
+  border-color: var(--app-border-color);
   border-radius: 4px 0 0 4px;
-  background-color: #FFFFFF;
+  background-color: var(--app-content-bg);
   display: flex;
   align-items: center;
 }
@@ -1332,24 +1332,24 @@ onMounted(async () => {
   font-weight: 400;
   font-size: 14px;
   line-height: 24px;  // 改为24px符合8px栅格
-  color: #1D1D1D;
+  color: var(--app-text-primary);
 }
 
 :deep(.search-input .el-input__inner::placeholder) {
-  color: #B2B8C2;
+  color: var(--app-text-secondary);
   font-family: 'Source Han Sans CN', sans-serif;
   font-weight: 400;
   font-size: 14px;
 }
 
 :deep(.search-input.is-focus .el-input__wrapper) {
-  border-color: #019C7C;
+  border-color: var(--el-color-primary);
   box-shadow: 0 0 0 1px #019C7C;
 }
 
 :deep(.search-input .el-input-group__append) {
-  background-color: #019C7C;
-  border-color: #019C7C;
+  background-color: var(--el-color-primary);
+  border-color: var(--el-color-primary);
   border-radius: 0 4px 4px 0;
   padding: 10px;
   width: 48px;  // 符合8px栅格
@@ -1378,7 +1378,7 @@ onMounted(async () => {
 
 /* 客户编码样式 */
 .customer-code {
-  color: #019C7C;
+  color: var(--el-color-primary);
   font-family: 'Source Han Sans CN', sans-serif;
   font-weight: 400;
   font-size: 14px;
@@ -1388,15 +1388,15 @@ onMounted(async () => {
 /* 表格精确样式 - 匹配Figma设计 */
 :deep(.el-table .el-table__header-wrapper) {
   th {
-    background-color: #F7F8FA !important;
+    background-color: var(--app-bg-color) !important;
     height: 48px !important;
     padding: 13px 20px !important;
     font-family: 'Source Han Sans CN', sans-serif !important;
     font-weight: 500 !important;
     font-size: 16px !important;
     line-height: 24px !important;
-    color: #1D1D1D !important;
-    border-bottom: 1px solid #F7F8FA !important;
+    color: var(--app-text-primary) !important;
+    border-bottom: 1px solid var(--app-border-light) !important;
   }
 }
 
@@ -1408,8 +1408,8 @@ onMounted(async () => {
     font-weight: 400 !important;
     font-size: 14px !important;
     line-height: 22px !important;
-    color: #1D1D1D !important;
-    border-bottom: 1px solid #F7F8FA !important;
+    color: var(--app-text-primary) !important;
+    border-bottom: 1px solid var(--app-border-light) !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -1435,18 +1435,18 @@ onMounted(async () => {
   @include text-ellipsis;
   
   &.status-normal {
-    background: rgba($primary-color, 0.08);
-    color: $primary-color;
+    background: var(--el-color-primary-light-9);
+    color: var(--el-color-primary);
   }
-  
+
   &.status-disabled {
-    background: rgba($danger-color, 0.08);
-    color: $danger-color;
+    background: rgba(244, 108, 108, 0.08);
+    color: #F46C6C;
   }
-  
+
   &.status-paused {
-    background: rgba($warning-color, 0.08);
-    color: $warning-color;
+    background: rgba(230, 162, 60, 0.08);
+    color: #E6A23C;
   }
 }
 
@@ -1515,45 +1515,45 @@ onMounted(async () => {
 
 .action-btn {
   &.primary {
-    background: rgba($primary-color, 0.08);
-    color: $primary-color;
-    
+    background: var(--el-color-primary-light-9);
+    color: var(--el-color-primary);
+
     @include non-touch-device {
       &:hover {
-        background: rgba($primary-color, 0.15);
+        background: var(--el-color-primary-light-8);
       }
     }
   }
-  
+
   &.danger {
-    background: rgba($danger-color, 0.08);
-    color: $danger-color;
-    
+    background: rgba(244, 108, 108, 0.08);
+    color: #F46C6C;
+
     @include non-touch-device {
       &:hover {
-        background: rgba($danger-color, 0.15);
+        background: rgba(244, 108, 108, 0.15);
       }
     }
   }
-  
+
   &.warning {
-    background: rgba($warning-color, 0.08);
-    color: $warning-color;
-    
+    background: rgba(230, 162, 60, 0.08);
+    color: #E6A23C;
+
     @include non-touch-device {
       &:hover {
-        background: rgba($warning-color, 0.15);
+        background: rgba(230, 162, 60, 0.15);
       }
     }
   }
-  
+
   &.success {
-    background: rgba($success-color, 0.08);
-    color: $success-color;
-    
+    background: rgba(103, 194, 58, 0.08);
+    color: #67C23A;
+
     @include non-touch-device {
       &:hover {
-        background: rgba($success-color, 0.15);
+        background: rgba(103, 194, 58, 0.15);
       }
     }
   }

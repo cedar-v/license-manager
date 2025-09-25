@@ -190,7 +190,7 @@ onMounted(() => {
   width: 100%;
   margin: 0;
   box-sizing: border-box;
-  background: #F7F8FA;
+  background: var(--app-bg-color);
 }
 
 .dashboard {
@@ -346,9 +346,9 @@ onMounted(() => {
 
 // 卡片通用样式 - 表格卡片占据60%高度
 .table-card {
-  background: #FFFFFF;
+  background: var(--app-content-bg);
   border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
-  box-shadow: 0px 0px 0.21vw 0px rgba(0, 0, 0, 0.1); /* 4px/1920 = 0.21vw */
+  box-shadow: var(--app-shadow);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -362,7 +362,7 @@ onMounted(() => {
   .card-title {
     font-size: 1.04vw; /* 20px/1920 = 1.04vw */
     font-weight: 400;
-    color: #1D1D1D;
+    color: var(--app-text-primary);
     margin: 0;
     line-height: 1.3;
   }
@@ -378,16 +378,16 @@ onMounted(() => {
   
   // Element Plus 表格样式重写
   :deep(.el-table) {
-    border: 1px solid #F5F7FA;
+    border: 1px solid var(--app-border-light);
     height: 100%; /* 充满容器高度 */
-    
+
     .el-table__body-wrapper {
       flex: 1; /* 表格主体占据剩余高度 */
     }
-    
+
     .table-header th {
-      background-color: #F7F8FA !important;
-      color: #1D1D1D;
+      background-color: var(--app-bg-color) !important;
+      color: var(--app-text-primary);
     font-weight: 500;
       font-size: 16px;
       font-family: 'Source Han Sans CN', sans-serif;
@@ -398,22 +398,22 @@ onMounted(() => {
     
     .el-table__body tr {
       height: 48px;
-      
+
       td {
         padding: 13px 20px;
-        border-bottom: 1px solid #F7F8FA;
+        border-bottom: 1px solid var(--app-border-light);
     font-size: 14px;
         font-family: 'Source Han Sans CN', sans-serif;
         font-weight: 350;
-    color: #1D1D1D;
+    color: var(--app-text-primary);
   }
-  
+
       &.stripe-row {
-    background-color: #F7F8FA;
+    background-color: var(--app-bg-color);
   }
-  
+
       &:hover > td {
-        background-color: #F7F8FA !important;
+        background-color: var(--app-bg-color) !important;
       }
     }
     
@@ -514,7 +514,7 @@ onMounted(() => {
   
   .table-card {
     border-radius: 8px;
-    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--app-shadow);
   }
   
   .card-header {

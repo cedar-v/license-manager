@@ -158,7 +158,7 @@ const chartOption = computed(() => {
         show: false
       },
       axisLabel: {
-        color: '#1D1D1D',
+        color: 'var(--app-text-primary)',
         fontSize: 12,
         fontFamily: 'Inter',
         margin: 12
@@ -176,26 +176,26 @@ const chartOption = computed(() => {
         show: false
       },
       axisLabel: {
-        color: '#1D1D1D',
+        color: 'var(--app-text-primary)',
         fontSize: 12,
         fontFamily: 'Inter',
         align: 'right'
       },
       splitLine: {
         lineStyle: {
-          color: '#EBEBEB',
+          color: 'var(--app-border-color)',
           width: 1
         }
       }
     },
     tooltip: {
       trigger: 'axis',
-      backgroundColor: '#FFFFFF',
-      borderColor: '#FFFFFF',
+      backgroundColor: 'var(--app-content-bg)',
+      borderColor: 'var(--app-content-bg)',
       borderWidth: 0.5,
       borderRadius: 4,
       textStyle: {
-        color: '#1D1D1D',
+        color: 'var(--app-text-primary)',
         fontSize: 12
       },
       extraCssText: 'box-shadow: 0px 4px 12px 0px rgba(59, 210, 180, 0.2); backdrop-filter: blur(4px);',
@@ -373,9 +373,9 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .license-trend-chart {
-  background: #FFFFFF;
+  background: var(--app-content-bg);
   border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
-  box-shadow: 0px 0px 0.21vw 0px rgba(0, 0, 0, 0.1); /* 4px/1920 = 0.21vw */
+  box-shadow: var(--app-shadow);
   overflow: hidden;
   height: 100%; /* 充满容器高度 */
   display: flex;
@@ -393,7 +393,7 @@ onMounted(() => {
     font-family: 'OPPOSans', sans-serif;
     font-size: 1.04vw; /* 20px/1920 = 1.04vw */
     font-weight: 400;
-    color: #1D1D1D;
+    color: var(--app-text-primary);
     margin: 0;
     line-height: 1.3;
   }
@@ -417,13 +417,13 @@ onMounted(() => {
   }
   
   :deep(.el-button--default) {
-    background: #F7F8FA;
-    border-color: #F7F8FA;
-    color: #666;
+    background: var(--app-bg-color);
+    border-color: var(--app-border-light);
+    color: var(--app-text-secondary);
     
     &:hover {
-      background: #E9ECEF;
-      border-color: #E9ECEF;
+      background: var(--app-border-color);
+      border-color: var(--app-border-color);
     }
   }
   
@@ -453,11 +453,11 @@ onMounted(() => {
       height: 32px;
       width: 200px;
       padding: 0 12px;
-      border: 1px solid #dcdfe6;
+      border: 1px solid var(--app-border-color);
       border-radius: 4px;
-      background: #fff;
+      background: var(--app-content-bg);
       font-size: 14px;
-      color: #606266;
+      color: var(--app-text-regular);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -465,7 +465,7 @@ onMounted(() => {
       transition: all 0.2s ease;
       
       &:hover {
-        border-color: #c0c4cc;
+        border-color: var(--app-border-color);
       }
       
       &:focus {
@@ -474,13 +474,13 @@ onMounted(() => {
       }
       
       .date-icon {
-        color: #c0c4cc;
+        color: var(--app-text-secondary);
         font-size: 14px;
         transition: color 0.2s ease;
       }
       
       &:hover .date-icon {
-        color: #909399;
+        color: var(--app-text-secondary);
       }
     }
   }
@@ -503,7 +503,7 @@ onMounted(() => {
 @media (max-width: 1024px) {
   .license-trend-chart {
     border-radius: 8px; /* 移动端使用固定像素 */
-    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--app-shadow);
   }
   
   .chart-header {
@@ -575,13 +575,13 @@ onMounted(() => {
       
       // 默认按钮样式
       :deep(.el-button--default) {
-        background: #f7f8fa;
-        border-color: #f7f8fa;
-        color: #666;
-        
+        background: var(--app-bg-color);
+        border-color: var(--app-border-light);
+        color: var(--app-text-secondary);
+
         &:hover {
-          background: #e9ecef;
-          border-color: #e9ecef;
+          background: var(--app-border-color);
+          border-color: var(--app-border-color);
         }
       }
     }

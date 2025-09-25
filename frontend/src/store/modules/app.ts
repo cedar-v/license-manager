@@ -10,7 +10,11 @@ export const useAppStore = defineStore('app', () => {
   const screenHeight = ref(window.innerHeight)
   const orientation = ref<'landscape' | 'portrait'>('landscape')
   const isTouchDevice = ref(false)
-  const theme = ref<'light' | 'dark' | 'auto'>('light')
+
+  // 从localStorage读取主题设置，默认为light
+  const storedTheme = localStorage.getItem('app-theme') as 'light' | 'dark' | 'auto' | null
+  const theme = ref<'light' | 'dark' | 'auto'>(storedTheme || 'light')
+
   const language = ref<'zh' | 'en' | 'ja'>('zh')
   const loading = ref(false)
 
@@ -67,7 +71,14 @@ export const useAppStore = defineStore('app', () => {
 
   const setTheme = (newTheme: 'light' | 'dark' | 'auto') => {
     theme.value = newTheme
-    document.documentElement.setAttribute('data-theme', newTheme)
+    // 根据实际的主题状态设置data-theme属性
+    const actualTheme = newTheme === 'auto'
+      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      : newTheme
+    document.documentElement.setAttribute('data-theme', actualTheme)
+
+    // 保存到localStorage
+    localStorage.setItem('app-theme', newTheme)
   }
 
   const setLanguage = (lang: 'zh' | 'en' | 'ja') => {
@@ -78,6 +89,25 @@ export const useAppStore = defineStore('app', () => {
 
   const setLoading = (isLoading: boolean) => {
     loading.value = isLoading
+  }
+
+  // 初始化主题
+  const initTheme = () => {
+    const actualTheme = theme.value === 'auto'
+      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      : theme.value
+    document.documentElement.setAttribute('data-theme', actualTheme)
+
+    // 监听系统主题变化
+    if (theme.value === 'auto') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+      const handleThemeChange = (e: MediaQueryListEvent) => {
+        if (theme.value === 'auto') {
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light')
+        }
+      }
+      mediaQuery.addEventListener('change', handleThemeChange)
+    }
   }
 
   return {
@@ -105,6 +135,7 @@ export const useAppStore = defineStore('app', () => {
     setMobile,
     setTheme,
     setLanguage,
-    setLoading
+    setLoading,
+    initTheme
   }
 })
