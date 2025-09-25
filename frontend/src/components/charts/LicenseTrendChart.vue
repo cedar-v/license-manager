@@ -76,10 +76,11 @@
 
     <!-- 图表容器 -->
     <div class="chart-container">
-      <v-chart 
-        class="trend-chart" 
-        :option="chartOption" 
+      <v-chart
+        class="trend-chart"
+        :option="chartOption"
         :autoresize="true"
+        :loading="chartLoading"
         ref="chartRef"
       />
     </div>
@@ -93,6 +94,8 @@ import { use } from 'echarts/core'
 import { useDevice } from '@/utils/useDevice'
 import MobileDateRange from '@/components/common/MobileDateRange.vue'
 import { Calendar } from '@element-plus/icons-vue'
+import { getAuthorizationTrend, type TrendDataItem } from '@/api/dashboard'
+import { ElMessage } from 'element-plus'
 import { CanvasRenderer } from 'echarts/renderers'
 import { LineChart } from 'echarts/charts'
 import {
@@ -128,14 +131,9 @@ const dateRange = ref<[string, string]>(['2024-05-13', '2024-05-17']) // 初始�
 const chartRef = ref()
 const datePickerRef = ref()
 
-// 模拟授权趋势数据
-const trendData = ref([
-  { date: '2024-05-13', value: 8 },
-  { date: '2024-05-14', value: 12 },
-  { date: '2024-05-15', value: 15 },
-  { date: '2024-05-16', value: 10 },
-  { date: '2024-05-17', value: 18 }
-])
+// 授权趋势数据
+const trendData = ref<{ date: string; value: number }[]>([])
+const chartLoading = ref(false)
 
 // 图表配置
 const chartOption = computed(() => {
@@ -327,35 +325,49 @@ const formatDateRange = (range: [string, string]) => {
   return `${formatDate(startDate)} ${t('chart.licenseTrend.datePicker.rangeSeparator')} ${formatDate(endDate)}`
 }
 
+// 获取授权趋势数据
+const fetchAuthorizationTrend = async (startDate: string, endDate: string) => {
+  console.log('开始请求授权趋势数据:', { startDate, endDate })
+  try {
+    chartLoading.value = true
+    const response = await getAuthorizationTrend({
+      type: "custom",
+      start_date:startDate,
+      end_date:endDate
+    })
+
+    console.log('授权趋势API响应:', response)
+
+    // 将API返回的trend-data转换为图表需要的格式
+    const apiTrendData = response.data.trend_data as TrendDataItem[]
+    console.log('趋势数据:', apiTrendData)
+
+    trendData.value = apiTrendData.map(item => ({
+      date: item.date,
+      value: item.total_authorizations
+    }))
+
+    console.log('转换后的图表数据:', trendData.value)
+  } catch (error: any) {
+    console.error('获取授权趋势数据失败:', error)
+    ElMessage.error(error?.backendMessage || '获取授权趋势数据失败')
+  } finally {
+    chartLoading.value = false
+  }
+}
+
 // 更新图表数据
 const updateChartData = () => {
-  // 这里可以根据选择的日期范围调用API获取实际数据
-  // 现在使用模拟数据
-  const mockData = generateMockData(dateRange.value[0], dateRange.value[1])
-  trendData.value = mockData
+  console.log('updateChartData 被调用，日期范围:', dateRange.value)
+  fetchAuthorizationTrend(dateRange.value[0], dateRange.value[1])
 }
 
-// 生成模拟数据
-const generateMockData = (startDate: string, endDate: string) => {
-  const start = new Date(startDate)
-  const end = new Date(endDate)
-  const data = []
-  
-  const currentDate = new Date(start)
-  while (currentDate <= end) {
-    data.push({
-      date: currentDate.toISOString().split('T')[0],
-      value: Math.floor(Math.random() * 15) + 5 // 5-20之间的随机数
-    })
-    currentDate.setDate(currentDate.getDate() + 1)
-  }
-  
-  return data
-}
 
 onMounted(() => {
+  console.log('LicenseTrendChart 组件已挂载，开始初始化')
   // 初始化时直接调用快捷选择，设置为本周
   handleQuickSelect('week')
+  console.log('已调用 handleQuickSelect(week)')
 })
 </script>
 

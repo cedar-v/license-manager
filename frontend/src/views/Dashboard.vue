@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-01 09:32:42
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-09-23 14:37:21
+ * @LastEditTime: 2025-09-24 15:22:03
  * @FilePath: /frontend/src/views/Dashboard.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -60,7 +60,7 @@
                   {{ $index + 1 }}
                 </template>
               </el-table-column>
-              <el-table-column prop="customer" :label="t('dashboard.recentLicenses.columns.customerName')" min-width="200" />
+              <el-table-column prop="customer_name" :label="t('dashboard.recentLicenses.columns.customerName')" min-width="200" />
               <el-table-column prop="description" :label="t('dashboard.recentLicenses.columns.description')" min-width="150" />
               <el-table-column :label="t('dashboard.recentLicenses.columns.status')" width="120" align="center">
                 <template #default="{ row }">
@@ -72,8 +72,8 @@
                   </span>
                 </template>
               </el-table-column>
-              <el-table-column prop="expiry" :label="t('dashboard.recentLicenses.columns.expiryTime')" width="301" />
-              <el-table-column prop="createTime" :label="t('dashboard.recentLicenses.columns.createTime')" width="301" />
+              <el-table-column prop="end_date" :label="t('dashboard.recentLicenses.columns.expiryTime')" width="301" />
+              <el-table-column prop="created_at" :label="t('dashboard.recentLicenses.columns.createTime')" width="301" />
             </el-table>
           </div>
         </div>
@@ -165,29 +165,11 @@ const fetchRecentAuthorizations = async () => {
   try {
     loading.value = true
     const response = await getRecentAuthorizations()
-    recentData.value = response.data
+    console.log('最近授权数据:', response.data)
+    recentData.value = response.data.list;
   } catch (error: any) {
     console.error('获取最近授权数据失败:', error)
     ElMessage.error(error?.backendMessage || '获取最近授权数据失败')
-    // 如果API调用失败，使用默认数据
-    recentData.value = [
-      {
-        id: 1,
-        customer: '石狮市潢安有限公司',
-        description: '落魄山一哥',
-        status: 1,
-        expiry: '2023-05-26 12:12:00',
-        createTime: '2023-05-26 12:12:00'
-      },
-      {
-        id: 2,
-        customer: '石狮市潢安有限公司',
-        description: '落魄山一哥',
-        status: 0,
-        expiry: '2023-05-26 12:12:00',
-        createTime: '2023-05-26 12:12:00'
-      }
-    ]
   } finally {
     loading.value = false
   }
@@ -195,6 +177,7 @@ const fetchRecentAuthorizations = async () => {
 
 // 组件挂载时获取数据
 onMounted(() => {
+  console.log('Dashboard 组件已挂载')
   fetchRecentAuthorizations()
 })
 </script>

@@ -84,6 +84,11 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       hmr: {
         overlay: true
       },
+      // WSL2热更新修复
+      watch: {
+        usePolling: true,
+        interval: 1000
+      },
     },
 
     // 依赖优化配置
