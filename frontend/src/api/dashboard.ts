@@ -27,8 +27,14 @@ export interface ApiResponse<T> {
   data: T
 }
 
+// 最近授权响应类型
+export interface RecentAuthorizationResponse {
+  list: RecentAuthorizationItem[]
+  total: number
+}
+
 // 获取最近授权列表 
-export const getRecentAuthorizations = (): Promise<ApiResponse<RecentAuthorizationItem[]>> => {
+export const getRecentAuthorizations = (): Promise<ApiResponse<RecentAuthorizationResponse>> => {
   return Axios.get('api/v1/dashboard/recent-authorizations')
 }
 
