@@ -166,7 +166,7 @@ const fetchRecentAuthorizations = async () => {
     loading.value = true
     const response = await getRecentAuthorizations()
     console.log('最近授权数据:', response.data)
-    recentData.value = response.data.list;
+    recentData.value = response.data;
   } catch (error: any) {
     console.error('获取最近授权数据失败:', error)
     ElMessage.error(error?.backendMessage || '获取最近授权数据失败')
