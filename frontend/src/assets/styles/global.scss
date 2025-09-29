@@ -77,7 +77,7 @@ body {
 [data-theme="dark"] {
   --app-bg-color: #1a1a1a;
   --app-content-bg: #2d2d2d;
-  --app-text-primary: #e5eaf3;
+  --app-text-primary: rgba(255, 255, 255, 1);
   --app-text-regular: #cfd3dc;
   --app-text-secondary: #a3a6ad;
   --app-border-color: #414243;
@@ -90,7 +90,7 @@ body {
   /* Element Plus Dark Theme Adjustments */
   --el-bg-color: #2d2d2d !important;
   --el-bg-color-page: #1a1a1a !important;
-  --el-text-color-primary: #e5eaf3 !important;
+  --el-text-color-primary: rgba(255, 255, 255, 1) !important;
   --el-text-color-regular: #cfd3dc !important;
   --el-text-color-secondary: #a3a6ad !important;
   --el-border-color: #414243 !important;

@@ -406,3 +406,81 @@ const handleNavClick = (item: NavItem, event: Event) => {
   }
 }
 </style>
+
+<style lang="scss">
+/* 侧边栏暗模式样式 - 完美还原设计图 */
+
+/* 侧边栏背景和边框 */
+[data-theme="dark"] .sidebar {
+  background: rgba(31, 41, 53, 1) !important;
+  border-right-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* 侧边栏头部分割线 */
+[data-theme="dark"] .sidebar__header {
+  border-bottom-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Logo文字颜色 */
+[data-theme="dark"] .logo-text {
+  color: #f9fafb !important;
+}
+
+/* 导航链接暗模式 */
+[data-theme="dark"] .nav-link {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .nav-link:hover {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #10b981 !important;
+}
+
+[data-theme="dark"] .nav-link--active {
+  background: rgba(16, 185, 129, 0.2) !important;
+  color: #10b981 !important;
+}
+
+[data-theme="dark"] .nav-link--active .nav-text {
+  color: #10b981 !important;
+}
+
+/* 导航图标暗模式 */
+[data-theme="dark"] .nav-icon {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] .nav-link:hover .nav-icon,
+[data-theme="dark"] .nav-link--active .nav-icon {
+  color: #10b981 !important;
+}
+
+/* 子菜单暗模式 */
+[data-theme="dark"] .nav-sublink {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] .nav-sublink:hover {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #10b981 !important;
+}
+
+[data-theme="dark"] .nav-sublink--active {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #10b981 !important;
+}
+
+/* 底部区域暗模式 */
+[data-theme="dark"] .sidebar__footer {
+  border-top-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* 滚动条暗模式 */
+[data-theme="dark"] .sidebar__nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme="dark"] .sidebar__nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+</style>
