@@ -112,7 +112,103 @@
     },
     "licenses": {
       "title": "授权管理",
-      "welcome": "欢迎你来到授权管理页面"
+      "welcome": "欢迎你来到授权管理页面",
+      "platform": "授权管理平台",
+      "actions": {
+        "query": "查询",
+        "createLicense": "创建授权",
+        "edit": "编辑",
+        "delete": "删除",
+        "activate": "激活",
+        "deactivate": "停用",
+        "renew": "续期",
+        "viewDetails": "查看详情",
+        "export": "导出",
+        "refresh": "刷新"
+      },
+      "search": {
+        "placeholder": "搜索授权码、客户名称、描述",
+        "selectCustomer": "下拉选择客户",
+        "allCustomers": "全部客户",
+        "dateRange": "选择日期范围",
+        "startDate": "开始日期",
+        "endDate": "结束日期"
+      },
+      "table": {
+        "licenseCode": "授权码",
+        "customerName": "客户名称",
+        "description": "描述",
+        "status": "状态",
+        "licenseType": "授权类型",
+        "expiryDate": "到期时间",
+        "activationDate": "激活时间",
+        "createTime": "创建时间",
+        "operation": "操作",
+        "loading": "加载中..."
+      },
+      "status": {
+        "active": "有效",
+        "inactive": "无效",
+        "expired": "已过期",
+        "expiring": "即将过期"
+      },
+      "form": {
+        "basicInfo": "基本信息",
+        "selectCustomer": "选择客户",
+        "description": "授权描述",
+        "licenseType": "授权类型",
+        "expiryDate": "到期日期",
+        "maxUsers": "最大用户数",
+        "features": "授权功能",
+        "ipRestrictions": "IP限制",
+        "hardwareId": "硬件ID",
+        "placeholder": {
+          "selectCustomer": "请选择客户",
+          "enterDescription": "请输入授权描述",
+          "selectLicenseType": "请选择授权类型",
+          "selectExpiryDate": "请选择到期日期",
+          "enterMaxUsers": "请输入最大用户数",
+          "enterIpRestrictions": "请输入IP限制（一行一个）",
+          "enterHardwareId": "请输入硬件ID"
+        }
+      },
+      "validation": {
+        "customerRequired": "请选择客户",
+        "descriptionRequired": "请输入授权描述",
+        "licenseTypeRequired": "请选择授权类型",
+        "expiryDateRequired": "请选择到期日期",
+        "maxUsersMin": "最大用户数不能小于1",
+        "ipFormatError": "IP地址格式错误"
+      },
+      "confirm": {
+        "deleteTitle": "确认删除",
+        "deleteMessage": "确定要删除授权 \"{code}\" 吗？",
+        "activateTitle": "确认激活",
+        "activateMessage": "确定要激活授权 \"{code}\" 吗？",
+        "deactivateTitle": "确认停用",
+        "deactivateMessage": "确定要停用授权 \"{code}\" 吗？",
+        "confirm": "确定",
+        "cancel": "取消"
+      },
+      "message": {
+        "createSuccess": "创建授权成功",
+        "updateSuccess": "更新授权成功",
+        "deleteSuccess": "删除授权成功",
+        "activateSuccess": "激活授权成功",
+        "deactivateSuccess": "停用授权成功",
+        "renewSuccess": "续期授权成功",
+        "loadError": "加载授权列表失败",
+        "createError": "创建授权失败",
+        "updateError": "更新授权失败",
+        "deleteError": "删除授权失败"
+      },
+      "stats": {
+        "total": "总授权数",
+        "active": "有效授权",
+        "inactive": "无效授权",
+        "expired": "过期授权",
+        "expiringSoon": "即将过期"
+      }
     }
   },
   "customers": {
