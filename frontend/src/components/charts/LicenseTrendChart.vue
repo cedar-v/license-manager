@@ -92,6 +92,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { use } from 'echarts/core'
 import { useDevice } from '@/utils/useDevice'
+import { useAppStore } from '@/store/modules/app'
 import MobileDateRange from '@/components/common/MobileDateRange.vue'
 import { Calendar } from '@element-plus/icons-vue'
 import { getAuthorizationTrend, type TrendDataItem } from '@/api/dashboard'
@@ -114,8 +115,9 @@ use([
   LegendComponent
 ])
 
-// 使用国际化
+// 使用国际化和store
 const { t } = useI18n()
+const appStore = useAppStore()
 
 // 快捷选择选项
 const quickOptions = computed(() => [
@@ -158,7 +160,7 @@ const chartOption = computed(() => {
         show: false
       },
       axisLabel: {
-        color: 'var(--app-text-primary)',
+        color: appStore.isDark ? 'rgba(255, 255, 255, 1)' : '#303133',
         fontSize: 12,
         fontFamily: 'Inter',
         margin: 12
@@ -176,26 +178,26 @@ const chartOption = computed(() => {
         show: false
       },
       axisLabel: {
-        color: 'var(--app-text-primary)',
+        color: appStore.isDark ? 'rgba(255, 255, 255, 1)' : '#303133',
         fontSize: 12,
         fontFamily: 'Inter',
         align: 'right'
       },
       splitLine: {
         lineStyle: {
-          color: 'var(--app-border-color)',
+          color: appStore.isDark ? 'rgba(255, 255, 255, 0.12)' : '#E4E7ED',
           width: 1
         }
       }
     },
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'var(--app-content-bg)',
-      borderColor: 'var(--app-content-bg)',
+      backgroundColor: appStore.isDark ? 'rgba(31, 41, 53, 1)' : '#FFFFFF',
+      borderColor: appStore.isDark ? 'rgba(255, 255, 255, 0.12)' : '#E4E7ED',
       borderWidth: 0.5,
       borderRadius: 4,
       textStyle: {
-        color: 'var(--app-text-primary)',
+        color: appStore.isDark ? 'rgba(255, 255, 255, 1)' : '#303133',
         fontSize: 12
       },
       extraCssText: 'box-shadow: 0px 4px 12px 0px rgba(59, 210, 180, 0.2); backdrop-filter: blur(4px);',
@@ -628,5 +630,74 @@ onMounted(() => {
       height: 180px;
     }
   }
+}
+</style>
+
+<style lang="scss">
+/* 图表组件暗模式样式 - 完美还原设计图 */
+
+/* 图表卡片背景 */
+[data-theme="dark"] .license-trend-chart {
+  background: rgba(31, 41, 53, 1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* 图表标题 */
+[data-theme="dark"] .chart-title {
+  color: #f9fafb !important;
+}
+
+/* 时间选择器按钮暗模式 */
+[data-theme="dark"] .time-selector :deep(.el-button--default) {
+  background: #4b5563 !important;
+  border-color: #6b7280 !important;
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .time-selector :deep(.el-button--default:hover) {
+  background: #6b7280 !important;
+  border-color: #6b7280 !important;
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] .time-selector :deep(.el-button--primary) {
+  background: #10b981 !important;
+  border-color: #10b981 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .time-selector :deep(.el-button--primary:hover) {
+  background: #059669 !important;
+  border-color: #059669 !important;
+}
+
+/* 日期显示器暗模式 */
+[data-theme="dark"] .date-display {
+  background: #4b5563 !important;
+  border-color: #6b7280 !important;
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .date-display:hover {
+  border-color: #6b7280 !important;
+}
+
+[data-theme="dark"] .date-display:focus {
+  border-color: #10b981 !important;
+}
+
+[data-theme="dark"] .date-display .date-icon {
+  color: #9ca3af !important;
+}
+
+/* 日期选择器暗模式 */
+[data-theme="dark"] .time-selector :deep(.el-date-editor .el-input__wrapper) {
+  background: #4b5563 !important;
+  border-color: #6b7280 !important;
+}
+
+[data-theme="dark"] .time-selector :deep(.el-date-editor .el-input__inner) {
+  color: #e5e7eb !important;
 }
 </style>

@@ -80,4 +80,9 @@ const iconClass = computed(() => ({
   fill: #1D1D1D;
   transition: fill 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* 暗模式下图标颜色 */
+[data-theme="dark"] .nav-icon :deep(path) {
+  fill: #f9fafb !important;
+}
 </style>

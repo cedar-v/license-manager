@@ -31,7 +31,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/licenses",
-    component: () => import("@/views/Licenses.vue"),
+    component: () => import("@/views/Licenses/index.vue"),
     meta: { title: "授权管理", requiresAuth: true }
   },
   {

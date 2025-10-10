@@ -482,3 +482,84 @@ const handleUserClick = () => {
   }
 }
 </style>
+
+<style lang="scss">
+/* 顶部导航栏暗模式样式 - 完美还原设计图 */
+
+/* 导航栏背景和边框 */
+[data-theme="dark"] .nav-content {
+  background: rgba(31, 41, 53, 1) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* 侧边栏切换按钮暗模式 */
+[data-theme="dark"] .sidebar-toggle-btn:hover {
+  background: rgba(16, 185, 129, 0.15) !important;
+}
+
+/* 面包屑导航暗模式 */
+[data-theme="dark"] .breadcrumb {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] .breadcrumb-current.page-title,
+[data-theme="dark"] .page-title {
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] .breadcrumb-link {
+  color: #10b981 !important;
+}
+
+[data-theme="dark"] .breadcrumb-link:hover {
+  color: #059669 !important;
+}
+
+[data-theme="dark"] .breadcrumb-current {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .breadcrumb-separator {
+  color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* 分割线暗模式 */
+[data-theme="dark"] .divider {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* 操作按钮暗模式 */
+[data-theme="dark"] .action-btn {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .action-btn:hover {
+  background: rgba(16, 185, 129, 0.15) !important;
+}
+
+/* 通知徽章暗模式 */
+[data-theme="dark"] .notification-badge {
+  background: #10b981 !important;
+  color: #ffffff !important;
+  border-color: rgba(31, 41, 53, 1) !important;
+}
+
+/* 导航栏图标暗模式 */
+[data-theme="dark"] .sidebar-toggle-btn,
+[data-theme="dark"] .user-avatar,
+[data-theme="dark"] .action-btn {
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] .sidebar-toggle-btn :deep(svg),
+[data-theme="dark"] .user-avatar :deep(svg),
+[data-theme="dark"] .action-btn :deep(svg) {
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] .sidebar-toggle-btn :deep(.nav-icon),
+[data-theme="dark"] .user-avatar :deep(.nav-icon),
+[data-theme="dark"] .action-btn :deep(.nav-icon) {
+  color: #f9fafb !important;
+}
+</style>
