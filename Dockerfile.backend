@@ -11,5 +11,7 @@ RUN apk --no-cache add ca-certificates tzdata curl
 WORKDIR /app/backend/cmd
 COPY --from=builder /app/backend/license-manager ./license-manager
 COPY backend/configs/ ../configs/
+# Use production config by default
+RUN ln -sf ../configs/config.prod.yaml config.yaml
 EXPOSE 18888
 CMD ["./license-manager"]

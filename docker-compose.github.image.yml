@@ -16,7 +16,6 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./mysql/conf.d:/etc/mysql/conf.d
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 30s
@@ -42,8 +41,7 @@ services:
     ports:
       - "18888:18888"
     volumes:
-      - ./backend/configs:/app/backend/configs:ro
-      - ./backend/configs/config.prod.yaml:/app/backend/cmd/config.yaml:ro
+      - ./backend-config:/app/backend/configs:ro
       - ./logs:/app/logs
       - ./data:/app/data
     depends_on:

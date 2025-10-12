@@ -9,11 +9,14 @@
 
 ## 快速部署
 
-### 1. 拉取镜像（可选）
+### 1. 初始化配置文件
 
 ```bash
-docker pull ghcr.io/cedar-v/license-manager-backend:v0.1.0
-docker pull ghcr.io/cedar-v/license-manager-frontend:v0.1.0
+# 创建配置目录
+mkdir -p backend-config
+
+# 从镜像中提取配置文件
+docker run --rm -v $(pwd)/backend-config:/tmp/config ghcr.io/cedar-v/license-manager-backend:v0.1.0 sh -c "cp -r /app/backend/configs/* /tmp/config/"
 ```
 
 ### 2. 启动服务
@@ -69,4 +72,25 @@ docker-compose -f docker-compose.github.image.yml logs mysql
 
 ```bash
 docker-compose -f docker-compose.github.image.yml restart
+```
+
+## 修改配置
+
+### 提取配置文件
+
+```bash
+# 如果需要修改配置，先提取配置文件
+mkdir -p backend-config
+docker run --rm -v $(pwd)/backend-config:/tmp/config ghcr.io/cedar-v/license-manager-backend:v0.1.0 sh -c "cp -r /app/backend/configs/* /tmp/config/"
+```
+
+### 修改配置
+
+编辑 `backend-config/config.prod.yaml` 文件修改数据库连接、密钥等配置。
+
+### 重启应用配置
+
+```bash
+# 重启后端服务使配置生效
+docker-compose -f docker-compose.github.image.yml restart backend
 ```
