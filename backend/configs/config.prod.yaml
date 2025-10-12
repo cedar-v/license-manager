@@ -23,9 +23,6 @@ auth:
     secret: "please-change-in-prod"
     expire_hours: 1
     refresh_threshold_minutes: 30
-  admin:
-    username: "admin"
-    password: "changeMe!"
   security:
     max_login_attempts: 5
     lockout_duration_minutes: 15

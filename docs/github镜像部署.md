@@ -25,7 +25,7 @@ docker run --rm -v $(pwd):/tmp/extract ghcr.io/cedar-v/license-manager-frontend:
 ### 2. 启动服务
 
 ```bash
-docker-compose -f docker-compose.github.image.yml up -d
+docker-compose -f docker-compose.github.image.yml up
 ```
 
 ### 3. 检查服务状态
@@ -43,7 +43,7 @@ docker-compose -f docker-compose.github.image.yml ps
 ## 默认账号
 
 - **用户名**: admin
-- **密码**: changeMe!
+- **密码**: admin@123
 
 ## 停止服务
 

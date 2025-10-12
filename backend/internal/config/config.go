@@ -40,24 +40,18 @@ type DatabaseConfig struct {
 
 type AuthConfig struct {
 	JWT      JWTConfig      `mapstructure:"jwt"`
-	Admin    AdminConfig    `mapstructure:"admin"`
 	Security SecurityConfig `mapstructure:"security"`
 }
 
 type JWTConfig struct {
-	Secret                   string `mapstructure:"secret"`
-	ExpireHours              int    `mapstructure:"expire_hours"`
-	RefreshThresholdMinutes  int    `mapstructure:"refresh_threshold_minutes"`
-}
-
-type AdminConfig struct {
-	Username string `mapstructure:"username"`
-	Password string `mapstructure:"password"`
+	Secret                  string `mapstructure:"secret"`
+	ExpireHours             int    `mapstructure:"expire_hours"`
+	RefreshThresholdMinutes int    `mapstructure:"refresh_threshold_minutes"`
 }
 
 type SecurityConfig struct {
-	MaxLoginAttempts        int `mapstructure:"max_login_attempts"`
-	LockoutDurationMinutes  int `mapstructure:"lockout_duration_minutes"`
+	MaxLoginAttempts       int `mapstructure:"max_login_attempts"`
+	LockoutDurationMinutes int `mapstructure:"lockout_duration_minutes"`
 }
 
 type LogConfig struct {
@@ -84,7 +78,7 @@ var AppConfig *Config
 func Load(configPath string) error {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	
+
 	if configPath != "" {
 		viper.SetConfigFile(configPath)
 	} else {
@@ -136,10 +130,7 @@ func setDefaults() {
 	viper.SetDefault("auth.jwt.secret", "license-manager-default-secret-key")
 	viper.SetDefault("auth.jwt.expire_hours", 1)
 	viper.SetDefault("auth.jwt.refresh_threshold_minutes", 30)
-	
-	viper.SetDefault("auth.admin.username", "admin")
-	viper.SetDefault("auth.admin.password", "admin@123")
-	
+
 	viper.SetDefault("auth.security.max_login_attempts", 5)
 	viper.SetDefault("auth.security.lockout_duration_minutes", 15)
 
