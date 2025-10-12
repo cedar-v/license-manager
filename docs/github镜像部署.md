@@ -15,8 +15,11 @@
 # 创建配置目录
 mkdir -p backend-config
 
-# 从镜像中提取配置文件
+# 从后端镜像中提取配置文件
 docker run --rm -v $(pwd)/backend-config:/tmp/config ghcr.io/cedar-v/license-manager-backend:v0.1.0 sh -c "cp -r /app/backend/configs/* /tmp/config/"
+
+# 从前端镜像中提取nginx配置文件
+docker run --rm -v $(pwd):/tmp/extract ghcr.io/cedar-v/license-manager-frontend:v0.1.0 sh -c "cp /etc/nginx/conf.d/default.conf /tmp/extract/nginx.conf"
 ```
 
 ### 2. 启动服务
@@ -81,7 +84,12 @@ docker-compose -f docker-compose.github.image.yml restart
 ```bash
 # 如果需要修改配置，先提取配置文件
 mkdir -p backend-config
+
+# 提取后端配置文件
 docker run --rm -v $(pwd)/backend-config:/tmp/config ghcr.io/cedar-v/license-manager-backend:v0.1.0 sh -c "cp -r /app/backend/configs/* /tmp/config/"
+
+# 提取前端nginx配置文件
+docker run --rm -v $(pwd):/tmp/extract ghcr.io/cedar-v/license-manager-frontend:v0.1.0 sh -c "cp /etc/nginx/conf.d/default.conf /tmp/extract/nginx.conf"
 ```
 
 ### 修改配置

@@ -48,7 +48,7 @@ jobs:
         context: .
         file: ./Dockerfile.frontend
         build-args: |
-          NGINX_CONF=nginx-ci.conf
+          NGINX_CONF=nginx.conf
         platforms: linux/amd64,linux/arm64
         push: true
         tags: ${{ steps.meta.outputs.tags }}
