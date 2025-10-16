@@ -155,6 +155,7 @@ import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getCustomerDetail } from '@/api/customer'
 import { useI18n } from 'vue-i18n'
+import { formatDate } from '@/utils/date'
 
 interface StatusRecord {
   action: string
@@ -297,11 +298,6 @@ const getStatusLabel = (status: string | undefined) => {
 }
 
 
-// 格式化日期
-const formatDate = (date: string | undefined) => {
-  if (!date) return t('customers.view.noData')
-  return new Date(date).toLocaleString('zh-CN')
-}
 
 // 组件挂载时获取数据
 onMounted(() => {

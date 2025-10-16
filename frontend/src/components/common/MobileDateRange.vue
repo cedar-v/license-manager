@@ -82,7 +82,7 @@ const quickOptions = computed(() => [
 ])
 
 // 格式化日期为 YYYY-MM-DD
-const formatDate = (date: Date): string => {
+const formatDateToISO = (date: Date): string => {
   return date.toISOString().split('T')[0]
 }
 
@@ -144,8 +144,8 @@ const handleQuickSelect = (value: string) => {
       return
   }
   
-  startDateValue.value = formatDate(startDate)
-  endDateValue.value = formatDate(endDate)
+  startDateValue.value = formatDateToISO(startDate)
+  endDateValue.value = formatDateToISO(endDate)
   
   emitChange()
 }

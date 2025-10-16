@@ -126,7 +126,7 @@
           </el-table-column>
           <el-table-column :label="t('customers.table.createTime')" :width="140"  align="center">
             <template #default="scope">
-              {{ formatDate(scope.row.created_at) }}
+              {{ formatDateShort(scope.row.created_at) }}
             </template>
           </el-table-column>
           <el-table-column :label="t('customers.table.operation')" fixed="right" class-name="action-column" align="center">
@@ -205,6 +205,7 @@ import {
   getStatusEnums,
   type RawEnumItem
 } from '@/api/enum'
+import { formatDateShort } from '@/utils/date'
 
 // Customer类型已从API文件导入
 
@@ -261,19 +262,6 @@ const getPageTitle = () => {
   return t('customers.title')
 }
 
-// 时间格式化函数
-const formatDate = (dateStr: string) => {
-  if (!dateStr) return ''
-  try {
-    return new Date(dateStr).toLocaleString('zh-CN', {
-      year: 'numeric',
-      month: '2-digit', 
-      day: '2-digit'
-    }).replace(/\//g, '-')
-  } catch {
-    return dateStr
-  }
-}
 
 
 const getRowStyle = ({ rowIndex }: { rowIndex: number }) => {

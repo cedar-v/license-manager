@@ -318,13 +318,13 @@ const formatDateRange = (range: [string, string]) => {
   const startDate = new Date(range[0])
   const endDate = new Date(range[1])
   
-  const formatDate = (date: Date) => {
+  const formatDateRange = (date: Date) => {
     const month = String(date.getMonth() + 1).padStart(2, '0')
     const day = String(date.getDate()).padStart(2, '0')
     return `${month}-${day}`
   }
   
-  return `${formatDate(startDate)} ${t('chart.licenseTrend.datePicker.rangeSeparator')} ${formatDate(endDate)}`
+  return `${formatDateRange(startDate)} ${t('chart.licenseTrend.datePicker.rangeSeparator')} ${formatDateRange(endDate)}`
 }
 
 // 获取授权趋势数据

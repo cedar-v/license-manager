@@ -94,15 +94,21 @@
                 </template>
               </el-table-column>
               <el-table-column
-                prop="end_date"
                 :label="t('dashboard.recentLicenses.columns.expiryTime')"
                 width="301"
-              />
+              >
+                <template #default="{ row }">
+                  {{ formatDate(row.end_date) }}
+                </template>
+              </el-table-column>
               <el-table-column
-                prop="created_at"
                 :label="t('dashboard.recentLicenses.columns.createTime')"
                 width="301"
-              />
+              >
+                <template #default="{ row }">
+                  {{ formatDate(row.created_at) }}
+                </template>
+              </el-table-column>
             </el-table>
           </div>
         </div>
@@ -118,6 +124,7 @@ import Layout from '@/components/common/layout/Layout.vue'
 import LicenseTrendChart from '@/components/charts/LicenseTrendChart.vue'
 import { getRecentAuthorizations, type RecentAuthorizationItem } from '@/api/dashboard'
 import { ElMessage } from 'element-plus'
+import { formatDate } from '@/utils/date'
 
 // 导入dashboard目录中的图标
 import icon1 from '@/assets/icons/dashboard/icon1.png'
