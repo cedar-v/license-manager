@@ -101,6 +101,14 @@ go build -o license-manager
 
 ## Docker Deployment
 
+### Using Pre-built Images (Recommended)
+
+For quick deployment without downloading source code, you can use pre-built GitHub Container Registry images:
+
+For detailed deployment steps, please refer to: [GitHub Images Deployment Guide](docs/github-images-deploy.md)
+
+### Build from Source
+
 We provide ready-to-use Docker Compose files for development and production:
 
 ```bash

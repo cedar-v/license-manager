@@ -1,0 +1,113 @@
+version: '3.8'
+
+services:
+  # MySQL 8 database - production optimized configuration
+  mysql:
+    image: mysql:8.0
+    container_name: license-manager-mysql-git
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root@123
+      MYSQL_DATABASE: license_manager
+      MYSQL_USER: license_user
+      MYSQL_PASSWORD: license@123
+      TZ: Asia/Shanghai
+    ports:
+      - "13306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - license-manager-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Backend service - using GitHub registry image
+  backend:
+    image: ghcr.io/cedar-v/license-manager-backend:v0.1.0
+    container_name: license-manager-backend-git
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai
+      - GIN_MODE=release
+    ports:
+      - "18888:18888"
+    volumes:
+      - ./backend-config:/app/backend/configs:ro
+      - ./logs:/app/logs
+      - ./data:/app/data
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:18888/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 6
+      start_period: 60s
+    networks:
+      - license-manager-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # Frontend service - using GitHub registry image
+  frontend:
+    image: ghcr.io/cedar-v/license-manager-frontend:v0.1.0
+    container_name: license-manager-frontend-git
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - "18080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - license-manager-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  license-manager-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

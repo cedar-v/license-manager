@@ -23,9 +23,6 @@ auth:
     secret: "please-change-in-prod"
     expire_hours: 1
     refresh_threshold_minutes: 30
-  admin:
-    username: "admin"
-    password: "changeMe!"
   security:
     max_login_attempts: 5
     lockout_duration_minutes: 15
@@ -39,5 +36,11 @@ i18n:
   default_lang: "zh-CN"
   config_path: "../configs/i18n/errors"
   support_langs: ["zh-CN", "en-US", "ja-JP"]
+
+license:
+  encryption_key: "please-change-in-prod-32-bytes-key" # 32字节许可证文件加密密钥
+  heartbeat_timeout: 300 # 心跳超时时间(秒) - 5分钟内为在线
+  offline_timeout: 1440 # 离线超时时间(分钟) - 24小时后为异常
+  expiring_days: 30 # 即将过期天数 - 30天内到期算即将过期
 
 

@@ -1,0 +1,31 @@
+name: Publish MySQL to Tencent CCR
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to CCR
+        run: |
+          echo "${{ secrets.TENCENT_CCR_PASSWORD }}" | docker login ccr.ccs.tencentyun.com --username="${{ secrets.TENCENT_CCR_USERNAME }}" --password-stdin
+      
+      - name: Pull and push AMD64
+        run: |
+          docker pull mysql:8.0 --platform linux/amd64
+          docker tag mysql:8.0 ccr.ccs.tencentyun.com/cedar-v/mysql:8.0-amd64
+          docker push ccr.ccs.tencentyun.com/cedar-v/mysql:8.0-amd64
+      
+      - name: Pull and push ARM64
+        run: |
+          docker pull mysql:8.0 --platform linux/arm64
+          docker tag mysql:8.0 ccr.ccs.tencentyun.com/cedar-v/mysql:8.0-arm64
+          docker push ccr.ccs.tencentyun.com/cedar-v/mysql:8.0-arm64
+      
+      - name: Create and push manifest
+        run: |
+          docker manifest create ccr.ccs.tencentyun.com/cedar-v/mysql:8.0 \
+            ccr.ccs.tencentyun.com/cedar-v/mysql:8.0-amd64 \
+            ccr.ccs.tencentyun.com/cedar-v/mysql:8.0-arm64
+          docker manifest push ccr.ccs.tencentyun.com/cedar-v/mysql:8.0
