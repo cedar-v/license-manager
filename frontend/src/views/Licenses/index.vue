@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-12 00:00:00
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-09-29 17:29:42
+ * @LastEditTime: 2025-10-16 15:29:00
  * @FilePath: /frontend/src/views/Licenses.vue
  * @Description: 授权管理页面
 -->
@@ -10,7 +10,7 @@
   <Layout app-name="Cedar-V" :page-title="t('pages.licenses.title')">
     <div class="license-container">
       <!-- 主要内容区域 -->
-      <div class="main-content">
+      <div v-if="!showSubRoute" class="main-content">
         <!-- 背景图片 -->
         <div class="background-section">
           <!-- 中央标题 -->
@@ -70,223 +70,40 @@
           </div>
         </div>
 
-        <!-- 授权列表区域 -->
-        <div v-if="showLicenseList" class="license-list-section">
-          <div class="list-header">
-            <div class="search-controls">
-              <el-input
-                v-model="searchText"
-                :placeholder="t('pages.licenses.search.placeholder')"
-                prefix-icon="Search"
-                clearable
-                size="large"
-                class="search-input"
-                @input="handleSearch"
-              />
+      </div>
 
-              <el-date-picker
-                v-model="dateRange"
-                type="daterange"
-                :range-separator="t('pages.licenses.search.dateRange')"
-                :start-placeholder="t('pages.licenses.search.startDate')"
-                :end-placeholder="t('pages.licenses.search.endDate')"
-                size="large"
-                class="date-picker"
-                @change="handleDateRangeChange"
-              />
-
-              <el-button
-                type="primary"
-                size="large"
-                @click="refreshLicenseList"
-              >
-                {{ t('pages.licenses.actions.refresh') }}
-              </el-button>
-            </div>
-          </div>
-
-          <!-- 授权表格 -->
-          <div class="table-container">
-            <el-table
-              :data="licenseList"
-              v-loading="loading"
-              :element-loading-text="t('pages.licenses.table.loading')"
-              stripe
-              style="width: 100%"
-              class="license-table"
-            >
-              <el-table-column
-                prop="license_code"
-                :label="t('pages.licenses.table.licenseCode')"
-                width="200"
-                show-overflow-tooltip
-              />
-
-              <el-table-column
-                prop="customer_name"
-                :label="t('pages.licenses.table.customerName')"
-                width="180"
-                show-overflow-tooltip
-              />
-
-              <el-table-column
-                prop="description"
-                :label="t('pages.licenses.table.description')"
-                min-width="200"
-                show-overflow-tooltip
-              />
-
-              <el-table-column
-                prop="status"
-                :label="t('pages.licenses.table.status')"
-                width="120"
-              >
-                <template #default="{ row }">
-                  <el-tag
-                    :type="getStatusType(row.status)"
-                    effect="plain"
-                  >
-                    {{ getStatusText(row.status) }}
-                  </el-tag>
-                </template>
-              </el-table-column>
-
-              <el-table-column
-                prop="license_type_display"
-                :label="t('pages.licenses.table.licenseType')"
-                width="140"
-                show-overflow-tooltip
-              />
-
-              <el-table-column
-                prop="expiry_date"
-                :label="t('pages.licenses.table.expiryDate')"
-                width="180"
-              >
-                <template #default="{ row }">
-                  {{ formatDate(row.expiry_date) }}
-                </template>
-              </el-table-column>
-
-              <el-table-column
-                prop="created_at"
-                :label="t('pages.licenses.table.createTime')"
-                width="180"
-              >
-                <template #default="{ row }">
-                  {{ formatDate(row.created_at) }}
-                </template>
-              </el-table-column>
-
-              <el-table-column
-                :label="t('pages.licenses.table.operation')"
-                width="200"
-                fixed="right"
-              >
-                <template #default="{ row }">
-                  <el-button
-                    type="primary"
-                    size="small"
-                    @click="handleEdit(row)"
-                  >
-                    {{ t('pages.licenses.actions.edit') }}
-                  </el-button>
-
-                  <el-button
-                    v-if="row.status === 'inactive'"
-                    type="success"
-                    size="small"
-                    @click="handleActivate(row)"
-                  >
-                    {{ t('pages.licenses.actions.activate') }}
-                  </el-button>
-
-                  <el-button
-                    v-if="row.status === 'active'"
-                    type="warning"
-                    size="small"
-                    @click="handleDeactivate(row)"
-                  >
-                    {{ t('pages.licenses.actions.deactivate') }}
-                  </el-button>
-
-                  <el-button
-                    type="danger"
-                    size="small"
-                    @click="handleDelete(row)"
-                  >
-                    {{ t('pages.licenses.actions.delete') }}
-                  </el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-
-            <!-- 分页 -->
-            <div class="pagination-container">
-              <el-pagination
-                v-model:current-page="currentPage"
-                v-model:page-size="pageSize"
-                :page-sizes="[10, 20, 50, 100]"
-                :total="total"
-                layout="total, sizes, prev, pager, next, jumper"
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-              />
-            </div>
-          </div>
-        </div>
+      <!-- 子路由视图区域 -->
+      <div v-if="showSubRoute" class="sub-route-section">
+        <router-view />
       </div>
     </div>
 
-    <!-- 创建/编辑授权对话框 -->
-    <LicenseForm
-      v-model:visible="formDialogVisible"
-      :license-data="editingLicense"
-      :customers="customers"
-      @success="handleFormSuccess"
-    />
   </Layout>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { useRouter, useRoute } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import Layout from '@/components/common/layout/Layout.vue'
-import LicenseForm from './LicenseForm.vue'
-import { getLicenses, deleteLicense, activateLicense, deactivateLicense, type License, type LicenseQueryRequest } from '@/api/license'
 import { getCustomers, type Customer } from '@/api/customer'
 
 const { t } = useI18n()
+const router = useRouter()
+const route = useRoute()
 
 // 响应式数据
 const selectedCustomer = ref<string>('')
 const customers = ref<Customer[]>([])
-const showLicenseList = ref(false)
-const searchText = ref('')
-const dateRange = ref<[Date, Date] | null>(null)
-const loading = ref(false)
-const licenseList = ref<License[]>([])
-const currentPage = ref(1)
-const pageSize = ref(20)
-const total = ref(0)
-const formDialogVisible = ref(false)
-const editingLicense = ref<License | null>(null)
+const showSubRoute = ref(false)
 
-// 查询参数
-const queryParams = reactive<LicenseQueryRequest>({
-  page: 1,
-  page_size: 20,
-  search: '',
-  customer_id: '',
-  sort: 'created_at',
-  order: 'desc'
+// 选中的客户信息
+const selectedCustomerInfo = computed(() => {
+  if (!selectedCustomer.value) return null
+  return customers.value.find(c => c.id === selectedCustomer.value) || null
 })
 
-// 计算属性
-// const formattedCustomers = computed(() => {
-//   return customers.value.filter(customer => customer.status === 'active')
-// })
 
 // 方法
 const loadCustomers = async () => {
@@ -299,189 +116,44 @@ const loadCustomers = async () => {
   }
 }
 
-const loadLicenseList = async () => {
-  try {
-    loading.value = true
-    const response = await getLicenses(queryParams)
-    licenseList.value = response.data.list
-    total.value = response.data.total
-    currentPage.value = response.data.page
-  } catch (error) {
-    console.error('Failed to load licenses:', error)
-    ElMessage.error(t('pages.licenses.message.loadError'))
-  } finally {
-    loading.value = false
-  }
-}
 
-const handleCustomerChange = (value: string) => {
-  queryParams.customer_id = value
+const handleCustomerChange = () => {
+  // 客户选择变化时的处理逻辑
 }
 
 const handleQuery = () => {
-  showLicenseList.value = true
-  queryParams.page = 1
-  currentPage.value = 1
-  loadLicenseList()
+  // 跳转到列表页，并传递客户信息参数
+  showSubRoute.value = true
+  router.push({
+    name: 'licenses-list',
+    query: {
+      customerId: selectedCustomer.value || '',
+      customerName: selectedCustomerInfo.value?.customer_name || ''
+    }
+  })
 }
 
 const handleCreateLicense = () => {
-  editingLicense.value = null
-  formDialogVisible.value = true
-}
-
-const handleSearch = () => {
-  queryParams.search = searchText.value
-  queryParams.page = 1
-  currentPage.value = 1
-  if (showLicenseList.value) {
-    loadLicenseList()
-  }
-}
-
-const handleDateRangeChange = (value: [Date, Date] | null) => {
-  if (value) {
-    queryParams.start_date = value[0].toISOString().split('T')[0]
-    queryParams.end_date = value[1].toISOString().split('T')[0]
-  } else {
-    queryParams.start_date = undefined
-    queryParams.end_date = undefined
-  }
-
-  if (showLicenseList.value) {
-    queryParams.page = 1
-    currentPage.value = 1
-    loadLicenseList()
-  }
-}
-
-const refreshLicenseList = () => {
-  if (showLicenseList.value) {
-    loadLicenseList()
-  }
-}
-
-const handleSizeChange = (size: number) => {
-  queryParams.page_size = size
-  queryParams.page = 1
-  currentPage.value = 1
-  loadLicenseList()
-}
-
-const handleCurrentChange = (page: number) => {
-  queryParams.page = page
-  loadLicenseList()
-}
-
-const handleEdit = (license: License) => {
-  editingLicense.value = license
-  formDialogVisible.value = true
-}
-
-const handleActivate = async (license: License) => {
-  try {
-    await ElMessageBox.confirm(
-      t('pages.licenses.confirm.activateMessage', { code: license.license_code }),
-      t('pages.licenses.confirm.activateTitle'),
-      {
-        confirmButtonText: t('pages.licenses.confirm.confirm'),
-        cancelButtonText: t('pages.licenses.confirm.cancel'),
-        type: 'warning'
-      }
-    )
-
-    await activateLicense(license.id)
-    ElMessage.success(t('pages.licenses.message.activateSuccess'))
-    loadLicenseList()
-  } catch (error) {
-    if (error !== 'cancel') {
-      console.error('Failed to activate license:', error)
-      ElMessage.error('激活授权失败')
+  // 跳转到创建授权页，并传递客户信息参数
+  showSubRoute.value = true
+  router.push({
+    name: 'licenses-create',
+    query: {
+      customerId: selectedCustomer.value || '',
+      customerName: selectedCustomerInfo.value?.customer_name || ''
     }
-  }
-}
-
-const handleDeactivate = async (license: License) => {
-  try {
-    await ElMessageBox.confirm(
-      t('pages.licenses.confirm.deactivateMessage', { code: license.license_code }),
-      t('pages.licenses.confirm.deactivateTitle'),
-      {
-        confirmButtonText: t('pages.licenses.confirm.confirm'),
-        cancelButtonText: t('pages.licenses.confirm.cancel'),
-        type: 'warning'
-      }
-    )
-
-    await deactivateLicense(license.id)
-    ElMessage.success(t('pages.licenses.message.deactivateSuccess'))
-    loadLicenseList()
-  } catch (error) {
-    if (error !== 'cancel') {
-      console.error('Failed to deactivate license:', error)
-      ElMessage.error('停用授权失败')
-    }
-  }
-}
-
-const handleDelete = async (license: License) => {
-  try {
-    await ElMessageBox.confirm(
-      t('pages.licenses.confirm.deleteMessage', { code: license.license_code }),
-      t('pages.licenses.confirm.deleteTitle'),
-      {
-        confirmButtonText: t('pages.licenses.confirm.confirm'),
-        cancelButtonText: t('pages.licenses.confirm.cancel'),
-        type: 'warning'
-      }
-    )
-
-    await deleteLicense(license.id)
-    ElMessage.success(t('pages.licenses.message.deleteSuccess'))
-    loadLicenseList()
-  } catch (error) {
-    if (error !== 'cancel') {
-      console.error('Failed to delete license:', error)
-      ElMessage.error(t('pages.licenses.message.deleteError'))
-    }
-  }
-}
-
-const handleFormSuccess = () => {
-  formDialogVisible.value = false
-  if (showLicenseList.value) {
-    loadLicenseList()
-  }
-}
-
-const getStatusType = (status: string) => {
-  switch (status) {
-    case 'active':
-      return 'success'
-    case 'inactive':
-      return 'info'
-    case 'expired':
-      return 'danger'
-    default:
-      return 'info'
-  }
-}
-
-const getStatusText = (status: string) => {
-  return t(`pages.licenses.status.${status}`)
-}
-
-const formatDate = (dateString: string) => {
-  if (!dateString) return '--'
-  const date = new Date(dateString)
-  return date.toLocaleString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
   })
 }
+
+
+
+
+
+// 监听路由变化，控制子路由显示
+watch(() => route.name, (newName) => {
+  // 如果是子路由，显示子路由区域
+  showSubRoute.value = newName === 'licenses-list' || newName === 'licenses-create'
+}, { immediate: true })
 
 // 生命周期
 onMounted(() => {
@@ -682,6 +354,14 @@ onMounted(() => {
       background-color: darken($primary-color, 10%);
     }
   }
+}
+
+.sub-route-section {
+  flex: 1;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .license-list-section {

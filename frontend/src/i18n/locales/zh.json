@@ -63,6 +63,8 @@
       "dashboard": "仪表盘",
       "customers": "客户管理",
       "licenses": "授权管理",
+      "licenseList": "授权列表",
+      "createLicense": "创建授权",
       "roles": "角色权限",
       "users": "系统用户",
       "login": "登录",

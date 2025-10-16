@@ -1,6 +1,24 @@
 import Axios from './https'
+// 授权码(AuthorizationCode)类型 - 供授权管理页面使用
+export interface AuthorizationCode {
+  id: string;
+  code: string;
+  customer_id?: string;
+  customer_name?: string;
+  description?: string;
+  status: 'normal' | 'locked' | 'expired';
+  status_display?: string;
+  created_at: string;
+  updated_at?: string;
+  start_date?: string;
+  end_date?: string;
+  is_locked?: boolean;
+  max_activations?: number;
+  current_activations?: number;
+  deployment_type_display?: string; // 部署类型显示文本
+}
 
-// 授权接口类型定义
+// 许可证（License）类型 - 供其他页面使用（保持兼容）
 export interface License {
   id: string;
   license_code: string;
@@ -29,24 +47,20 @@ export interface License {
 export interface LicenseQueryRequest {
   page?: number;
   page_size?: number;
-  search?: string;
   customer_id?: string;
-  status?: 'active' | 'inactive' | 'expired';
-  license_type?: string;
-  sort?: 'created_at' | 'updated_at' | 'expiry_date' | 'activation_date';
+  status?: 'normal' | 'locked' | 'expired';
+  sort?: 'created_at' | 'updated_at' | 'code';
   order?: 'asc' | 'desc';
-  start_date?: string;
-  end_date?: string;
 }
 
 // 创建授权请求参数
-export interface LicenseCreateRequest {
+export interface AuthorizationCodeCreateRequest {
   customer_id: string;
   description: string;
-  license_type: string;
-  expiry_date: string;
+  license_type?: string;
+  expiry_date?: string;
   max_users?: number;
-  features: string[];
+  features?: string[];
   ip_restrictions?: string[];
   hardware_id?: string;
 }
@@ -77,7 +91,7 @@ export interface LicenseQueryResponse {
   message: string;
   timestamp: string;
   data: {
-    list: License[];
+    list: AuthorizationCode[];
     total: number;
     page: number;
     page_size: number;
@@ -97,56 +111,52 @@ export interface ApiResponse<T = any> {
  * 查询授权列表
  */
 export function getLicenses(params?: LicenseQueryRequest): Promise<LicenseQueryResponse> {
-  return Axios.get('/api/licenses', { params })
+  return Axios.get('/api/v1/authorization-codes', { params })
 }
-
 /**
  * 获取授权详情
  */
-export function getLicenseDetail(id: string): Promise<ApiResponse<License>> {
-  return Axios.get(`/api/licenses/${id}`)
+export function getLicenseDetail(id: string): Promise<ApiResponse<AuthorizationCode>> {
+  return Axios.get(`/api/v1/authorization-codes/${id}`)
 }
 
 /**
  * 创建授权
  */
-export function createLicense(data: LicenseCreateRequest): Promise<ApiResponse<License>> {
-  return Axios.post('/api/licenses', data)
+export function createLicense(data: AuthorizationCodeCreateRequest): Promise<ApiResponse<AuthorizationCode>> {
+  return Axios.post('/api/v1/authorization-codes', data)
 }
 
 /**
  * 更新授权
  */
-export function updateLicense(id: string, data: LicenseUpdateRequest): Promise<ApiResponse<License>> {
-  return Axios.put(`/api/licenses/${id}`, data)
+export function updateLicense(id: string, data: LicenseUpdateRequest): Promise<ApiResponse<AuthorizationCode>> {
+  return Axios.put(`/api/v1/authorization-codes/${id}`, data)
 }
 
 /**
  * 删除授权
  */
 export function deleteLicense(id: string): Promise<ApiResponse> {
-  return Axios.delete(`/api/licenses/${id}`)
+  return Axios.delete(`/api/v1/authorization-codes/${id}`)
 }
 
 /**
- * 激活授权
+ * 锁定/解锁授权码
  */
-export function activateLicense(id: string): Promise<ApiResponse<License>> {
-  return Axios.patch(`/api/licenses/${id}/activate`)
+export function lockAuthorizationCode(
+  id: string,
+  data: { is_locked: boolean; lock_reason?: string; reason?: string }
+): Promise<ApiResponse<AuthorizationCode>> {
+  return Axios.put(`/api/v1/authorization-codes/${id}/lock`, data)
 }
 
-/**
- * 停用授权
- */
-export function deactivateLicense(id: string): Promise<ApiResponse<License>> {
-  return Axios.patch(`/api/licenses/${id}/deactivate`)
-}
 
 /**
  * 获取授权统计数据
  */
 export function getLicenseStats(): Promise<ApiResponse<LicenseStats>> {
-  return Axios.get('/api/licenses/stats')
+  return Axios.get('/api/v1/authorization-codes/stats')
 }
 
 /**
@@ -159,6 +169,20 @@ export function getLicensesByCustomer(customerId: string, params?: Omit<LicenseQ
 /**
  * 续期授权
  */
-export function renewLicense(id: string, expiry_date: string): Promise<ApiResponse<License>> {
-  return Axios.patch(`/api/licenses/${id}/renew`, { expiry_date })
+export function renewLicense(id: string, expiry_date: string): Promise<ApiResponse<AuthorizationCode>> {
+  return Axios.patch(`/api/v1/authorization-codes/${id}/renew`, { expiry_date })
+}
+
+/**
+ * 激活授权
+ */
+export function activateLicense(id: string): Promise<ApiResponse<AuthorizationCode>> {
+  return Axios.patch(`/api/v1/authorization-codes/${id}/activate`)
+}
+
+/**
+ * 停用授权
+ */
+export function deactivateLicense(id: string): Promise<ApiResponse<AuthorizationCode>> {
+  return Axios.patch(`/api/v1/authorization-codes/${id}/deactivate`)
 }

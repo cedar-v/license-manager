@@ -63,6 +63,8 @@
       "dashboard": "ダッシュボード",
       "customers": "顧客管理",
       "licenses": "ライセンス管理",
+      "licenseList": "ライセンス一覧",
+      "createLicense": "ライセンス作成",
       "roles": "ロールと権限",
       "users": "システムユーザー",
       "login": "ログイン",

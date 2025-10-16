@@ -36,7 +36,41 @@ export function useBreadcrumb() {
   // 生成面包屑
   const breadcrumbs = computed<BreadcrumbItem[]>(() => {
     const currentPath = route.path
-    
+
+    // 特殊处理授权管理子路由
+    if (currentPath.startsWith('/licenses/')) {
+      const items: BreadcrumbItem[] = []
+
+      // 添加授权管理作为父级
+      items.push({
+        title: t('navigation.breadcrumb.licenses'),
+        path: '/licenses'
+      })
+
+      // 如果有客户名称查询参数，显示客户名称
+      if (route.query.customerName && typeof route.query.customerName === 'string') {
+        items.push({
+          title: route.query.customerName
+        })
+      } else {
+        // 否则显示当前路由的标题
+        const pathSegments = currentPath.split('/').filter(Boolean)
+        const lastSegment = pathSegments[pathSegments.length - 1]
+
+        if (lastSegment === 'list') {
+          items.push({
+            title: t('navigation.breadcrumb.licenseList')
+          })
+        } else if (lastSegment === 'create') {
+          items.push({
+            title: t('navigation.breadcrumb.createLicense')
+          })
+        }
+      }
+
+      return items
+    }
+
     // 从配置中获取面包屑
     const configKeys = routeBreadcrumbKeys[currentPath]
     if (configKeys) {

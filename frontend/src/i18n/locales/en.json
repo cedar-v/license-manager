@@ -63,6 +63,8 @@
       "dashboard": "Dashboard",
       "customers": "Customer Management",
       "licenses": "License Management",
+      "licenseList": "License List",
+      "createLicense": "Create License",
       "roles": "Roles & Permissions",
       "users": "System Users",
       "login": "Login",

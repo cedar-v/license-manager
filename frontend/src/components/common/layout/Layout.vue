@@ -78,7 +78,8 @@ const router = useRouter()
 const navItems = computed(() => {
   return defaultNavItems.value.map(item => ({
     ...item,
-    active: route.path === item.href
+    // 对于有子路由的项目，匹配路径前缀
+    active: route.path === item.href || route.path.startsWith(item.href + '/')
   }))
 })
 

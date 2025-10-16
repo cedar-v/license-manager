@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:www.figma.com)"
+      "WebFetch(domain:www.figma.com)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []
