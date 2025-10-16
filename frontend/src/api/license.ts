@@ -51,6 +51,11 @@ export interface LicenseQueryRequest {
   status?: 'normal' | 'locked' | 'expired';
   sort?: 'created_at' | 'updated_at' | 'code';
   order?: 'asc' | 'desc';
+  start_date?: string; // 创建时间开始
+  end_date?: string; // 创建时间结束
+  expiry_start_date?: string; // 到期时间开始
+  expiry_end_date?: string; // 到期时间结束
+  code?: string; // 授权码搜索
 }
 
 // 创建授权请求参数

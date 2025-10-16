@@ -8,27 +8,22 @@
 
       <div class="filters">
         <span class="filter-label">筛选：</span>
+        
+        <el-input
+          v-model="filterCode"
+          placeholder="授权码"
+          clearable
+          class="filter-input"
+        />
+
         <el-select v-model="filterStatus" placeholder="状态" clearable class="filter-select">
-          <el-option label="正常" value="normal" />
-          <el-option label="锁定" value="locked" />
-          <el-option label="过期" value="expired" />
+          <el-option 
+            v-for="option in statusOptions" 
+            :key="option.key" 
+            :label="option.display" 
+            :value="option.key" 
+          />
         </el-select>
-
-        <el-date-picker
-          v-model="filterCreateDate"
-          type="date"
-          placeholder="创建时间"
-          clearable
-          class="filter-date"
-        />
-
-        <el-date-picker
-          v-model="filterExpiryDate"
-          type="date"
-          placeholder="到期时间"
-          clearable
-          class="filter-date"
-        />
 
         <el-button type="primary" @click="handleQuery">
           查询
@@ -49,12 +44,16 @@
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
             <el-tag :type="getStatusTagType(row.status)">
-              {{ getStatusText(row.status) }}
+              {{ row.status_display}}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="current_activations" label="激活状态" width="120" />
-        <el-table-column prop="end_date" label="到期时间" width="180" />
+        <el-table-column prop="deployment_type_display" label="部署类型" width="120" />
+        <el-table-column prop="end_date" label="到期时间" width="180">
+          <template #default="{ row }">
+            {{ formatDate(row.end_date) }}
+          </template>
+        </el-table-column>
         <el-table-column prop="description" label="备注" min-width="200" show-overflow-tooltip />
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
@@ -104,7 +103,9 @@
 import { ref, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
-import { getLicenses, lockAuthorizationCode, type AuthorizationCode, type LicenseQueryRequest } from '@/api/license'
+import { getLicenses, lockAuthorizationCode, deleteLicense, getLicenseDetail, type AuthorizationCode, type LicenseQueryRequest } from '@/api/license'
+import { getAuthorizationStatusEnums, type RawEnumItem } from '@/api/enum'
+import { formatDate } from '@/utils/date'
 
 const router = useRouter()
 const route = useRoute()
@@ -120,12 +121,12 @@ const customerInfo = computed(() => {
 // 响应式数据
 const loading = ref(false)
 const filterStatus = ref('')
-const filterCreateDate = ref('')
-const filterExpiryDate = ref('')
+const filterCode = ref('')
 const tableData = ref<AuthorizationCode[]>([])
 const currentPage = ref(1)
 const pageSize = ref(20)
 const total = ref(0)
+const statusOptions = ref<RawEnumItem[]>([])
 
 // 方法
 const getStatusTagType = (status: string) => {
@@ -142,17 +143,10 @@ const getStatusTagType = (status: string) => {
 }
 
 const getStatusText = (status: string) => {
-  switch (status) {
-    case 'normal':
-      return '正常'
-    case 'locked':
-      return '锁定'
-    case 'expired':
-      return '过期'
-    default:
-      return status
-  }
+  const option = statusOptions.value.find(opt => opt.key === status)
+  return option ? option.display : status
 }
+
 
 const handleCreate = () => {
   router.push({ 
@@ -169,8 +163,46 @@ const handleQuery = () => {
   loadData()
 }
 
-const handleDetail = (_row: any) => {
-  ElMessage.info('查看详情功能待实现')
+const handleDetail = async (row: any) => {
+  try {
+    loading.value = true
+    const response = await getLicenseDetail(row.id)
+    console.log('授权详情:', response.data)
+    
+    if (!response.data) {
+      ElMessage.error('获取详情失败：数据为空')
+      return
+    }
+    
+    const data = response.data
+    
+    // 显示详情信息
+    ElMessageBox.alert(
+      `
+      <div style="text-align: left;">
+        <p><strong>授权码：</strong>${data.code}</p>
+        <p><strong>状态：</strong>${getStatusText(data.status)}</p>
+        <p><strong>客户：</strong>${data.customer_name || '未指定'}</p>
+        <p><strong>描述：</strong>${data.description || '无'}</p>
+        <p><strong>创建时间：</strong>${formatDate(data.created_at)}</p>
+        <p><strong>到期时间：</strong>${formatDate(data.end_date)}</p>
+        <p><strong>最大激活数：</strong>${data.max_activations || '无限制'}</p>
+        <p><strong>当前激活数：</strong>${data.current_activations || 0}</p>
+        <p><strong>是否锁定：</strong>${data.is_locked ? '是' : '否'}</p>
+      </div>
+      `,
+      '授权详情',
+      {
+        dangerouslyUseHTMLString: true,
+        confirmButtonText: '确定'
+      }
+    )
+  } catch (error) {
+    console.error('获取详情失败:', error)
+    ElMessage.error('获取详情失败')
+  } finally {
+    loading.value = false
+  }
 }
 
 const handleLock = async (row: any) => {
@@ -219,14 +251,20 @@ const handleUnlock = async (row: any) => {
   })
 }
 
-const handleDelete = (_row: any) => {
-  ElMessageBox.confirm('确定要删除此授权吗？', '提示', {
-    confirmButtonText: '确定',
+const handleDelete = async (row: any) => {
+  ElMessageBox.confirm('确定要删除此授权吗？删除后无法恢复！', '警告', {
+    confirmButtonText: '确定删除',
     cancelButtonText: '取消',
     type: 'warning'
-  }).then(() => {
-    ElMessage.success('删除成功')
-    loadData()
+  }).then(async () => {
+    try {
+      await deleteLicense(row.id)
+      ElMessage.success('删除成功')
+      loadData()
+    } catch (error) {
+      console.error('删除失败:', error)
+      ElMessage.error('删除失败')
+    }
   }).catch(() => {
     // 取消操作
   })
@@ -240,6 +278,22 @@ const handleSizeChange = (size: number) => {
 const handlePageChange = (page: number) => {
   currentPage.value = page
   loadData()
+}
+
+const loadStatusOptions = async () => {
+  try {
+    const response = await getAuthorizationStatusEnums()
+    statusOptions.value = response.data.items
+    console.log('状态选项:', statusOptions.value)
+  } catch (error) {
+    console.error('加载状态选项失败:', error)
+    // 如果接口失败，使用默认选项
+    statusOptions.value = [
+      { key: 'normal', display: '正常' },
+      { key: 'locked', display: '锁定' },
+      { key: 'expired', display: '过期' }
+    ]
+  }
 }
 
 const loadData = async () => {
@@ -258,6 +312,11 @@ const loadData = async () => {
       queryParams.status = filterStatus.value as 'normal' | 'locked' | 'expired'
     }
 
+    // 添加授权码搜索
+    if (filterCode.value) {
+      queryParams.code = filterCode.value
+    }
+
     console.log('查询参数:', queryParams)
     const response = await getLicenses(queryParams)
     console.log('API响应:', response)
@@ -273,9 +332,10 @@ const loadData = async () => {
 }
 
 // 生命周期
-onMounted(() => {
+onMounted(async () => {
   console.log('LinenseList组件已挂载')
   console.log('客户信息:', customerInfo.value)
+  await loadStatusOptions()
   loadData()
 })
 </script>
@@ -337,12 +397,12 @@ onMounted(() => {
   color: #606266;
 }
 
-.filter-select {
-  width: 120px;
+.filter-input {
+  width: 150px;
 }
 
-.filter-date {
-  width: 160px;
+.filter-select {
+  width: 120px;
 }
 
 .table-container {
@@ -368,8 +428,8 @@ onMounted(() => {
   .filters {
     width: 100%;
 
-    .filter-select,
-    .filter-date {
+    .filter-input,
+    .filter-select {
       flex: 1;
       min-width: 100px;
     }

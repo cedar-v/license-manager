@@ -55,3 +55,10 @@ export function getStatusEnums(): Promise<EnumResponse> {
 export function getCompanySizeEnums(): Promise<EnumResponse> {
   return getEnumOptions('company_size')
 }
+
+/**
+ * 获取授权码状态枚举
+ */
+export function getAuthorizationStatusEnums(): Promise<EnumResponse> {
+  return getEnumOptions('authorization_status')
+}
