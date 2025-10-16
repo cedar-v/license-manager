@@ -3,8 +3,9 @@ import Axios from './https'
 export interface AuthorizationCode {
   id: string;
   code: string;
-  customer_id?: string;
+  customer_id: string;
   customer_name?: string;
+  software_id?: string;
   description?: string;
   status: 'normal' | 'locked' | 'expired';
   status_display?: string;
@@ -12,10 +13,17 @@ export interface AuthorizationCode {
   updated_at?: string;
   start_date?: string;
   end_date?: string;
-  is_locked?: boolean;
-  max_activations?: number;
+  deployment_type: string;
+  deployment_type_display?: string;
+  encryption_type?: string;
+  encryption_type_display?: string;
+  software_version?: string;
+  max_activations: number;
   current_activations?: number;
-  deployment_type_display?: string; // 部署类型显示文本
+  is_locked?: boolean;
+  feature_config?: any;
+  usage_limits?: any;
+  custom_parameters?: any;
 }
 
 // 许可证（License）类型 - 供其他页面使用（保持兼容）
@@ -61,24 +69,32 @@ export interface LicenseQueryRequest {
 // 创建授权请求参数
 export interface AuthorizationCodeCreateRequest {
   customer_id: string;
-  description: string;
-  license_type?: string;
-  expiry_date?: string;
-  max_users?: number;
-  features?: string[];
-  ip_restrictions?: string[];
-  hardware_id?: string;
+  software_id?: string;
+  description?: string;
+  validity_days: number;
+  deployment_type: string;
+  encryption_type?: string;
+  software_version?: string;
+  max_activations: number;
+  feature_config?: any;
+  usage_limits?: any;
+  custom_parameters?: any;
 }
 
 // 更新授权请求参数
 export interface LicenseUpdateRequest {
+  software_id?: string;
   description?: string;
-  status?: 'active' | 'inactive' | 'expired';
-  expiry_date?: string;
-  max_users?: number;
-  features?: string[];
-  ip_restrictions?: string[];
-  hardware_id?: string;
+  validity_days?: number;
+  deployment_type?: string;
+  encryption_type?: string;
+  software_version?: string;
+  max_activations?: number;
+  feature_config?: any;
+  usage_limits?: any;
+  custom_parameters?: any;
+  change_type: string;
+  reason?: string;
 }
 
 // 授权统计数据

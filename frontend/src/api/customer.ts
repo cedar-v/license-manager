@@ -30,6 +30,7 @@ export interface CustomerQueryRequest {
   page?: number;
   page_size?: number;
   search?: string;
+  customer_name?: string;
   customer_type?: 'individual' | 'enterprise' | 'government' | 'education';
   customer_level?: 'normal' | 'vip' | 'enterprise' | 'strategic';
   status?: 'active' | 'disabled';
