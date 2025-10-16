@@ -1,5 +1,164 @@
 <template>
+  <!-- 页面模式 -->
+  <div v-if="isPageMode" class="license-form-page">
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title">{{ isEdit ? '编辑授权' : t('pages.licenses.actions.createLicense') }}</h1>
+        <div class="header-actions">
+          <el-button @click="handleBack">
+            {{ t('customers.actions.cancel') }}
+          </el-button>
+          <el-button
+            type="primary"
+            :loading="submitting"
+            @click="handleSubmit"
+          >
+            {{ t('customers.actions.save') }}
+          </el-button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="page-content">
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
+        label-width="120px"
+        class="license-form"
+      >
+        <div class="form-section">
+          <h3 class="section-title">{{ t('pages.licenses.form.basicInfo') }}</h3>
+
+          <el-form-item
+            :label="t('pages.licenses.form.selectCustomer')"
+            prop="customer_id"
+          >
+            <el-select
+              v-model="formData.customer_id"
+              :placeholder="t('pages.licenses.form.placeholder.selectCustomer')"
+              filterable
+              style="width: 100%"
+              :disabled="isEdit"
+            >
+              <el-option
+                v-for="customer in customers"
+                :key="customer.id"
+                :label="customer.customer_name"
+                :value="customer.id"
+              />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item
+            :label="t('pages.licenses.form.description')"
+            prop="description"
+          >
+            <el-input
+              v-model="formData.description"
+              :placeholder="t('pages.licenses.form.placeholder.enterDescription')"
+              type="textarea"
+              :rows="3"
+              maxlength="500"
+              show-word-limit
+            />
+          </el-form-item>
+
+          <el-form-item
+            :label="t('pages.licenses.form.licenseType')"
+            prop="license_type"
+          >
+            <el-select
+              v-model="formData.license_type"
+              :placeholder="t('pages.licenses.form.placeholder.selectLicenseType')"
+              style="width: 100%"
+            >
+              <el-option label="标准版" value="standard" />
+              <el-option label="专业版" value="professional" />
+              <el-option label="企业版" value="enterprise" />
+              <el-option label="定制版" value="custom" />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item
+            :label="t('pages.licenses.form.expiryDate')"
+            prop="expiry_date"
+          >
+            <el-date-picker
+              v-model="formData.expiry_date"
+              type="datetime"
+              :placeholder="t('pages.licenses.form.placeholder.selectExpiryDate')"
+              style="width: 100%"
+              format="YYYY-MM-DD HH:mm:ss"
+              value-format="YYYY-MM-DD HH:mm:ss"
+              :disabled-date="disabledDate"
+            />
+          </el-form-item>
+
+          <el-form-item
+            :label="t('pages.licenses.form.maxUsers')"
+            prop="max_users"
+          >
+            <el-input-number
+              v-model="formData.max_users"
+              :min="1"
+              :max="10000"
+              :placeholder="t('pages.licenses.form.placeholder.enterMaxUsers')"
+              style="width: 100%"
+            />
+          </el-form-item>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">高级配置</h3>
+
+          <el-form-item
+            :label="t('pages.licenses.form.features')"
+            prop="features"
+          >
+            <el-checkbox-group v-model="formData.features">
+              <el-checkbox label="basic" value="basic">基础功能</el-checkbox>
+              <el-checkbox label="advanced" value="advanced">高级功能</el-checkbox>
+              <el-checkbox label="api" value="api">API接口</el-checkbox>
+              <el-checkbox label="export" value="export">数据导出</el-checkbox>
+              <el-checkbox label="backup" value="backup">数据备份</el-checkbox>
+              <el-checkbox label="analytics" value="analytics">数据分析</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+
+          <el-form-item
+            :label="t('pages.licenses.form.ipRestrictions')"
+            prop="ip_restrictions"
+          >
+            <el-input
+              v-model="ipRestrictionsText"
+              :placeholder="t('pages.licenses.form.placeholder.enterIpRestrictions')"
+              type="textarea"
+              :rows="3"
+              @blur="handleIpRestrictionsChange"
+            />
+            <div class="form-tip">多个IP地址请用换行分隔，支持CIDR格式（如：192.168.1.0/24）</div>
+          </el-form-item>
+
+          <el-form-item
+            :label="t('pages.licenses.form.hardwareId')"
+            prop="hardware_id"
+          >
+            <el-input
+              v-model="formData.hardware_id"
+              :placeholder="t('pages.licenses.form.placeholder.enterHardwareId')"
+              maxlength="100"
+            />
+            <div class="form-tip">硬件ID用于绑定特定设备，留空表示不限制设备</div>
+          </el-form-item>
+        </div>
+      </el-form>
+    </div>
+  </div>
+
+  <!-- 对话框模式 -->
   <el-dialog
+    v-else
     :model-value="visible"
     :title="isEdit ? '编辑授权' : t('pages.licenses.actions.createLicense')"
     width="800px"
@@ -158,21 +317,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from 'vue'
+import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { createLicense, updateLicense, type License, type LicenseCreateRequest, type LicenseUpdateRequest } from '@/api/license'
-import { type Customer } from '@/api/customer'
+import { createLicense, updateLicense, type License, type AuthorizationCode, type AuthorizationCodeCreateRequest, type LicenseUpdateRequest } from '@/api/license'
+import { getCustomers, type Customer } from '@/api/customer'
 
 // Props & Emits
 interface Props {
-  visible: boolean
-  licenseData?: License | null
-  customers: Customer[]
+  visible?: boolean
+  licenseData?: AuthorizationCode | null
+  customers?: Customer[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  licenseData: null
+  visible: false,
+  licenseData: null,
+  customers: () => []
 })
 
 const emit = defineEmits<{
@@ -181,13 +343,26 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const router = useRouter()
+const route = useRoute()
+
+// 判断是否为页面模式
+const isPageMode = computed(() => {
+  return route.name === 'licenses-create' || route.name === 'licenses-edit'
+})
 
 // Refs
 const formRef = ref<FormInstance>()
 const submitting = ref(false)
+const pageCustomers = ref<Customer[]>([])
 
 // Computed
 const isEdit = computed(() => !!props.licenseData)
+
+// 获取客户列表（页面模式下使用）
+const customers = computed(() => {
+  return isPageMode.value ? pageCustomers.value : props.customers
+})
 
 // Form Data
 const formData = reactive({
@@ -239,15 +414,15 @@ const resetForm = () => {
 
 const loadFormData = () => {
   if (props.licenseData) {
-    formData.customer_id = props.licenseData.customer_id
-    formData.description = props.licenseData.description
-    formData.license_type = props.licenseData.license_type
-    formData.expiry_date = props.licenseData.expiry_date
-    formData.max_users = props.licenseData.max_users || 1
-    formData.features = [...(props.licenseData.features || [])]
-    formData.ip_restrictions = [...(props.licenseData.ip_restrictions || [])]
-    formData.hardware_id = props.licenseData.hardware_id || ''
-    ipRestrictionsText.value = formData.ip_restrictions.join('\n')
+    formData.customer_id = props.licenseData.customer_id || ''
+    formData.description = props.licenseData.description || ''
+    formData.license_type = ''
+    formData.expiry_date = props.licenseData.end_date || ''
+    formData.max_users = props.licenseData.max_activations || 1
+    formData.features = []
+    formData.ip_restrictions = []
+    formData.hardware_id = ''
+    ipRestrictionsText.value = ''
   } else {
     resetForm()
   }
@@ -308,7 +483,7 @@ const handleSubmit = async () => {
       ElMessage.success(t('pages.licenses.message.updateSuccess'))
     } else {
       // 创建授权
-      const createData: LicenseCreateRequest = {
+      const createData: AuthorizationCodeCreateRequest = {
         customer_id: formData.customer_id,
         description: formData.description,
         license_type: formData.license_type,
@@ -323,7 +498,13 @@ const handleSubmit = async () => {
       ElMessage.success(t('pages.licenses.message.createSuccess'))
     }
 
-    emit('success')
+    if (isPageMode.value) {
+      // 页面模式下跳转回主页面
+      router.push({ name: 'licenses' })
+    } else {
+      // 对话框模式下触发成功事件
+      emit('success')
+    }
   } catch (error) {
     console.error('Failed to save license:', error)
     ElMessage.error(isEdit.value
@@ -344,21 +525,97 @@ const handleClose = () => {
   }, 300)
 }
 
+// 页面模式下的返回功能
+const handleBack = () => {
+  router.push({ name: 'licenses' })
+}
+
+// 加载客户数据（页面模式）
+const loadCustomers = async () => {
+  try {
+    const response = await getCustomers({ status: 'active', page_size: 1000 })
+    pageCustomers.value = response.data.list
+  } catch (error) {
+    console.error('Failed to load customers:', error)
+    ElMessage.error('加载客户列表失败')
+  }
+}
+
 // Watchers
 watch(() => props.visible, (visible) => {
   if (visible) {
     loadFormData()
   }
 })
+
+// 页面模式下的初始化
+watch(() => route.query, (query) => {
+  if (isPageMode.value && query.customerId) {
+    formData.customer_id = query.customerId as string
+  }
+}, { immediate: true })
+
+// 生命周期
+onMounted(() => {
+  if (isPageMode.value) {
+    loadCustomers()
+    loadFormData()
+  }
+})
+
 </script>
 
 <style scoped lang="scss">
 @import '@/assets/styles/variables.scss';
 
-.license-form {
-  max-height: 70vh;
+// 页面模式样式
+.license-form-page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+.page-header {
+  padding: 24px;
+  border-bottom: 1px solid $border-color-light;
+  background: #fff;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: $text-color-primary;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.page-content {
+  flex: 1;
+  padding: 24px;
   overflow-y: auto;
-  padding-right: 8px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.license-form {
+  max-height: none;
+  overflow-y: visible;
+  padding-right: 0;
 }
 
 .form-section {
