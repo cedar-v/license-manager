@@ -17,6 +17,7 @@ import './assets/styles/element-theme.scss'
 // Pinia状态管理
 import pinia from './store'
 import { useAppStore } from './store/modules/app'
+import { useUserStore } from './store/modules/user'
 
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
@@ -42,5 +43,9 @@ app.use(router)
 // 初始化主题设置
 const appStore = useAppStore()
 appStore.initTheme()
+
+// 初始化用户认证状态
+const userStore = useUserStore()
+userStore.initAuth()
 
 app.mount('#app')

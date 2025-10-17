@@ -1,14 +1,21 @@
+/*
+ * @Author: 13895237362 2205451508@qq.com
+ * @Date: 2025-08-26 13:23:45
+ * @LastEditors: 13895237362 2205451508@qq.com
+ * @LastEditTime: 2025-10-17 10:35:22
+ * @FilePath: \license-manager\frontend\src\store\modules\user.ts
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
 interface UserInfo {
-  id: string
+  id?: string
   username: string
-  name: string
-  email: string
+  email?: string
   avatar?: string
-  role: 'admin' | 'user' | 'guest'
-  permissions: string[]
+  role: string
+  permissions?: string[]
 }
 
 export const useUserStore = defineStore('user', () => {
@@ -36,24 +43,18 @@ export const useUserStore = defineStore('user', () => {
   const setUserInfo = (info: UserInfo | null) => {
     userInfo.value = info
     isLoggedIn.value = !!info
+    
+    // 同时保存到localStorage
+    if (info) {
+      localStorage.setItem('userInfo', JSON.stringify(info))
+    } else {
+      localStorage.removeItem('userInfo')
+    }
   }
 
-  const login = async (credentials: { username: string; password: string }) => {
-    // 这里应该调用登录API
-    // const response = await loginApi(credentials)
-    // setToken(response.data.token)
-    // setUserInfo(response.data.user)
-    
-    // 模拟登录
-    setToken('mock-token-123')
-    setUserInfo({
-      id: '1',
-      username: credentials.username,
-      name: '管理员',
-      email: 'admin@example.com',
-      role: 'admin',
-      permissions: ['*']
-    })
+  const setLoginData = (token: string, userInfo: UserInfo) => {
+    setToken(token)
+    setUserInfo(userInfo)
   }
 
   const logout = () => {
@@ -70,9 +71,22 @@ export const useUserStore = defineStore('user', () => {
   // 初始化时检查登录状态
   const initAuth = () => {
     if (token.value) {
-      // 这里应该调用API验证token有效性
-      // 暂时模拟已登录状态
-      isLoggedIn.value = true
+      // 从localStorage恢复用户信息
+      const savedUserInfo = localStorage.getItem('userInfo')
+      if (savedUserInfo) {
+        try {
+          const userInfoData = JSON.parse(savedUserInfo)
+          setUserInfo(userInfoData)
+        } catch (error) {
+          console.error('恢复用户信息失败:', error)
+          // 如果解析失败，清除无效数据
+          localStorage.removeItem('userInfo')
+          setToken(null)
+        }
+      } else {
+        // 如果没有保存的用户信息，但有token，设置基本登录状态
+        isLoggedIn.value = true
+      }
     }
   }
 
@@ -87,7 +101,7 @@ export const useUserStore = defineStore('user', () => {
     // 操作
     setToken,
     setUserInfo,
-    login,
+    setLoginData,
     logout,
     updateProfile,
     initAuth

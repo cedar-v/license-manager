@@ -117,12 +117,14 @@ import { User, Lock } from '@element-plus/icons-vue'
 import { Login, type LoginRequest } from '@/api/user'
 import { changeLanguage, type SupportedLocale } from '@/utils/language'
 import { useAppStore } from '@/store/modules/app'
+import { useUserStore } from '@/store/modules/user'
 // 导入背景图片
 import lightBgImg from '@/assets/images/login-background.png'
 import darkBgImg from '@/assets/images/login-background-dark.png'
 
 const router = useRouter()
 const appStore = useAppStore()
+const userStore = useUserStore()
 
 // 动态背景图样式
 const backgroundStyle = computed(() => {
@@ -211,9 +213,13 @@ async function handleLogin() {
 
     // 检查响应是否成功 (支持 code 000000)
     if (response.code === '000000') {
-      // 登录成功
-      if (response.data && response.data.token) {
-        localStorage.setItem('token', response.data.token)
+      // 登录成功，存储用户信息到store
+      if (response.data && response.data.token && response.data.user_info) {
+        // 使用store的方法存储登录数据
+        userStore.setLoginData(response.data.token, {
+          username: response.data.user_info.username,
+          role: response.data.user_info.role
+        })
       }
 
       if (rememberMe.value) {

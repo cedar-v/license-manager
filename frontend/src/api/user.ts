@@ -9,8 +9,12 @@ export interface LoginResponse {
   code: string;
   message: string;
   data: {
-    token?: string;
-    [key: string]: any;
+    token: string;
+    expires_in: number;
+    user_info: {
+      username: string;
+      role: string;
+    };
   };
 }
 
