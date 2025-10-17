@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-12 00:00:00
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-10-16 15:29:00
+ * @LastEditTime: 2025-10-17 10:51:55
  * @FilePath: /frontend/src/views/Licenses.vue
  * @Description: 授权管理页面
 -->
@@ -108,7 +108,7 @@ const selectedCustomerInfo = computed(() => {
 // 方法
 const loadCustomers = async () => {
   try {
-    const response = await getCustomers({ status: 'active', page_size: 1000 })
+    const response = await getCustomers({ status: 'active', page_size: 100 })
     customers.value = response.data.list
   } catch (error) {
     console.error('Failed to load customers:', error)
