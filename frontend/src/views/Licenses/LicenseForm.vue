@@ -48,7 +48,7 @@
               <el-input
                 v-model="customerCode"
                 placeholder="自动生成或手动输入"
-                readonly
+                disabled
               />
             </el-form-item>
             
@@ -56,7 +56,7 @@
               <el-input
                 v-model="createdBy"
                 placeholder="当前登录用户"
-                readonly
+                disabled
               />
             </el-form-item>
           </div>
@@ -76,19 +76,33 @@
         <div class="license-form">
           <h3 class="section-title">授权配置</h3>
           
-          <!-- 第三行：授权期限，起止时间 -->
+          <!-- 第三行：授权期限类型，起止时间 -->
           <div class="fields-row">
-            <el-form-item label="授权期限" prop="validity_days" required class="field-item">
-              <el-input-number
-                v-model="formData.validity_days"
-                :min="1"
-                :max="36500"
-                placeholder="请输入授权期限（天）"
+            <el-form-item label="授权期限" prop="validity_type" required class="field-item">
+              <el-select
+                v-model="validityType"
+                placeholder="请选择授权期限类型"
                 style="width: 100%"
-              />
+                @change="handleValidityTypeChange"
+              >
+                <el-option
+                  label="永久"
+                  value="permanent"
+                />
+                <el-option
+                  label="有限"
+                  value="limited"
+                />
+              </el-select>
             </el-form-item>
             
-            <el-form-item label="起止时间" prop="date_range" required class="field-item">
+            <el-form-item 
+              v-if="validityType === 'limited'" 
+              label="起止时间" 
+              prop="date_range" 
+              required 
+              class="field-item"
+            >
               <el-date-picker
                 v-model="dateRange"
                 type="daterange"
@@ -99,6 +113,18 @@
                 value-format="YYYY-MM-DD"
                 style="width: 100%"
                 @change="handleDateRangeChange"
+              />
+            </el-form-item>
+            
+            <el-form-item 
+              v-if="validityType === 'permanent'" 
+              label="有效期天数" 
+              class="field-item"
+            >
+              <el-input
+                :value="'永久（365000天）'"
+                readonly
+                style="width: 100%"
               />
             </el-form-item>
           </div>
@@ -119,6 +145,7 @@
                 v-model="formData.deployment_type"
                 placeholder="请选择部署类型"
                 style="width: 100%"
+                @change="handleDeploymentTypeChange"
               >
                 <el-option
                   v-for="option in deploymentTypeOptions"
@@ -157,9 +184,11 @@ import { useRouter, useRoute } from 'vue-router'
 import { createLicense, updateLicense, getLicenseDetail, type AuthorizationCodeCreateRequest, type LicenseUpdateRequest } from '@/api/license'
 import { getCustomers, type Customer } from '@/api/customer'
 import { getEnumOptions, type RawEnumItem } from '@/api/enum'
+import { useUserStore } from '@/store/modules/user'
 
 const router = useRouter()
 const route = useRoute()
+const userStore = useUserStore()
 
 // 表单引用
 const formRef = ref<FormInstance>()
@@ -190,6 +219,7 @@ const formData = reactive<AuthorizationCodeCreateRequest>({
 const customerCode = ref('')
 const createdBy = ref('')
 const dateRange = ref<[string, string] | null>(null)
+const validityType = ref<'permanent' | 'limited'>('limited')
 
 // 计算属性
 const isEdit = computed(() => {
@@ -199,23 +229,72 @@ const isEdit = computed(() => {
 // 表单验证规则
 const formRules: FormRules = {
   customer_id: [
-    { required: true, message: '请选择客户', trigger: 'change' }
-  ],
-  customer_code: [
-    { required: true, message: '客户ID不能为空', trigger: 'blur' }
-  ],
-  created_by: [
-    { required: true, message: '创建人不能为空', trigger: 'blur' }
+    { required: true, message: '请选择客户', trigger: 'change' },
+    {
+      validator: (_rule: any, value: any, callback: any) => {
+        if (value && customerOptions.value.length > 0) {
+          const selectedCustomer = customerOptions.value.find(c => c.id === value)
+          if (!selectedCustomer) {
+            callback(new Error('请从下拉列表中选择有效的客户'))
+          } else {
+            callback()
+          }
+        } else {
+          callback()
+        }
+      },
+      trigger: 'change'
+    }
   ],
   description: [
-    { required: true, message: '请输入备注信息', trigger: 'blur' }
+    { required: true, message: '请输入备注信息', trigger: 'blur' },
+    { min: 1, max: 500, message: '备注信息长度应在1-500个字符之间', trigger: 'blur' }
   ],
-  validity_days: [
-    { required: true, message: '请输入授权期限', trigger: 'blur' },
-    { type: 'number', min: 1, max: 36500, message: '授权期限必须在1-36500天之间', trigger: 'blur' }
+  validity_type: [
+    { required: true, message: '请选择授权期限类型', trigger: 'change' }
   ],
   date_range: [
-    { required: true, message: '请选择起止时间', trigger: 'change' }
+    { 
+      required: true, 
+      message: '请选择起止时间', 
+      trigger: 'change',
+      validator: (_rule: any, _value: any, callback: any) => {
+        if (validityType.value === 'limited' && (!dateRange.value || dateRange.value.length !== 2)) {
+          callback(new Error('请选择起止时间'))
+        } else {
+          callback()
+        }
+      }
+    },
+    {
+      validator: (_rule: any, _value: any, callback: any) => {
+        if (validityType.value === 'limited' && dateRange.value && dateRange.value.length === 2) {
+          const startDate = new Date(dateRange.value[0])
+          const endDate = new Date(dateRange.value[1])
+          const today = new Date()
+          today.setHours(0, 0, 0, 0)
+          
+          if (startDate < today) {
+            callback(new Error('开始日期不能早于今天'))
+          } else if (endDate <= startDate) {
+            callback(new Error('结束日期必须晚于开始日期'))
+          } else {
+            // 检查日期范围是否超过合理范围（比如10年）
+            const maxDays = 3650 // 10年
+            const diffTime = endDate.getTime() - startDate.getTime()
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+            if (diffDays > maxDays) {
+              callback(new Error('授权期限不能超过10年'))
+            } else {
+              callback()
+            }
+          }
+        } else {
+          callback()
+        }
+      },
+      trigger: 'change'
+    }
   ],
   deployment_type: [
     { required: true, message: '请选择部署类型', trigger: 'change' }
@@ -225,7 +304,23 @@ const formRules: FormRules = {
   ],
   max_activations: [
     { required: true, message: '请输入最大激活设备数', trigger: 'blur' },
-    { type: 'number', min: 1, message: '最大激活设备数必须大于0', trigger: 'blur' }
+    { 
+      type: 'number', 
+      min: 1, 
+      max: 999999, 
+      message: '最大激活设备数必须在1-999999之间', 
+      trigger: 'blur' 
+    },
+    {
+      validator: (_rule: any, value: any, callback: any) => {
+        if (value && !Number.isInteger(Number(value))) {
+          callback(new Error('最大激活设备数必须为整数'))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur'
+    }
   ]
 }
 
@@ -234,26 +329,31 @@ const loadEnumOptions = async () => {
   try {
     // 加载部署类型选项
     const deploymentResponse = await getEnumOptions('deployment_type')
-    deploymentTypeOptions.value = deploymentResponse.data.items
+    if (deploymentResponse.code === '000000') {
+      deploymentTypeOptions.value = deploymentResponse.data.items
+    } else {
+      throw new Error(deploymentResponse.message || '加载部署类型选项失败')
+    }
 
     // 加载加密类型选项
     const encryptionResponse = await getEnumOptions('encryption_type')
-    encryptionTypeOptions.value = encryptionResponse.data.items
-  } catch (error) {
+    if (encryptionResponse.code === '000000') {
+      encryptionTypeOptions.value = encryptionResponse.data.items
+    } else {
+      throw new Error(encryptionResponse.message || '加载加密类型选项失败')
+    }
+  } catch (error: any) {
     console.error('加载枚举选项失败:', error)
-    // 使用默认选项
-    deploymentTypeOptions.value = [
-      { key: 'standalone', display: '单机版' },
-      { key: 'cloud', display: '云端版' },
-      { key: 'hybrid', display: '混合版' }
-    ]
-    encryptionTypeOptions.value = [
-      { key: 'standard', display: '标准加密' },
-      { key: 'advanced', display: '高级加密' }
-    ]
+    let errorMessage = error.backendMessage || error.response?.data?.message || error.message
+    if (errorMessage) {
+      ElMessage.error('加载枚举选项失败: ' + errorMessage)
+    } else {
+      ElMessage.error('加载枚举选项失败，请稍后重试')
+    }
   }
 }
 
+// 搜索关联客户
 const searchCustomers = async (query: string) => {
   if (!query) {
     customerOptions.value = []
@@ -268,42 +368,73 @@ const searchCustomers = async (query: string) => {
       customer_name: query
     })
     customerOptions.value = response.data.list
-  } catch (error) {
+  } catch (error: any) {
     console.error('搜索客户失败:', error)
-    ElMessage.error('搜索客户失败')
+    let errorMessage = error.backendMessage || error.response?.data?.message || error.message
+    if (errorMessage) {
+      ElMessage.error('搜索客户失败: ' + errorMessage)
+    } else {
+      ElMessage.error('搜索客户失败，请稍后重试')
+    }
   } finally {
     customerLoading.value = false
   }
 }
 
+// 表单初始化
 const loadCustomerInfo = () => {
   // 从路由参数获取客户信息
-  const customerId = route.query.customerId as string
-  const customerName = route.query.customerName as string
+  // const customerId = route.query.customerId as string
+  // const customerName = route.query.customerName as string
   
-  if (customerId && customerName) {
-    formData.customer_id = customerId
-    customerOptions.value = [{
-      id: customerId,
-      customer_name: customerName,
-      customer_code: '',
-      customer_type: '',
-      customer_type_display: '',
-      contact_person: '',
-      email: '',
-      customer_level: '',
-      customer_level_display: '',
-      status: '',
-      status_display: '',
-      created_at: '',
-      updated_at: '',
-      created_by: '',
-      updated_by: ''
-    } as Customer]
+  // if (customerId && customerName) {
+  //   formData.customer_id = customerId
+  //   customerOptions.value = [{
+  //     id: customerId,
+  //     customer_name: customerName,
+  //     customer_code: '',
+  //     customer_type: '',
+  //     customer_type_display: '',
+  //     contact_person: '',
+  //     email: '',
+  //     customer_level: '',
+  //     customer_level_display: '',
+  //     status: '',
+  //     status_display: '',
+  //     created_at: '',
+  //     updated_at: '',
+  //     created_by: '',
+  //     updated_by: ''
+  //   } as Customer]
+  // }
+  
+  // 设置创建人（从用户store获取当前登录用户）
+  if (userStore.userInfo) {
+    createdBy.value =  userStore.userInfo.username
+  } else {
+    createdBy.value = '未知用户'
   }
-  
-  // 设置创建人（这里可以从用户store获取当前登录用户）
-  createdBy.value = '当前用户' // TODO: 从用户store获取
+}
+
+// 处理授权期限类型变化
+const handleValidityTypeChange = (type: 'permanent' | 'limited') => {
+  if (type === 'permanent') {
+    formData.validity_days = 365000
+    dateRange.value = null
+  } else {
+    // 有限期限时，如果已有日期范围，重新计算天数
+    if (dateRange.value && dateRange.value.length === 2) {
+      const startDate = new Date(dateRange.value[0])
+      const endDate = new Date(dateRange.value[1])
+      const diffTime = endDate.getTime() - startDate.getTime()
+      formData.validity_days = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    }
+  }
+}
+
+// 处理部署类型变化
+const handleDeploymentTypeChange = () => {
+  // 部署类型变化时的处理逻辑（如需要可以在这里添加）
 }
 
 // 处理日期范围变化
@@ -316,15 +447,17 @@ const handleDateRangeChange = (dates: [string, string] | null) => {
   }
 }
 
+// 根据id获取授权详情
 const loadLicenseDetail = async () => {
   if (!isEdit.value) return
   
   try {
     const id = route.params.id as string
     const response = await getLicenseDetail(id)
-    const data = response.data
     
-    if (data) {
+    if (response.code === '000000' && response.data) {
+      const data = response.data
+      
       // 填充表单数据
       formData.customer_id = data.customer_id || ''
       formData.description = data.description || ''
@@ -334,15 +467,35 @@ const loadLicenseDetail = async () => {
       
       // 设置独立字段
       customerCode.value = (data as any).customer_code || data.customer_id || ''
-      createdBy.value = (data as any).created_by || '当前用户'
+      // 编辑模式下显示原始创建人，如果没有则显示当前用户
+      createdBy.value = (data as any).created_by || (userStore.userInfo ?  userStore.userInfo.username : '未知用户')
       
       // 计算有效期天数和设置日期范围
       if (data.start_date && data.end_date) {
         const startDate = new Date(data.start_date)
         const endDate = new Date(data.end_date)
         const diffTime = endDate.getTime() - startDate.getTime()
-        formData.validity_days = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-        dateRange.value = [data.start_date, data.end_date]
+        const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+        formData.validity_days = days
+        
+        // 根据天数判断是永久还是有限
+        if (days >= 365000) {
+          validityType.value = 'permanent'
+          dateRange.value = null
+        } else {
+          validityType.value = 'limited'
+          dateRange.value = [data.start_date, data.end_date]
+        }
+      } else {
+        // 如果没有日期信息，根据validity_days判断
+        const validityDays = (data as any).validity_days
+        if (validityDays && validityDays >= 365000) {
+          validityType.value = 'permanent'
+          formData.validity_days = 365000
+        } else {
+          validityType.value = 'limited'
+          formData.validity_days = validityDays || 365
+        }
       }
       
       // 设置客户选项
@@ -365,17 +518,26 @@ const loadLicenseDetail = async () => {
           updated_by: ''
         } as Customer]
       }
+    } else {
+      throw new Error(response.message || '获取授权详情失败')
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('加载授权详情失败:', error)
-    ElMessage.error('加载授权详情失败')
+    let errorMessage = error.backendMessage || error.response?.data?.message || error.message
+    if (errorMessage) {
+      ElMessage.error('加载授权详情失败: ' + errorMessage)
+    } else {
+      ElMessage.error('加载授权详情失败，请稍后重试')
+    }
   }
 }
 
+// 提交（新增/更新）授权数据
 const handleSubmit = async () => {
   if (!formRef.value) return
   
   try {
+    // 执行表单验证
     await formRef.value.validate()
     
     submitting.value = true
@@ -396,24 +558,39 @@ const handleSubmit = async () => {
         reason: '管理员更新授权配置'
       }
       
-      await updateLicense(id, updateData)
-      ElMessage.success('更新成功')
+      const response = await updateLicense(id, updateData)
+      if (response.code === '000000') {
+        ElMessage.success(response.message || '更新成功')
+        // 返回列表页面
+        router.back()
+      } else {
+        throw new Error(response.message || '更新失败')
+      }
     } else {
       // 创建授权
-      await createLicense(formData)
-      ElMessage.success('创建成功')
+      const response = await createLicense(formData)
+      if (response.code === '000000') {
+        ElMessage.success(response.message || '创建成功')
+        // 返回列表页面
+        router.back()
+      } else {
+        throw new Error(response.message || '创建失败')
+      }
     }
-    
-    // 返回列表页面
-    router.back()
-  } catch (error) {
+  } catch (error: any) {
     console.error('提交失败:', error)
-    ElMessage.error('提交失败')
+    let errorMessage = error.backendMessage || error.response?.data?.message || error.message
+    if (errorMessage) {
+      ElMessage.error('提交失败: ' + errorMessage)
+    } else {
+      ElMessage.error('提交失败，请稍后重试')
+    }
   } finally {
     submitting.value = false
   }
 }
 
+// 取消函数
 const handleCancel = () => {
   ElMessageBox.confirm('确定要取消吗？未保存的更改将丢失。', '提示', {
     confirmButtonText: '确定',
@@ -432,7 +609,12 @@ watch(() => formData.customer_id, (newCustomerId) => {
     const selectedCustomer = customerOptions.value.find(c => c.id === newCustomerId)
     if (selectedCustomer) {
       customerCode.value = selectedCustomer.customer_code || selectedCustomer.id
+    } else {
+      // 如果没有找到客户，清空客户代码
+      customerCode.value = ''
     }
+  } else {
+    customerCode.value = ''
   }
 })
 
