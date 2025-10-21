@@ -2,9 +2,9 @@ package repository
 
 import (
 	"context"
+	"license-manager/internal/models"
 	"math"
 	"time"
-	"license-manager/internal/models"
 
 	"gorm.io/gorm"
 )
@@ -58,11 +58,17 @@ func (r *authorizationCodeRepository) GetAuthorizationCodeList(ctx context.Conte
 		order = "desc"
 	}
 
-	// 构建查询
+	// 构建查询，包含状态计算
 	query := r.db.WithContext(ctx).Table("authorization_codes ac").
 		Select(`ac.id, ac.code, ac.customer_id, c.customer_name, 
 				ac.start_date, ac.end_date, ac.max_activations, 
-				ac.deployment_type, ac.is_locked, ac.description, ac.created_at`).
+				ac.deployment_type, ac.is_locked, ac.description, ac.created_at,
+				CASE 
+					WHEN ac.is_locked = true THEN 'locked'
+					WHEN ac.end_date < NOW() THEN 'expired'
+					WHEN ac.start_date <= NOW() AND ac.end_date >= NOW() THEN 'normal'
+					ELSE 'expired'
+				END AS status`).
 		Joins("LEFT JOIN customers c ON ac.customer_id = c.id AND c.deleted_at IS NULL")
 
 	// 添加筛选条件
@@ -70,7 +76,18 @@ func (r *authorizationCodeRepository) GetAuthorizationCodeList(ctx context.Conte
 		query = query.Where("ac.customer_id = ?", req.CustomerID)
 	}
 
-	// 状态筛选需要在应用层处理，因为status是计算字段
+	// 状态筛选 - 在 SQL 层面处理
+	if req.Status != "" {
+		switch req.Status {
+		case "locked":
+			query = query.Where("ac.is_locked = true")
+		case "expired":
+			query = query.Where("ac.is_locked = false AND ac.end_date < NOW()")
+		case "normal":
+			query = query.Where("ac.is_locked = false AND ac.start_date <= NOW() AND ac.end_date >= NOW()")
+		}
+	}
+
 	if req.StartDate != "" {
 		query = query.Where("ac.created_at >= ?", req.StartDate)
 	}
@@ -97,6 +114,7 @@ func (r *authorizationCodeRepository) GetAuthorizationCodeList(ctx context.Conte
 		IsLocked       bool    `json:"is_locked"`
 		Description    *string `json:"description"`
 		CreatedAt      string  `json:"created_at"`
+		Status         string  `json:"status"` // 添加状态字段
 	}
 
 	offset := (page - 1) * pageSize
@@ -112,20 +130,21 @@ func (r *authorizationCodeRepository) GetAuthorizationCodeList(ctx context.Conte
 		if result.CustomerName != nil {
 			customerName = *result.CustomerName
 		}
-		
+
 		list[i] = models.AuthorizationCodeListItem{
-			ID:                     result.ID,
-			Code:                   result.Code,
-			CustomerID:             result.CustomerID,
-			CustomerName:           customerName,
-			StartDate:              result.StartDate,
-			EndDate:                result.EndDate,
-			MaxActivations:         result.MaxActivations,
-			CurrentActivations:     0, // TODO: 从licenses表统计
-			DeploymentType:         result.DeploymentType,
-			IsLocked:               result.IsLocked,
-			Description:            result.Description,
-			CreatedAt:              result.CreatedAt,
+			ID:                 result.ID,
+			Code:               result.Code,
+			CustomerID:         result.CustomerID,
+			CustomerName:       customerName,
+			Status:             result.Status, // 使用 SQL 计算的状态
+			StartDate:          result.StartDate,
+			EndDate:            result.EndDate,
+			MaxActivations:     result.MaxActivations,
+			CurrentActivations: 0, // TODO: 从licenses表统计
+			DeploymentType:     result.DeploymentType,
+			IsLocked:           result.IsLocked,
+			Description:        result.Description,
+			CreatedAt:          result.CreatedAt,
 		}
 	}
 
@@ -224,12 +243,12 @@ func (r *authorizationCodeRepository) GetAuthorizationChangeList(ctx context.Con
 	offset := (req.Page - 1) * req.PageSize
 
 	var changes []struct {
-		ID                string     `json:"id"`
-		ChangeType        string     `json:"change_type"`
-		OperatorID        string     `json:"operator_id"`
-		OperatorName      *string    `json:"operator_name"`
-		Reason            *string    `json:"reason"`
-		CreatedAt         time.Time  `json:"created_at"`
+		ID           string    `json:"id"`
+		ChangeType   string    `json:"change_type"`
+		OperatorID   string    `json:"operator_id"`
+		OperatorName *string   `json:"operator_name"`
+		Reason       *string   `json:"reason"`
+		CreatedAt    time.Time `json:"created_at"`
 	}
 
 	if err := query.Order(orderBy).Limit(req.PageSize).Offset(offset).Scan(&changes).Error; err != nil {

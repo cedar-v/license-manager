@@ -17,6 +17,36 @@ GET /api/v1/authorization-codes
 - `sort` - 排序字段 (created_at/updated_at/code)
 - `order` - 排序方向 (asc/desc)
 
+**实现说明**
+
+由于 `status` 是虚拟字段，需要在 SQL 查询中动态计算并筛选：
+
+```sql
+-- 状态计算逻辑
+SELECT *,
+  CASE 
+    WHEN is_locked = true THEN 'locked'
+    WHEN end_date < NOW() THEN 'expired'
+    WHEN start_date <= NOW() AND end_date >= NOW() THEN 'normal'
+    ELSE 'expired'
+  END AS status
+FROM authorization_codes
+WHERE 1=1
+  -- status 参数筛选
+  AND (
+    (:status = 'locked' AND is_locked = true) OR
+    (:status = 'expired' AND is_locked = false AND end_date < NOW()) OR
+    (:status = 'normal' AND is_locked = false AND start_date <= NOW() AND end_date >= NOW()) OR
+    :status IS NULL
+  )
+  -- 其他筛选条件
+  AND (:customer_id IS NULL OR customer_id = :customer_id)
+  AND (:start_date IS NULL OR created_at >= :start_date)
+  AND (:end_date IS NULL OR created_at <= :end_date)
+ORDER BY created_at DESC
+LIMIT :page_size OFFSET :offset;
+```
+
 **响应**
 ```json
 {
