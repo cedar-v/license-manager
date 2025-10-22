@@ -46,7 +46,7 @@
             
             <el-form-item label="客户ID" prop="customer_code" required class="field-item">
               <el-input
-                v-model="customerCode"
+                v-model="formData.customer_code"
                 placeholder="自动生成或手动输入"
                 disabled
               />
@@ -54,7 +54,7 @@
             
             <el-form-item label="创建人" prop="created_by" required class="field-item">
               <el-input
-                v-model="createdBy"
+                v-model="formData.created_by"
                 placeholder="当前登录用户"
                 disabled
               />
@@ -80,7 +80,7 @@
           <div class="fields-row">
             <el-form-item label="授权期限" prop="validity_type" required class="field-item">
               <el-select
-                v-model="validityType"
+                v-model="formData.validity_type"
                 placeholder="请选择授权期限类型"
                 style="width: 100%"
                 @change="handleValidityTypeChange"
@@ -97,7 +97,7 @@
             </el-form-item>
             
             <el-form-item 
-              v-if="validityType === 'limited'" 
+              v-if="formData.validity_type === 'limited'" 
               label="起止时间" 
               prop="date_range" 
               required 
@@ -117,7 +117,7 @@
             </el-form-item>
             
             <el-form-item 
-              v-if="validityType === 'permanent'" 
+              v-if="formData.validity_type === 'permanent'" 
               label="有效期天数" 
               class="field-item"
             >
@@ -203,8 +203,15 @@ const deploymentTypeOptions = ref<RawEnumItem[]>([])
 const encryptionTypeOptions = ref<RawEnumItem[]>([])
 
 // 表单数据
-const formData = reactive<AuthorizationCodeCreateRequest>({
+const formData = reactive<AuthorizationCodeCreateRequest & {
+  customer_code: string
+  created_by: string
+  validity_type: 'permanent' | 'limited'
+}>({
   customer_id: '',
+  customer_code: '',
+  created_by: '',
+  validity_type: 'limited',
   description: '',
   validity_days: 365,
   deployment_type: 'standalone',
@@ -216,10 +223,7 @@ const formData = reactive<AuthorizationCodeCreateRequest>({
 })
 
 // 独立的响应式变量
-const customerCode = ref('')
-const createdBy = ref('')
 const dateRange = ref<[string, string] | null>(null)
-const validityType = ref<'permanent' | 'limited'>('limited')
 
 // 计算属性
 const isEdit = computed(() => {
@@ -259,7 +263,7 @@ const formRules: FormRules = {
       message: '请选择起止时间', 
       trigger: 'change',
       validator: (_rule: any, _value: any, callback: any) => {
-        if (validityType.value === 'limited' && (!dateRange.value || dateRange.value.length !== 2)) {
+        if (formData.validity_type === 'limited' && (!dateRange.value || dateRange.value.length !== 2)) {
           callback(new Error('请选择起止时间'))
         } else {
           callback()
@@ -268,7 +272,7 @@ const formRules: FormRules = {
     },
     {
       validator: (_rule: any, _value: any, callback: any) => {
-        if (validityType.value === 'limited' && dateRange.value && dateRange.value.length === 2) {
+        if (formData.validity_type === 'limited' && dateRange.value && dateRange.value.length === 2) {
           const startDate = new Date(dateRange.value[0])
           const endDate = new Date(dateRange.value[1])
           const today = new Date()
@@ -410,9 +414,9 @@ const loadCustomerInfo = () => {
   
   // 设置创建人（从用户store获取当前登录用户）
   if (userStore.userInfo) {
-    createdBy.value =  userStore.userInfo.username
+    formData.created_by = userStore.userInfo.username
   } else {
-    createdBy.value = '未知用户'
+    formData.created_by = '未知用户'
   }
 }
 
@@ -465,10 +469,10 @@ const loadLicenseDetail = async () => {
       formData.encryption_type = data.encryption_type || 'standard'
       formData.max_activations = data.max_activations || 1
       
-      // 设置独立字段
-      customerCode.value = (data as any).customer_code || data.customer_id || ''
+      // 设置表单字段
+      formData.customer_code = (data as any).customer_code || data.customer_id || ''
       // 编辑模式下显示原始创建人，如果没有则显示当前用户
-      createdBy.value = (data as any).created_by || (userStore.userInfo ?  userStore.userInfo.username : '未知用户')
+      formData.created_by = (data as any).created_by || (userStore.userInfo ? userStore.userInfo.username : '未知用户')
       
       // 计算有效期天数和设置日期范围
       if (data.start_date && data.end_date) {
@@ -480,20 +484,20 @@ const loadLicenseDetail = async () => {
         
         // 根据天数判断是永久还是有限
         if (days >= 365000) {
-          validityType.value = 'permanent'
+          formData.validity_type = 'permanent'
           dateRange.value = null
         } else {
-          validityType.value = 'limited'
+          formData.validity_type = 'limited'
           dateRange.value = [data.start_date, data.end_date]
         }
       } else {
         // 如果没有日期信息，根据validity_days判断
         const validityDays = (data as any).validity_days
         if (validityDays && validityDays >= 365000) {
-          validityType.value = 'permanent'
+          formData.validity_type = 'permanent'
           formData.validity_days = 365000
         } else {
-          validityType.value = 'limited'
+          formData.validity_type = 'limited'
           formData.validity_days = validityDays || 365
         }
       }
@@ -608,13 +612,13 @@ watch(() => formData.customer_id, (newCustomerId) => {
   if (newCustomerId) {
     const selectedCustomer = customerOptions.value.find(c => c.id === newCustomerId)
     if (selectedCustomer) {
-      customerCode.value = selectedCustomer.customer_code || selectedCustomer.id
+      formData.customer_code = selectedCustomer.customer_code || selectedCustomer.id
     } else {
       // 如果没有找到客户，清空客户代码
-      customerCode.value = ''
+      formData.customer_code = ''
     }
   } else {
-    customerCode.value = ''
+    formData.customer_code = ''
   }
 })
 

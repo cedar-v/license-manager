@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-01 09:32:42
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-10-13 16:00:25
+ * @LastEditTime: 2025-10-21 16:59:51
  * @FilePath: /frontend/src/router/index.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -36,6 +36,12 @@ const routes: Array<RouteRecordRaw> = [
     meta: { title: "授权管理", requiresAuth: true },
     children: [
       {
+        path: "",
+        name: "licenses-search",
+        component: () => import("@/views/Licenses/LicenseSearch.vue"),
+        meta: { title: "授权搜索", requiresAuth: true }
+      },
+      {
         path: "list",
         name: "licenses-list",
         component: () => import("@/views/Licenses/LinenseList.vue"),
@@ -46,6 +52,12 @@ const routes: Array<RouteRecordRaw> = [
         name: "licenses-create",
         component: () => import("@/views/Licenses/LicenseForm.vue"),
         meta: { title: "创建授权", requiresAuth: true }
+      },
+      {
+        path: "view/:id",
+        name: "licenses-view",
+        component: () => import("@/views/Licenses/LicensesView/index.vue"),
+        meta: { title: "查看授权", requiresAuth: true }
       }
     ]
   },

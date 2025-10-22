@@ -2,52 +2,56 @@
   <div class="license-list-page">
     <!-- 顶部操作区 -->
     <div class="top-actions">
-      <el-button type="primary" @click="handleCreate">
-        创建授权
-      </el-button>
+      <el-button type="primary" @click="handleCreate"> 创建授权 </el-button>
 
       <div class="filters">
         <span class="filter-label">筛选：</span>
-        
-        <el-input
-          v-model="filterCode"
-          placeholder="授权码"
-          clearable
-          class="filter-input"
-        />
+
+        <el-input v-model="filterCode" placeholder="授权码" clearable class="filter-input" />
 
         <el-select v-model="filterStatus" placeholder="状态" clearable class="filter-select">
-          <el-option 
-            v-for="option in statusOptions" 
-            :key="option.key" 
-            :label="option.display" 
-            :value="option.key" 
+          <el-option
+            v-for="option in statusOptions"
+            :key="option.key"
+            :label="option.display"
+            :value="option.key"
           />
         </el-select>
 
-        <el-button type="primary" @click="handleQuery">
-          查询
-        </el-button>
+        <el-button type="primary" @click="handleQuery"> 查询 </el-button>
       </div>
     </div>
 
     <!-- 数据表格 -->
     <div class="table-container">
       <div class="table-wrapper">
-      <el-table
-        :data="tableData"
+        <el-table
+          :data="tableData"
           v-loading="loading"
           :element-loading-text="'加载中...'"
-        stripe
+          stripe
           border
-          style="width: 100%;"
-          :header-cell-style="{ backgroundColor: 'var(--app-bg-color)', color: 'var(--app-text-primary)' }"
+          style="width: 100%"
+          :header-cell-style="{
+            backgroundColor: 'var(--app-bg-color)',
+            color: 'var(--app-text-primary)'
+          }"
           :row-style="getRowStyle"
           :max-height="'calc(100vh - 280px)'"
         >
-          <el-table-column prop="code" label="授权码" :width="200" show-overflow-tooltip align="left">
+          <el-table-column
+            prop="code"
+            label="授权码"
+            :width="200"
+            show-overflow-tooltip
+            align="left"
+          >
             <template #default="scope">
-              <span class="license-code" style="white-space: nowrap; overflow: visible; text-overflow: initial;">{{ scope.row.code }}</span>
+              <span
+                class="license-code"
+                style="white-space: nowrap; overflow: visible; text-overflow: initial"
+                >{{ scope.row.code }}</span
+              >
             </template>
           </el-table-column>
           <el-table-column prop="status" label="状态" :width="100" align="center">
@@ -57,33 +61,44 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="deployment_type_display" label="部署类型" :width="120" align="center" />
+          <el-table-column
+            prop="deployment_type_display"
+            label="部署类型"
+            :width="120"
+            align="center"
+          />
           <el-table-column prop="end_date" label="到期时间" :width="180" align="center">
             <template #default="scope">
               {{ formatDate(scope.row.end_date) }}
-          </template>
-        </el-table-column>
-          <el-table-column prop="description" label="备注" :min-width="200" show-overflow-tooltip align="center">
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="description"
+            label="备注"
+            :min-width="200"
+            show-overflow-tooltip
+            align="center"
+          >
             <template #default="scope">
               <span class="ellipsis-text">{{ scope.row.description }}</span>
-          </template>
-        </el-table-column>
+            </template>
+          </el-table-column>
           <el-table-column label="操作" fixed="right" class-name="action-column" align="center">
             <template #default="scope">
               <div class="action-buttons">
                 <button class="action-btn primary" @click="handleDetail(scope.row)">详情</button>
-                <button 
-                  class="action-btn" 
-                  :class="scope.row.is_locked ? 'success' : 'warning'" 
+                <button
+                  class="action-btn"
+                  :class="scope.row.is_locked ? 'success' : 'warning'"
                   @click="scope.row.is_locked ? handleUnlock(scope.row) : handleLock(scope.row)"
                 >
                   {{ scope.row.is_locked ? '解锁' : '锁定' }}
                 </button>
                 <button class="action-btn danger" @click="handleDelete(scope.row)">删除</button>
               </div>
-          </template>
-        </el-table-column>
-      </el-table>
+            </template>
+          </el-table-column>
+        </el-table>
       </div>
     </div>
 
@@ -107,7 +122,13 @@
 import { ref, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
-import { getLicenses, lockAuthorizationCode, deleteLicense, getLicenseDetail, type AuthorizationCode, type LicenseQueryRequest } from '@/api/license'
+import {
+  getLicenses,
+  lockAuthorizationCode,
+  deleteLicense,
+  type AuthorizationCode,
+  type LicenseQueryRequest
+} from '@/api/license'
 import { getAuthorizationStatusEnums, type RawEnumItem } from '@/api/enum'
 import { formatDate } from '@/utils/date'
 
@@ -117,8 +138,8 @@ const route = useRoute()
 // 从路由参数获取客户信息
 const customerInfo = computed(() => {
   return {
-    id: route.query.customerId as string || '',
-    name: route.query.customerName as string || ''
+    id: (route.query.customerId as string) || '',
+    name: (route.query.customerName as string) || ''
   }
 })
 
@@ -134,13 +155,10 @@ const statusOptions = ref<RawEnumItem[]>([])
 
 // 方法
 
-const getStatusText = (status: string) => {
-  const option = statusOptions.value.find(opt => opt.key === status)
-  return option ? option.display : status
-}
-
 const getRowStyle = ({ rowIndex }: { rowIndex: number }) => {
-  return rowIndex % 2 === 1 ? { backgroundColor: 'var(--app-bg-color)' } : { backgroundColor: 'var(--app-content-bg)' }
+  return rowIndex % 2 === 1
+    ? { backgroundColor: 'var(--app-bg-color)' }
+    : { backgroundColor: 'var(--app-content-bg)' }
 }
 
 const getStatusClass = (status: string) => {
@@ -151,9 +169,8 @@ const getStatusClass = (status: string) => {
   }
 }
 
-
 const handleCreate = () => {
-  router.push({ 
+  router.push({
     name: 'licenses-create',
     query: {
       customerId: customerInfo.value.id,
@@ -167,46 +184,18 @@ const handleQuery = () => {
   loadData()
 }
 
-const handleDetail = async (row: any) => {
-  try {
-    loading.value = true
-    const response = await getLicenseDetail(row.id)
-    console.log('授权详情:', response.data)
-    
-    if (!response.data) {
-      ElMessage.error('获取详情失败：数据为空')
-      return
+const handleDetail = (row: any) => {
+  // 跳转到授权详情页面
+  router.push({
+    name: 'licenses-view',
+    params: {
+      id: row.id
+    },
+    query: {
+      customerId: customerInfo.value.id,
+      customerName: customerInfo.value.name
     }
-    
-    const data = response.data
-    
-    // 显示详情信息
-    ElMessageBox.alert(
-      `
-      <div style="text-align: left;">
-        <p><strong>授权码：</strong>${data.code}</p>
-        <p><strong>状态：</strong>${getStatusText(data.status)}</p>
-        <p><strong>客户：</strong>${data.customer_name || '未指定'}</p>
-        <p><strong>描述：</strong>${data.description || '无'}</p>
-        <p><strong>创建时间：</strong>${formatDate(data.created_at)}</p>
-        <p><strong>到期时间：</strong>${formatDate(data.end_date)}</p>
-        <p><strong>最大激活数：</strong>${data.max_activations || '无限制'}</p>
-        <p><strong>当前激活数：</strong>${data.current_activations || 0}</p>
-        <p><strong>是否锁定：</strong>${data.is_locked ? '是' : '否'}</p>
-      </div>
-      `,
-      '授权详情',
-      {
-        dangerouslyUseHTMLString: true,
-        confirmButtonText: '确定'
-      }
-    )
-  } catch (error) {
-    console.error('获取详情失败:', error)
-    ElMessage.error('获取详情失败')
-  } finally {
-    loading.value = false
-  }
+  })
 }
 
 const handleLock = async (row: any) => {
@@ -214,22 +203,24 @@ const handleLock = async (row: any) => {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
-  }).then(async () => {
-    try {
-      await lockAuthorizationCode(row.id, { 
-        is_locked: true,
-        lock_reason: '手动锁定',
-        reason: '管理员手动锁定'
-      })
-      ElMessage.success('锁定成功')
-      loadData()
-    } catch (error) {
-      console.error('锁定失败:', error)
-      ElMessage.error('锁定失败')
-    }
-  }).catch(() => {
-    // 取消操作
   })
+    .then(async () => {
+      try {
+        await lockAuthorizationCode(row.id, {
+          is_locked: true,
+          lock_reason: '手动锁定',
+          reason: '管理员手动锁定'
+        })
+        ElMessage.success('锁定成功')
+        loadData()
+      } catch (error) {
+        console.error('锁定失败:', error)
+        ElMessage.error('锁定失败')
+      }
+    })
+    .catch(() => {
+      // 取消操作
+    })
 }
 
 const handleUnlock = async (row: any) => {
@@ -237,22 +228,24 @@ const handleUnlock = async (row: any) => {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
-  }).then(async () => {
-    try {
-      await lockAuthorizationCode(row.id, { 
-        is_locked: false,
-        lock_reason: '手动解锁',
-        reason: '管理员手动解锁'
-      })
-      ElMessage.success('解锁成功')
-      loadData()
-    } catch (error) {
-      console.error('解锁失败:', error)
-      ElMessage.error('解锁失败')
-    }
-  }).catch(() => {
-    // 取消操作
   })
+    .then(async () => {
+      try {
+        await lockAuthorizationCode(row.id, {
+          is_locked: false,
+          lock_reason: '手动解锁',
+          reason: '管理员手动解锁'
+        })
+        ElMessage.success('解锁成功')
+        loadData()
+      } catch (error) {
+        console.error('解锁失败:', error)
+        ElMessage.error('解锁失败')
+      }
+    })
+    .catch(() => {
+      // 取消操作
+    })
 }
 
 const handleDelete = async (row: any) => {
@@ -260,18 +253,20 @@ const handleDelete = async (row: any) => {
     confirmButtonText: '确定删除',
     cancelButtonText: '取消',
     type: 'warning'
-  }).then(async () => {
-    try {
-      await deleteLicense(row.id)
-      ElMessage.success('删除成功')
-      loadData()
-    } catch (error) {
-      console.error('删除失败:', error)
-      ElMessage.error('删除失败')
-    }
-  }).catch(() => {
-    // 取消操作
   })
+    .then(async () => {
+      try {
+        await deleteLicense(row.id)
+        ElMessage.success('删除成功')
+        loadData()
+      } catch (error) {
+        console.error('删除失败:', error)
+        ElMessage.error('删除失败')
+      }
+    })
+    .catch(() => {
+      // 取消操作
+    })
 }
 
 const handleSizeChange = (size: number) => {
@@ -359,7 +354,7 @@ onMounted(async () => {
   box-sizing: border-box;
   width: 100%;
   margin: 0 auto;
-  
+
   @include mobile {
     padding: $spacing-base;
   }
@@ -371,7 +366,7 @@ onMounted(async () => {
   margin-bottom: $spacing-medium;
   padding: $spacing-large $spacing-large 0 $spacing-large; // 只在顶部和两侧添加padding
   flex-shrink: 0;
-  
+
   @include mobile {
     @include flex-responsive;
     align-items: stretch;
@@ -381,15 +376,15 @@ onMounted(async () => {
 .filters {
   @include flex-center-vertical;
   gap: $spacing-small;
-  min-width: 288px;  // 改为288px (36*8)
+  min-width: 288px; // 改为288px (36*8)
   flex-shrink: 1;
-  
+
   @include mobile {
     width: 100%;
-  flex-wrap: wrap;
+    flex-wrap: wrap;
     gap: $spacing-small;
   }
-  
+
   @include mobile {
     flex-direction: column;
     align-items: stretch;
@@ -401,13 +396,13 @@ onMounted(async () => {
   font-weight: $font-weight-primary;
   color: var(--app-text-primary);
   margin-right: $spacing-small;
-  min-width: 48px;   // 改为48px (6*8)
-  
+  min-width: 48px; // 改为48px (6*8)
+
   @include mobile {
     width: auto;
     margin-right: $spacing-small;
   }
-  
+
   @include mobile {
     align-self: flex-start;
   }
@@ -418,8 +413,7 @@ onMounted(async () => {
 }
 
 .filter-select {
-  width: 120px;  // 符合8px栅格(15*8)
-  height: 40px;  // 改为40px符合8px栅格
+  width: 120px; // 符合8px栅格(15*8)
 }
 
 .table-container {
@@ -454,7 +448,7 @@ onMounted(async () => {
   gap: $spacing-small;
   padding: 0 $spacing-large $spacing-large $spacing-large; // 添加下部和两侧padding
   flex-shrink: 0;
-  
+
   @include mobile {
     @include flex-center;
     flex-wrap: wrap;
@@ -467,14 +461,14 @@ onMounted(async () => {
   min-width: 1408px; /* 改为1408px (176*8) */
   border: 1px solid var(--app-border-light);
   table-layout: fixed; /* 固定表格布局防止错位 */
-  
+
   /* 表头和表体宽度一致 */
   .el-table__header-wrapper,
   .el-table__body-wrapper {
     width: 100% !important;
     overflow-x: auto !important; /* 允许水平滚动以支持固定列 */
   }
-  
+
   .el-table__body-wrapper {
     overflow-y: auto !important;
     /* 使用flex布局自动计算高度 */
@@ -483,22 +477,23 @@ onMounted(async () => {
     margin-right: 0 !important;
     padding-right: 0 !important;
   }
-  
+
   /* 表格主体和表头宽度一致 */
   .el-table__header,
   .el-table__body {
     width: 100% !important;
     table-layout: fixed !important;
   }
-  
+
   /* 确保所有列宽度一致 */
-  th, td {
+  th,
+  td {
     box-sizing: border-box;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  
+
   /* 列宽度分配 - 防止错位 */
   colgroup {
     width: 100% !important;
@@ -513,7 +508,7 @@ onMounted(async () => {
   --el-pagination-bg-color: var(--app-content-bg);
   --el-pagination-text-color: var(--app-text-primary);
   --el-pagination-border-color: var(--app-border-color);
-  --el-pagination-hover-color: #019C7C;
+  --el-pagination-hover-color: #019c7c;
   font-family: 'Source Han Sans CN', sans-serif;
 }
 
@@ -564,7 +559,7 @@ onMounted(async () => {
 
 /* 每页条数选择器 */
 :deep(.el-pagination .el-pagination__sizes .el-select) {
-  width: 88px;  // 88px符合8px栅格(11*8)
+  width: 88px; // 88px符合8px栅格(11*8)
 }
 
 :deep(.el-pagination .el-pagination__sizes .el-select .el-select__wrapper) {
@@ -584,7 +579,7 @@ onMounted(async () => {
 }
 
 :deep(.el-pagination .el-pagination__jump .el-input) {
-  width: 48px;  // 符合8px栅格
+  width: 48px; // 符合8px栅格
   margin: 0 8px;
 }
 
@@ -602,23 +597,25 @@ onMounted(async () => {
   color: var(--app-text-primary);
 }
 
-/* 筛选器样式 */
-:deep(.filter-select) {
-  width: 120px;  // 符合8px栅格(15*8)
-  height: 40px;  // 改为40px符合8px栅格
+/* 筛选器样式 - 统一输入框和下拉框高度 */
+:deep(.filter-input .el-input__wrapper) {
+  height: 36px;
+  min-height: 36px;
+  padding: 1px 11px;
 }
 
 :deep(.filter-select .el-select__wrapper) {
   align-items: center;
   background-color: var(--el-fill-color-blank);
   border-radius: var(--el-border-radius-base);
-  box-shadow: 0 0 0 1px #DCDEE2 inset;
+  box-shadow: 0 0 0 1px #dcdee2 inset;
   box-sizing: border-box;
   cursor: pointer;
   display: flex;
   font-size: 14px;
-  gap: 8px;  // 改为8px符合8px栅格
+  gap: 8px; // 改为8px符合8px栅格
   line-height: 24px;
+  height: 36px;
   min-height: 36px;
   padding: 0px 12px;
   position: relative;
@@ -655,11 +652,11 @@ onMounted(async () => {
 }
 
 :deep(.filter-select.is-focus .el-select__wrapper) {
-  box-shadow: 0 0 0 1px #019C7C inset;
+  box-shadow: 0 0 0 1px #019c7c inset;
 }
 
 :deep(.filter-select:hover .el-select__wrapper) {
-  box-shadow: 0 0 0 1px #019C7C inset;
+  box-shadow: 0 0 0 1px #019c7c inset;
 }
 
 /* 授权码样式 */
@@ -668,7 +665,7 @@ onMounted(async () => {
   font-family: 'Source Han Sans CN', sans-serif;
   font-weight: 400;
   font-size: 14px;
-  line-height: 24px;  // 改为24px符合8px栅格
+  line-height: 24px; // 改为24px符合8px栅格
 }
 
 /* 表格精确样式 - 匹配Figma设计 */
@@ -700,7 +697,7 @@ onMounted(async () => {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
   }
-  
+
   .cell {
     white-space: nowrap !important;
     overflow: hidden !important;
@@ -714,12 +711,12 @@ onMounted(async () => {
   border-radius: $border-radius-small;
   font-size: $font-size-base;
   font-weight: $font-weight-secondary;
-  height: 24px;  // 改为24px符合8px栅格
+  height: 24px; // 改为24px符合8px栅格
   min-width: fit-content;
 
   @include flex-center;
   @include text-ellipsis;
-  
+
   &.status-normal {
     background: var(--el-color-primary-light-9);
     color: var(--el-color-primary);
@@ -727,12 +724,12 @@ onMounted(async () => {
 
   &.status-locked {
     background: rgba(230, 162, 60, 0.08);
-    color: #E6A23C;
+    color: #e6a23c;
   }
 
   &.status-expired {
     background: rgba(244, 108, 108, 0.08);
-    color: #F46C6C;
+    color: #f46c6c;
   }
 }
 
@@ -747,7 +744,7 @@ onMounted(async () => {
   justify-content: center;
   flex-wrap: nowrap;
   overflow: visible;
-  
+
   @include mobile {
     display: flex !important;
     flex-wrap: wrap !important;
@@ -758,7 +755,7 @@ onMounted(async () => {
     align-content: flex-start !important;
     padding: $spacing-small 0 !important;
   }
-  
+
   @include mobile {
     max-width: 130px !important;
     gap: math.div($spacing-extra-small, 2) !important;
@@ -767,18 +764,18 @@ onMounted(async () => {
 
 .action-btn {
   padding: $spacing-extra-small $spacing-base;
-  height: 32px;  // 改为32px符合8px栅格
+  height: 32px; // 改为32px符合8px栅格
   border-radius: $border-radius-small;
   font-size: $font-size-small;
   font-weight: $font-weight-primary;
-  line-height: 20px;  // 改为20px符合8px栅格
+  line-height: 20px; // 改为20px符合8px栅格
   flex-shrink: 0;
   width: auto;
   min-width: fit-content;
   white-space: nowrap;
 
   @include button-base;
-  
+
   @include mobile {
     flex: 0 0 calc(50% - #{math.div($spacing-extra-small, 2)}) !important;
     width: calc(50% - #{math.div($spacing-extra-small, 2)}) !important;
@@ -788,7 +785,7 @@ onMounted(async () => {
     height: 20px !important;
     min-width: 0 !important;
   }
-  
+
   @include mobile {
     padding: 1px 2px !important;
     font-size: 8px !important;
@@ -813,7 +810,7 @@ onMounted(async () => {
 
   &.danger {
     background: rgba(244, 108, 108, 0.08);
-    color: #F46C6C;
+    color: #f46c6c;
 
     @include non-touch-device {
       &:hover {
@@ -824,7 +821,7 @@ onMounted(async () => {
 
   &.warning {
     background: rgba(230, 162, 60, 0.08);
-    color: #E6A23C;
+    color: #e6a23c;
 
     @include non-touch-device {
       &:hover {
@@ -835,7 +832,7 @@ onMounted(async () => {
 
   &.success {
     background: rgba(103, 194, 58, 0.08);
-    color: #67C23A;
+    color: #67c23a;
 
     @include non-touch-device {
       &:hover {
@@ -868,11 +865,11 @@ onMounted(async () => {
     margin-right: 8px;
   }
 
-    .filter-input,
-    .filter-select {
-      flex: 1;
-      min-width: 100px;
-    }
+  .filter-input,
+  .filter-select {
+    flex: 1;
+    min-width: 100px;
+  }
 
   /* 表格容器移动端优化 */
   .table-wrapper {
@@ -880,35 +877,36 @@ onMounted(async () => {
     -webkit-overflow-scrolling: touch;
     width: 100% !important;
   }
-  
+
   /* 移动端表格样式修复 */
   :deep(.el-table) {
     min-width: 1200px !important; /* 移动端最小宽度 */
-    
+
     .el-table__header-wrapper,
     .el-table__body-wrapper {
       width: 100% !important;
       overflow-x: visible !important;
     }
-    
+
     .el-table__body-wrapper {
       max-height: calc(100vh - 300px) !important;
     }
-    
+
     /* 移动端表头和表体对齐 */
     .el-table__header,
     .el-table__body {
       width: 100% !important;
       min-width: 1200px !important;
     }
-    
+
     /* 移动端列宽度修复 */
-    th, td {
+    th,
+    td {
       min-width: 80px !important;
       white-space: nowrap !important;
       padding: 8px 12px !important;
     }
-    
+
     /* 移动端操作列自适应宽度 */
     .action-column {
       width: auto !important;
@@ -920,13 +918,13 @@ onMounted(async () => {
   :deep(.el-table) {
     --el-table-action-column-width: 160px;
   }
-  
+
   :deep(.el-table__header-wrapper colgroup col:last-child),
   :deep(.el-table__body-wrapper colgroup col:last-child),
   :deep(.el-table__fixed-right colgroup col:last-child) {
     width: 160px !important;
   }
-  
+
   :deep(.el-table__header-wrapper .action-column),
   :deep(.el-table__body-wrapper .action-column),
   :deep(.el-table th:last-child),
@@ -935,27 +933,27 @@ onMounted(async () => {
     min-width: 160px !important;
     max-width: 160px !important;
   }
-  
+
   :deep(.el-table__fixed-right) {
     width: 160px !important;
     right: 0 !important;
   }
-  
+
   :deep(.el-table__fixed-right .el-table__fixed-body-wrapper),
   :deep(.el-table__fixed-right .el-table__fixed-header-wrapper),
   :deep(.el-table__fixed-right .el-table__fixed-footer-wrapper) {
     width: 160px !important;
   }
-  
+
   :deep(.el-table__fixed-right-patch) {
     width: 160px !important;
   }
-  
+
   /* 强制覆盖内联样式 */
-  :deep(.el-table [style*="width: 300px"]) {
+  :deep(.el-table [style*='width: 300px']) {
     width: 160px !important;
   }
-  
+
   /* 移动端操作按钮样式 - 2行2列布局 */
   .action-buttons {
     display: flex !important;
@@ -967,7 +965,7 @@ onMounted(async () => {
     align-content: flex-start !important;
     padding: 6px 0 !important;
   }
-  
+
   .action-btn {
     flex: 0 0 calc(50% - 2px) !important;
     width: calc(50% - 2px) !important;
@@ -982,14 +980,14 @@ onMounted(async () => {
     box-sizing: border-box !important;
     border-radius: 2px !important;
   }
-  
+
   /* 移动端分页样式 */
   :deep(.el-pagination) {
     justify-content: center;
     flex-wrap: wrap;
     gap: 4px;
   }
-  
+
   :deep(.el-pagination .el-pagination__total),
   :deep(.el-pagination .el-pagination__sizes) {
     order: -1;
@@ -1008,22 +1006,22 @@ onMounted(async () => {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .filter-label {
     align-self: flex-start;
   }
-  
+
   .filter-input,
   .filter-select {
     width: 100% !important;
   }
-  
+
   /* 超小屏幕进一步压缩 */
   .action-buttons {
     max-width: 130px !important;
     gap: 3px !important;
   }
-  
+
   .action-btn {
     padding: 1px 2px !important;
     font-size: 8px !important;

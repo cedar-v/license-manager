@@ -59,20 +59,21 @@
       "users": "系统用户"
     },
     "toggleSidebar": "切换侧边栏",
-    "breadcrumb": {
-      "dashboard": "仪表盘",
-      "customers": "客户管理",
-      "licenses": "授权管理",
-      "licenseList": "授权列表",
-      "createLicense": "创建授权",
-      "roles": "角色权限",
-      "users": "系统用户",
-      "login": "登录",
-      "settings": "设置",
-      "profile": "个人资料",
-      "workspace": "工作台",
-      "unknown": "未知页面"
-    }
+      "breadcrumb": {
+        "dashboard": "仪表盘",
+        "customers": "客户管理",
+        "licenses": "授权管理",
+        "licenseList": "授权列表",
+        "createLicense": "创建授权",
+        "viewLicense": "查看授权",
+        "roles": "角色权限",
+        "users": "系统用户",
+        "login": "登录",
+        "settings": "设置",
+        "profile": "个人资料",
+        "workspace": "工作台",
+        "unknown": "未知页面"
+      }
   },
   "chart": {
     "licenseTrend": {
@@ -126,7 +127,10 @@
         "renew": "续期",
         "viewDetails": "查看详情",
         "export": "导出",
-        "refresh": "刷新"
+        "refresh": "刷新",
+        "back": "返回",
+        "lock": "锁定授权",
+        "unlock": "解锁授权"
       },
       "search": {
         "placeholder": "搜索授权码、客户名称、描述",
@@ -202,7 +206,43 @@
         "loadError": "加载授权列表失败",
         "createError": "创建授权失败",
         "updateError": "更新授权失败",
-        "deleteError": "删除授权失败"
+        "deleteError": "删除授权失败",
+        "noLicenseWarning": "您还没有授权，请创建授权！",
+        "selectCustomerFirst": "请先选择一个客户",
+        "queryLicenseError": "查询授权失败，请稍后重试"
+      },
+      "view": {
+        "title": "查看授权",
+        "basicInfo": "基本信息",
+        "licenseConfig": "授权配置",
+        "remarks": "备注信息",
+        "operationHistory": "操作历史",
+        "fields": {
+          "licenseCode": "授权码",
+          "customerName": "客户名称",
+          "customerId": "客户ID",
+          "createdBy": "创建人",
+          "createdAt": "创建时间",
+          "updatedAt": "更新时间",
+          "validityPeriod": "授权期限",
+          "startDate": "开始时间",
+          "endDate": "结束时间",
+          "deploymentType": "部署类型",
+          "lockStatus": "锁定状态",
+          "description": "备注"
+        },
+        "status": {
+          "locked": "已锁定",
+          "unlocked": "未锁定"
+        },
+        "actions": {
+          "confirmLock": "确定要锁定此授权吗？",
+          "confirmUnlock": "确定要解锁此授权吗？",
+          "confirmDelete": "确定要删除此授权吗？删除后无法恢复！",
+          "lockSuccess": "授权已锁定",
+          "unlockSuccess": "授权已解锁",
+          "deleteSuccess": "授权删除成功"
+        }
       },
       "stats": {
         "total": "总授权数",
