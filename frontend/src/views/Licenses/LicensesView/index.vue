@@ -74,7 +74,7 @@
         <!-- Tab 内容区域 -->
         <div class="tab-content-area">
           <BasicInfo v-if="activeTab === 'basic'" :license-data="licenseData" />
-          <BasicInfo v-if="activeTab === 'authorization'" :license-data="licenseData" />
+          <AuthorizationInfo v-if="activeTab === 'authorization'" :license-data="licenseData" />
           <LicenseInfo v-if="activeTab === 'license'" :license-data="licenseData" />
           <ChangeHistory v-if="activeTab === 'history'" :history-data="historyData" />
         </div>
@@ -90,6 +90,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { getLicenseDetail, type AuthorizationCode } from '@/api/license'
 import LicenseTabIcon from '@/components/common/icons/LicenseTabIcon.vue'
 import BasicInfo from './components/BasicInfo.vue'
+import AuthorizationInfo from './components/AuthorizationInfo.vue'
 import LicenseInfo from './components/LicenseInfo.vue'
 import ChangeHistory from './components/ChangeHistory.vue'
 
