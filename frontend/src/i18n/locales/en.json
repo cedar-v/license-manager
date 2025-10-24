@@ -59,6 +59,13 @@
       "users": "System Users"
     },
     "toggleSidebar": "Toggle Sidebar",
+    "tooltip": {
+      "user": "User Settings",
+      "search": "Search",
+      "notification": "Notifications",
+      "language": "Switch Language",
+      "theme": "Switch Theme"
+    },
     "breadcrumb": {
       "dashboard": "Dashboard",
       "customers": "Customer Management",
@@ -116,6 +123,16 @@
       "title": "License Management",
       "welcome": "Welcome to the License Management page"
     }
+  },
+  "userMenu": {
+    "profile": "Profile",
+    "logout": "Logout",
+    "logoutTitle": "Confirm",
+    "logoutConfirm": "Are you sure you want to logout?",
+    "confirm": "Confirm Logout",
+    "cancel": "Cancel",
+    "logoutSuccess": "Logout successful",
+    "profileComingSoon": "Profile feature coming soon"
   },
   "customers": {
     "title": "Customer Management",

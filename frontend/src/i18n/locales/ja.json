@@ -59,6 +59,13 @@
       "users": "システムユーザー"
     },
     "toggleSidebar": "サイドバー切り替え",
+    "tooltip": {
+      "user": "ユーザー設定",
+      "search": "検索",
+      "notification": "通知",
+      "language": "言語切り替え",
+      "theme": "テーマ切り替え"
+    },
     "breadcrumb": {
       "dashboard": "ダッシュボード",
       "customers": "顧客管理",
@@ -116,6 +123,16 @@
       "title": "ライセンス管理",
       "welcome": "ライセンス管理ページへようこそ"
     }
+  },
+  "userMenu": {
+    "profile": "基本情報",
+    "logout": "ログアウト",
+    "logoutTitle": "確認",
+    "logoutConfirm": "システムを終了しますか？",
+    "confirm": "ログアウト",
+    "cancel": "キャンセル",
+    "logoutSuccess": "ログアウトしました",
+    "profileComingSoon": "プロフィール機能は近日公開予定です"
   },
   "customers": {
     "title": "顧客管理",

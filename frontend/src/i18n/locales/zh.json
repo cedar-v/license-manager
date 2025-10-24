@@ -59,6 +59,13 @@
       "users": "系统用户"
     },
     "toggleSidebar": "切换侧边栏",
+    "tooltip": {
+      "user": "用户设置",
+      "search": "搜索",
+      "notification": "消息通知",
+      "language": "切换语言",
+      "theme": "切换主题"
+    },
       "breadcrumb": {
         "dashboard": "仪表盘",
         "customers": "客户管理",
@@ -252,6 +259,16 @@
         "expiringSoon": "即将过期"
       }
     }
+  },
+  "userMenu": {
+    "profile": "基本信息",
+    "logout": "退出",
+    "logoutTitle": "提示",
+    "logoutConfirm": "是否退出系统？",
+    "confirm": "确定退出",
+    "cancel": "取消",
+    "logoutSuccess": "退出成功",
+    "profileComingSoon": "个人信息功能即将上线"
   },
   "customers": {
     "title": "客户管理",

@@ -53,10 +53,49 @@
 
     <!-- 右侧：用户头像和操作按钮 -->
     <div class="nav-content__right">
-      <!-- 用户头像 -->
-      <div class="user-avatar" @click="handleUserClick">
-        <NavIcon name="user" />
-      </div>
+      <!-- 用户头像和下拉菜单 -->
+      <el-tooltip :content="t('navigation.tooltip.user')" placement="bottom">
+        <el-dropdown trigger="click" @command="handleUserCommand">
+          <div class="user-avatar">
+            <NavIcon name="user" />
+          </div>
+          <template #dropdown>
+          <el-dropdown-menu class="user-dropdown-menu">
+            <!-- 用户信息头部 -->
+            <div class="user-info-header">
+              <div class="user-avatar-large">
+                <div class="avatar-icon">
+                  <span class="avatar-text">{{ userInitial }}</span>
+                </div>
+              </div>
+              <div class="user-details">
+                <div class="user-name">{{ userInfo?.username || '未登录' }}</div>
+                <div class="user-role">{{ userInfo?.role || '--' }}</div>
+              </div>
+            </div>
+
+            <!-- 分割线 -->
+            <el-dropdown-item divided class="dropdown-divider" disabled></el-dropdown-item>
+
+            <!-- 基本信息 -->
+            <el-dropdown-item command="profile" class="dropdown-menu-item">
+              <svg class="menu-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 2C6.34315 2 5 3.34315 5 5C5 6.65685 6.34315 8 8 8C9.65685 8 11 6.65685 11 5C11 3.34315 9.65685 2 8 2ZM3 5C3 2.23858 5.23858 0 8 0C10.7614 0 13 2.23858 13 5C13 7.76142 10.7614 10 8 10C5.23858 10 3 7.76142 3 5ZM2 13C2 11.3431 3.34315 10 5 10H11C12.6569 10 14 11.3431 14 13V14C14 14.5523 13.5523 15 13 15C12.4477 15 12 14.5523 12 14V13C12 12.4477 11.5523 12 11 12H5C4.44772 12 4 12.4477 4 13V14C4 14.5523 3.55228 15 3 15C2.44772 15 2 14.5523 2 14V13Z" fill="currentColor"/>
+              </svg>
+              <span class="menu-text">{{ t('userMenu.profile') }}</span>
+            </el-dropdown-item>
+
+            <!-- 退出 -->
+            <el-dropdown-item command="logout" class="dropdown-menu-item logout-item">
+              <svg class="menu-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M6 14H3C2.44772 14 2 13.5523 2 13V3C2 2.44772 2.44772 2 3 2H6C6.55228 2 7 1.55228 7 1C7 0.447715 6.55228 0 6 0H3C1.34315 0 0 1.34315 0 3V13C0 14.6569 1.34315 16 3 16H6C6.55228 16 7 15.5523 7 15C7 14.4477 6.55228 14 6 14ZM11.2929 4.29289C11.6834 3.90237 12.3166 3.90237 12.7071 4.29289L15.7071 7.29289C16.0976 7.68342 16.0976 8.31658 15.7071 8.70711L12.7071 11.7071C12.3166 12.0976 11.6834 12.0976 11.2929 11.7071C10.9024 11.3166 10.9024 10.6834 11.2929 10.2929L12.5858 9H6C5.44772 9 5 8.55228 5 8C5 7.44772 5.44772 7 6 7H12.5858L11.2929 5.70711C10.9024 5.31658 10.9024 4.68342 11.2929 4.29289Z" fill="currentColor"/>
+              </svg>
+              <span class="menu-text">{{ t('userMenu.logout') }}</span>
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+        </el-dropdown>
+      </el-tooltip>
 
       <!-- 分割线 -->
       <div class="divider"></div>
@@ -64,27 +103,35 @@
       <!-- 操作按钮组 -->
       <div class="action-buttons">
         <!-- 搜索按钮 -->
-        <button class="action-btn" @click="handleSearchClick">
-          <NavIcon name="search" />
-        </button>
+        <el-tooltip :content="t('navigation.tooltip.search')" placement="bottom">
+          <button class="action-btn" @click="handleSearchClick">
+            <NavIcon name="search" />
+          </button>
+        </el-tooltip>
 
         <!-- 通知按钮 -->
-        <button class="action-btn notification-btn" @click="handleNotificationClick">
-          <NavIcon name="notification" />
-          <span v-if="notificationCount" class="notification-badge">
-            {{ notificationCount > 99 ? '99+' : notificationCount }}
-          </span>
-        </button>
+        <el-tooltip :content="t('navigation.tooltip.notification')" placement="bottom">
+          <button class="action-btn notification-btn" @click="handleNotificationClick">
+            <NavIcon name="notification" />
+            <span v-if="notificationCount" class="notification-badge">
+              {{ notificationCount > 99 ? '99+' : notificationCount }}
+            </span>
+          </button>
+        </el-tooltip>
 
         <!-- 语言切换按钮 -->
-        <button class="action-btn" @click="handleLanguageClick">
-          <NavIcon name="language" />
-        </button>
+        <el-tooltip :content="t('navigation.tooltip.language')" placement="bottom">
+          <button class="action-btn" @click="handleLanguageClick">
+            <NavIcon name="language" />
+          </button>
+        </el-tooltip>
 
         <!-- 主题切换按钮 -->
-        <button class="action-btn" @click="handleThemeClick">
-          <NavIcon name="dark-mode" />
-        </button>
+        <el-tooltip :content="t('navigation.tooltip.theme')" placement="bottom">
+          <button class="action-btn" @click="handleThemeClick">
+            <NavIcon name="dark-mode" />
+          </button>
+        </el-tooltip>
       </div>
     </div>
   </header>
@@ -93,7 +140,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+import { ElMessageBox, ElMessage } from 'element-plus'
 import { useAppStore } from '@/store/modules/app'
+import { useUserStore } from '@/store/modules/user'
 import NavIcon from '@/components/common/icons/NavIcon.vue'
 import { useBreadcrumb } from '@/utils/breadcrumb'
 
@@ -119,8 +169,25 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 // 使用store和组合函数
+const router = useRouter()
 const appStore = useAppStore()
+const userStore = useUserStore()
 const { breadcrumbs, navigateTo } = useBreadcrumb()
+
+// 获取用户信息
+const userInfo = computed(() => userStore.userInfo)
+
+// 获取用户名首字母（用于头像显示）
+const userInitial = computed(() => {
+  const username = userInfo.value?.username
+  if (!username) return '?'
+  // 如果是中文名，取第一个字
+  if (/[\u4e00-\u9fa5]/.test(username)) {
+    return username.charAt(0)
+  }
+  // 如果是英文名，取首字母
+  return username.charAt(0).toUpperCase()
+})
 
 // 计算导航栏样式类
 const navClasses = computed(() => ({
@@ -157,9 +224,39 @@ const handleThemeClick = () => {
   emit('themeClick')
 }
 
-// 处理用户头像点击
-const handleUserClick = () => {
-  emit('userClick')
+// 处理用户下拉菜单命令
+const handleUserCommand = async (command: string) => {
+  switch (command) {
+    case 'profile':
+      // 跳转到个人信息页面
+      ElMessage.info(t('userMenu.profileComingSoon'))
+      break
+    case 'logout':
+      // 退出登录
+      try {
+        await ElMessageBox.confirm(
+          t('userMenu.logoutConfirm'),
+          t('userMenu.logoutTitle'),
+          {
+            confirmButtonText: t('userMenu.confirm'),
+            cancelButtonText: t('userMenu.cancel'),
+            type: 'warning',
+            // center: true,
+          }
+        )
+        // 清除用户信息
+        userStore.logout()
+        // 跳转到登录页
+        await router.push('/login')
+        ElMessage.success(t('userMenu.logoutSuccess'))
+      } catch (error) {
+        // 用户取消退出
+        if (error !== 'cancel') {
+          console.error('退出登录失败:', error)
+        }
+      }
+      break
+  }
 }
 </script>
 
@@ -295,6 +392,122 @@ const handleUserClick = () => {
 
 .user-avatar:hover {
   opacity: 0.7;
+}
+
+/* 用户下拉菜单样式 */
+:deep(.user-dropdown-menu) {
+  width: 256px;
+  padding: 0;
+  border-radius: 8px;
+  box-shadow: 0px 2px 12px 0px rgba(0, 0, 0, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 8px;
+}
+
+/* 用户信息头部 */
+.user-info-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: transparent;
+}
+
+.user-avatar-large {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.avatar-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #019C7C;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-text {
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #FFFFFF;
+  line-height: 1.29;
+  letter-spacing: 0.03em;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.user-name {
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #000000;
+  line-height: 1.29;
+  letter-spacing: 0.03em;
+}
+
+.user-role {
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #000000;
+  line-height: 1.5;
+  letter-spacing: 0.03em;
+}
+
+/* 分割线项 */
+:deep(.dropdown-divider) {
+  height: 0;
+  padding: 0;
+  margin: 8px 16px;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* 菜单项 */
+:deep(.dropdown-menu-item) {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8.5px 24px;
+  height: 33px;
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #202332;
+  letter-spacing: 0.0714em;
+  transition: background-color 0.2s;
+}
+
+:deep(.dropdown-menu-item:hover) {
+  background: #F5F5F5;
+}
+
+.menu-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: #202332;
+}
+
+.menu-text {
+  flex: 1;
+}
+
+/* 退出菜单项特殊样式 */
+:deep(.logout-item:hover) {
+  background: rgba(0, 194, 124, 0.12);
+}
+
+:deep(.logout-item:last-child) {
+  margin-bottom: 4px;
 }
 
 /* 分割线 */
@@ -561,5 +774,48 @@ const handleUserClick = () => {
 [data-theme="dark"] .user-avatar :deep(.nav-icon),
 [data-theme="dark"] .action-btn :deep(.nav-icon) {
   color: #f9fafb !important;
+}
+
+/* 用户下拉菜单暗模式样式 */
+[data-theme="dark"] :deep(.user-dropdown-menu) {
+  background: rgba(31, 41, 53, 1) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0px 2px 12px 0px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-theme="dark"] .user-info-header {
+  background: transparent !important;
+}
+
+[data-theme="dark"] .avatar-icon {
+  background: #10b981 !important;
+}
+
+[data-theme="dark"] .user-name {
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] .user-role {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] :deep(.dropdown-divider) {
+  border-top-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+[data-theme="dark"] :deep(.dropdown-menu-item) {
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] :deep(.dropdown-menu-item:hover) {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .menu-icon {
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] :deep(.logout-item:hover) {
+  background: rgba(16, 185, 129, 0.15) !important;
 }
 </style>
