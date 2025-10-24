@@ -312,6 +312,27 @@
           "license": "License Information",
           "history": "Authorization Change History"
         },
+        "authorizationInfo": {
+          "basicInfo": "Basic Information",
+          "customerName": "Customer Name",
+          "customerId": "Customer ID",
+          "createdBy": "Created By",
+          "description": "Description",
+          "title": "Authorization Information",
+          "validityPeriodLabel": "Validity Period",
+          "validityPeriod": "Valid Period",
+          "validityTime": "Validity Time",
+          "to": "to",
+          "maxActivations": "Max Activations",
+          "devices": " devices",
+          "deploymentType": "Deployment Type",
+          "encryptionType": "Encryption Type",
+          "standardEncryption": "Standard Encryption",
+          "authorizationCode": "Authorization Code",
+          "forActivation": "(For Client Activation)",
+          "code": "Authorization Code",
+          "tipText": "Provide this authorization code to the customer, who can automatically obtain the software license after configuring it in ThingsPanel"
+        },
         "actions": {
           "copyCode": "Copy License Code",
           "updateLicense": "Update License",

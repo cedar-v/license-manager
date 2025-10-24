@@ -312,6 +312,27 @@
           "license": "ライセンス情報",
           "history": "認証変更履歴"
         },
+        "authorizationInfo": {
+          "basicInfo": "基本情報",
+          "customerName": "顧客名",
+          "customerId": "顧客ID",
+          "createdBy": "作成者",
+          "description": "備考",
+          "title": "認証情報",
+          "validityPeriodLabel": "有効期間",
+          "validityPeriod": "有効期間",
+          "validityTime": "有効時間",
+          "to": "から",
+          "maxActivations": "最大アクティベーション数",
+          "devices": "台",
+          "deploymentType": "デプロイメントタイプ",
+          "encryptionType": "暗号化タイプ",
+          "standardEncryption": "標準暗号化",
+          "authorizationCode": "認証コード",
+          "forActivation": "（クライアントアクティベーション用）",
+          "code": "認証コード",
+          "tipText": "この認証コードを顧客に提供してください。顧客がThingsPanelで設定すると、ソフトウェアライセンスを自動的に取得できます"
+        },
         "actions": {
           "copyCode": "ライセンスコードをコピー",
           "updateLicense": "ライセンス更新",

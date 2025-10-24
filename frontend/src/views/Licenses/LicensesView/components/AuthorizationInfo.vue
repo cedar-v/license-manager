@@ -2,22 +2,22 @@
   <div class="authorization-info-container">
     <!-- 基本信息卡片 -->
     <div class="info-card">
-      <div class="card-title">基本信息</div>
+      <div class="card-title">{{ t('pages.licenses.detail.authorizationInfo.basicInfo') }}</div>
       <div class="info-content">
         <div class="info-row">
-          <div class="info-label">客户名称：</div>
+          <div class="info-label">{{ t('pages.licenses.detail.authorizationInfo.customerName') }}：</div>
           <div class="info-value">{{ licenseData?.customer_name || '-' }}</div>
         </div>
         <div class="info-row">
-          <div class="info-label">客户ID：</div>
+          <div class="info-label">{{ t('pages.licenses.detail.authorizationInfo.customerId') }}：</div>
           <div class="info-value">{{ licenseData?.customer_id || '-' }}</div>
         </div>
         <div class="info-row">
-          <div class="info-label">创建人：</div>
+          <div class="info-label">{{ t('pages.licenses.detail.authorizationInfo.createdBy') }}：</div>
           <div class="info-value">{{ licenseData?.customer_name || '-' }}</div>
         </div>
         <div class="info-row">
-          <div class="info-label">备注：</div>
+          <div class="info-label">{{ t('pages.licenses.detail.authorizationInfo.description') }}：</div>
           <div class="info-value">{{ licenseData?.description || '-' }}</div>
         </div>
       </div>
@@ -25,27 +25,27 @@
 
     <!-- 授权信息卡片 -->
     <div class="info-card">
-      <div class="card-title">授权信息</div>
+      <div class="card-title">{{ t('pages.licenses.detail.authorizationInfo.title') }}</div>
       <div class="info-content">
         <div class="info-row">
-          <div class="info-label">授权期限：</div>
+          <div class="info-label">{{ t('pages.licenses.detail.authorizationInfo.validityPeriodLabel') }}：</div>
           <div class="info-value">{{ getLicensePeriodType() }}</div>
         </div>
         <div class="info-row">
-          <div class="info-label">有效时间：</div>
+          <div class="info-label">{{ t('pages.licenses.detail.authorizationInfo.validityTime') }}：</div>
           <div class="info-value">{{ formatDateRange() }}</div>
         </div>
         <div class="info-row">
-          <div class="info-label">最多激活设备数：</div>
-          <div class="info-value">{{ licenseData?.max_activations || 0 }}台</div>
+          <div class="info-label">{{ t('pages.licenses.detail.authorizationInfo.maxActivations') }}：</div>
+          <div class="info-value">{{ licenseData?.max_activations || 0 }}{{ t('pages.licenses.detail.authorizationInfo.devices') }}</div>
         </div>
         <div class="info-row">
-          <div class="info-label">部署类型：</div>
+          <div class="info-label">{{ t('pages.licenses.detail.authorizationInfo.deploymentType') }}：</div>
           <div class="info-value">{{ licenseData?.deployment_type_display || '-' }}</div>
         </div>
         <div class="info-row">
-          <div class="info-label">加密类型：</div>
-          <div class="info-value">{{ licenseData?.encryption_type_display || '标准加密' }}</div>
+          <div class="info-label">{{ t('pages.licenses.detail.authorizationInfo.encryptionType') }}：</div>
+          <div class="info-value">{{ licenseData?.encryption_type_display || t('pages.licenses.detail.authorizationInfo.standardEncryption') }}</div>
         </div>
       </div>
     </div>
@@ -53,19 +53,19 @@
     <!-- 授权码卡片 -->
     <div class="info-card authorization-code-card">
       <div class="card-title-row">
-        <div class="card-title">授权码</div>
-        <div class="card-subtitle">（用于客户端激活）</div>
+        <div class="card-title">{{ t('pages.licenses.detail.authorizationInfo.authorizationCode') }}</div>
+        <div class="card-subtitle">{{ t('pages.licenses.detail.authorizationInfo.forActivation') }}</div>
       </div>
       <div class="info-content">
         <div class="info-row">
-          <div class="info-label">授权码：</div>
+          <div class="info-label">{{ t('pages.licenses.detail.authorizationInfo.code') }}：</div>
           <div class="info-value code-value">{{ licenseData?.code || '-' }}</div>
         </div>
         <div class="info-tip">
           <svg class="tip-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM11 15H9V9H11V15ZM11 7H9V5H11V7Z" fill="#4763FF"/>
           </svg>
-          <span class="tip-text">将此授权码提供给客户，客户在ThingsPanel中配置后可自动获取软件许可证</span>
+          <span class="tip-text">{{ t('pages.licenses.detail.authorizationInfo.tipText') }}</span>
         </div>
       </div>
     </div>
@@ -73,6 +73,7 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { AuthorizationCode } from '@/api/license'
 import { formatDateShort as formatDateUtil } from '@/utils/date'
 
@@ -81,11 +82,12 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const { t } = useI18n()
 
 // 获取授权期限类型
 const getLicensePeriodType = () => {
   // 这里假设有个字段表示授权期限类型，如果没有则返回"有效期限"
-  return '有效期限'
+  return t('pages.licenses.detail.authorizationInfo.validityPeriod')
 }
 
 // 格式化日期区间
@@ -95,7 +97,7 @@ const formatDateRange = () => {
   }
   const startDate = formatDateUtil(props.licenseData.start_date)
   const endDate = formatDateUtil(props.licenseData.end_date)
-  return `${startDate} 至 ${endDate}`
+  return `${startDate} ${t('pages.licenses.detail.authorizationInfo.to')} ${endDate}`
 }
 </script>
 

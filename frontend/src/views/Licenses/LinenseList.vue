@@ -2,14 +2,14 @@
   <div class="license-list-page">
     <!-- 顶部操作区 -->
     <div class="top-actions">
-      <el-button type="primary" @click="handleCreate"> {{ t('licenses.list.createLicense') }} </el-button>
+      <el-button type="primary" @click="handleCreate"> {{ t('pages.licenses.list.createLicense') }} </el-button>
 
       <div class="filters">
-        <span class="filter-label">{{ t('licenses.list.filter.label') }}</span>
+        <span class="filter-label">{{ t('pages.licenses.list.filter.label') }}</span>
 
-        <el-input v-model="filterCode" :placeholder="t('licenses.list.filter.codePlaceholder')" clearable class="filter-input" />
+        <el-input v-model="filterCode" :placeholder="t('pages.licenses.list.filter.codePlaceholder')" clearable class="filter-input" />
 
-        <el-select v-model="filterStatus" :placeholder="t('licenses.list.filter.statusPlaceholder')" clearable class="filter-select">
+        <el-select v-model="filterStatus" :placeholder="t('pages.licenses.list.filter.statusPlaceholder')" clearable class="filter-select">
           <el-option
             v-for="option in statusOptions"
             :key="option.key"
@@ -18,7 +18,7 @@
           />
         </el-select>
 
-        <el-button type="primary" @click="handleQuery"> {{ t('licenses.list.filter.query') }} </el-button>
+        <el-button type="primary" @click="handleQuery"> {{ t('pages.licenses.list.filter.query') }} </el-button>
       </div>
     </div>
 
@@ -28,7 +28,7 @@
         <el-table
           :data="tableData"
           v-loading="loading"
-          :element-loading-text="t('licenses.list.table.loading')"
+          :element-loading-text="t('pages.licenses.list.table.loading')"
           stripe
           border
           style="width: 100%"
@@ -41,8 +41,8 @@
         >
           <el-table-column
             prop="code"
-            :label="t('licenses.list.table.code')"
-            :width="200"
+            :label="t('pages.licenses.list.table.code')"
+            :width="220"
             show-overflow-tooltip
             align="left"
           >
@@ -54,7 +54,7 @@
               >
             </template>
           </el-table-column>
-          <el-table-column prop="status" :label="t('licenses.list.table.status')" :width="100" align="center">
+          <el-table-column prop="status" :label="t('pages.licenses.list.table.status')" :width="100" align="center">
             <template #default="scope">
               <div class="status-tag" :class="getStatusClass(scope.row.status)">
                 {{ scope.row.status_display }}
@@ -63,18 +63,18 @@
           </el-table-column>
           <el-table-column
             prop="deployment_type_display"
-            :label="t('licenses.list.table.deploymentType')"
-            :width="120"
+            :label="t('pages.licenses.list.table.deploymentType')"
+            :width="140"
             align="center"
           />
-          <el-table-column prop="end_date" :label="t('licenses.list.table.endDate')" :width="180" align="center">
+          <el-table-column prop="end_date" :label="t('pages.licenses.list.table.endDate')" :width="180" align="center">
             <template #default="scope">
               {{ formatDate(scope.row.end_date) }}
             </template>
           </el-table-column>
           <el-table-column
             prop="description"
-            :label="t('licenses.list.table.description')"
+            :label="t('pages.licenses.list.table.description')"
             :min-width="200"
             show-overflow-tooltip
             align="center"
@@ -83,18 +83,18 @@
               <span class="ellipsis-text">{{ scope.row.description }}</span>
             </template>
           </el-table-column>
-          <el-table-column :label="t('licenses.list.table.operation')" fixed="right" class-name="action-column" align="center">
+          <el-table-column :label="t('pages.licenses.list.table.operation')" fixed="right" class-name="action-column" align="center">
             <template #default="scope">
               <div class="action-buttons">
-                <button class="action-btn primary" @click="handleDetail(scope.row)">{{ t('licenses.list.actions.detail') }}</button>
+                <button class="action-btn primary" @click="handleDetail(scope.row)">{{ t('pages.licenses.list.actions.detail') }}</button>
                 <button
                   class="action-btn"
                   :class="scope.row.is_locked ? 'success' : 'warning'"
                   @click="scope.row.is_locked ? handleUnlock(scope.row) : handleLock(scope.row)"
                 >
-                  {{ scope.row.is_locked ? t('licenses.list.actions.unlock') : t('licenses.list.actions.lock') }}
+                  {{ scope.row.is_locked ? t('pages.licenses.list.actions.unlock') : t('pages.licenses.list.actions.lock') }}
                 </button>
-                <button class="action-btn danger" @click="handleDelete(scope.row)">{{ t('licenses.list.actions.delete') }}</button>
+                <button class="action-btn danger" @click="handleDelete(scope.row)">{{ t('pages.licenses.list.actions.delete') }}</button>
               </div>
             </template>
           </el-table-column>
@@ -201,9 +201,9 @@ const handleDetail = (row: any) => {
 }
 
 const handleLock = async (row: any) => {
-  ElMessageBox.confirm(t('licenses.list.confirm.lockMessage'), t('licenses.list.confirm.lockTitle'), {
-    confirmButtonText: t('licenses.list.confirm.confirm'),
-    cancelButtonText: t('licenses.list.confirm.cancel'),
+  ElMessageBox.confirm(t('pages.licenses.list.confirm.lockMessage'), t('pages.licenses.list.confirm.lockTitle'), {
+    confirmButtonText: t('pages.licenses.list.confirm.confirm'),
+    cancelButtonText: t('pages.licenses.list.confirm.cancel'),
     type: 'warning'
   })
     .then(async () => {
@@ -213,11 +213,11 @@ const handleLock = async (row: any) => {
           lock_reason: '手动锁定',
           reason: '管理员手动锁定'
         })
-        ElMessage.success(t('licenses.list.message.lockSuccess'))
+        ElMessage.success(t('pages.licenses.list.message.lockSuccess'))
         loadData()
       } catch (error) {
         console.error('锁定失败:', error)
-        ElMessage.error(t('licenses.list.message.lockError'))
+        ElMessage.error(t('pages.licenses.list.message.lockError'))
       }
     })
     .catch(() => {
@@ -226,9 +226,9 @@ const handleLock = async (row: any) => {
 }
 
 const handleUnlock = async (row: any) => {
-  ElMessageBox.confirm(t('licenses.list.confirm.unlockMessage'), t('licenses.list.confirm.unlockTitle'), {
-    confirmButtonText: t('licenses.list.confirm.confirm'),
-    cancelButtonText: t('licenses.list.confirm.cancel'),
+  ElMessageBox.confirm(t('pages.licenses.list.confirm.unlockMessage'), t('pages.licenses.list.confirm.unlockTitle'), {
+    confirmButtonText: t('pages.licenses.list.confirm.confirm'),
+    cancelButtonText: t('pages.licenses.list.confirm.cancel'),
     type: 'warning'
   })
     .then(async () => {
@@ -238,11 +238,11 @@ const handleUnlock = async (row: any) => {
           lock_reason: '手动解锁',
           reason: '管理员手动解锁'
         })
-        ElMessage.success(t('licenses.list.message.unlockSuccess'))
+        ElMessage.success(t('pages.licenses.list.message.unlockSuccess'))
         loadData()
       } catch (error) {
         console.error('解锁失败:', error)
-        ElMessage.error(t('licenses.list.message.unlockError'))
+        ElMessage.error(t('pages.licenses.list.message.unlockError'))
       }
     })
     .catch(() => {
@@ -251,19 +251,19 @@ const handleUnlock = async (row: any) => {
 }
 
 const handleDelete = async (row: any) => {
-  ElMessageBox.confirm(t('licenses.list.confirm.deleteMessage'), t('licenses.list.confirm.deleteTitle'), {
-    confirmButtonText: t('licenses.list.confirm.deleteConfirm'),
-    cancelButtonText: t('licenses.list.confirm.cancel'),
+  ElMessageBox.confirm(t('pages.licenses.list.confirm.deleteMessage'), t('pages.licenses.list.confirm.deleteTitle'), {
+    confirmButtonText: t('pages.licenses.list.confirm.deleteConfirm'),
+    cancelButtonText: t('pages.licenses.list.confirm.cancel'),
     type: 'warning'
   })
     .then(async () => {
       try {
         await deleteLicense(row.id)
-        ElMessage.success(t('licenses.list.message.deleteSuccess'))
+        ElMessage.success(t('pages.licenses.list.message.deleteSuccess'))
         loadData()
       } catch (error) {
         console.error('删除失败:', error)
-        ElMessage.error(t('licenses.list.message.deleteError'))
+        ElMessage.error(t('pages.licenses.list.message.deleteError'))
       }
     })
     .catch(() => {
@@ -326,7 +326,7 @@ const loadData = async () => {
     console.log('表格数据:', tableData.value)
   } catch (error) {
     console.error('加载数据失败:', error)
-    ElMessage.error(t('licenses.list.message.loadError'))
+    ElMessage.error(t('pages.licenses.list.message.loadError'))
   } finally {
     loading.value = false
   }

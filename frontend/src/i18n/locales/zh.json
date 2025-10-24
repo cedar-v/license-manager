@@ -313,6 +313,27 @@
           "license": "许可证信息",
           "history": "授权变更历史"
         },
+        "authorizationInfo": {
+          "basicInfo": "基本信息",
+          "customerName": "客户名称",
+          "customerId": "客户ID",
+          "createdBy": "创建人",
+          "description": "备注",
+          "title": "授权信息",
+          "validityPeriodLabel": "授权期限",
+          "validityPeriod": "有效期限",
+          "validityTime": "有效时间",
+          "to": "至",
+          "maxActivations": "最多激活设备数",
+          "devices": "台",
+          "deploymentType": "部署类型",
+          "encryptionType": "加密类型",
+          "standardEncryption": "标准加密",
+          "authorizationCode": "授权码",
+          "forActivation": "（用于客户端激活）",
+          "code": "授权码",
+          "tipText": "将此授权码提供给客户，客户在ThingsPanel中配置后可自动获取软件许可证"
+        },
         "actions": {
           "copyCode": "复制授权码",
           "updateLicense": "变更授权",
