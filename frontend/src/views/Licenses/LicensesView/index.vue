@@ -2,7 +2,7 @@
   <div class="license-view-page">
     <!-- 面包屑导航 -->
     <div class="breadcrumb-section">
-      <span class="breadcrumb-item clickable" @click="goBack">授权管理</span>/<span class="breadcrumb-item active">授权详情</span>
+      <span class="breadcrumb-item clickable" @click="goBack">{{ $t('pages.licenses.detail.breadcrumb.licenseManagement') }}</span>/<span class="breadcrumb-item active">{{ $t('pages.licenses.detail.breadcrumb.licenseDetail') }}</span>
     </div>
 
     <!-- 授权详情内容 -->
@@ -15,7 +15,7 @@
           @click="activeTab = 'basic'"
         >
           <LicenseTabIcon name="basic" :active="activeTab === 'basic'" />
-          <span class="text">基础信息</span>
+          <span class="text">{{ $t('pages.licenses.detail.tabs.basic') }}</span>
         </div>
         <div
           class="sidebar-item"
@@ -23,7 +23,7 @@
           @click="activeTab = 'authorization'"
         >
           <LicenseTabIcon name="authorization" :active="activeTab === 'authorization'" />
-          <span class="text">授权信息</span>
+          <span class="text">{{ $t('pages.licenses.detail.tabs.authorization') }}</span>
         </div>
         <div
           class="sidebar-item"
@@ -31,7 +31,7 @@
           @click="activeTab = 'license'"
         >
           <LicenseTabIcon name="license" :active="activeTab === 'license'" />
-          <span class="text">许可证信息</span>
+          <span class="text">{{ $t('pages.licenses.detail.tabs.license') }}</span>
         </div>
         <div
           class="sidebar-item"
@@ -39,7 +39,7 @@
           @click="activeTab = 'history'"
         >
           <LicenseTabIcon name="history" :active="activeTab === 'history'" />
-          <span class="text">授权变更历史</span>
+          <span class="text">{{ $t('pages.licenses.detail.tabs.history') }}</span>
         </div>
       </div>
 
@@ -54,19 +54,19 @@
           </div>
           <div class="action-buttons-inline">
             <el-button class="action-btn-inline copy-btn" @click="handleCopyCode">
-              复制授权码
+              {{ $t('pages.licenses.detail.actions.copyCode') }}
             </el-button>
             <el-button class="action-btn-inline update-btn" @click="handleUpdateLicense">
-              变更授权
+              {{ $t('pages.licenses.detail.actions.updateLicense') }}
             </el-button>
             <el-button class="action-btn-inline renew-btn" @click="handleRenewLicense">
-              延期授权
+              {{ $t('pages.licenses.detail.actions.renewLicense') }}
             </el-button>
             <el-button class="action-btn-inline revoke-btn" @click="handleRevokeLicense">
-              吊销授权
+              {{ $t('pages.licenses.detail.actions.revokeLicense') }}
             </el-button>
             <el-button class="action-btn-inline download-btn" @click="handleDownloadCertificate">
-              下载部署包
+              {{ $t('pages.licenses.detail.actions.downloadCertificate') }}
             </el-button>
           </div>
         </div>
@@ -87,6 +87,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import { getLicenseDetail, type AuthorizationCode } from '@/api/license'
 import LicenseTabIcon from '@/components/common/icons/LicenseTabIcon.vue'
 import BasicInfo from './components/BasicInfo.vue'
@@ -96,6 +97,7 @@ import ChangeHistory from './components/ChangeHistory.vue'
 
 const router = useRouter()
 const route = useRoute()
+const { t } = useI18n()
 
 const loading = ref(false)
 const activeTab = ref('basic')
@@ -121,45 +123,45 @@ const getStatusType = (status?: string) => {
 
 const handleCopyCode = () => {
   if (!licenseData.value?.code) {
-    ElMessage.warning('授权码为空')
+    ElMessage.warning(t('pages.licenses.detail.messages.codeEmpty'))
     return
   }
 
   navigator.clipboard.writeText(licenseData.value.code).then(() => {
-    ElMessage.success('授权码已复制到剪贴板')
+    ElMessage.success(t('pages.licenses.detail.messages.copySuccess'))
   }).catch(() => {
-    ElMessage.error('复制失败，请手动复制')
+    ElMessage.error(t('pages.licenses.detail.messages.copyError'))
   })
 }
 
 const handleUpdateLicense = () => {
-  ElMessage.info('变更授权功能开发中...')
+  ElMessage.info(t('pages.licenses.detail.messages.updateComingSoon'))
 }
 
 const handleRenewLicense = () => {
-  ElMessage.info('延期授权功能开发中...')
+  ElMessage.info(t('pages.licenses.detail.messages.renewComingSoon'))
 }
 
 const handleRevokeLicense = () => {
-  ElMessageBox.confirm('确定要吊销此授权吗？此操作不可撤销！', '警告', {
-    confirmButtonText: '确定吊销',
-    cancelButtonText: '取消',
+  ElMessageBox.confirm(t('pages.licenses.detail.messages.revokeConfirm'), t('pages.licenses.detail.messages.revokeTitle'), {
+    confirmButtonText: t('pages.licenses.detail.messages.revokeConfirmButton'),
+    cancelButtonText: t('pages.licenses.detail.messages.revokeCancelButton'),
     type: 'warning'
   }).then(() => {
-    ElMessage.info('吊销授权功能开发中...')
+    ElMessage.info(t('pages.licenses.detail.messages.revokeComingSoon'))
   }).catch(() => {
     // 取消操作
   })
 }
 
 const handleDownloadCertificate = () => {
-  ElMessage.info('下载凭单功能开发中...')
+  ElMessage.info(t('pages.licenses.detail.messages.downloadComingSoon'))
 }
 
 const loadLicenseData = async () => {
   const id = route.params.id as string
   if (!id) {
-    ElMessage.error('缺少授权ID')
+    ElMessage.error(t('pages.licenses.detail.messages.missingId'))
     router.back()
     return
   }
@@ -170,11 +172,11 @@ const loadLicenseData = async () => {
     if (response.code === '000000' && response.data) {
       licenseData.value = response.data
     } else {
-      throw new Error(response.message || '获取授权详情失败')
+      throw new Error(response.message || t('pages.licenses.detail.messages.loadError'))
     }
   } catch (error: any) {
     console.error('加载授权详情失败:', error)
-    ElMessage.error(error.message || '加载授权详情失败')
+    ElMessage.error(error.message || t('pages.licenses.detail.messages.loadError'))
     router.back()
   } finally {
     loading.value = false

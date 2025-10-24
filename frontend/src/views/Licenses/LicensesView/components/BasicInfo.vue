@@ -3,11 +3,11 @@
     <!-- 基础信息部分 -->
     <div class="info-section">
       <div class="info-row">
-        <div class="info-label">客户ID</div>
+        <div class="info-label">{{ $t('customers.basicInfo.customerId') }}</div>
         <div class="info-value">{{ licenseData?.customer_id || '-' }}</div>
       </div>
       <div class="info-row">
-        <div class="info-label">客户名称</div>
+        <div class="info-label">{{ $t('customers.basicInfo.customerName') }}</div>
         <div class="info-value">{{ licenseData?.customer_name || '-' }}</div>
       </div>
     </div>
@@ -18,7 +18,7 @@
       <div class="stat-card stat-card-1">
         <div class="card-content">
           <div class="stat-value">{{ licenseData?.current_activations || 0 }}</div>
-          <div class="stat-label">已激活设备数量</div>
+          <div class="stat-label">{{ $t('customers.basicInfo.activatedDevices') }}</div>
         </div>
       </div>
 
@@ -26,7 +26,7 @@
       <div class="stat-card stat-card-2">
         <div class="card-content">
           <div class="stat-value">{{ formatDateShort(licenseData?.start_date) }}</div>
-          <div class="stat-label">创建时间</div>
+          <div class="stat-label">{{ $t('customers.basicInfo.creationTime') }}</div>
         </div>
       </div>
 
@@ -34,7 +34,7 @@
       <div class="stat-card stat-card-3">
         <div class="card-content">
           <div class="stat-value">{{ formatDateShort(licenseData?.end_date) }}</div>
-          <div class="stat-label">到期时间</div>
+          <div class="stat-label">{{ $t('customers.basicInfo.expiryTime') }}</div>
         </div>
       </div>
 
@@ -42,7 +42,7 @@
       <div class="stat-card stat-card-4">
         <div class="card-content">
           <div class="stat-value">{{ getRemainingDays(licenseData?.end_date) }}</div>
-          <div class="stat-label">剩余时间（天）</div>
+          <div class="stat-label">{{ $t('customers.basicInfo.remainingDays') }}</div>
         </div>
       </div>
     </div>

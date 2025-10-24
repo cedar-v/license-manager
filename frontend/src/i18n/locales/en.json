@@ -121,7 +121,307 @@
     },
     "licenses": {
       "title": "License Management",
-      "welcome": "Welcome to the License Management page"
+      "welcome": "Welcome to the License Management page",
+      "platform": "License Management Platform",
+      "list": {
+        "title": "License List",
+        "createLicense": "Create License",
+        "filter": {
+          "label": "Filter:",
+          "codePlaceholder": "License Code",
+          "statusPlaceholder": "Status",
+          "query": "Query"
+        },
+        "table": {
+          "code": "License Code",
+          "status": "Status",
+          "deploymentType": "Deployment Type",
+          "endDate": "Expiry Time",
+          "description": "Description",
+          "operation": "Operation",
+          "loading": "Loading..."
+        },
+        "actions": {
+          "detail": "Detail",
+          "lock": "Lock",
+          "unlock": "Unlock",
+          "delete": "Delete"
+        },
+        "status": {
+          "normal": "Normal",
+          "locked": "Locked",
+          "expired": "Expired"
+        },
+        "confirm": {
+          "lockTitle": "Confirm",
+          "lockMessage": "Are you sure you want to lock this license?",
+          "unlockTitle": "Confirm",
+          "unlockMessage": "Are you sure you want to unlock this license?",
+          "deleteTitle": "Warning",
+          "deleteMessage": "Are you sure you want to delete this license? This action cannot be undone!",
+          "confirm": "Confirm",
+          "cancel": "Cancel",
+          "deleteConfirm": "Confirm Delete"
+        },
+        "message": {
+          "lockSuccess": "Lock successful",
+          "lockError": "Lock failed",
+          "unlockSuccess": "Unlock successful",
+          "unlockError": "Unlock failed",
+          "deleteSuccess": "Delete successful",
+          "deleteError": "Delete failed",
+          "loadError": "Failed to load data"
+        }
+      },
+      "actions": {
+        "query": "Query",
+        "createLicense": "Create License",
+        "edit": "Edit",
+        "delete": "Delete",
+        "activate": "Activate",
+        "deactivate": "Deactivate",
+        "renew": "Renew",
+        "viewDetails": "View Details",
+        "export": "Export",
+        "refresh": "Refresh",
+        "back": "Back",
+        "lock": "Lock License",
+        "unlock": "Unlock License"
+      },
+      "search": {
+        "placeholder": "Search license code, customer name, description",
+        "selectCustomer": "Select Customer",
+        "allCustomers": "All Customers",
+        "dateRange": "Select Date Range",
+        "startDate": "Start Date",
+        "endDate": "End Date"
+      },
+      "table": {
+        "licenseCode": "License Code",
+        "customerName": "Customer Name",
+        "description": "Description",
+        "status": "Status",
+        "licenseType": "License Type",
+        "expiryDate": "Expiry Date",
+        "activationDate": "Activation Date",
+        "createTime": "Create Time",
+        "operation": "Operation",
+        "loading": "Loading..."
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "expired": "Expired",
+        "expiring": "Expiring Soon"
+      },
+      "form": {
+        "basicInfo": "Basic Information",
+        "selectCustomer": "Select Customer",
+        "description": "License Description",
+        "licenseType": "License Type",
+        "expiryDate": "Expiry Date",
+        "maxUsers": "Max Users",
+        "features": "License Features",
+        "ipRestrictions": "IP Restrictions",
+        "hardwareId": "Hardware ID",
+        "placeholder": {
+          "selectCustomer": "Please select customer",
+          "enterDescription": "Please enter license description",
+          "selectLicenseType": "Please select license type",
+          "selectExpiryDate": "Please select expiry date",
+          "enterMaxUsers": "Please enter max users",
+          "enterIpRestrictions": "Please enter IP restrictions (one per line)",
+          "enterHardwareId": "Please enter hardware ID"
+        }
+      },
+      "validation": {
+        "customerRequired": "Please select customer",
+        "descriptionRequired": "Please enter license description",
+        "licenseTypeRequired": "Please select license type",
+        "expiryDateRequired": "Please select expiry date",
+        "maxUsersMin": "Max users cannot be less than 1",
+        "ipFormatError": "Invalid IP address format"
+      },
+      "confirm": {
+        "deleteTitle": "Confirm Delete",
+        "deleteMessage": "Are you sure you want to delete license \"{code}\"?",
+        "activateTitle": "Confirm Activate",
+        "activateMessage": "Are you sure you want to activate license \"{code}\"?",
+        "deactivateTitle": "Confirm Deactivate",
+        "deactivateMessage": "Are you sure you want to deactivate license \"{code}\"?",
+        "confirm": "Confirm",
+        "cancel": "Cancel"
+      },
+      "message": {
+        "createSuccess": "Create license successful",
+        "updateSuccess": "Update license successful",
+        "deleteSuccess": "Delete license successful",
+        "activateSuccess": "Activate license successful",
+        "deactivateSuccess": "Deactivate license successful",
+        "renewSuccess": "Renew license successful",
+        "loadError": "Failed to load license list",
+        "createError": "Create license failed",
+        "updateError": "Update license failed",
+        "deleteError": "Delete license failed",
+        "noLicenseWarning": "You don't have any licenses yet, please create one!",
+        "selectCustomerFirst": "Please select a customer first",
+        "queryLicenseError": "Query license failed, please try again later"
+      },
+      "view": {
+        "title": "View License",
+        "basicInfo": "Basic Information",
+        "licenseConfig": "License Configuration",
+        "remarks": "Remarks",
+        "operationHistory": "Operation History",
+        "fields": {
+          "licenseCode": "License Code",
+          "customerName": "Customer Name",
+          "customerId": "Customer ID",
+          "createdBy": "Created By",
+          "createdAt": "Created At",
+          "updatedAt": "Updated At",
+          "validityPeriod": "Validity Period",
+          "startDate": "Start Date",
+          "endDate": "End Date",
+          "deploymentType": "Deployment Type",
+          "lockStatus": "Lock Status",
+          "description": "Description"
+        },
+        "status": {
+          "locked": "Locked",
+          "unlocked": "Unlocked"
+        },
+        "actions": {
+          "confirmLock": "Are you sure you want to lock this license?",
+          "confirmUnlock": "Are you sure you want to unlock this license?",
+          "confirmDelete": "Are you sure you want to delete this license? This action cannot be undone!",
+          "lockSuccess": "License locked",
+          "unlockSuccess": "License unlocked",
+          "deleteSuccess": "License deleted successfully"
+        }
+      },
+      "detail": {
+        "title": "License Details",
+        "breadcrumb": {
+          "licenseManagement": "License Management",
+          "licenseDetail": "License Details"
+        },
+        "tabs": {
+          "basic": "Basic Information",
+          "authorization": "Authorization Information",
+          "license": "License Information",
+          "history": "Authorization Change History"
+        },
+        "actions": {
+          "copyCode": "Copy License Code",
+          "updateLicense": "Update License",
+          "renewLicense": "Renew License",
+          "revokeLicense": "Revoke License",
+          "downloadCertificate": "Download Deployment Package"
+        },
+        "messages": {
+          "copySuccess": "License code copied to clipboard",
+          "copyError": "Copy failed, please copy manually",
+          "codeEmpty": "License code is empty",
+          "updateComingSoon": "Update license feature is under development...",
+          "renewComingSoon": "Renew license feature is under development...",
+          "revokeComingSoon": "Revoke license feature is under development...",
+          "downloadComingSoon": "Download certificate feature is under development...",
+          "revokeConfirm": "Are you sure you want to revoke this license? This action cannot be undone!",
+          "revokeTitle": "Warning",
+          "revokeConfirmButton": "Confirm Revoke",
+          "revokeCancelButton": "Cancel",
+          "loadError": "Failed to load license details",
+          "missingId": "Missing license ID"
+        }
+      },
+      "stats": {
+        "total": "Total Licenses",
+        "active": "Active Licenses",
+        "inactive": "Inactive Licenses",
+        "expired": "Expired Licenses",
+        "expiringSoon": "Expiring Soon"
+      },
+      "form": {
+        "title": "License Form",
+        "breadcrumb": {
+          "licenseManagement": "License Management",
+          "createLicense": "Create License",
+          "editLicense": "Edit License"
+        },
+        "sections": {
+          "basicInfo": "Basic Information",
+          "licenseConfig": "License Configuration"
+        },
+        "fields": {
+          "customerName": "Associated Customer Name",
+          "customerId": "Customer ID",
+          "createdBy": "Created By",
+          "description": "Description",
+          "validityPeriod": "Validity Period",
+          "validityType": "Validity Type",
+          "dateRange": "Date Range",
+          "validityDays": "Validity Days",
+          "maxActivations": "Max Activations",
+          "deploymentType": "Deployment Type",
+          "encryptionType": "Encryption Type"
+        },
+        "validityTypes": {
+          "permanent": "Permanent",
+          "limited": "Limited"
+        },
+        "placeholders": {
+          "selectCustomer": "Please select customer",
+          "autoGenerateOrManual": "Auto-generated or manual input",
+          "currentUser": "Current logged-in user",
+          "enterDescription": "Please enter description",
+          "selectValidityType": "Please select validity type",
+          "selectDateRange": "Please select date range",
+          "startDate": "Start Date",
+          "endDate": "End Date",
+          "enterMaxActivations": "Please enter max activations",
+          "selectDeploymentType": "Please select deployment type",
+          "selectEncryptionType": "Please select encryption type"
+        },
+        "actions": {
+          "cancel": "Cancel",
+          "create": "Create",
+          "update": "Update",
+          "submit": "Submit"
+        },
+        "validation": {
+          "customerRequired": "Please select customer",
+          "customerInvalid": "Please select a valid customer from the dropdown list",
+          "descriptionRequired": "Please enter description",
+          "descriptionLength": "Description length should be between 1-500 characters",
+          "validityTypeRequired": "Please select validity type",
+          "dateRangeRequired": "Please select date range",
+          "startDateNotPast": "Start date cannot be earlier than today",
+          "endDateAfterStart": "End date must be later than start date",
+          "validityPeriodTooLong": "Validity period cannot exceed 10 years",
+          "deploymentTypeRequired": "Please select deployment type",
+          "encryptionTypeRequired": "Please select encryption type",
+          "maxActivationsRequired": "Please enter max activations",
+          "maxActivationsRange": "Max activations must be between 1-999999",
+          "maxActivationsInteger": "Max activations must be an integer"
+        },
+        "messages": {
+          "loadEnumError": "Failed to load enum options",
+          "loadEnumErrorRetry": "Failed to load enum options, please try again later",
+          "searchCustomerError": "Failed to search customers",
+          "searchCustomerErrorRetry": "Failed to search customers, please try again later",
+          "loadDetailError": "Failed to load license details",
+          "loadDetailErrorRetry": "Failed to load license details, please try again later",
+          "submitError": "Submit failed",
+          "submitErrorRetry": "Submit failed, please try again later",
+          "createSuccess": "Created successfully",
+          "updateSuccess": "Updated successfully",
+          "cancelConfirm": "Are you sure you want to cancel? Unsaved changes will be lost.",
+          "cancelTitle": "Confirm",
+          "cancelConfirmButton": "Confirm",
+          "cancelCancelButton": "Continue Editing"
+        }
+      }
     }
   },
   "userMenu": {
@@ -250,6 +550,14 @@
       "noData": "--",
       "onlineLicense": "Online License",
       "customerNotExist": "Customer data does not exist"
+    },
+    "basicInfo": {
+      "customerId": "Customer ID",
+      "customerName": "Customer Name",
+      "activatedDevices": "Activated Devices Count",
+      "creationTime": "Creation Time",
+      "expiryTime": "Expiry Time",
+      "remainingDays": "Remaining Days"
     }
   }
 }

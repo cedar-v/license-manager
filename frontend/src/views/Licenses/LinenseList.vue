@@ -2,14 +2,14 @@
   <div class="license-list-page">
     <!-- 顶部操作区 -->
     <div class="top-actions">
-      <el-button type="primary" @click="handleCreate"> 创建授权 </el-button>
+      <el-button type="primary" @click="handleCreate"> {{ t('licenses.list.createLicense') }} </el-button>
 
       <div class="filters">
-        <span class="filter-label">筛选：</span>
+        <span class="filter-label">{{ t('licenses.list.filter.label') }}</span>
 
-        <el-input v-model="filterCode" placeholder="授权码" clearable class="filter-input" />
+        <el-input v-model="filterCode" :placeholder="t('licenses.list.filter.codePlaceholder')" clearable class="filter-input" />
 
-        <el-select v-model="filterStatus" placeholder="状态" clearable class="filter-select">
+        <el-select v-model="filterStatus" :placeholder="t('licenses.list.filter.statusPlaceholder')" clearable class="filter-select">
           <el-option
             v-for="option in statusOptions"
             :key="option.key"
@@ -18,7 +18,7 @@
           />
         </el-select>
 
-        <el-button type="primary" @click="handleQuery"> 查询 </el-button>
+        <el-button type="primary" @click="handleQuery"> {{ t('licenses.list.filter.query') }} </el-button>
       </div>
     </div>
 
@@ -28,7 +28,7 @@
         <el-table
           :data="tableData"
           v-loading="loading"
-          :element-loading-text="'加载中...'"
+          :element-loading-text="t('licenses.list.table.loading')"
           stripe
           border
           style="width: 100%"
@@ -41,7 +41,7 @@
         >
           <el-table-column
             prop="code"
-            label="授权码"
+            :label="t('licenses.list.table.code')"
             :width="200"
             show-overflow-tooltip
             align="left"
@@ -54,7 +54,7 @@
               >
             </template>
           </el-table-column>
-          <el-table-column prop="status" label="状态" :width="100" align="center">
+          <el-table-column prop="status" :label="t('licenses.list.table.status')" :width="100" align="center">
             <template #default="scope">
               <div class="status-tag" :class="getStatusClass(scope.row.status)">
                 {{ scope.row.status_display }}
@@ -63,18 +63,18 @@
           </el-table-column>
           <el-table-column
             prop="deployment_type_display"
-            label="部署类型"
+            :label="t('licenses.list.table.deploymentType')"
             :width="120"
             align="center"
           />
-          <el-table-column prop="end_date" label="到期时间" :width="180" align="center">
+          <el-table-column prop="end_date" :label="t('licenses.list.table.endDate')" :width="180" align="center">
             <template #default="scope">
               {{ formatDate(scope.row.end_date) }}
             </template>
           </el-table-column>
           <el-table-column
             prop="description"
-            label="备注"
+            :label="t('licenses.list.table.description')"
             :min-width="200"
             show-overflow-tooltip
             align="center"
@@ -83,18 +83,18 @@
               <span class="ellipsis-text">{{ scope.row.description }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="操作" fixed="right" class-name="action-column" align="center">
+          <el-table-column :label="t('licenses.list.table.operation')" fixed="right" class-name="action-column" align="center">
             <template #default="scope">
               <div class="action-buttons">
-                <button class="action-btn primary" @click="handleDetail(scope.row)">详情</button>
+                <button class="action-btn primary" @click="handleDetail(scope.row)">{{ t('licenses.list.actions.detail') }}</button>
                 <button
                   class="action-btn"
                   :class="scope.row.is_locked ? 'success' : 'warning'"
                   @click="scope.row.is_locked ? handleUnlock(scope.row) : handleLock(scope.row)"
                 >
-                  {{ scope.row.is_locked ? '解锁' : '锁定' }}
+                  {{ scope.row.is_locked ? t('licenses.list.actions.unlock') : t('licenses.list.actions.lock') }}
                 </button>
-                <button class="action-btn danger" @click="handleDelete(scope.row)">删除</button>
+                <button class="action-btn danger" @click="handleDelete(scope.row)">{{ t('licenses.list.actions.delete') }}</button>
               </div>
             </template>
           </el-table-column>
@@ -122,6 +122,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import {
   getLicenses,
   lockAuthorizationCode,
@@ -134,6 +135,7 @@ import { formatDate } from '@/utils/date'
 
 const router = useRouter()
 const route = useRoute()
+const { t } = useI18n()
 
 // 从路由参数获取客户信息
 const customerInfo = computed(() => {
@@ -199,9 +201,9 @@ const handleDetail = (row: any) => {
 }
 
 const handleLock = async (row: any) => {
-  ElMessageBox.confirm('确定要锁定此授权吗？', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+  ElMessageBox.confirm(t('licenses.list.confirm.lockMessage'), t('licenses.list.confirm.lockTitle'), {
+    confirmButtonText: t('licenses.list.confirm.confirm'),
+    cancelButtonText: t('licenses.list.confirm.cancel'),
     type: 'warning'
   })
     .then(async () => {
@@ -211,11 +213,11 @@ const handleLock = async (row: any) => {
           lock_reason: '手动锁定',
           reason: '管理员手动锁定'
         })
-        ElMessage.success('锁定成功')
+        ElMessage.success(t('licenses.list.message.lockSuccess'))
         loadData()
       } catch (error) {
         console.error('锁定失败:', error)
-        ElMessage.error('锁定失败')
+        ElMessage.error(t('licenses.list.message.lockError'))
       }
     })
     .catch(() => {
@@ -224,9 +226,9 @@ const handleLock = async (row: any) => {
 }
 
 const handleUnlock = async (row: any) => {
-  ElMessageBox.confirm('确定要解锁此授权吗？', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+  ElMessageBox.confirm(t('licenses.list.confirm.unlockMessage'), t('licenses.list.confirm.unlockTitle'), {
+    confirmButtonText: t('licenses.list.confirm.confirm'),
+    cancelButtonText: t('licenses.list.confirm.cancel'),
     type: 'warning'
   })
     .then(async () => {
@@ -236,11 +238,11 @@ const handleUnlock = async (row: any) => {
           lock_reason: '手动解锁',
           reason: '管理员手动解锁'
         })
-        ElMessage.success('解锁成功')
+        ElMessage.success(t('licenses.list.message.unlockSuccess'))
         loadData()
       } catch (error) {
         console.error('解锁失败:', error)
-        ElMessage.error('解锁失败')
+        ElMessage.error(t('licenses.list.message.unlockError'))
       }
     })
     .catch(() => {
@@ -249,19 +251,19 @@ const handleUnlock = async (row: any) => {
 }
 
 const handleDelete = async (row: any) => {
-  ElMessageBox.confirm('确定要删除此授权吗？删除后无法恢复！', '警告', {
-    confirmButtonText: '确定删除',
-    cancelButtonText: '取消',
+  ElMessageBox.confirm(t('licenses.list.confirm.deleteMessage'), t('licenses.list.confirm.deleteTitle'), {
+    confirmButtonText: t('licenses.list.confirm.deleteConfirm'),
+    cancelButtonText: t('licenses.list.confirm.cancel'),
     type: 'warning'
   })
     .then(async () => {
       try {
         await deleteLicense(row.id)
-        ElMessage.success('删除成功')
+        ElMessage.success(t('licenses.list.message.deleteSuccess'))
         loadData()
       } catch (error) {
         console.error('删除失败:', error)
-        ElMessage.error('删除失败')
+        ElMessage.error(t('licenses.list.message.deleteError'))
       }
     })
     .catch(() => {
@@ -324,7 +326,7 @@ const loadData = async () => {
     console.log('表格数据:', tableData.value)
   } catch (error) {
     console.error('加载数据失败:', error)
-    ElMessage.error('加载数据失败')
+    ElMessage.error(t('licenses.list.message.loadError'))
   } finally {
     loading.value = false
   }

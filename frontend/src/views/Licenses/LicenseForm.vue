@@ -4,15 +4,15 @@
     <div class="top-section">
       <!-- 面包屑导航 -->
       <div class="breadcrumb">
-        <span class="breadcrumb-item">授权管理</span>
+        <span class="breadcrumb-item">{{ t('pages.licenses.form.breadcrumb.licenseManagement') }}</span>
         <span class="breadcrumb-separator">></span>
-        <span class="breadcrumb-current">{{ isEdit ? '编辑授权' : '创建授权' }}</span>
+        <span class="breadcrumb-current">{{ isEdit ? t('pages.licenses.form.breadcrumb.editLicense') : t('pages.licenses.form.breadcrumb.createLicense') }}</span>
       </div>
       
       <!-- 操作按钮 -->
       <div class="form-actions">
-        <el-button @click="handleCancel">取消</el-button>
-        <el-button type="primary" @click="handleSubmit" :loading="submitting">{{ isEdit ? '更新' : '创建' }}</el-button>
+        <el-button @click="handleCancel">{{ t('pages.licenses.form.actions.cancel') }}</el-button>
+        <el-button type="primary" @click="handleSubmit" :loading="submitting">{{ isEdit ? t('pages.licenses.form.actions.update') : t('pages.licenses.form.actions.create') }}</el-button>
       </div>
     </div>
 
@@ -21,14 +21,14 @@
       <el-form :model="formData" :rules="formRules" ref="formRef" label-position="top">
         <!-- 基本信息 -->
         <div class="license-form">
-          <h3 class="section-title">基本信息</h3>
+          <h3 class="section-title">{{ t('pages.licenses.form.sections.basicInfo') }}</h3>
           
           <!-- 第一行：关联客户名称，客户ID，创建人 -->
           <div class="fields-row">
-            <el-form-item label="关联客户名称" prop="customer_id" required class="field-item">
+            <el-form-item :label="t('pages.licenses.form.fields.customerName')" prop="customer_id" required class="field-item">
               <el-select
                 v-model="formData.customer_id"
-                placeholder="请选择客户"
+                :placeholder="t('pages.licenses.form.placeholders.selectCustomer')"
                 filterable
                 remote
                 :remote-method="searchCustomers"
@@ -44,18 +44,18 @@
               </el-select>
             </el-form-item>
             
-            <el-form-item label="客户ID" prop="customer_code" required class="field-item">
+            <el-form-item :label="t('pages.licenses.form.fields.customerId')" prop="customer_code" required class="field-item">
               <el-input
                 v-model="formData.customer_code"
-                placeholder="自动生成或手动输入"
+                :placeholder="t('pages.licenses.form.placeholders.autoGenerateOrManual')"
                 disabled
               />
             </el-form-item>
             
-            <el-form-item label="创建人" prop="created_by" required class="field-item">
+            <el-form-item :label="t('pages.licenses.form.fields.createdBy')" prop="created_by" required class="field-item">
               <el-input
                 v-model="formData.created_by"
-                placeholder="当前登录用户"
+                :placeholder="t('pages.licenses.form.placeholders.currentUser')"
                 disabled
               />
             </el-form-item>
@@ -63,10 +63,10 @@
           
           <!-- 第二行：备注单独一行 -->
           <div class="fields-row">
-            <el-form-item label="备注" prop="description" required class="field-item-full">
+            <el-form-item :label="t('pages.licenses.form.fields.description')" prop="description" required class="field-item-full">
               <el-input
                 v-model="formData.description"
-                placeholder="请输入备注信息"
+                :placeholder="t('pages.licenses.form.placeholders.enterDescription')"
               />
             </el-form-item>
           </div>
@@ -74,23 +74,23 @@
 
         <!-- 授权配置 -->
         <div class="license-form">
-          <h3 class="section-title">授权配置</h3>
+          <h3 class="section-title">{{ t('pages.licenses.form.sections.licenseConfig') }}</h3>
           
           <!-- 第三行：授权期限类型，起止时间 -->
           <div class="fields-row">
-            <el-form-item label="授权期限" prop="validity_type" required class="field-item">
+            <el-form-item :label="t('pages.licenses.form.fields.validityPeriod')" prop="validity_type" required class="field-item">
               <el-select
                 v-model="formData.validity_type"
-                placeholder="请选择授权期限类型"
+                :placeholder="t('pages.licenses.form.placeholders.selectValidityType')"
                 style="width: 100%"
                 @change="handleValidityTypeChange"
               >
                 <el-option
-                  label="永久"
+                  :label="t('pages.licenses.form.validityTypes.permanent')"
                   value="permanent"
                 />
                 <el-option
-                  label="有限"
+                  :label="t('pages.licenses.form.validityTypes.limited')"
                   value="limited"
                 />
               </el-select>
@@ -98,7 +98,7 @@
             
             <el-form-item 
               v-if="formData.validity_type === 'limited'" 
-              label="起止时间" 
+              :label="t('pages.licenses.form.fields.dateRange')" 
               prop="date_range" 
               required 
               class="field-item"
@@ -106,9 +106,9 @@
               <el-date-picker
                 v-model="dateRange"
                 type="daterange"
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
+                :range-separator="t('chart.licenseTrend.datePicker.rangeSeparator')"
+                :start-placeholder="t('pages.licenses.form.placeholders.startDate')"
+                :end-placeholder="t('pages.licenses.form.placeholders.endDate')"
                 format="YYYY-MM-DD"
                 value-format="YYYY-MM-DD"
                 style="width: 100%"
@@ -118,11 +118,11 @@
             
             <el-form-item 
               v-if="formData.validity_type === 'permanent'" 
-              label="有效期天数" 
+              :label="t('pages.licenses.form.fields.validityDays')" 
               class="field-item"
             >
               <el-input
-                :value="'永久（365000天）'"
+                :value="t('pages.licenses.form.validityTypes.permanent') + '（365000天）'"
                 readonly
                 style="width: 100%"
               />
@@ -131,19 +131,19 @@
           
           <!-- 第四行：最大激活设备数，部署类型，加密类型 -->
           <div class="fields-row">
-            <el-form-item label="最大激活设备数" prop="max_activations" required class="field-item">
+            <el-form-item :label="t('pages.licenses.form.fields.maxActivations')" prop="max_activations" required class="field-item">
               <el-input-number
                 v-model="formData.max_activations"
                 :min="1"
-                placeholder="请输入最大激活设备数"
+                :placeholder="t('pages.licenses.form.placeholders.enterMaxActivations')"
                 style="width: 100%"
               />
             </el-form-item>
             
-            <el-form-item label="部署类型" prop="deployment_type" required class="field-item">
+            <el-form-item :label="t('pages.licenses.form.fields.deploymentType')" prop="deployment_type" required class="field-item">
               <el-select
                 v-model="formData.deployment_type"
-                placeholder="请选择部署类型"
+                :placeholder="t('pages.licenses.form.placeholders.selectDeploymentType')"
                 style="width: 100%"
                 @change="handleDeploymentTypeChange"
               >
@@ -156,10 +156,10 @@
               </el-select>
             </el-form-item>
             
-            <el-form-item label="加密类型" prop="encryption_type" required class="field-item">
+            <el-form-item :label="t('pages.licenses.form.fields.encryptionType')" prop="encryption_type" required class="field-item">
               <el-select
                 v-model="formData.encryption_type"
-                placeholder="请选择加密类型"
+                :placeholder="t('pages.licenses.form.placeholders.selectEncryptionType')"
                 style="width: 100%"
               >
                 <el-option
@@ -181,6 +181,7 @@
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { createLicense, updateLicense, getLicenseDetail, type AuthorizationCodeCreateRequest, type LicenseUpdateRequest } from '@/api/license'
 import { getCustomers, type Customer } from '@/api/customer'
 import { getEnumOptions, type RawEnumItem } from '@/api/enum'
@@ -189,6 +190,7 @@ import { useUserStore } from '@/store/modules/user'
 const router = useRouter()
 const route = useRoute()
 const userStore = useUserStore()
+const { t } = useI18n()
 
 // 表单引用
 const formRef = ref<FormInstance>()
@@ -233,13 +235,13 @@ const isEdit = computed(() => {
 // 表单验证规则
 const formRules: FormRules = {
   customer_id: [
-    { required: true, message: '请选择客户', trigger: 'change' },
+    { required: true, message: t('pages.licenses.form.validation.customerRequired'), trigger: 'change' },
     {
       validator: (_rule: any, value: any, callback: any) => {
         if (value && customerOptions.value.length > 0) {
           const selectedCustomer = customerOptions.value.find(c => c.id === value)
           if (!selectedCustomer) {
-            callback(new Error('请从下拉列表中选择有效的客户'))
+            callback(new Error(t('pages.licenses.form.validation.customerInvalid')))
           } else {
             callback()
           }
@@ -251,20 +253,20 @@ const formRules: FormRules = {
     }
   ],
   description: [
-    { required: true, message: '请输入备注信息', trigger: 'blur' },
-    { min: 1, max: 500, message: '备注信息长度应在1-500个字符之间', trigger: 'blur' }
+    { required: true, message: t('pages.licenses.form.validation.descriptionRequired'), trigger: 'blur' },
+    { min: 1, max: 500, message: t('pages.licenses.form.validation.descriptionLength'), trigger: 'blur' }
   ],
   validity_type: [
-    { required: true, message: '请选择授权期限类型', trigger: 'change' }
+    { required: true, message: t('pages.licenses.form.validation.validityTypeRequired'), trigger: 'change' }
   ],
   date_range: [
     { 
       required: true, 
-      message: '请选择起止时间', 
+      message: t('pages.licenses.form.validation.dateRangeRequired'), 
       trigger: 'change',
       validator: (_rule: any, _value: any, callback: any) => {
         if (formData.validity_type === 'limited' && (!dateRange.value || dateRange.value.length !== 2)) {
-          callback(new Error('请选择起止时间'))
+          callback(new Error(t('pages.licenses.form.validation.dateRangeRequired')))
         } else {
           callback()
         }
@@ -279,16 +281,16 @@ const formRules: FormRules = {
           today.setHours(0, 0, 0, 0)
           
           if (startDate < today) {
-            callback(new Error('开始日期不能早于今天'))
+            callback(new Error(t('pages.licenses.form.validation.startDateNotPast')))
           } else if (endDate <= startDate) {
-            callback(new Error('结束日期必须晚于开始日期'))
+            callback(new Error(t('pages.licenses.form.validation.endDateAfterStart')))
           } else {
             // 检查日期范围是否超过合理范围（比如10年）
             const maxDays = 3650 // 10年
             const diffTime = endDate.getTime() - startDate.getTime()
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
             if (diffDays > maxDays) {
-              callback(new Error('授权期限不能超过10年'))
+              callback(new Error(t('pages.licenses.form.validation.validityPeriodTooLong')))
             } else {
               callback()
             }
@@ -301,24 +303,24 @@ const formRules: FormRules = {
     }
   ],
   deployment_type: [
-    { required: true, message: '请选择部署类型', trigger: 'change' }
+    { required: true, message: t('pages.licenses.form.validation.deploymentTypeRequired'), trigger: 'change' }
   ],
   encryption_type: [
-    { required: true, message: '请选择加密类型', trigger: 'change' }
+    { required: true, message: t('pages.licenses.form.validation.encryptionTypeRequired'), trigger: 'change' }
   ],
   max_activations: [
-    { required: true, message: '请输入最大激活设备数', trigger: 'blur' },
+    { required: true, message: t('pages.licenses.form.validation.maxActivationsRequired'), trigger: 'blur' },
     { 
       type: 'number', 
       min: 1, 
       max: 999999, 
-      message: '最大激活设备数必须在1-999999之间', 
+      message: t('pages.licenses.form.validation.maxActivationsRange'), 
       trigger: 'blur' 
     },
     {
       validator: (_rule: any, value: any, callback: any) => {
         if (value && !Number.isInteger(Number(value))) {
-          callback(new Error('最大激活设备数必须为整数'))
+          callback(new Error(t('pages.licenses.form.validation.maxActivationsInteger')))
         } else {
           callback()
         }
@@ -350,9 +352,9 @@ const loadEnumOptions = async () => {
     console.error('加载枚举选项失败:', error)
     let errorMessage = error.backendMessage || error.response?.data?.message || error.message
     if (errorMessage) {
-      ElMessage.error('加载枚举选项失败: ' + errorMessage)
+      ElMessage.error(t('pages.licenses.form.messages.loadEnumError') + ': ' + errorMessage)
     } else {
-      ElMessage.error('加载枚举选项失败，请稍后重试')
+      ElMessage.error(t('pages.licenses.form.messages.loadEnumErrorRetry'))
     }
   }
 }
@@ -376,9 +378,9 @@ const searchCustomers = async (query: string) => {
     console.error('搜索客户失败:', error)
     let errorMessage = error.backendMessage || error.response?.data?.message || error.message
     if (errorMessage) {
-      ElMessage.error('搜索客户失败: ' + errorMessage)
+      ElMessage.error(t('pages.licenses.form.messages.searchCustomerError') + ': ' + errorMessage)
     } else {
-      ElMessage.error('搜索客户失败，请稍后重试')
+      ElMessage.error(t('pages.licenses.form.messages.searchCustomerErrorRetry'))
     }
   } finally {
     customerLoading.value = false
@@ -416,7 +418,7 @@ const loadCustomerInfo = () => {
   if (userStore.userInfo) {
     formData.created_by = userStore.userInfo.username
   } else {
-    formData.created_by = '未知用户'
+    formData.created_by = t('pages.licenses.form.placeholders.currentUser')
   }
 }
 
@@ -472,7 +474,7 @@ const loadLicenseDetail = async () => {
       // 设置表单字段
       formData.customer_code = (data as any).customer_code || data.customer_id || ''
       // 编辑模式下显示原始创建人，如果没有则显示当前用户
-      formData.created_by = (data as any).created_by || (userStore.userInfo ? userStore.userInfo.username : '未知用户')
+      formData.created_by = (data as any).created_by || (userStore.userInfo ? userStore.userInfo.username : t('pages.licenses.form.placeholders.currentUser'))
       
       // 计算有效期天数和设置日期范围
       if (data.start_date && data.end_date) {
@@ -523,15 +525,15 @@ const loadLicenseDetail = async () => {
         } as Customer]
       }
     } else {
-      throw new Error(response.message || '获取授权详情失败')
+      throw new Error(response.message || t('pages.licenses.form.messages.loadDetailError'))
     }
   } catch (error: any) {
     console.error('加载授权详情失败:', error)
     let errorMessage = error.backendMessage || error.response?.data?.message || error.message
     if (errorMessage) {
-      ElMessage.error('加载授权详情失败: ' + errorMessage)
+      ElMessage.error(t('pages.licenses.form.messages.loadDetailError') + ': ' + errorMessage)
     } else {
-      ElMessage.error('加载授权详情失败，请稍后重试')
+      ElMessage.error(t('pages.licenses.form.messages.loadDetailErrorRetry'))
     }
   }
 }
@@ -559,35 +561,35 @@ const handleSubmit = async () => {
         usage_limits: formData.usage_limits,
         custom_parameters: formData.custom_parameters,
         change_type: 'other',
-        reason: '管理员更新授权配置'
+        reason: t('pages.licenses.form.messages.updateSuccess')
       }
       
       const response = await updateLicense(id, updateData)
       if (response.code === '000000') {
-        ElMessage.success(response.message || '更新成功')
+        ElMessage.success(response.message || t('pages.licenses.form.messages.updateSuccess'))
         // 返回列表页面
         router.back()
       } else {
-        throw new Error(response.message || '更新失败')
+        throw new Error(response.message || t('pages.licenses.form.messages.submitError'))
       }
     } else {
       // 创建授权
       const response = await createLicense(formData)
       if (response.code === '000000') {
-        ElMessage.success(response.message || '创建成功')
+        ElMessage.success(response.message || t('pages.licenses.form.messages.createSuccess'))
         // 返回列表页面
         router.back()
       } else {
-        throw new Error(response.message || '创建失败')
+        throw new Error(response.message || t('pages.licenses.form.messages.submitError'))
       }
     }
   } catch (error: any) {
     console.error('提交失败:', error)
     let errorMessage = error.backendMessage || error.response?.data?.message || error.message
     if (errorMessage) {
-      ElMessage.error('提交失败: ' + errorMessage)
+      ElMessage.error(t('pages.licenses.form.messages.submitError') + ': ' + errorMessage)
     } else {
-      ElMessage.error('提交失败，请稍后重试')
+      ElMessage.error(t('pages.licenses.form.messages.submitErrorRetry'))
     }
   } finally {
     submitting.value = false
@@ -596,9 +598,9 @@ const handleSubmit = async () => {
 
 // 取消函数
 const handleCancel = () => {
-  ElMessageBox.confirm('确定要取消吗？未保存的更改将丢失。', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '继续编辑',
+  ElMessageBox.confirm(t('pages.licenses.form.messages.cancelConfirm'), t('pages.licenses.form.messages.cancelTitle'), {
+    confirmButtonText: t('pages.licenses.form.messages.cancelConfirmButton'),
+    cancelButtonText: t('pages.licenses.form.messages.cancelCancelButton'),
     type: 'warning'
   }).then(() => {
     router.back()

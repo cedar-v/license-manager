@@ -14,11 +14,11 @@
         </div>
         <div class="info-row">
           <div class="info-label">创建人：</div>
-          <div class="info-value">{{ licenseData?.creator || '-' }}</div>
+          <div class="info-value">{{ licenseData?.customer_name || '-' }}</div>
         </div>
         <div class="info-row">
           <div class="info-label">备注：</div>
-          <div class="info-value">{{ licenseData?.remark || '-' }}</div>
+          <div class="info-value">{{ licenseData?.description || '-' }}</div>
         </div>
       </div>
     </div>
@@ -85,7 +85,7 @@ const props = defineProps<Props>()
 // 获取授权期限类型
 const getLicensePeriodType = () => {
   // 这里假设有个字段表示授权期限类型，如果没有则返回"有效期限"
-  return props.licenseData?.period_type || '有效期限'
+  return '有效期限'
 }
 
 // 格式化日期区间

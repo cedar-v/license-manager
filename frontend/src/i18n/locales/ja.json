@@ -121,7 +121,307 @@
     },
     "licenses": {
       "title": "ライセンス管理",
-      "welcome": "ライセンス管理ページへようこそ"
+      "welcome": "ライセンス管理ページへようこそ",
+      "platform": "ライセンス管理プラットフォーム",
+      "list": {
+        "title": "ライセンス一覧",
+        "createLicense": "ライセンス作成",
+        "filter": {
+          "label": "フィルター：",
+          "codePlaceholder": "ライセンスコード",
+          "statusPlaceholder": "ステータス",
+          "query": "検索"
+        },
+        "table": {
+          "code": "ライセンスコード",
+          "status": "ステータス",
+          "deploymentType": "デプロイメントタイプ",
+          "endDate": "有効期限",
+          "description": "説明",
+          "operation": "操作",
+          "loading": "読み込み中..."
+        },
+        "actions": {
+          "detail": "詳細",
+          "lock": "ロック",
+          "unlock": "アンロック",
+          "delete": "削除"
+        },
+        "status": {
+          "normal": "正常",
+          "locked": "ロック済み",
+          "expired": "期限切れ"
+        },
+        "confirm": {
+          "lockTitle": "確認",
+          "lockMessage": "このライセンスをロックしてもよろしいですか？",
+          "unlockTitle": "確認",
+          "unlockMessage": "このライセンスをアンロックしてもよろしいですか？",
+          "deleteTitle": "警告",
+          "deleteMessage": "このライセンスを削除してもよろしいですか？この操作は元に戻せません！",
+          "confirm": "確認",
+          "cancel": "キャンセル",
+          "deleteConfirm": "削除確認"
+        },
+        "message": {
+          "lockSuccess": "ロックしました",
+          "lockError": "ロックに失敗しました",
+          "unlockSuccess": "アンロックしました",
+          "unlockError": "アンロックに失敗しました",
+          "deleteSuccess": "削除しました",
+          "deleteError": "削除に失敗しました",
+          "loadError": "データの読み込みに失敗しました"
+        }
+      },
+      "actions": {
+        "query": "検索",
+        "createLicense": "ライセンス作成",
+        "edit": "編集",
+        "delete": "削除",
+        "activate": "有効化",
+        "deactivate": "無効化",
+        "renew": "更新",
+        "viewDetails": "詳細表示",
+        "export": "エクスポート",
+        "refresh": "更新",
+        "back": "戻る",
+        "lock": "ライセンスロック",
+        "unlock": "ライセンスアンロック"
+      },
+      "search": {
+        "placeholder": "ライセンスコード、顧客名、説明で検索",
+        "selectCustomer": "顧客選択",
+        "allCustomers": "全顧客",
+        "dateRange": "日付範囲選択",
+        "startDate": "開始日",
+        "endDate": "終了日"
+      },
+      "table": {
+        "licenseCode": "ライセンスコード",
+        "customerName": "顧客名",
+        "description": "説明",
+        "status": "ステータス",
+        "licenseType": "ライセンスタイプ",
+        "expiryDate": "有効期限",
+        "activationDate": "有効化日",
+        "createTime": "作成日時",
+        "operation": "操作",
+        "loading": "読み込み中..."
+      },
+      "status": {
+        "active": "有効",
+        "inactive": "無効",
+        "expired": "期限切れ",
+        "expiring": "期限近し"
+      },
+      "form": {
+        "basicInfo": "基本情報",
+        "selectCustomer": "顧客選択",
+        "description": "ライセンス説明",
+        "licenseType": "ライセンスタイプ",
+        "expiryDate": "有効期限",
+        "maxUsers": "最大ユーザー数",
+        "features": "ライセンス機能",
+        "ipRestrictions": "IP制限",
+        "hardwareId": "ハードウェアID",
+        "placeholder": {
+          "selectCustomer": "顧客を選択してください",
+          "enterDescription": "ライセンス説明を入力してください",
+          "selectLicenseType": "ライセンスタイプを選択してください",
+          "selectExpiryDate": "有効期限を選択してください",
+          "enterMaxUsers": "最大ユーザー数を入力してください",
+          "enterIpRestrictions": "IP制限を入力してください（1行に1つ）",
+          "enterHardwareId": "ハードウェアIDを入力してください"
+        }
+      },
+      "validation": {
+        "customerRequired": "顧客を選択してください",
+        "descriptionRequired": "ライセンス説明を入力してください",
+        "licenseTypeRequired": "ライセンスタイプを選択してください",
+        "expiryDateRequired": "有効期限を選択してください",
+        "maxUsersMin": "最大ユーザー数は1以上である必要があります",
+        "ipFormatError": "IPアドレス形式が正しくありません"
+      },
+      "confirm": {
+        "deleteTitle": "削除確認",
+        "deleteMessage": "ライセンス \"{code}\" を削除してもよろしいですか？",
+        "activateTitle": "有効化確認",
+        "activateMessage": "ライセンス \"{code}\" を有効化してもよろしいですか？",
+        "deactivateTitle": "無効化確認",
+        "deactivateMessage": "ライセンス \"{code}\" を無効化してもよろしいですか？",
+        "confirm": "確認",
+        "cancel": "キャンセル"
+      },
+      "message": {
+        "createSuccess": "ライセンス作成しました",
+        "updateSuccess": "ライセンス更新しました",
+        "deleteSuccess": "ライセンス削除しました",
+        "activateSuccess": "ライセンス有効化しました",
+        "deactivateSuccess": "ライセンス無効化しました",
+        "renewSuccess": "ライセンス更新しました",
+        "loadError": "ライセンス一覧の読み込みに失敗しました",
+        "createError": "ライセンス作成に失敗しました",
+        "updateError": "ライセンス更新に失敗しました",
+        "deleteError": "ライセンス削除に失敗しました",
+        "noLicenseWarning": "まだライセンスがありません。ライセンスを作成してください！",
+        "selectCustomerFirst": "まず顧客を選択してください",
+        "queryLicenseError": "ライセンス検索に失敗しました。後ほど再度お試しください"
+      },
+      "view": {
+        "title": "ライセンス表示",
+        "basicInfo": "基本情報",
+        "licenseConfig": "ライセンス設定",
+        "remarks": "備考",
+        "operationHistory": "操作履歴",
+        "fields": {
+          "licenseCode": "ライセンスコード",
+          "customerName": "顧客名",
+          "customerId": "顧客ID",
+          "createdBy": "作成者",
+          "createdAt": "作成日時",
+          "updatedAt": "更新日時",
+          "validityPeriod": "有効期間",
+          "startDate": "開始日",
+          "endDate": "終了日",
+          "deploymentType": "デプロイメントタイプ",
+          "lockStatus": "ロック状態",
+          "description": "説明"
+        },
+        "status": {
+          "locked": "ロック済み",
+          "unlocked": "ロック解除済み"
+        },
+        "actions": {
+          "confirmLock": "このライセンスをロックしてもよろしいですか？",
+          "confirmUnlock": "このライセンスをアンロックしてもよろしいですか？",
+          "confirmDelete": "このライセンスを削除してもよろしいですか？この操作は元に戻せません！",
+          "lockSuccess": "ライセンスをロックしました",
+          "unlockSuccess": "ライセンスをアンロックしました",
+          "deleteSuccess": "ライセンスを削除しました"
+        }
+      },
+      "detail": {
+        "title": "ライセンス詳細",
+        "breadcrumb": {
+          "licenseManagement": "ライセンス管理",
+          "licenseDetail": "ライセンス詳細"
+        },
+        "tabs": {
+          "basic": "基本情報",
+          "authorization": "認証情報",
+          "license": "ライセンス情報",
+          "history": "認証変更履歴"
+        },
+        "actions": {
+          "copyCode": "ライセンスコードをコピー",
+          "updateLicense": "ライセンス更新",
+          "renewLicense": "ライセンス延長",
+          "revokeLicense": "ライセンス取り消し",
+          "downloadCertificate": "デプロイメントパッケージをダウンロード"
+        },
+        "messages": {
+          "copySuccess": "ライセンスコードがクリップボードにコピーされました",
+          "copyError": "コピーに失敗しました。手動でコピーしてください",
+          "codeEmpty": "ライセンスコードが空です",
+          "updateComingSoon": "ライセンス更新機能は開発中です...",
+          "renewComingSoon": "ライセンス延長機能は開発中です...",
+          "revokeComingSoon": "ライセンス取り消し機能は開発中です...",
+          "downloadComingSoon": "証明書ダウンロード機能は開発中です...",
+          "revokeConfirm": "このライセンスを取り消してもよろしいですか？この操作は元に戻せません！",
+          "revokeTitle": "警告",
+          "revokeConfirmButton": "取り消し確認",
+          "revokeCancelButton": "キャンセル",
+          "loadError": "ライセンス詳細の読み込みに失敗しました",
+          "missingId": "ライセンスIDが不足しています"
+        }
+      },
+      "stats": {
+        "total": "総ライセンス数",
+        "active": "有効ライセンス",
+        "inactive": "無効ライセンス",
+        "expired": "期限切れライセンス",
+        "expiringSoon": "期限近し"
+      },
+      "form": {
+        "title": "ライセンスフォーム",
+        "breadcrumb": {
+          "licenseManagement": "ライセンス管理",
+          "createLicense": "ライセンス作成",
+          "editLicense": "ライセンス編集"
+        },
+        "sections": {
+          "basicInfo": "基本情報",
+          "licenseConfig": "ライセンス設定"
+        },
+        "fields": {
+          "customerName": "関連顧客名",
+          "customerId": "顧客ID",
+          "createdBy": "作成者",
+          "description": "備考",
+          "validityPeriod": "有効期間",
+          "validityType": "有効期間タイプ",
+          "dateRange": "期間",
+          "validityDays": "有効日数",
+          "maxActivations": "最大アクティベーション数",
+          "deploymentType": "デプロイメントタイプ",
+          "encryptionType": "暗号化タイプ"
+        },
+        "validityTypes": {
+          "permanent": "永続",
+          "limited": "限定"
+        },
+        "placeholders": {
+          "selectCustomer": "顧客を選択してください",
+          "autoGenerateOrManual": "自動生成または手動入力",
+          "currentUser": "現在のログインユーザー",
+          "enterDescription": "備考を入力してください",
+          "selectValidityType": "有効期間タイプを選択してください",
+          "selectDateRange": "期間を選択してください",
+          "startDate": "開始日",
+          "endDate": "終了日",
+          "enterMaxActivations": "最大アクティベーション数を入力してください",
+          "selectDeploymentType": "デプロイメントタイプを選択してください",
+          "selectEncryptionType": "暗号化タイプを選択してください"
+        },
+        "actions": {
+          "cancel": "キャンセル",
+          "create": "作成",
+          "update": "更新",
+          "submit": "送信"
+        },
+        "validation": {
+          "customerRequired": "顧客を選択してください",
+          "customerInvalid": "ドロップダウンリストから有効な顧客を選択してください",
+          "descriptionRequired": "備考を入力してください",
+          "descriptionLength": "備考の長さは1-500文字の間である必要があります",
+          "validityTypeRequired": "有効期間タイプを選択してください",
+          "dateRangeRequired": "期間を選択してください",
+          "startDateNotPast": "開始日は今日より前にはできません",
+          "endDateAfterStart": "終了日は開始日より後である必要があります",
+          "validityPeriodTooLong": "有効期間は10年を超えることはできません",
+          "deploymentTypeRequired": "デプロイメントタイプを選択してください",
+          "encryptionTypeRequired": "暗号化タイプを選択してください",
+          "maxActivationsRequired": "最大アクティベーション数を入力してください",
+          "maxActivationsRange": "最大アクティベーション数は1-999999の間である必要があります",
+          "maxActivationsInteger": "最大アクティベーション数は整数である必要があります"
+        },
+        "messages": {
+          "loadEnumError": "列挙オプションの読み込みに失敗しました",
+          "loadEnumErrorRetry": "列挙オプションの読み込みに失敗しました。後ほど再度お試しください",
+          "searchCustomerError": "顧客検索に失敗しました",
+          "searchCustomerErrorRetry": "顧客検索に失敗しました。後ほど再度お試しください",
+          "loadDetailError": "ライセンス詳細の読み込みに失敗しました",
+          "loadDetailErrorRetry": "ライセンス詳細の読み込みに失敗しました。後ほど再度お試しください",
+          "submitError": "送信に失敗しました",
+          "submitErrorRetry": "送信に失敗しました。後ほど再度お試しください",
+          "createSuccess": "作成しました",
+          "updateSuccess": "更新しました",
+          "cancelConfirm": "キャンセルしてもよろしいですか？保存されていない変更は失われます。",
+          "cancelTitle": "確認",
+          "cancelConfirmButton": "確認",
+          "cancelCancelButton": "編集を続行"
+        }
+      }
     }
   },
   "userMenu": {
@@ -250,6 +550,14 @@
       "noData": "--",
       "onlineLicense": "オンラインライセンス",
       "customerNotExist": "顧客データが存在しません"
+    },
+    "basicInfo": {
+      "customerId": "顧客ID",
+      "customerName": "顧客名",
+      "activatedDevices": "アクティベート済みデバイス数",
+      "creationTime": "作成日時",
+      "expiryTime": "有効期限",
+      "remainingDays": "残り日数"
     }
   }
 }

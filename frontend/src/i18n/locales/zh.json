@@ -124,6 +124,56 @@
       "title": "授权管理",
       "welcome": "欢迎你来到授权管理页面",
       "platform": "授权管理平台",
+      "list": {
+        "title": "授权列表",
+        "createLicense": "创建授权",
+        "filter": {
+          "label": "筛选：",
+          "codePlaceholder": "授权码",
+          "statusPlaceholder": "状态",
+          "query": "查询"
+        },
+        "table": {
+          "code": "授权码",
+          "status": "状态",
+          "deploymentType": "部署类型",
+          "endDate": "到期时间",
+          "description": "备注",
+          "operation": "操作",
+          "loading": "加载中..."
+        },
+        "actions": {
+          "detail": "详情",
+          "lock": "锁定",
+          "unlock": "解锁",
+          "delete": "删除"
+        },
+        "status": {
+          "normal": "正常",
+          "locked": "锁定",
+          "expired": "过期"
+        },
+        "confirm": {
+          "lockTitle": "提示",
+          "lockMessage": "确定要锁定此授权吗？",
+          "unlockTitle": "提示",
+          "unlockMessage": "确定要解锁此授权吗？",
+          "deleteTitle": "警告",
+          "deleteMessage": "确定要删除此授权吗？删除后无法恢复！",
+          "confirm": "确定",
+          "cancel": "取消",
+          "deleteConfirm": "确定删除"
+        },
+        "message": {
+          "lockSuccess": "锁定成功",
+          "lockError": "锁定失败",
+          "unlockSuccess": "解锁成功",
+          "unlockError": "解锁失败",
+          "deleteSuccess": "删除成功",
+          "deleteError": "删除失败",
+          "loadError": "加载数据失败"
+        }
+      },
       "actions": {
         "query": "查询",
         "createLicense": "创建授权",
@@ -165,7 +215,7 @@
         "expired": "已过期",
         "expiring": "即将过期"
       },
-      "form": {
+      "formBasic": {
         "basicInfo": "基本信息",
         "selectCustomer": "选择客户",
         "description": "授权描述",
@@ -251,12 +301,127 @@
           "deleteSuccess": "授权删除成功"
         }
       },
+      "detail": {
+        "title": "授权详情",
+        "breadcrumb": {
+          "licenseManagement": "授权管理",
+          "licenseDetail": "授权详情"
+        },
+        "tabs": {
+          "basic": "基础信息",
+          "authorization": "授权信息",
+          "license": "许可证信息",
+          "history": "授权变更历史"
+        },
+        "actions": {
+          "copyCode": "复制授权码",
+          "updateLicense": "变更授权",
+          "renewLicense": "延期授权",
+          "revokeLicense": "吊销授权",
+          "downloadCertificate": "下载部署包"
+        },
+        "messages": {
+          "copySuccess": "授权码已复制到剪贴板",
+          "copyError": "复制失败，请手动复制",
+          "codeEmpty": "授权码为空",
+          "updateComingSoon": "变更授权功能开发中...",
+          "renewComingSoon": "延期授权功能开发中...",
+          "revokeComingSoon": "吊销授权功能开发中...",
+          "downloadComingSoon": "下载凭单功能开发中...",
+          "revokeConfirm": "确定要吊销此授权吗？此操作不可撤销！",
+          "revokeTitle": "警告",
+          "revokeConfirmButton": "确定吊销",
+          "revokeCancelButton": "取消",
+          "loadError": "加载授权详情失败",
+          "missingId": "缺少授权ID"
+        }
+      },
       "stats": {
         "total": "总授权数",
         "active": "有效授权",
         "inactive": "无效授权",
         "expired": "过期授权",
         "expiringSoon": "即将过期"
+      },
+      "form": {
+        "title": "授权表单",
+        "breadcrumb": {
+          "licenseManagement": "授权管理",
+          "createLicense": "创建授权",
+          "editLicense": "编辑授权"
+        },
+        "sections": {
+          "basicInfo": "基本信息",
+          "licenseConfig": "授权配置"
+        },
+        "fields": {
+          "customerName": "关联客户名称",
+          "customerId": "客户ID",
+          "createdBy": "创建人",
+          "description": "备注",
+          "validityPeriod": "授权期限",
+          "validityType": "授权期限类型",
+          "dateRange": "起止时间",
+          "validityDays": "有效期天数",
+          "maxActivations": "最大激活设备数",
+          "deploymentType": "部署类型",
+          "encryptionType": "加密类型"
+        },
+        "validityTypes": {
+          "permanent": "永久",
+          "limited": "有限"
+        },
+        "placeholders": {
+          "selectCustomer": "请选择客户",
+          "autoGenerateOrManual": "自动生成或手动输入",
+          "currentUser": "当前登录用户",
+          "enterDescription": "请输入备注信息",
+          "selectValidityType": "请选择授权期限类型",
+          "selectDateRange": "请选择起止时间",
+          "startDate": "开始日期",
+          "endDate": "结束日期",
+          "enterMaxActivations": "请输入最大激活设备数",
+          "selectDeploymentType": "请选择部署类型",
+          "selectEncryptionType": "请选择加密类型"
+        },
+        "actions": {
+          "cancel": "取消",
+          "create": "创建",
+          "update": "更新",
+          "submit": "提交"
+        },
+        "validation": {
+          "customerRequired": "请选择客户",
+          "customerInvalid": "请从下拉列表中选择有效的客户",
+          "descriptionRequired": "请输入备注信息",
+          "descriptionLength": "备注信息长度应在1-500个字符之间",
+          "validityTypeRequired": "请选择授权期限类型",
+          "dateRangeRequired": "请选择起止时间",
+          "startDateNotPast": "开始日期不能早于今天",
+          "endDateAfterStart": "结束日期必须晚于开始日期",
+          "validityPeriodTooLong": "授权期限不能超过10年",
+          "deploymentTypeRequired": "请选择部署类型",
+          "encryptionTypeRequired": "请选择加密类型",
+          "maxActivationsRequired": "请输入最大激活设备数",
+          "maxActivationsRange": "最大激活设备数必须在1-999999之间",
+          "maxActivationsInteger": "最大激活设备数必须为整数"
+        },
+        "messages": {
+          "loadEnumError": "加载枚举选项失败",
+          "loadEnumErrorRetry": "加载枚举选项失败，请稍后重试",
+          "searchCustomerError": "搜索客户失败",
+          "searchCustomerErrorRetry": "搜索客户失败，请稍后重试",
+          "loadDetailError": "加载授权详情失败",
+          "loadDetailErrorRetry": "加载授权详情失败，请稍后重试",
+          "submitError": "提交失败",
+          "submitErrorRetry": "提交失败，请稍后重试",
+          "createSuccess": "创建成功",
+          "updateSuccess": "更新成功",
+          "cancelConfirm": "确定要取消吗？未保存的更改将丢失。",
+          "cancelTitle": "提示",
+          "cancelConfirmButton": "确定",
+          "cancelCancelButton": "继续编辑"
+        }
       }
     }
   },
@@ -368,24 +533,32 @@
       "phoneFormat": "请输入正确的手机号码",
       "websiteFormat": "请输入正确的网址格式"
     },
-    "view": {
-      "back": "返 回",
-      "statusInfo": "状态信息",
-      "licenseStats": "授权统计",
-      "creator": "创建人",
-      "createTime": "创建时间",
-      "updater": "更新人",
-      "updateTime": "更新时间",
-      "totalLicenses": "总授权数",
-      "activeLicenses": "活跃授权",
-      "recentLicense": "最近授权",
-      "expiringSoon": "即将过期",
-      "expiringSoonTime": "即将过期时间",
-      "expiredLicenses": "过期授权",
-      "expiredTime": "过期时间",
-      "noData": "--",
-      "onlineLicense": "在线授权",
-      "customerNotExist": "客户数据不存在"
-    }
+      "view": {
+        "back": "返 回",
+        "statusInfo": "状态信息",
+        "licenseStats": "授权统计",
+        "creator": "创建人",
+        "createTime": "创建时间",
+        "updater": "更新人",
+        "updateTime": "更新时间",
+        "totalLicenses": "总授权数",
+        "activeLicenses": "活跃授权",
+        "recentLicense": "最近授权",
+        "expiringSoon": "即将过期",
+        "expiringSoonTime": "即将过期时间",
+        "expiredLicenses": "过期授权",
+        "expiredTime": "过期时间",
+        "noData": "--",
+        "onlineLicense": "在线授权",
+        "customerNotExist": "客户数据不存在"
+      },
+      "basicInfo": {
+        "customerId": "客户ID",
+        "customerName": "客户名称",
+        "activatedDevices": "已激活设备数量",
+        "creationTime": "创建时间",
+        "expiryTime": "到期时间",
+        "remainingDays": "剩余时间（天）"
+      }
   }
 }

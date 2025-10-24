@@ -105,7 +105,7 @@ interface Device {
   license: DeviceLicense
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 
 // 模拟设备数据，实际应从API获取
 const devices = ref<Device[]>([
@@ -146,7 +146,7 @@ const devices = ref<Device[]>([
 // 格式化日期时间
 const formatDateTime = (dateTime: string) => {
   if (!dateTime) return '-'
-  return formatDate(dateTime, 'YYYY-MM-DD HH:mm:ss')
+  return formatDate(dateTime)
 }
 
 // 处理新增许可证

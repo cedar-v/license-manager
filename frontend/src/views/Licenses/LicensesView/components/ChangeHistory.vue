@@ -94,7 +94,7 @@ interface Props {
   licenseData?: any
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 
 // 筛选条件
 const timeRange = ref('30')
@@ -168,10 +168,10 @@ const getStatusType = (status: string) => {
 }
 
 // 查看详情
-const handleViewDetail = (item: HistoryDetail) => {
-  console.log('查看详情', item)
-  // TODO: 实现查看详情逻辑
-}
+// const handleViewDetail = (item: HistoryDetail) => {
+//   console.log('查看详情', item)
+//   // TODO: 实现查看详情逻辑
+// }
 </script>
 
 <style lang="scss" scoped>
