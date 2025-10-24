@@ -16,13 +16,21 @@ import (
 )
 
 type authorizationCodeService struct {
-	authCodeRepo repository.AuthorizationCodeRepository
+	authCodeRepo   repository.AuthorizationCodeRepository
+	customerRepo   repository.CustomerRepository
+	licenseRepo    repository.LicenseRepository
 }
 
 // NewAuthorizationCodeService 创建授权码服务实例
-func NewAuthorizationCodeService(authCodeRepo repository.AuthorizationCodeRepository) AuthorizationCodeService {
+func NewAuthorizationCodeService(
+	authCodeRepo repository.AuthorizationCodeRepository,
+	customerRepo repository.CustomerRepository,
+	licenseRepo repository.LicenseRepository,
+) AuthorizationCodeService {
 	return &authorizationCodeService{
-		authCodeRepo: authCodeRepo,
+		authCodeRepo:   authCodeRepo,
+		customerRepo:   customerRepo,
+		licenseRepo:    licenseRepo,
 	}
 }
 
@@ -177,6 +185,33 @@ func (s *authorizationCodeService) GetAuthorizationCode(ctx context.Context, id 
 		// 数据库相关错误
 		return nil, i18n.NewI18nError("900004", lang, err.Error())
 	}
+
+	// 查询客户信息
+	customer, err := s.customerRepo.GetCustomerByID(ctx, authCode.CustomerID)
+	if err != nil {
+		// 如果客户不存在，不影响授权码查询，只是不填充客户信息
+		// 记录错误日志但不返回错误
+	} else {
+		// 填充客户信息
+		authCode.CustomerInfo = &models.CustomerInfoForAuthCode{
+			ID:                  customer.ID,
+			CustomerCode:        customer.CustomerCode,
+			CustomerName:        customer.CustomerName,
+			CustomerType:        customer.CustomerType,
+			CustomerTypeDisplay: i18n.GetEnumMessage("customer_type", customer.CustomerType, lang),
+			Status:              customer.Status,
+			StatusDisplay:       i18n.GetEnumMessage("customer_status", customer.Status, lang),
+			CreatedAt:           customer.CreatedAt.Format(time.RFC3339),
+		}
+	}
+
+	// 查询已激活的许可证数量
+	activatedCount, err := s.licenseRepo.GetActiveLicenseCount(ctx, id)
+	if err != nil {
+		// 查询失败时，数量设为0，记录错误日志但不返回错误
+		activatedCount = 0
+	}
+	authCode.ActivatedLicensesCount = activatedCount
 
 	// 填充多语言显示字段和计算状态
 	s.fillAuthorizationCodeDisplayFields(authCode, lang)

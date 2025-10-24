@@ -2343,24 +2343,31 @@
             "type": "object",
             "properties": {
                 "change_type": {
+                    "description": "变更类型",
                     "type": "string"
                 },
                 "change_type_display": {
+                    "description": "变更类型显示（多语言）",
                     "type": "string"
                 },
                 "created_at": {
+                    "description": "创建时间",
                     "type": "string"
                 },
                 "id": {
+                    "description": "变更记录ID",
                     "type": "string"
                 },
                 "operator_id": {
+                    "description": "操作人ID",
                     "type": "string"
                 },
                 "operator_name": {
+                    "description": "操作人名称",
                     "type": "string"
                 },
                 "reason": {
+                    "description": "变更原因",
                     "type": "string"
                 }
             }
@@ -2369,21 +2376,26 @@
             "type": "object",
             "properties": {
                 "list": {
+                    "description": "变更历史列表",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/models.AuthorizationChangeListItem"
                     }
                 },
                 "page": {
+                    "description": "当前页码",
                     "type": "integer"
                 },
                 "page_size": {
+                    "description": "每页条数",
                     "type": "integer"
                 },
                 "total": {
+                    "description": "总记录数",
                     "type": "integer"
                 },
                 "total_pages": {
+                    "description": "总页数",
                     "type": "integer"
                 }
             }
@@ -2391,88 +2403,128 @@
         "models.AuthorizationCode": {
             "type": "object",
             "properties": {
+                "activated_licenses_count": {
+                    "description": "该授权码下已激活的许可证数量",
+                    "type": "integer"
+                },
                 "code": {
+                    "description": "授权码",
                     "type": "string"
                 },
                 "created_at": {
+                    "description": "创建时间",
                     "type": "string"
                 },
                 "created_by": {
+                    "description": "创建人ID",
                     "type": "string"
                 },
                 "current_activations": {
+                    "description": "当前激活次数",
                     "type": "integer"
                 },
                 "custom_parameters": {
+                    "description": "自定义参数（JSON对象）",
                     "type": "object"
                 },
                 "customer_id": {
+                    "description": "客户ID",
                     "type": "string"
                 },
+                "customer_info": {
+                    "description": "客户信息（仅在详情接口返回）",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.CustomerInfoForAuthCode"
+                        }
+                    ]
+                },
                 "customer_name": {
+                    "description": "客户名称",
                     "type": "string"
                 },
                 "customer_name_display": {
+                    "description": "客户名称显示（多语言）",
                     "type": "string"
                 },
                 "deployment_type": {
+                    "description": "部署类型：standalone/cloud/hybrid",
                     "type": "string"
                 },
                 "deployment_type_display": {
+                    "description": "部署类型显示（多语言）",
                     "type": "string"
                 },
                 "description": {
+                    "description": "描述",
                     "type": "string"
                 },
                 "encryption_type": {
+                    "description": "加密类型：standard/advanced",
                     "type": "string"
                 },
                 "encryption_type_display": {
+                    "description": "加密类型显示（多语言）",
                     "type": "string"
                 },
                 "end_date": {
+                    "description": "失效日期",
                     "type": "string"
                 },
                 "feature_config": {
+                    "description": "功能配置（JSON对象）",
                     "type": "object"
                 },
                 "id": {
+                    "description": "授权码ID",
                     "type": "string"
                 },
                 "is_locked": {
+                    "description": "是否锁定",
                     "type": "boolean"
                 },
                 "lock_reason": {
+                    "description": "锁定原因",
                     "type": "string"
                 },
                 "locked_at": {
+                    "description": "锁定时间",
                     "type": "string"
                 },
                 "locked_by": {
+                    "description": "锁定人ID",
                     "type": "string"
                 },
                 "max_activations": {
+                    "description": "最大激活次数",
                     "type": "integer"
                 },
                 "software_id": {
+                    "description": "软件ID",
                     "type": "string"
                 },
                 "software_version": {
+                    "description": "软件版本",
                     "type": "string"
                 },
                 "start_date": {
+                    "description": "生效日期",
                     "type": "string"
                 },
                 "status": {
+                    "description": "状态：normal/locked/expired",
                     "type": "string"
                 },
                 "status_display": {
+                    "description": "状态显示（多语言）",
                     "type": "string"
                 },
                 "updated_at": {
+                    "description": "更新时间",
                     "type": "string"
                 },
                 "usage_limits": {
+                    "description": "使用限制（JSON对象）",
                     "type": "object"
                 }
             }
@@ -2486,11 +2538,15 @@
                 "validity_days"
             ],
             "properties": {
-                "custom_parameters": {},
+                "custom_parameters": {
+                    "description": "自定义参数（JSON对象）"
+                },
                 "customer_id": {
+                    "description": "客户ID",
                     "type": "string"
                 },
                 "deployment_type": {
+                    "description": "部署类型：standalone/cloud/hybrid",
                     "type": "string",
                     "enum": [
                         "standalone",
@@ -2499,29 +2555,39 @@
                     ]
                 },
                 "description": {
+                    "description": "描述",
                     "type": "string",
                     "maxLength": 1000
                 },
                 "encryption_type": {
+                    "description": "加密类型：standard/advanced",
                     "type": "string",
                     "enum": [
                         "standard",
                         "advanced"
                     ]
                 },
-                "feature_config": {},
+                "feature_config": {
+                    "description": "功能配置（JSON对象）"
+                },
                 "max_activations": {
+                    "description": "最大激活次数",
                     "type": "integer",
                     "minimum": 1
                 },
                 "software_id": {
+                    "description": "软件ID",
                     "type": "string"
                 },
                 "software_version": {
+                    "description": "软件版本",
                     "type": "string"
                 },
-                "usage_limits": {},
+                "usage_limits": {
+                    "description": "使用限制（JSON对象）"
+                },
                 "validity_days": {
+                    "description": "有效天数（1-36500天）",
                     "type": "integer",
                     "maximum": 36500,
                     "minimum": 1
@@ -2532,9 +2598,11 @@
             "type": "object",
             "properties": {
                 "code": {
+                    "description": "授权码",
                     "type": "string"
                 },
                 "id": {
+                    "description": "授权码ID",
                     "type": "string"
                 }
             }
@@ -2543,51 +2611,67 @@
             "type": "object",
             "properties": {
                 "code": {
+                    "description": "授权码",
                     "type": "string"
                 },
                 "created_at": {
+                    "description": "创建时间",
                     "type": "string"
                 },
                 "current_activations": {
+                    "description": "当前激活次数",
                     "type": "integer"
                 },
                 "customer_id": {
+                    "description": "客户ID",
                     "type": "string"
                 },
                 "customer_name": {
+                    "description": "客户名称",
                     "type": "string"
                 },
                 "customer_name_display": {
+                    "description": "客户名称显示（多语言）",
                     "type": "string"
                 },
                 "deployment_type": {
+                    "description": "部署类型：standalone/cloud/hybrid",
                     "type": "string"
                 },
                 "deployment_type_display": {
+                    "description": "部署类型显示（多语言）",
                     "type": "string"
                 },
                 "description": {
+                    "description": "描述",
                     "type": "string"
                 },
                 "end_date": {
+                    "description": "失效日期",
                     "type": "string"
                 },
                 "id": {
+                    "description": "授权码ID",
                     "type": "string"
                 },
                 "is_locked": {
+                    "description": "是否锁定",
                     "type": "boolean"
                 },
                 "max_activations": {
+                    "description": "最大激活次数",
                     "type": "integer"
                 },
                 "start_date": {
+                    "description": "生效日期",
                     "type": "string"
                 },
                 "status": {
+                    "description": "状态：normal/locked/expired",
                     "type": "string"
                 },
                 "status_display": {
+                    "description": "状态显示（多语言）",
                     "type": "string"
                 }
             }
@@ -2596,21 +2680,26 @@
             "type": "object",
             "properties": {
                 "list": {
+                    "description": "授权码列表",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/models.AuthorizationCodeListItem"
                     }
                 },
                 "page": {
+                    "description": "当前页码",
                     "type": "integer"
                 },
                 "page_size": {
+                    "description": "每页条数",
                     "type": "integer"
                 },
                 "total": {
+                    "description": "总记录数",
                     "type": "integer"
                 },
                 "total_pages": {
+                    "description": "总页数",
                     "type": "integer"
                 }
             }
@@ -2641,6 +2730,7 @@
             ],
             "properties": {
                 "change_type": {
+                    "description": "变更类型：renewal/upgrade/limit_change/feature_toggle/lock/unlock/other",
                     "type": "string",
                     "enum": [
                         "renewal",
@@ -2652,8 +2742,11 @@
                         "other"
                     ]
                 },
-                "custom_parameters": {},
+                "custom_parameters": {
+                    "description": "自定义参数"
+                },
                 "deployment_type": {
+                    "description": "部署类型：standalone/cloud/hybrid",
                     "type": "string",
                     "enum": [
                         "standalone",
@@ -2662,33 +2755,44 @@
                     ]
                 },
                 "description": {
+                    "description": "描述",
                     "type": "string",
                     "maxLength": 1000
                 },
                 "encryption_type": {
+                    "description": "加密类型：standard/advanced",
                     "type": "string",
                     "enum": [
                         "standard",
                         "advanced"
                     ]
                 },
-                "feature_config": {},
+                "feature_config": {
+                    "description": "功能配置"
+                },
                 "max_activations": {
+                    "description": "最大激活次数",
                     "type": "integer",
                     "minimum": 1
                 },
                 "reason": {
+                    "description": "变更原因",
                     "type": "string",
                     "maxLength": 500
                 },
                 "software_id": {
+                    "description": "软件ID",
                     "type": "string"
                 },
                 "software_version": {
+                    "description": "软件版本",
                     "type": "string"
                 },
-                "usage_limits": {},
+                "usage_limits": {
+                    "description": "使用限制"
+                },
                 "validity_days": {
+                    "description": "有效天数",
                     "type": "integer",
                     "maximum": 36500,
                     "minimum": 1
@@ -2845,6 +2949,43 @@
                         "active",
                         "disabled"
                     ]
+                }
+            }
+        },
+        "models.CustomerInfoForAuthCode": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "description": "客户创建时间",
+                    "type": "string"
+                },
+                "customer_code": {
+                    "description": "客户编号",
+                    "type": "string"
+                },
+                "customer_name": {
+                    "description": "客户名称",
+                    "type": "string"
+                },
+                "customer_type": {
+                    "description": "客户类型",
+                    "type": "string"
+                },
+                "customer_type_display": {
+                    "description": "客户类型显示（多语言）",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "客户ID",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "客户状态",
+                    "type": "string"
+                },
+                "status_display": {
+                    "description": "客户状态显示（多语言）",
+                    "type": "string"
                 }
             }
         },
@@ -3298,64 +3439,84 @@
             "type": "object",
             "properties": {
                 "activated_at": {
+                    "description": "激活时间",
                     "type": "string"
                 },
                 "activation_ip": {
+                    "description": "激活IP",
                     "type": "string"
                 },
                 "authorization_code": {
+                    "description": "授权码",
                     "type": "string"
                 },
                 "authorization_code_id": {
+                    "description": "授权码ID",
                     "type": "string"
                 },
                 "config_updated_at": {
+                    "description": "客户端配置更新时间",
                     "type": "string"
                 },
                 "created_at": {
+                    "description": "创建时间",
                     "type": "string"
                 },
                 "customer_id": {
+                    "description": "客户ID",
                     "type": "string"
                 },
                 "customer_name": {
+                    "description": "客户名称",
                     "type": "string"
                 },
                 "device_info": {
+                    "description": "设备信息",
                     "type": "object",
                     "additionalProperties": true
                 },
                 "hardware_fingerprint": {
+                    "description": "硬件指纹",
                     "type": "string"
                 },
                 "id": {
+                    "description": "许可证ID",
                     "type": "string"
                 },
                 "is_online": {
+                    "description": "是否在线",
                     "type": "boolean"
                 },
                 "is_online_display": {
+                    "description": "在线状态显示名称",
                     "type": "string"
                 },
                 "last_heartbeat": {
+                    "description": "最后心跳时间",
                     "type": "string"
                 },
                 "last_online_ip": {
+                    "description": "最后在线IP",
                     "type": "string"
                 },
                 "license_key": {
+                    "description": "许可证密钥",
                     "type": "string"
                 },
                 "status": {
+                    "description": "许可证状态",
                     "type": "string"
                 },
                 "status_display": {
+                    "description": "状态显示名称",
                     "type": "string"
                 },
                 "updated_at": {
+                    "description": "更新时间",
                     "type": "string"
                 },
                 "usage_data": {
+                    "description": "使用数据",
                     "type": "object",
                     "additionalProperties": true
                 }
@@ -3365,45 +3526,59 @@
             "type": "object",
             "properties": {
                 "activated_at": {
+                    "description": "激活时间",
                     "type": "string"
                 },
                 "activation_ip": {
+                    "description": "激活IP",
                     "type": "string"
                 },
                 "authorization_code": {
+                    "description": "授权码",
                     "type": "string"
                 },
                 "authorization_code_id": {
+                    "description": "授权码ID",
                     "type": "string"
                 },
                 "customer_name": {
+                    "description": "客户名称",
                     "type": "string"
                 },
                 "hardware_fingerprint": {
+                    "description": "硬件指纹",
                     "type": "string"
                 },
                 "id": {
+                    "description": "许可证ID",
                     "type": "string"
                 },
                 "is_online": {
+                    "description": "是否在线",
                     "type": "boolean"
                 },
                 "is_online_display": {
+                    "description": "在线状态显示名称",
                     "type": "string"
                 },
                 "last_heartbeat": {
+                    "description": "最后心跳时间",
                     "type": "string"
                 },
                 "last_online_ip": {
+                    "description": "最后在线IP",
                     "type": "string"
                 },
                 "license_key": {
+                    "description": "许可证密钥",
                     "type": "string"
                 },
                 "status": {
+                    "description": "许可证状态",
                     "type": "string"
                 },
                 "status_display": {
+                    "description": "状态显示名称",
                     "type": "string"
                 }
             }
@@ -3449,9 +3624,11 @@
             ],
             "properties": {
                 "password": {
+                    "description": "密码",
                     "type": "string"
                 },
                 "username": {
+                    "description": "用户名",
                     "type": "string"
                 }
             }
@@ -3460,10 +3637,14 @@
             "type": "object",
             "properties": {
                 "code": {
+                    "description": "响应代码",
                     "type": "string"
                 },
-                "data": {},
+                "data": {
+                    "description": "响应数据"
+                },
                 "message": {
+                    "description": "响应消息",
                     "type": "string"
                 }
             }
