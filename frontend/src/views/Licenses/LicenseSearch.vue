@@ -74,38 +74,22 @@ const selectedCustomerInfo = computed(() => {
   return customers.value.find(c => c.id === selectedCustomer.value) || null
 })
 
+// 获取所有客户列表
 const loadCustomers = async () => {
   try {
     const response = await getCustomers({ status: 'active', page_size: 100 })
-    const allCustomers = response.data.list
-
-    const customersWithLicenses = []
-    for (const customer of allCustomers) {
-      try {
-        const licenseResponse = await getLicenses({
-          customer_id: customer.id,
-          page_size: 1
-        })
-        if (licenseResponse.data.list.length > 0) {
-          customersWithLicenses.push(customer)
-        }
-      } catch (error) {
-        console.warn(`��7 ${customer.customer_name} ��C1%:`, error)
-        customersWithLicenses.push(customer)
-      }
-    }
-
-    customers.value = customersWithLicenses
+    customers.value = response.data.list
   } catch (error) {
     console.error('Failed to load customers:', error)
-    ElMessage.error('�}�7h1%')
+    ElMessage.error('获取客户列表失败')
   }
 }
 
 const handleCustomerChange = () => {
-  // �7	����;�
+  // 客户选择变化
 }
 
+// 点击查询按钮时，检查是否有授权数据
 const handleQuery = async () => {
   if (!selectedCustomer.value) {
     ElMessage.warning(t('pages.licenses.message.selectCustomerFirst'))
@@ -131,7 +115,7 @@ const handleQuery = async () => {
       }
     })
   } catch (error) {
-    console.error('��C1%:', error)
+    console.error('Query licenses failed:', error)
     ElMessage.error(t('pages.licenses.message.queryLicenseError'))
   }
 }
