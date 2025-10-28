@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-01 09:32:42
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-09-29 13:17:41
+ * @LastEditTime: 2025-10-28 17:28:18
  * @FilePath: /frontend/src/views/Dashboard.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -83,13 +83,9 @@
                 <template #default="{ row }">
                   <span
                     class="status-badge"
-                    :class="row.status === 1 ? 'status-valid' : 'status-invalid'"
+                    :class="getStatusClass(row.status)"
                   >
-                    {{
-                      row.status === 1
-                        ? t('dashboard.recentLicenses.statusLabels.valid')
-                        : t('dashboard.recentLicenses.statusLabels.invalid')
-                    }}
+                    {{ row.status_display }}
                   </span>
                 </template>
               </el-table-column>
@@ -195,6 +191,20 @@ const statsData = computed(() => [
 // 最近授权数据 - 响应式数据
 const recentData = ref<RecentAuthorizationItem[]>([])
 const loading = ref(false)
+
+// 获取状态样式类名
+const getStatusClass = (status: string) => {
+  switch (status) {
+    case 'normal':
+      return 'status-valid'
+    case 'locked':
+      return 'status-locked'
+    case 'expired':
+      return 'status-invalid'
+    default:
+      return 'status-invalid'
+  }
+}
 
 // 获取最近授权数据
 const fetchRecentAuthorizations = async () => {
@@ -493,6 +503,11 @@ onMounted(() => {
     color: #4763ff;
   }
 
+  &.status-locked {
+    background: #fff7e6;
+    color: #d46b08;
+  }
+
   &.status-invalid {
     background: #ffe5e5;
     color: #e90c0c;
@@ -724,6 +739,11 @@ onMounted(() => {
 [data-theme='dark'] .status-badge.status-valid {
   background: #1e40af !important;
   color: #93c5fd !important;
+}
+
+[data-theme='dark'] .status-badge.status-locked {
+  background: #92400e !important;
+  color: #fbbf24 !important;
 }
 
 [data-theme='dark'] .status-badge.status-invalid {
