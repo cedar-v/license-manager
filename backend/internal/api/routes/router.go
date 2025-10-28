@@ -50,7 +50,7 @@ func SetupRouter() *gin.Engine {
 	systemService := service.NewSystemService()
 	customerService := service.NewCustomerService(customerRepo)
 	enumService := service.NewEnumService()
-	authCodeService := service.NewAuthorizationCodeService(authCodeRepo)
+	authCodeService := service.NewAuthorizationCodeService(authCodeRepo, customerRepo, licenseRepo)
 	licenseService := service.NewLicenseService(licenseRepo, db, log)
 	dashboardService := service.NewDashboardService(dashboardRepo)
 

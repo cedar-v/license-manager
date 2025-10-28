@@ -59,10 +59,24 @@ type AuthorizationCode struct {
 	FeatureConfig         JSON       `gorm:"type:json" json:"feature_config" swaggertype:"object"`                  // 功能配置（JSON对象）
 	UsageLimits           JSON       `gorm:"type:json" json:"usage_limits" swaggertype:"object"`                    // 使用限制（JSON对象）
 	CustomParameters      JSON       `gorm:"type:json" json:"custom_parameters" swaggertype:"object"`               // 自定义参数（JSON对象）
-	Status                string     `gorm:"-" json:"status,omitempty"`                                             // 状态：normal/locked/expired
-	StatusDisplay         string     `gorm:"-" json:"status_display,omitempty"`                                     // 状态显示（多语言）
-	CreatedAt             time.Time  `gorm:"type:datetime(3);not null" json:"created_at"`                           // 创建时间
-	UpdatedAt             time.Time  `gorm:"type:datetime(3);not null" json:"updated_at"`                           // 更新时间
+	Status                  string                    `gorm:"-" json:"status,omitempty"`                             // 状态：normal/locked/expired
+	StatusDisplay           string                    `gorm:"-" json:"status_display,omitempty"`                     // 状态显示（多语言）
+	CreatedAt               time.Time                 `gorm:"type:datetime(3);not null" json:"created_at"`           // 创建时间
+	UpdatedAt               time.Time                 `gorm:"type:datetime(3);not null" json:"updated_at"`           // 更新时间
+	CustomerInfo            *CustomerInfoForAuthCode  `gorm:"-" json:"customer_info,omitempty"`                      // 客户信息（仅在详情接口返回）
+	ActivatedLicensesCount  int64                     `gorm:"-" json:"activated_licenses_count,omitempty"`           // 该授权码下已激活的许可证数量
+}
+
+// CustomerInfoForAuthCode 授权码详情中的客户信息结构
+type CustomerInfoForAuthCode struct {
+	ID                  string `json:"id"`                              // 客户ID
+	CustomerCode        string `json:"customer_code"`                   // 客户编号
+	CustomerName        string `json:"customer_name"`                   // 客户名称
+	CustomerType        string `json:"customer_type"`                   // 客户类型
+	CustomerTypeDisplay string `json:"customer_type_display,omitempty"` // 客户类型显示（多语言）
+	Status              string `json:"status"`                          // 客户状态
+	StatusDisplay       string `json:"status_display,omitempty"`        // 客户状态显示（多语言）
+	CreatedAt           string `json:"created_at"`                      // 客户创建时间
 }
 
 // TableName 指定表名

@@ -149,7 +149,6 @@ GET /api/v1/authorization-codes/{id}
     "id": "uuid-string",
     "code": "LIC-COMP001-A7B9X2-C8F4",
     "customer_id": "customer-uuid",
-    "customer_name": "张三公司",
     "status": "normal",
     "status_display": "正常",
     "start_date": "2024-01-01T00:00:00Z",
@@ -172,7 +171,18 @@ GET /api/v1/authorization-codes/{id}
     "lock_reason": null,
     "description": "企业版授权",
     "created_at": "2024-01-01T10:00:00Z",
-    "updated_at": "2024-01-01T10:00:00Z"
+    "updated_at": "2024-01-01T10:00:00Z",
+    "customer_info": {
+      "id": "customer-uuid",
+      "customer_code": "CUS-2024-0001",
+      "customer_name": "张三公司",
+      "customer_type": "enterprise",
+      "customer_type_display": "企业客户",
+      "status": "active",
+      "status_display": "激活",
+      "created_at": "2023-12-01T10:00:00Z"
+    },
+    "activated_licenses_count": 7
   }
 }
 ```
