@@ -459,19 +459,15 @@ const loadEnumOptions = async () => {
   }
 }
 
-// 搜索关联客户
+// 搜索或加载所有客户
 const searchCustomers = async (query: string) => {
-  if (!query) {
-    customerOptions.value = []
-    return
-  }
-
   try {
     customerLoading.value = true
     const response = await getCustomers({
       page: 1,
-      page_size: 20,
-      customer_name: query
+      page_size: 100,
+      customer_name: query || undefined,
+      status: 'active'
     })
     customerOptions.value = response.data.list
   } catch (error: any) {
@@ -482,6 +478,7 @@ const searchCustomers = async (query: string) => {
     } else {
       ElMessage.error(t('pages.licenses.form.messages.searchCustomerErrorRetry'))
     }
+    customerOptions.value = []
   } finally {
     customerLoading.value = false
   }
@@ -490,29 +487,29 @@ const searchCustomers = async (query: string) => {
 // 表单初始化
 const loadCustomerInfo = () => {
   // 从路由参数获取客户信息
-  // const customerId = route.query.customerId as string
-  // const customerName = route.query.customerName as string
+  const customerId = route.query.customerId as string
+  const customerName = route.query.customerName as string
 
-  // if (customerId && customerName) {
-  //   formData.customer_id = customerId
-  //   customerOptions.value = [{
-  //     id: customerId,
-  //     customer_name: customerName,
-  //     customer_code: '',
-  //     customer_type: '',
-  //     customer_type_display: '',
-  //     contact_person: '',
-  //     email: '',
-  //     customer_level: '',
-  //     customer_level_display: '',
-  //     status: '',
-  //     status_display: '',
-  //     created_at: '',
-  //     updated_at: '',
-  //     created_by: '',
-  //     updated_by: ''
-  //   } as Customer]
-  // }
+  if (customerId && customerName) {
+    formData.customer_id = customerId
+    customerOptions.value = [{
+      id: customerId,
+      customer_name: customerName,
+      customer_code: customerId,
+      customer_type: '',
+      customer_type_display: '',
+      contact_person: '',
+      email: '',
+      customer_level: '',
+      customer_level_display: '',
+      status: 'active',
+      status_display: '',
+      created_at: '',
+      updated_at: '',
+      created_by: '',
+      updated_by: ''
+    } as Customer]
+  }
 
   // 设置创建人（从用户store获取当前登录用户）
   if (userStore.userInfo) {
@@ -743,6 +740,10 @@ watch(
 onMounted(async () => {
   await loadEnumOptions()
   loadCustomerInfo()
+  // 如果没有从路由获取到客户信息，则加载所有客户
+  if (!route.query.customerId) {
+    await searchCustomers('')
+  }
   await loadLicenseDetail()
 })
 </script>
