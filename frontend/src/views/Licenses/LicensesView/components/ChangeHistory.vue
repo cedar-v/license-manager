@@ -80,7 +80,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, computed } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { AuthorizationCode, AuthorizationChangeItem } from '@/api/license'
 import { getAuthorizationChanges } from '@/api/license'

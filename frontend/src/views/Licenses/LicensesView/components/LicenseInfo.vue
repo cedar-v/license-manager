@@ -18,7 +18,7 @@
           </div>
           <div class="device-info-row">
             <span class="device-info-item">设备地址：{{ device.last_online_ip || device.activation_ip || '-' }}</span>
-            <span class="device-info-item">最后活跃时间：{{ formatDateTime(device.last_heartbeat) }}</span>
+            <span class="device-info-item">最后活跃时间：{{ formatDateTime(device.last_heartbeat || '') }}</span>
           </div>
         </div>
 

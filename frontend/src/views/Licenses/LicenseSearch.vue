@@ -152,7 +152,8 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-@import '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables.scss' as *;
+@use 'sass:color';
 
 .license-search-container {
   height: calc(100vh - 80px);
@@ -306,7 +307,7 @@ onMounted(() => {
     background-color: $primary-color;
 
     &:hover {
-      background-color: darken($primary-color, 10%);
+      background-color: color.adjust($primary-color, $lightness: -10%);
     }
   }
 
@@ -315,7 +316,7 @@ onMounted(() => {
     background-color: $primary-color;
 
     &:hover {
-      background-color: darken($primary-color, 10%);
+      background-color: color.adjust($primary-color, $lightness: -10%);
     }
   }
 }

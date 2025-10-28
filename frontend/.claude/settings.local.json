@@ -3,7 +3,8 @@
     "allow": [
       "WebFetch(domain:www.figma.com)",
       "Bash(git checkout:*)",
-      "Read(//mnt/d/work/license-manager/backend/internal/models/**)"
+      "Read(//mnt/d/work/license-manager/backend/internal/models/**)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []
