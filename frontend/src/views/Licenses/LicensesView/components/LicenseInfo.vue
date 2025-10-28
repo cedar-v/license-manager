@@ -1,24 +1,24 @@
 <template>
-  <div class="license-info-container">
+  <div class="license-info-container" v-loading="loading">
     <!-- 新增许可证按钮 -->
     <div class="action-bar">
       <el-button type="primary" @click="handleAddLicense">新增许可证</el-button>
     </div>
 
     <!-- 设备列表 -->
-    <div v-if="devices.length > 0" class="devices-list">
+    <div v-if="!loading && devices.length > 0" class="devices-list">
       <div v-for="(device, index) in devices" :key="device.id" class="device-card">
         <!-- 设备头部 -->
         <div class="device-header">
           <div class="device-title-row">
             <span class="device-title">设备{{ index + 1 }}</span>
-            <el-tag :type="device.status === 'online' ? 'success' : 'danger'" size="small">
-              {{ device.status === 'online' ? '在线' : '离线' }}
+            <el-tag :type="device.is_online ? 'success' : 'danger'" size="small">
+              {{ device.is_online_display}}
             </el-tag>
           </div>
           <div class="device-info-row">
-            <span class="device-info-item">设备地址：{{ device.address || '-' }}</span>
-            <span class="device-info-item">最后活跃时间：{{ formatDateTime(device.lastActiveTime) }}</span>
+            <span class="device-info-item">设备地址：{{ device.last_online_ip || device.activation_ip || '-' }}</span>
+            <span class="device-info-item">最后活跃时间：{{ formatDateTime(device.last_heartbeat) }}</span>
           </div>
         </div>
 
@@ -29,17 +29,21 @@
             <span class="section-subtitle">（绑定信息）</span>
           </div>
           <div class="info-grid">
-            <div class="info-col">
+            <div class="info-row">
               <div class="info-label">机器序列号</div>
-              <div class="info-label">MAC地址</div>
-              <div class="info-label">CPU ID</div>
-              <div class="info-label">硬件哈希</div>
+              <div class="info-value">{{ device.device_info?.machine_code || '-' }}</div>
             </div>
-            <div class="info-col values">
-              <div class="info-value">{{ device.hardware?.serialNumber || '-' }}</div>
-              <div class="info-value">{{ device.hardware?.macAddress || '-' }}</div>
-              <div class="info-value">{{ device.hardware?.cpuId || '-' }}</div>
-              <div class="info-value hash-value">{{ device.hardware?.hardwareHash || '-' }}</div>
+            <div class="info-row">
+              <div class="info-label">MAC地址</div>
+              <div class="info-value">{{ device.device_info?.mac_address || '-' }}</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">CPU ID</div>
+              <div class="info-value">{{ device.device_info?.cpu_id || '-' }}</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">硬件哈希</div>
+              <div class="info-value">{{ device.hardware_fingerprint || '-' }}</div>
             </div>
           </div>
         </div>
@@ -52,14 +56,12 @@
           </div>
           <div class="license-content">
             <div class="license-row">
-              <span class="license-label">许可证</span>
-              <div class="license-value-wrapper">
-                <div class="license-value">{{ device.license?.certificate || '-' }}</div>
-              </div>
+              <div class="license-label">许可证密钥</div>
+              <div class="license-value">{{ device.license_key || '-' }}</div>
             </div>
-            <div class="license-status">
-              <span class="license-label">许可证状态</span>
-              <span class="license-status-text">{{ device.license?.status || '此许可证已生成并绑定到指定硬件，可用于系统运行验证' }}</span>
+            <div class="license-row">
+              <div class="license-label">许可证状态</div>
+              <div class="license-value status-text">{{ device.status_display || '此许可证已生成并绑定到指定硬件，可用于系统运行验证' }}</div>
             </div>
           </div>
         </div>
@@ -67,7 +69,7 @@
     </div>
 
     <!-- 空状态 -->
-    <div v-else class="empty-state">
+    <div v-if="!loading && devices.length === 0" class="empty-state">
       <el-empty description="暂无设备许可证信息">
         <el-button type="primary" @click="handleAddLicense">新增许可证</el-button>
       </el-empty>
@@ -76,72 +78,77 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import type { AuthorizationCode } from '@/api/license'
+import { ref, onMounted, watch } from 'vue'
+import { ElMessage } from 'element-plus'
+import type { AuthorizationCode, LicenseDevice } from '@/api/license'
+import { getLicenseDevices, getLicenseDeviceDetail } from '@/api/license'
 import { formatDate } from '@/utils/date'
 
 interface Props {
   licenseData: AuthorizationCode | null
 }
 
-interface DeviceHardware {
-  serialNumber: string
-  macAddress: string
-  cpuId: string
-  hardwareHash: string
-}
+const props = defineProps<Props>()
 
-interface DeviceLicense {
-  certificate: string
-  status: string
-}
+const devices = ref<LicenseDevice[]>([])
+const loading = ref(false)
 
-interface Device {
-  id: number
-  status: 'online' | 'offline'
-  address: string
-  lastActiveTime: string
-  hardware: DeviceHardware
-  license: DeviceLicense
-}
-
-defineProps<Props>()
-
-// 模拟设备数据，实际应从API获取
-const devices = ref<Device[]>([
-  {
-    id: 1,
-    status: 'online',
-    address: '125.665.2.612',
-    lastActiveTime: '2025-09-14 10:10:25',
-    hardware: {
-      serialNumber: 'VMware-56 4d 74 f6 88 a5 09 f1-81 c4 06 6b e1 ae 59 41',
-      macAddress: '00:0c:29:ae:59:41',
-      cpuId: 'Intel(R)-Core(TM)-i7-8700-CPU-@-3.20GHz',
-      hardwareHash: 'ePZtmBWUgp8iIEKtROmt21cOwMeQqhzCsEc6j6czYzw='
-    },
-    license: {
-      certificate: 'eyJjdXN0b21lcl9pZCI6MTAsImV4cGlyZV9kYXlzIjoxODAsImdlbmVyYXRlZF9hdCI6MTc1NDAyOTE3Nn1ONATrOXHImU+fQaZZpmPoQNjEGpemoqk',
-      status: '此许可证已生成并绑定到指定硬件，可用于系统运行验证'
-    }
-  },
-  {
-    id: 2,
-    status: 'offline',
-    address: '125.665.2.612',
-    lastActiveTime: '2025-09-14 10:10:25',
-    hardware: {
-      serialNumber: 'VMware-56 4d 74 f6 88 a5 09 f1-81 c4 06 6b e1 ae 59 41',
-      macAddress: '00:0c:29:ae:59:41',
-      cpuId: 'Intel(R)-Core(TM)-i7-8700-CPU-@-3.20GHz',
-      hardwareHash: 'ePZtmBWUgp8iIEKtROmt21cOwMeQqhzCsEc6j6czYzw='
-    },
-    license: {
-      certificate: 'eyJjdXN0b21lcl9pZCI6MTAsImV4cGlyZV9kYXlzIjoxODAsImdlbmVyYXRlZF9hdCI6MTc1NDAyOTE3Nn1ONATrOXHImU+fQaZZpmPoQNjEGpemoqk',
-      status: '此许可证已生成并绑定到指定硬件，可用于系统运行验证'
-    }
+// 获取设备列表
+const fetchDevices = async () => {
+  if (!props.licenseData?.id) {
+    devices.value = []
+    return
   }
-])
+
+  loading.value = true
+  try {
+    const response = await getLicenseDevices({
+      authorization_code_id: props.licenseData.id,
+      page: 1,
+      page_size: 100
+    })
+
+    if (response.data?.list && response.data.list.length > 0) {
+      // 检查第一个设备是否有 device_info，如果没有则需要获取详情
+      const needDetails = !response.data.list[0].device_info
+
+      if (needDetails) {
+        // 并发获取所有设备的详细信息
+        const detailPromises = response.data.list.map(device =>
+          getLicenseDeviceDetail(device.id)
+            .then(res => res.data)
+            .catch(err => {
+              console.error(`获取设备 ${device.id} 详情失败:`, err)
+              return device // 如果获取失败，使用原数据
+            })
+        )
+
+        const detailedDevices = await Promise.all(detailPromises)
+        devices.value = detailedDevices as LicenseDevice[]
+      } else {
+        devices.value = response.data.list
+      }
+    } else {
+      devices.value = []
+    }
+  } catch (error) {
+    console.error('获取设备列表失败:', error)
+    ElMessage.error('获取设备列表失败')
+    devices.value = []
+  } finally {
+    loading.value = false
+  }
+}
+
+// 组件挂载时获取数据
+onMounted(() => {
+  fetchDevices()
+})
+
+// 监听licenseData变化，重新获取数据
+watch(() => props.licenseData?.id, () => {
+  fetchDevices()
+})
 
 // 格式化日期时间
 const formatDateTime = (dateTime: string) => {
@@ -279,16 +286,13 @@ const handleAddLicense = () => {
 .hardware-section {
   .info-grid {
     display: flex;
-    gap: 30px;
+    flex-direction: column;
+    gap: 12px;
 
-    .info-col {
+    .info-row {
       display: flex;
-      flex-direction: column;
-      gap: 12px;
-
-      &.values {
-        flex: 1;
-      }
+      align-items: center;
+      gap: 30px;
 
       .info-label {
         font-family: 'Source Han Sans CN', sans-serif;
@@ -297,9 +301,48 @@ const handleAddLicense = () => {
         line-height: 22px;
         color: #1D1D1D;
         white-space: nowrap;
+        min-width: 100px;
       }
 
       .info-value {
+        flex: 1;
+        font-family: 'Source Han Sans CN', sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 22px;
+        color: #1D1D1D;
+        padding: 8px 12px;
+        background: rgba(136, 165, 209, 0.2);
+        border-radius: 8px;
+        word-break: break-all;
+      }
+    }
+  }
+}
+
+.license-section {
+  .license-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .license-row {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+
+      .license-label {
+        font-family: 'Source Han Sans CN', sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 22px;
+        color: #1D1D1D;
+        white-space: nowrap;
+        min-width: 100px;
+      }
+
+      .license-value {
+        flex: 1;
         font-family: 'Source Han Sans CN', sans-serif;
         font-size: 14px;
         font-weight: 400;
@@ -310,67 +353,11 @@ const handleAddLicense = () => {
         border-radius: 8px;
         word-break: break-all;
 
-        &.hash-value {
-          margin-top: 5px;
+        &.status-text {
+          color: #4763FF;
+          background: transparent;
+          padding: 0;
         }
-      }
-    }
-  }
-}
-
-.license-section {
-  .license-content {
-    .license-row {
-      display: flex;
-      gap: 30px;
-      margin-bottom: 24px;
-
-      .license-label {
-        font-family: 'Source Han Sans CN', sans-serif;
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 22px;
-        color: #1D1D1D;
-        white-space: nowrap;
-      }
-
-      .license-value-wrapper {
-        flex: 1;
-
-        .license-value {
-          font-family: 'Source Han Sans CN', sans-serif;
-          font-size: 14px;
-          font-weight: 400;
-          line-height: 22px;
-          color: #1D1D1D;
-          padding: 8px 12px;
-          background: rgba(136, 165, 209, 0.2);
-          border-radius: 8px;
-          word-break: break-all;
-        }
-      }
-    }
-
-    .license-status {
-      display: flex;
-      gap: 30px;
-
-      .license-label {
-        font-family: 'Source Han Sans CN', sans-serif;
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 22px;
-        color: #1D1D1D;
-        white-space: nowrap;
-      }
-
-      .license-status-text {
-        flex: 1;
-        font-family: 'Source Han Sans CN', sans-serif;
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 22px;
-        color: #4763FF;
       }
     }
   }
@@ -392,17 +379,36 @@ const handleAddLicense = () => {
 
   .hardware-section {
     .info-grid {
-      flex-direction: column;
-      gap: 16px;
+      .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+
+        .info-label {
+          min-width: auto;
+        }
+
+        .info-value {
+          width: 100%;
+        }
+      }
     }
   }
 
   .license-section {
     .license-content {
-      .license-row,
-      .license-status {
+      .license-row {
         flex-direction: column;
+        align-items: flex-start;
         gap: 8px;
+
+        .license-label {
+          min-width: auto;
+        }
+
+        .license-value {
+          width: 100%;
+        }
       }
     }
   }

@@ -76,7 +76,7 @@
           <BasicInfo v-if="activeTab === 'basic'" :license-data="licenseData" />
           <AuthorizationInfo v-if="activeTab === 'authorization'" :license-data="licenseData" />
           <LicenseInfo v-if="activeTab === 'license'" :license-data="licenseData" />
-          <ChangeHistory v-if="activeTab === 'history'" :history-data="historyData" />
+          <ChangeHistory v-if="activeTab === 'history'" :license-data="licenseData" />
         </div>
       </div>
     </div>
@@ -102,7 +102,6 @@ const { t } = useI18n()
 const loading = ref(false)
 const activeTab = ref('basic')
 const licenseData = ref<AuthorizationCode | null>(null)
-const historyData = ref<any[]>([])
 
 const goBack = () => {
   router.back()
@@ -171,6 +170,7 @@ const loadLicenseData = async () => {
     const response = await getLicenseDetail(id)
     if (response.code === '000000' && response.data) {
       licenseData.value = response.data
+      console.log(licenseData.value)
     } else {
       throw new Error(response.message || t('pages.licenses.detail.messages.loadError'))
     }

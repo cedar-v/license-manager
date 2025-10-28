@@ -1,31 +1,39 @@
 <template>
-  <div class="change-history-container">
+  <div class="change-history-container" v-loading="loading">
     <!-- 筛选条件 -->
     <div class="filter-bar">
       <div class="filter-item">
-        <span class="filter-label">时间范围：</span>
-        <el-select v-model="timeRange" placeholder="请选择" class="filter-select">
-          <el-option label="最近7天" value="7" />
-          <el-option label="最近30天" value="30" />
-          <el-option label="最近90天" value="90" />
-          <el-option label="全部" value="all" />
+        <span class="filter-label">操作类型：</span>
+        <el-select v-model="changeType" placeholder="请选择" class="filter-select">
+          <el-option label="全部操作" value="all" />
+          <el-option label="续期" value="renewal" />
+          <el-option label="升级" value="upgrade" />
+          <el-option label="限制变更" value="limit_change" />
+          <el-option label="功能切换" value="feature_toggle" />
+          <el-option label="锁定" value="lock" />
+          <el-option label="解锁" value="unlock" />
+          <el-option label="其他" value="other" />
         </el-select>
       </div>
       <div class="filter-item">
-        <span class="filter-label">操作类型：</span>
-        <el-select v-model="operationType" placeholder="请选择" class="filter-select">
-          <el-option label="全部操作" value="all" />
-          <el-option label="创建授权" value="create" />
-          <el-option label="设备激活" value="activate" />
-          <el-option label="授权锁定" value="lock" />
-          <el-option label="解绑设备" value="unbind" />
-        </el-select>
+        <span class="filter-label">时间范围：</span>
+        <el-date-picker
+          v-model="dateRange"
+          type="daterange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          class="date-picker"
+          :shortcuts="shortcuts"
+          format="YYYY-MM-DD"
+          value-format="YYYY-MM-DD"
+        />
       </div>
     </div>
 
     <!-- 历史记录列表 -->
     <div class="history-container">
-      <div v-if="historyList.length > 0" class="history-timeline">
+      <div v-if="!loading && historyList.length > 0" class="history-timeline">
         <div v-for="item in historyList" :key="item.id" class="history-item">
           <!-- 时间轴圆点 -->
           <div class="timeline-dot"></div>
@@ -35,32 +43,28 @@
             <div class="history-header">
               <div class="header-left">
                 <div class="title-section">
-                  <span class="operation-title">{{ item.title }}</span>
+                  <span class="operation-title">{{ item.change_type_display || item.change_type }}</span>
                 </div>
               </div>
               <div class="header-right">
                 <el-tag
-                  :type="getStatusType(item.status)"
+                  :type="getStatusType(item.change_type)"
                   size="small"
                   class="status-tag"
                 >
-                  {{ item.statusText }}
+                  {{ item.change_type_display || item.change_type }}
                 </el-tag>
               </div>
             </div>
 
             <div class="history-meta">
-              <span class="operator">{{ item.operator }}</span>
-              <span class="time">{{ formatDateTime(item.time) }}</span>
+              <span class="operator">{{ item.operator_name || item.operator_id }}</span>
+              <span class="time">{{ formatDateTime(item.created_at) }}</span>
             </div>
 
-            <div class="detail-type">
-              {{ item.detailType === 'compare' ? '变更对比' : '变更详情' }}
-            </div>
-
-            <div class="history-details">
-              <div v-for="(detail, idx) in item.details" :key="idx" class="detail-item">
-                {{ detail }}
+            <div v-if="item.reason" class="history-details">
+              <div class="detail-item">
+                变更原因：{{ item.reason }}
               </div>
             </div>
           </div>
@@ -68,7 +72,7 @@
       </div>
 
       <!-- 空状态 -->
-      <div v-else class="empty-state">
+      <div v-if="!loading && historyList.length === 0" class="empty-state">
         <el-empty description="暂无变更历史记录" />
       </div>
     </div>
@@ -76,102 +80,139 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { formatDateTime } from '@/utils/date'
-
-interface HistoryDetail {
-  id: string
-  title: string
-  status: 'success' | 'locked' | 'failed'
-  statusText: string
-  operator: string
-  time: string
-  detailType: 'compare' | 'detail'
-  details: string[]
-}
+import { ref, watch, onMounted, computed } from 'vue'
+import { ElMessage } from 'element-plus'
+import type { AuthorizationCode, AuthorizationChangeItem } from '@/api/license'
+import { getAuthorizationChanges } from '@/api/license'
+import { formatDate } from '@/utils/date'
 
 interface Props {
-  licenseData?: any
+  licenseData: AuthorizationCode | null
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
 // 筛选条件
-const timeRange = ref('30')
-const operationType = ref('all')
+const dateRange = ref<[string, string] | null>(null)
+const changeType = ref('all')
+const loading = ref(false)
 
-// 模拟历史记录数据
-const historyList = ref<HistoryDetail[]>([
+// 历史记录数据
+const historyList = ref<AuthorizationChangeItem[]>([])
+const total = ref(0)
+const currentPage = ref(1)
+const pageSize = ref(20)
+
+// 日期快捷选项
+const shortcuts = [
   {
-    id: '1',
-    title: '创建新授权码',
-    status: 'success',
-    statusText: '成功',
-    operator: '管理员',
-    time: '2025-04-29 18:41:20',
-    detailType: 'detail',
-    details: [
-      '授权码：XKDA-55GD-KJFA5-UIYP',
-      '客户ID：X10023'
-    ]
+    text: '最近7天',
+    value: () => {
+      const end = new Date()
+      const start = new Date()
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+      return [start, end]
+    },
   },
   {
-    id: '2',
-    title: '设备激活',
-    status: 'success',
-    statusText: '成功',
-    operator: '张经理',
-    time: '2025-04-29 18:41:20',
-    detailType: 'compare',
-    details: [
-      '设备名称：办公室工作站',
-      '状态变更：未激活➡️已激活'
-    ]
+    text: '最近30天',
+    value: () => {
+      const end = new Date()
+      const start = new Date()
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+      return [start, end]
+    },
   },
   {
-    id: '3',
-    title: '授权锁定',
-    status: 'locked',
-    statusText: '已锁定',
-    operator: '系统自动',
-    time: '2025-04-29 18:41:20',
-    detailType: 'compare',
-    details: [
-      '授权状态：正常➡️已锁定',
-      '锁定原因：检测到异常使用行为'
-    ]
+    text: '最近90天',
+    value: () => {
+      const end = new Date()
+      const start = new Date()
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+      return [start, end]
+    },
   },
-  {
-    id: '4',
-    title: '解绑设备',
-    status: 'success',
-    statusText: '成功',
-    operator: '管理员',
-    time: '2025-04-29 18:41:20',
-    detailType: 'detail',
-    details: [
-      '设备ID：GD-KJFA5-UIYP',
-      '解绑原因：设备更换'
-    ]
+]
+
+// 获取日期范围参数
+const getDateRangeParams = () => {
+  if (!dateRange.value || dateRange.value.length !== 2) {
+    return { start_date: undefined, end_date: undefined }
   }
-])
 
-
-// 获取状态类型
-const getStatusType = (status: string) => {
-  const typeMap: Record<string, 'success' | 'danger' | 'warning'> = {
-    success: 'success',
-    locked: 'danger',
-    failed: 'danger'
+  return {
+    start_date: dateRange.value[0],
+    end_date: dateRange.value[1]
   }
-  return typeMap[status] || 'success'
 }
 
-// 查看详情
-// const handleViewDetail = (item: HistoryDetail) => {
-//   console.log('查看详情', item)
-//   // TODO: 实现查看详情逻辑
-// }
+// 获取变更历史列表
+const fetchChangeHistory = async () => {
+  console.log('获取变更历史，许可证ID:', props.licenseData)
+  if (!props.licenseData?.id) {
+    historyList.value = []
+    return
+  }
+
+  loading.value = true
+  try {
+    const dateParams = getDateRangeParams()
+    const response = await getAuthorizationChanges(props.licenseData.id, {
+      page: currentPage.value,
+      page_size: pageSize.value,
+      change_type: changeType.value === 'all' ? undefined : changeType.value,
+      ...dateParams
+    })
+
+    if (response.data?.list) {
+      historyList.value = response.data.list
+      total.value = response.data.total
+    } else {
+      historyList.value = []
+      total.value = 0
+    }
+  } catch (error) {
+    console.error('获取变更历史失败:', error)
+    ElMessage.error('获取变更历史失败')
+    historyList.value = []
+    total.value = 0
+  } finally {
+    loading.value = false
+  }
+}
+
+// 组件挂载时获取数据
+onMounted(() => {
+  fetchChangeHistory()
+})
+
+// 监听 licenseData 变化
+watch(() => props.licenseData?.id, () => {
+  currentPage.value = 1
+  fetchChangeHistory()
+})
+
+// 监听筛选条件变化
+watch([dateRange, changeType], () => {
+  currentPage.value = 1
+  fetchChangeHistory()
+})
+
+// 格式化日期时间
+const formatDateTime = (dateTime: string) => {
+  if (!dateTime) return '-'
+  return formatDate(dateTime)
+}
+
+// 获取状态类型（根据变更类型判断）
+const getStatusType = (changeType: string) => {
+  // 锁定相关操作显示为危险
+  if (changeType.includes('lock')) {
+    return 'danger'
+  }
+  // 其他操作显示为成功
+  return 'success'
+}
 </script>
 
 <style lang="scss" scoped>
@@ -199,7 +240,8 @@ const getStatusType = (status: string) => {
       white-space: nowrap;
     }
 
-    .filter-select {
+    .filter-select,
+    .date-picker {
       width: 216px;
 
       :deep(.el-input__wrapper) {
@@ -214,6 +256,26 @@ const getStatusType = (status: string) => {
         font-weight: 500;
         line-height: 24px;
         color: #B2B8C2;
+      }
+    }
+
+    .date-picker {
+      width: 280px;
+
+      :deep(.el-range-separator) {
+        font-family: 'Source Han Sans CN', sans-serif;
+        font-size: 12px;
+        color: #666666;
+      }
+
+      :deep(.el-range-input) {
+        font-family: 'Source Han Sans CN', sans-serif;
+        font-size: 12px;
+        color: #1D1D1D;
+      }
+
+      :deep(.el-range__icon) {
+        font-size: 14px;
       }
     }
   }
@@ -338,7 +400,7 @@ const getStatusType = (status: string) => {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
 
     .operator,
     .time {
@@ -350,26 +412,20 @@ const getStatusType = (status: string) => {
     }
   }
 
-  .detail-type {
-    font-family: 'Source Han Sans CN', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 22px;
-    color: #202332;
-    margin-bottom: 8px;
-  }
-
   .history-details {
     display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
+    flex-direction: column;
+    gap: 8px;
 
     .detail-item {
       font-family: 'Source Han Sans CN', sans-serif;
       font-size: 14px;
       font-weight: 400;
-      line-height: 18px;
-      color: #8186A5;
+      line-height: 22px;
+      color: #666666;
+      padding: 8px 12px;
+      background: rgba(136, 165, 209, 0.1);
+      border-radius: 4px;
     }
   }
 }
@@ -391,8 +447,10 @@ const getStatusType = (status: string) => {
     .filter-item {
       width: 100%;
 
-      .filter-select {
+      .filter-select,
+      .date-picker {
         flex: 1;
+        width: 100%;
       }
     }
   }

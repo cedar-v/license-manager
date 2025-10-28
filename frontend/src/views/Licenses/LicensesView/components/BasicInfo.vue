@@ -8,7 +8,7 @@
       </div>
       <div class="info-row">
         <div class="info-label">{{ $t('customers.basicInfo.customerName') }}</div>
-        <div class="info-value">{{ licenseData?.customer_name || '-' }}</div>
+        <div class="info-value">{{ licenseData?.customer_info.customer_name || '-' }}</div>
       </div>
     </div>
 
@@ -17,7 +17,7 @@
       <!-- 已激活设备数量 -->
       <div class="stat-card stat-card-1">
         <div class="card-content">
-          <div class="stat-value">{{ licenseData?.current_activations || 0 }}</div>
+          <div class="stat-value">{{ licenseData?.activated_licenses_count || 0 }}</div>
           <div class="stat-label">{{ $t('customers.basicInfo.activatedDevices') }}</div>
         </div>
       </div>

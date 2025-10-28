@@ -332,7 +332,7 @@
           "authorizationCode": "授权码",
           "forActivation": "（用于客户端激活）",
           "code": "授权码",
-          "tipText": "将此授权码提供给客户，客户在ThingsPanel中配置后可自动获取软件许可证"
+          "tipText": "将此授权码提供给客户，客户在软件产品中配置后可自动获取软件许可证"
         },
         "actions": {
           "copyCode": "复制授权码",

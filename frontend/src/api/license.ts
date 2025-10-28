@@ -12,6 +12,7 @@ export interface AuthorizationCode {
   created_at: string;
   updated_at?: string;
   start_date?: string;
+  created_by?: string;
   end_date?: string;
   deployment_type: string;
   deployment_type_display?: string;
@@ -19,11 +20,14 @@ export interface AuthorizationCode {
   encryption_type_display?: string;
   software_version?: string;
   max_activations: number;
-  current_activations?: number;
+  activated_licenses_count?: number;
   is_locked?: boolean;
   feature_config?: any;
   usage_limits?: any;
   custom_parameters?: any;
+  customer_info:{
+    customer_name: string;
+  }
 }
 
 // 许可证（License）类型 - 供其他页面使用（保持兼容）
@@ -206,4 +210,138 @@ export function activateLicense(id: string): Promise<ApiResponse<AuthorizationCo
  */
 export function deactivateLicense(id: string): Promise<ApiResponse<AuthorizationCode>> {
   return Axios.patch(`/api/v1/authorization-codes/${id}/deactivate`)
+}
+
+// 许可证设备信息类型（与后端 LicenseListItem 对应）
+export interface LicenseDevice {
+  id: string
+  license_key: string
+  authorization_code_id: string
+  authorization_code: string
+  customer_name: string
+  hardware_fingerprint: string
+  status: 'active' | 'inactive' | 'revoked'
+  status_display?: string
+  is_online: boolean
+  is_online_display?: string
+  activation_ip?: string
+  last_online_ip?: string
+  activated_at?: string
+  last_heartbeat?: string,
+  device_info?: {
+    machine_code?: string    // 机器序列号
+    mac_address?: string     // MAC地址
+    cpu_id?: string          // CPU ID
+    [key: string]: any
+  }
+}
+
+// 许可证详情类型（与后端 LicenseDetailResponse 对应）
+export interface LicenseDetail {
+  id: string
+  license_key: string
+  authorization_code_id: string
+  authorization_code: string
+  customer_id: string
+  customer_name: string
+  hardware_fingerprint: string
+  device_info?: {
+    machine_code?: string
+    mac_address?: string
+    cpu_id?: string
+    [key: string]: any
+  }
+  activation_ip?: string
+  status: string
+  status_display?: string
+  is_online: boolean
+  is_online_display?: string
+  activated_at?: string
+  last_heartbeat?: string
+  last_online_ip?: string
+  config_updated_at?: string
+  usage_data?: any
+  created_at: string
+  updated_at: string
+}
+
+// 许可证列表查询请求
+export interface LicenseListQueryRequest {
+  authorization_code_id?: string
+  page?: number
+  page_size?: number
+  status?: 'active' | 'inactive' | 'expired'
+}
+
+// 许可证列表响应
+export interface LicenseListResponse {
+  code: string
+  message: string
+  timestamp: string
+  data: {
+    list: LicenseDevice[]
+    total: number
+    page: number
+    page_size: number
+    total_pages: number
+  }
+}
+
+/**
+ * 获取许可证列表（已激活的设备列表）
+ */
+export function getLicenseDevices(params: LicenseListQueryRequest): Promise<LicenseListResponse> {
+  return Axios.get('/api/v1/licenses', { params })
+}
+
+/**
+ * 获取许可证详情
+ */
+export function getLicenseDeviceDetail(id: string): Promise<ApiResponse<LicenseDetail>> {
+  return Axios.get(`/api/v1/licenses/${id}`)
+}
+
+// 授权变更历史相关类型定义
+export interface AuthorizationChangeItem {
+  id: string
+  change_type: string
+  change_type_display?: string
+  operator_id: string
+  operator_name?: string
+  reason?: string
+  created_at: string
+}
+
+export interface AuthorizationChangeListRequest {
+  page?: number
+  page_size?: number
+  change_type?: string
+  operator_id?: string
+  start_date?: string
+  end_date?: string
+  sort?: 'created_at' | 'change_type'
+  order?: 'asc' | 'desc'
+}
+
+export interface AuthorizationChangeListResponse {
+  code: string
+  message: string
+  timestamp: string
+  data: {
+    list: AuthorizationChangeItem[]
+    total: number
+    page: number
+    page_size: number
+    total_pages: number
+  }
+}
+
+/**
+ * 获取授权变更历史列表
+ */
+export function getAuthorizationChanges(
+  id: string,
+  params?: AuthorizationChangeListRequest
+): Promise<AuthorizationChangeListResponse> {
+  return Axios.get(`/api/v1/authorization-codes/${id}/changes`, { params })
 }

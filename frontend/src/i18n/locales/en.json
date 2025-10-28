@@ -331,7 +331,7 @@
           "authorizationCode": "Authorization Code",
           "forActivation": "(For Client Activation)",
           "code": "Authorization Code",
-          "tipText": "Provide this authorization code to the customer, who can automatically obtain the software license after configuring it in ThingsPanel"
+          "tipText": "Provide this authorization code to the customer, who can automatically obtain the software license after configuring it in the software product"
         },
         "actions": {
           "copyCode": "Copy License Code",

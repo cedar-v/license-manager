@@ -55,7 +55,7 @@
     <div class="nav-content__right">
       <!-- 用户头像和下拉菜单 -->
       <el-tooltip :content="t('navigation.tooltip.user')" placement="bottom">
-        <el-dropdown trigger="click" @command="handleUserCommand">
+        <el-dropdown trigger="click" @command="handleUserCommand" placement="bottom-start">
           <div class="user-avatar">
             <NavIcon name="user" />
           </div>
@@ -73,10 +73,6 @@
                 <div class="user-role">{{ userInfo?.role || '--' }}</div>
               </div>
             </div>
-
-            <!-- 分割线 -->
-            <el-dropdown-item divided class="dropdown-divider" disabled></el-dropdown-item>
-
             <!-- 基本信息 -->
             <el-dropdown-item command="profile" class="dropdown-menu-item">
               <svg class="menu-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -395,21 +391,23 @@ const handleUserCommand = async (command: string) => {
 }
 
 /* 用户下拉菜单样式 */
-:deep(.user-dropdown-menu) {
-  width: 256px;
-  padding: 0;
-  border-radius: 8px;
-  box-shadow: 0px 2px 12px 0px rgba(0, 0, 0, 0.24);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  margin-top: 8px;
+:deep(.el-dropdown-menu) {
+  padding: 0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0px 2px 12px 0px rgba(0, 0, 0, 0.24) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  margin-top: 8px !important;
+  right: 0 !important; /* 右对齐到用户头像 */
+  left: auto !important;
 }
 
 /* 用户信息头部 */
 .user-info-header {
   display: flex;
+  width: 200px !important;
   align-items: center;
   gap: 12px;
-  padding: 16px;
+  padding: 5px 16px;
   background: transparent;
 }
 
