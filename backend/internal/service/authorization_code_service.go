@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -16,9 +17,9 @@ import (
 )
 
 type authorizationCodeService struct {
-	authCodeRepo   repository.AuthorizationCodeRepository
-	customerRepo   repository.CustomerRepository
-	licenseRepo    repository.LicenseRepository
+	authCodeRepo repository.AuthorizationCodeRepository
+	customerRepo repository.CustomerRepository
+	licenseRepo  repository.LicenseRepository
 }
 
 // NewAuthorizationCodeService 创建授权码服务实例
@@ -28,9 +29,9 @@ func NewAuthorizationCodeService(
 	licenseRepo repository.LicenseRepository,
 ) AuthorizationCodeService {
 	return &authorizationCodeService{
-		authCodeRepo:   authCodeRepo,
-		customerRepo:   customerRepo,
-		licenseRepo:    licenseRepo,
+		authCodeRepo: authCodeRepo,
+		customerRepo: customerRepo,
+		licenseRepo:  licenseRepo,
 	}
 }
 
@@ -267,7 +268,10 @@ func (s *authorizationCodeService) UpdateAuthorizationCode(ctx context.Context, 
 	}
 
 	// 获取当前用户ID
-	// currentUserID := "admin_uuid" // TODO: 从JWT token中获取
+	currentUserID := "admin_uuid" // TODO: 从JWT token中获取
+
+	// 记录变更前的配置
+	oldConfig := s.buildConfigSnapshot(existingAuthCode)
 
 	// 只更新提供的字段
 	if req.SoftwareID != nil {
@@ -320,9 +324,6 @@ func (s *authorizationCodeService) UpdateAuthorizationCode(ctx context.Context, 
 		existingAuthCode.CustomParameters = models.JSON(customParametersBytes)
 	}
 
-	// 设置更新者 - 注意这里没有UpdatedBy字段，会通过BeforeUpdate钩子自动设置UpdatedAt
-	// existingAuthCode.UpdatedBy = &currentUserID  // 如果表结构有这个字段的话
-
 	// 委托给Repository层进行数据更新
 	if err := s.authCodeRepo.UpdateAuthorizationCode(ctx, existingAuthCode); err != nil {
 		return nil, i18n.NewI18nError("900004", lang, err.Error())
@@ -331,8 +332,11 @@ func (s *authorizationCodeService) UpdateAuthorizationCode(ctx context.Context, 
 	// 填充多语言显示字段和计算状态
 	s.fillAuthorizationCodeDisplayFields(existingAuthCode, lang)
 
-	// TODO: 记录变更历史到 authorization_changes 表
-	// s.recordAuthorizationChange(ctx, id, req.ChangeType, req.Reason, currentUserID)
+	// 记录变更历史到 authorization_changes 表
+	newConfig := s.buildConfigSnapshot(existingAuthCode)
+	if err := s.recordAuthorizationChange(ctx, id, req.ChangeType, req.Reason, currentUserID, oldConfig, newConfig); err != nil {
+		log.Printf("记录授权变更历史失败: %v", err)
+	}
 
 	return existingAuthCode, nil
 }
@@ -361,6 +365,9 @@ func (s *authorizationCodeService) LockUnlockAuthorizationCode(ctx context.Conte
 	// 获取当前用户ID
 	currentUserID := "admin_uuid" // TODO: 从JWT token中获取
 
+	// 记录变更前的配置
+	oldConfig := s.buildConfigSnapshot(existingAuthCode)
+
 	// 更新锁定状态
 	now := time.Now()
 	existingAuthCode.IsLocked = req.IsLocked
@@ -385,12 +392,15 @@ func (s *authorizationCodeService) LockUnlockAuthorizationCode(ctx context.Conte
 	// 填充多语言显示字段和计算状态
 	s.fillAuthorizationCodeDisplayFields(existingAuthCode, lang)
 
-	// TODO: 记录变更历史到 authorization_changes 表
-	// changeType := "lock"
-	// if !req.IsLocked {
-	// 	changeType = "unlock"
-	// }
-	// s.recordAuthorizationChange(ctx, id, changeType, req.Reason, currentUserID)
+	// 记录变更历史到 authorization_changes 表
+	changeType := "lock"
+	if !req.IsLocked {
+		changeType = "unlock"
+	}
+	newConfig := s.buildConfigSnapshot(existingAuthCode)
+	if err := s.recordAuthorizationChange(ctx, id, changeType, req.Reason, currentUserID, oldConfig, newConfig); err != nil {
+		log.Printf("记录授权变更历史失败: %v", err)
+	}
 
 	return existingAuthCode, nil
 }
@@ -404,8 +414,11 @@ func (s *authorizationCodeService) DeleteAuthorizationCode(ctx context.Context, 
 		return i18n.NewI18nError("900001", lang)
 	}
 
+	// 获取当前用户ID
+	currentUserID := "admin_uuid" // TODO: 从JWT token中获取
+
 	// 先查询现有授权码，确保存在
-	_, err := s.authCodeRepo.GetAuthorizationCodeByID(ctx, id)
+	existingAuthCode, err := s.authCodeRepo.GetAuthorizationCodeByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, repository.ErrAuthorizationCodeNotFound) {
 			return i18n.NewI18nError("300001", lang)
@@ -413,16 +426,94 @@ func (s *authorizationCodeService) DeleteAuthorizationCode(ctx context.Context, 
 		return i18n.NewI18nError("900004", lang, err.Error())
 	}
 
+	// 记录变更前的配置
+	oldConfig := s.buildConfigSnapshot(existingAuthCode)
+
 	// 委托给Repository层进行软删除
 	if err := s.authCodeRepo.DeleteAuthorizationCode(ctx, id); err != nil {
 		return i18n.NewI18nError("900004", lang, err.Error())
 	}
 
-	// TODO: 记录变更历史到 authorization_changes 表
-	// currentUserID := "admin_uuid" // TODO: 从JWT token中获取
-	// s.recordAuthorizationChange(ctx, id, "delete", nil, currentUserID)
+	// 记录变更历史到 authorization_changes 表
+	emptyConfig := make(map[string]interface{})
+	if err := s.recordAuthorizationChange(ctx, id, "delete", nil, currentUserID, oldConfig, emptyConfig); err != nil {
+		log.Printf("记录授权变更历史失败: %v", err)
+	}
 
 	return nil
+}
+
+// recordAuthorizationChange 记录授权变更历史
+func (s *authorizationCodeService) recordAuthorizationChange(ctx context.Context, authCodeID string, changeType string, reason *string, operatorID string, oldConfig, newConfig map[string]interface{}) error {
+	// 构建变更历史记录
+	change := &models.AuthorizationChange{
+		AuthorizationCodeID: authCodeID,
+		ChangeType:          changeType,
+		OperatorID:          operatorID,
+		Reason:              reason,
+	}
+
+	// 序列化配置为JSON
+	if oldConfig != nil {
+		oldConfigBytes, err := json.Marshal(oldConfig)
+		if err != nil {
+			return err
+		}
+		change.OldConfig = models.JSON(oldConfigBytes)
+	}
+
+	if newConfig != nil {
+		newConfigBytes, err := json.Marshal(newConfig)
+		if err != nil {
+			return err
+		}
+		change.NewConfig = models.JSON(newConfigBytes)
+	}
+
+	// 委托给Repository层记录变更历史
+	return s.authCodeRepo.RecordAuthorizationChange(ctx, change)
+}
+
+// buildConfigSnapshot 构建配置快照，用于记录变更历史
+func (s *authorizationCodeService) buildConfigSnapshot(authCode *models.AuthorizationCode) map[string]interface{} {
+	config := make(map[string]interface{})
+
+	// 基础配置
+	config["code"] = authCode.Code
+	config["software_id"] = authCode.SoftwareID
+	config["description"] = authCode.Description
+	config["start_date"] = authCode.StartDate.Format(time.RFC3339)
+	config["end_date"] = authCode.EndDate.Format(time.RFC3339)
+	config["deployment_type"] = authCode.DeploymentType
+	config["encryption_type"] = authCode.EncryptionType
+	config["software_version"] = authCode.SoftwareVersion
+	config["max_activations"] = authCode.MaxActivations
+	config["is_locked"] = authCode.IsLocked
+	config["lock_reason"] = authCode.LockReason
+
+	// JSON配置字段
+	if len(authCode.FeatureConfig) > 0 {
+		var featureConfig map[string]interface{}
+		if err := json.Unmarshal(authCode.FeatureConfig, &featureConfig); err == nil {
+			config["feature_config"] = featureConfig
+		}
+	}
+
+	if len(authCode.UsageLimits) > 0 {
+		var usageLimits map[string]interface{}
+		if err := json.Unmarshal(authCode.UsageLimits, &usageLimits); err == nil {
+			config["usage_limits"] = usageLimits
+		}
+	}
+
+	if len(authCode.CustomParameters) > 0 {
+		var customParameters map[string]interface{}
+		if err := json.Unmarshal(authCode.CustomParameters, &customParameters); err == nil {
+			config["custom_parameters"] = customParameters
+		}
+	}
+
+	return config
 }
 
 // fillAuthCodeDisplayFields 填充授权码列表项多语言显示字段
