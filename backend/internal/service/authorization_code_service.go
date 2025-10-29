@@ -59,7 +59,10 @@ func (s *authorizationCodeService) CreateAuthorizationCode(ctx context.Context, 
 	endDate := startDate.AddDate(0, 0, req.ValidityDays-1).Add(23*time.Hour + 59*time.Minute + 59*time.Second) // 有效期最后一天的23:59:59结束
 
 	// 获取当前用户ID
-	currentUserID := "admin_uuid" // TODO: 从JWT token中获取
+	currentUserID := pkgcontext.GetUserIDFromContext(ctx)
+	if currentUserID == "" {
+		return nil, i18n.NewI18nError("100004", lang) // 缺少认证信息
+	}
 
 	// 生成授权码
 	authCode, err := s.generateAuthorizationCode(req.CustomerID)
@@ -268,7 +271,10 @@ func (s *authorizationCodeService) UpdateAuthorizationCode(ctx context.Context, 
 	}
 
 	// 获取当前用户ID
-	currentUserID := "admin_uuid" // TODO: 从JWT token中获取
+	currentUserID := pkgcontext.GetUserIDFromContext(ctx)
+	if currentUserID == "" {
+		return nil, i18n.NewI18nError("100004", lang)
+	}
 
 	// 记录变更前的配置
 	oldConfig := s.buildConfigSnapshot(existingAuthCode)
@@ -363,7 +369,10 @@ func (s *authorizationCodeService) LockUnlockAuthorizationCode(ctx context.Conte
 	}
 
 	// 获取当前用户ID
-	currentUserID := "admin_uuid" // TODO: 从JWT token中获取
+	currentUserID := pkgcontext.GetUserIDFromContext(ctx)
+	if currentUserID == "" {
+		return nil, i18n.NewI18nError("100004", lang)
+	}
 
 	// 记录变更前的配置
 	oldConfig := s.buildConfigSnapshot(existingAuthCode)
@@ -415,7 +424,10 @@ func (s *authorizationCodeService) DeleteAuthorizationCode(ctx context.Context, 
 	}
 
 	// 获取当前用户ID
-	currentUserID := "admin_uuid" // TODO: 从JWT token中获取
+	currentUserID := pkgcontext.GetUserIDFromContext(ctx)
+	if currentUserID == "" {
+		return i18n.NewI18nError("100004", lang)
+	}
 
 	// 先查询现有授权码，确保存在
 	existingAuthCode, err := s.authCodeRepo.GetAuthorizationCodeByID(ctx, id)
