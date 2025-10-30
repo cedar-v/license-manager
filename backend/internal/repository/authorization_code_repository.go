@@ -284,3 +284,8 @@ func (r *authorizationCodeRepository) GetAuthorizationChangeList(ctx context.Con
 		TotalPages: totalPages,
 	}, nil
 }
+
+// RecordAuthorizationChange 记录授权变更历史
+func (r *authorizationCodeRepository) RecordAuthorizationChange(ctx context.Context, change *models.AuthorizationChange) error {
+	return r.db.WithContext(ctx).Create(change).Error
+}

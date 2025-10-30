@@ -32,7 +32,7 @@ CREATE TABLE licenses (
     updated_at DATETIME(3) NOT NULL,
     
     -- 外键约束
-    FOREIGN KEY (authorization_code_id) REFERENCES authorization_codes(id) ON DELETE RESTRICT,
+    FOREIGN KEY (authorization_code_id) REFERENCES authorization_codes(id) ON DELETE CASCADE,
     FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE RESTRICT,
     
     -- 唯一约束：同一授权码下的硬件指纹应该唯一

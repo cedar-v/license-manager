@@ -52,10 +52,8 @@ func (h *AuthorizationCodeHandler) CreateAuthorizationCode(c *gin.Context) {
 		return
 	}
 
-	// 设置语言到Context中
-	ctx := middleware.WithLanguage(c.Request.Context(), c)
-
-	data, err := h.authCodeService.CreateAuthorizationCode(ctx, &req)
+	// 直接传递 gin.Context
+	data, err := h.authCodeService.CreateAuthorizationCode(c, &req)
 	if err != nil {
 		// 错误已经在Service层完全包装好了，直接使用
 		var i18nErr *i18n.I18nError
@@ -120,10 +118,8 @@ func (h *AuthorizationCodeHandler) GetAuthorizationCodeList(c *gin.Context) {
 		return
 	}
 
-	// 设置语言到Context中
-	ctx := middleware.WithLanguage(c.Request.Context(), c)
-
-	data, err := h.authCodeService.GetAuthorizationCodeList(ctx, &req)
+	// 直接传递 gin.Context
+	data, err := h.authCodeService.GetAuthorizationCodeList(c, &req)
 	if err != nil {
 		// 错误已经在Service层完全包装好了，直接使用
 		var i18nErr *i18n.I18nError
@@ -182,10 +178,8 @@ func (h *AuthorizationCodeHandler) GetAuthorizationCode(c *gin.Context) {
 		return
 	}
 
-	// 设置语言到Context中
-	ctx := middleware.WithLanguage(c.Request.Context(), c)
-
-	data, err := h.authCodeService.GetAuthorizationCode(ctx, id)
+	// 直接传递 gin.Context
+	data, err := h.authCodeService.GetAuthorizationCode(c, id)
 	if err != nil {
 		// 错误已经在Service层完全包装好了，直接使用
 		var i18nErr *i18n.I18nError
@@ -257,10 +251,8 @@ func (h *AuthorizationCodeHandler) UpdateAuthorizationCode(c *gin.Context) {
 		return
 	}
 
-	// 设置语言到Context中
-	ctx := middleware.WithLanguage(c.Request.Context(), c)
-
-	data, err := h.authCodeService.UpdateAuthorizationCode(ctx, id, &req)
+	// 直接传递 gin.Context
+	authCode, err := h.authCodeService.UpdateAuthorizationCode(c, id, &req)
 	if err != nil {
 		// 错误已经在Service层完全包装好了，直接使用
 		var i18nErr *i18n.I18nError
@@ -288,9 +280,10 @@ func (h *AuthorizationCodeHandler) UpdateAuthorizationCode(c *gin.Context) {
 	c.JSON(http.StatusOK, models.APIResponse{
 		Code:    "000000",
 		Message: successMessage,
-		Data:    data,
+		Data:    authCode,
 	})
 }
+
 // LockUnlockAuthorizationCode 锁定/解锁授权码
 // @Summary 锁定/解锁授权码
 // @Description 锁定或解锁指定的授权码，可以设置锁定原因
@@ -331,10 +324,8 @@ func (h *AuthorizationCodeHandler) LockUnlockAuthorizationCode(c *gin.Context) {
 		return
 	}
 
-	// 设置语言到Context中
-	ctx := middleware.WithLanguage(c.Request.Context(), c)
-
-	data, err := h.authCodeService.LockUnlockAuthorizationCode(ctx, id, &req)
+	// 直接传递 gin.Context
+	data, err := h.authCodeService.LockUnlockAuthorizationCode(c, id, &req)
 	if err != nil {
 		// 错误已经在Service层完全包装好了，直接使用
 		var i18nErr *i18n.I18nError
@@ -393,11 +384,8 @@ func (h *AuthorizationCodeHandler) DeleteAuthorizationCode(c *gin.Context) {
 		return
 	}
 
-	// 设置语言到Context中
-	ctx := middleware.WithLanguage(c.Request.Context(), c)
-
-	err := h.authCodeService.DeleteAuthorizationCode(ctx, id)
-	if err != nil {
+	// 直接传递 gin.Context
+	if err := h.authCodeService.DeleteAuthorizationCode(c, id); err != nil {
 		// 错误已经在Service层完全包装好了，直接使用
 		var i18nErr *i18n.I18nError
 		if errors.As(err, &i18nErr) {
@@ -475,10 +463,8 @@ func (h *AuthorizationCodeHandler) GetAuthorizationChangeList(c *gin.Context) {
 		return
 	}
 
-	// 设置语言到Context中
-	ctx := middleware.WithLanguage(c.Request.Context(), c)
-
-	data, err := h.authCodeService.GetAuthorizationChangeList(ctx, id, &req)
+	// 直接传递 gin.Context
+	data, err := h.authCodeService.GetAuthorizationChangeList(c, id, &req)
 	if err != nil {
 		// 错误已经在Service层完全包装好了，直接使用
 		var i18nErr *i18n.I18nError

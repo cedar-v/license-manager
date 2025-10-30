@@ -16,8 +16,8 @@ CREATE TABLE authorization_changes (
     -- 时间字段 (使用DATETIME(3)匹配Go的time.Time和GORM的精度要求)
     created_at DATETIME(3) NOT NULL COMMENT '记录创建时间',
     
-    -- 外键约束
-    FOREIGN KEY (authorization_code_id) REFERENCES authorization_codes(id) ON DELETE RESTRICT
+    -- 外键约束 - 修改为级联删除
+    FOREIGN KEY (authorization_code_id) REFERENCES authorization_codes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='授权变更历史表 - 记录授权码的所有变更操作';
 
 -- 创建索引

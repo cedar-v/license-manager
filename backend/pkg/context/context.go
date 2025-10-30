@@ -2,6 +2,8 @@ package context
 
 import (
 	"context"
+
+	"github.com/gin-gonic/gin"
 )
 
 // 定义Context键的类型，避免键冲突
@@ -55,11 +57,62 @@ func WithUserID(ctx context.Context, userID string) context.Context {
 	return context.WithValue(ctx, UserIDKey, userID)
 }
 
-// GetUserIDFromContext 从Context中获取用户ID
+// GetUserIDFromContext 从context中获取当前用户ID
 func GetUserIDFromContext(ctx context.Context) string {
-	if userID, ok := ctx.Value(UserIDKey).(string); ok {
-		return userID
+	// 尝试从gin.Context获取
+	if ginCtx, ok := ctx.(*gin.Context); ok {
+		if userID, exists := ginCtx.Get("user_id"); exists {
+			if id, ok := userID.(string); ok {
+				return id
+			}
+		}
 	}
+
+	// 尝试从标准context.Context获取
+	if userID := ctx.Value("user_id"); userID != nil {
+		if id, ok := userID.(string); ok {
+			return id
+		}
+	}
+
+	return ""
+}
+
+// GetUsernameFromContext 从context中获取当前用户名
+func GetUsernameFromContext(ctx context.Context) string {
+	if ginCtx, ok := ctx.(*gin.Context); ok {
+		if username, exists := ginCtx.Get("username"); exists {
+			if name, ok := username.(string); ok {
+				return name
+			}
+		}
+	}
+
+	if username := ctx.Value("username"); username != nil {
+		if name, ok := username.(string); ok {
+			return name
+		}
+	}
+
+	return ""
+}
+
+// GetUserRoleFromContext 从context中获取当前用户角色
+func GetUserRoleFromContext(ctx context.Context) string {
+	if ginCtx, ok := ctx.(*gin.Context); ok {
+		if role, exists := ginCtx.Get("role"); exists {
+			if r, ok := role.(string); ok {
+				return r
+			}
+		}
+	}
+
+	if role := ctx.Value("role"); role != nil {
+		if r, ok := role.(string); ok {
+			return r
+		}
+	}
+
 	return ""
 }
 
@@ -99,11 +152,11 @@ func WithContextInfo(ctx context.Context, info *ContextInfo) context.Context {
 	if info == nil {
 		return ctx
 	}
-	
+
 	ctx = WithLanguage(ctx, info.Language)
 	ctx = WithRequestID(ctx, info.RequestID)
 	ctx = WithUserID(ctx, info.UserID)
 	ctx = WithTraceID(ctx, info.TraceID)
-	
+
 	return ctx
 }
