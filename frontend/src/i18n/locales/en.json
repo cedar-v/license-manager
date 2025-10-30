@@ -303,7 +303,7 @@
       "detail": {
         "title": "License Details",
         "breadcrumb": {
-          "licenseManagement": "License Management",
+          "licenseManagement": "License List",
           "licenseDetail": "License Details"
         },
         "tabs": {
