@@ -2,8 +2,6 @@ package service
 
 import (
 	"context"
-	"crypto/aes"
-	"crypto/cipher"
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/hex"
@@ -20,12 +18,14 @@ import (
 	"license-manager/internal/repository"
 	pkgcontext "license-manager/pkg/context"
 	"license-manager/pkg/i18n"
+	"license-manager/pkg/utils"
 )
 
 type licenseService struct {
-	licenseRepo repository.LicenseRepository
-	db          *gorm.DB
-	logger      *logrus.Logger
+	licenseRepo   repository.LicenseRepository
+	db            *gorm.DB
+	logger        *logrus.Logger
+	rsaPrivateKey *utils.RSAPrivateKey // RSA私钥（缓存）
 }
 
 // NewLicenseService 创建许可证服务实例
@@ -327,7 +327,6 @@ func (s *licenseService) GenerateLicenseFile(ctx context.Context, id string) ([]
 		licenseFileData["start_date"] = license.AuthorizationCode.StartDate
 		licenseFileData["end_date"] = license.AuthorizationCode.EndDate
 		licenseFileData["deployment_type"] = license.AuthorizationCode.DeploymentType
-		licenseFileData["encryption_type"] = license.AuthorizationCode.EncryptionType
 		licenseFileData["max_activations"] = license.AuthorizationCode.MaxActivations
 		
 		// 包含功能配置
@@ -361,8 +360,8 @@ func (s *licenseService) GenerateLicenseFile(ctx context.Context, id string) ([]
 		return nil, "", i18n.NewI18nError("300009", lang) // 许可证文件生成失败
 	}
 
-	// 加密许可证文件
-	encryptedData, err := s.encryptLicenseFile(licenseJSON)
+	// 使用RSA数字签名
+	encryptedData, err := s.signLicenseFile(licenseJSON)
 	if err != nil {
 		return nil, "", i18n.NewI18nError("300009", lang) // 许可证文件生成失败
 	}
@@ -601,7 +600,6 @@ func (s *licenseService) generateLicenseFileContent(license *models.License, aut
 		licenseFileData["start_date"] = authCode.StartDate
 		licenseFileData["end_date"] = authCode.EndDate
 		licenseFileData["deployment_type"] = authCode.DeploymentType
-		licenseFileData["encryption_type"] = authCode.EncryptionType
 		licenseFileData["max_activations"] = authCode.MaxActivations
 		
 		// 包含功能配置等
@@ -627,13 +625,14 @@ func (s *licenseService) generateLicenseFileContent(license *models.License, aut
 		}
 	}
 
-	// 序列化并加密
+	// 序列化
 	licenseJSON, err := json.Marshal(licenseFileData)
 	if err != nil {
 		return "", err
 	}
 
-	encryptedData, err := s.encryptLicenseFile(licenseJSON)
+	// 使用RSA数字签名
+	encryptedData, err := s.signLicenseFile(licenseJSON)
 	if err != nil {
 		return "", err
 	}
@@ -641,42 +640,61 @@ func (s *licenseService) generateLicenseFileContent(license *models.License, aut
 	return string(encryptedData), nil
 }
 
-// encryptLicenseFile 加密许可证文件
-func (s *licenseService) encryptLicenseFile(data []byte) ([]byte, error) {
-	// 从配置文件获取加密密钥
+// loadRSAPrivateKey 加载RSA私钥（懒加载）
+func (s *licenseService) loadRSAPrivateKey() (*utils.RSAPrivateKey, error) {
+	if s.rsaPrivateKey != nil {
+		return s.rsaPrivateKey, nil
+	}
+
 	cfg := config.GetConfig()
 	if cfg == nil {
 		return nil, fmt.Errorf("configuration not initialized")
 	}
-	
-	key := []byte(cfg.License.EncryptionKey)
-	if len(key) != 16 && len(key) != 24 && len(key) != 32 {
-		return nil, fmt.Errorf("invalid encryption key length: %d bytes, must be 16, 24, or 32 bytes", len(key))
+
+	privateKeyPath := cfg.License.RSA.PrivateKeyPath
+	if privateKeyPath == "" {
+		return nil, fmt.Errorf("RSA private key path not configured")
 	}
-	
-	block, err := aes.NewCipher(key)
+
+	key, err := utils.LoadRSAPrivateKeyFromFile(privateKeyPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create AES cipher: %w", err)
+		return nil, fmt.Errorf("加载RSA私钥失败: %w", err)
 	}
 
-	// 使用GCM模式进行加密
-	gcm, err := cipher.NewGCM(block)
+	s.rsaPrivateKey = key
+	return key, nil
+}
+
+// signLicenseFile 使用RSA数字签名许可证文件
+func (s *licenseService) signLicenseFile(data []byte) ([]byte, error) {
+	// 加载RSA私钥
+	privateKey, err := s.loadRSAPrivateKey()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("加载RSA私钥失败: %w", err)
 	}
 
-	// 生成随机nonce
-	nonce := make([]byte, gcm.NonceSize())
-	if _, err = rand.Read(nonce); err != nil {
-		return nil, err
+	// 对数据进行数字签名
+	signature, err := privateKey.SignData(data)
+	if err != nil {
+		return nil, fmt.Errorf("签名失败: %w", err)
 	}
 
-	// 加密数据
-	ciphertext := gcm.Seal(nonce, nonce, data, nil)
-	
+	// 构建签名后的许可证文件结构
+	licenseWithSignature := map[string]interface{}{
+		"data":      string(data), // 原始数据（JSON字符串）
+		"signature": signature,   // 数字签名
+		"algorithm": "RSA-PSS-SHA256",
+	}
+
+	// 序列化为JSON
+	licenseJSON, err := json.Marshal(licenseWithSignature)
+	if err != nil {
+		return nil, fmt.Errorf("序列化失败: %w", err)
+	}
+
 	// 使用base64编码
-	encoded := base64.StdEncoding.EncodeToString(ciphertext)
-	
+	encoded := base64.StdEncoding.EncodeToString(licenseJSON)
+
 	return []byte(encoded), nil
 }
 

@@ -38,7 +38,12 @@ i18n:
   support_langs: ["zh-CN", "en-US", "ja-JP"]
 
 license:
-  encryption_key: "please-change-in-prod-32-bytes-key" # 32字节许可证文件加密密钥
+  # RSA非对称加密配置
+  rsa:
+    private_key_path: "../configs/rsa_private_key.pem" # RSA私钥文件路径（服务器端使用，必须保密）
+    public_key_path: "../configs/rsa_public_key.pem"   # RSA公钥文件路径（客户端使用，可以公开）
+    key_size: 2048                                   # 密钥大小：2048或4096，默认2048
+  
   heartbeat_timeout: 300 # 心跳超时时间(秒) - 5分钟内为在线
   offline_timeout: 1440 # 离线超时时间(分钟) - 24小时后为异常
   expiring_days: 30 # 即将过期天数 - 30天内到期算即将过期

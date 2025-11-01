@@ -67,10 +67,18 @@ type I18nConfig struct {
 }
 
 type LicenseConfig struct {
-	EncryptionKey    string `mapstructure:"encryption_key"`    // 许可证文件加密密钥
-	HeartbeatTimeout int    `mapstructure:"heartbeat_timeout"` // 心跳超时时间(秒)
-	OfflineTimeout   int    `mapstructure:"offline_timeout"`   // 离线超时时间(分钟)
-	ExpiringDays     int    `mapstructure:"expiring_days"`     // 即将过期天数
+	// RSA非对称加密配置
+	RSA RSAConfig `mapstructure:"rsa"`
+	
+	HeartbeatTimeout int `mapstructure:"heartbeat_timeout"` // 心跳超时时间(秒)
+	OfflineTimeout   int `mapstructure:"offline_timeout"`   // 离线超时时间(分钟)
+	ExpiringDays     int `mapstructure:"expiring_days"`     // 即将过期天数
+}
+
+type RSAConfig struct {
+	PrivateKeyPath string `mapstructure:"private_key_path"` // RSA私钥文件路径
+	PublicKeyPath  string `mapstructure:"public_key_path"`  // RSA公钥文件路径
+	KeySize        int    `mapstructure:"key_size"`        // 密钥大小（2048或4096），默认2048
 }
 
 var AppConfig *Config
@@ -145,7 +153,10 @@ func setDefaults() {
 	viper.SetDefault("i18n.support_langs", []string{"zh-CN", "en-US", "ja-JP"})
 
 	// License defaults
-	viper.SetDefault("license.encryption_key", "license-manager-secret-key-32b")
+	viper.SetDefault("license.encryption_key", "license-manager-secret-key-32b") // legacy AES key
+	viper.SetDefault("license.rsa.private_key_path", "configs/rsa_private_key.pem")
+	viper.SetDefault("license.rsa.public_key_path", "configs/rsa_public_key.pem")
+	viper.SetDefault("license.rsa.key_size", 2048)
 	viper.SetDefault("license.heartbeat_timeout", 300)
 	viper.SetDefault("license.offline_timeout", 1440)
 	viper.SetDefault("license.expiring_days", 30)
