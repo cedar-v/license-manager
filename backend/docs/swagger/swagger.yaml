@@ -450,9 +450,9 @@ definitions:
       customer_level:
         description: 客户等级，必填
         enum:
-        - normal
+        - basic
+        - active
         - vip
-        - enterprise
         - strategic
         type: string
       customer_name:
@@ -597,9 +597,9 @@ definitions:
       customer_level:
         description: 客户等级，可选
         enum:
-        - normal
+        - basic
+        - active
         - vip
-        - enterprise
         - strategic
         type: string
       customer_name:
