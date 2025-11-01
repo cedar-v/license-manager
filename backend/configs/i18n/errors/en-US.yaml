@@ -22,6 +22,7 @@ errors:
     "200004": "Invalid customer information format"
     "200005": "Failed to query customer list"
     "200006": "Customer has authorization codes, cannot delete. Please delete authorizations first"
+    "200007": "Customer is disabled, cannot create authorization"
   
   # Authorization module (30xxxx)
   authorization:

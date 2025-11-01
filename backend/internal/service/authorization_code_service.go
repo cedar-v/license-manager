@@ -44,13 +44,18 @@ func (s *authorizationCodeService) CreateAuthorizationCode(ctx context.Context, 
 		return nil, i18n.NewI18nError("900001", lang)
 	}
 
-	// 验证客户是否存在
-	exists, err := s.authCodeRepo.CheckCustomerExists(ctx, req.CustomerID)
+	// 验证客户是否存在并检查状态
+	customer, err := s.customerRepo.GetCustomerByID(ctx, req.CustomerID)
 	if err != nil {
+		if errors.Is(err, repository.ErrCustomerNotFound) {
+			return nil, i18n.NewI18nError("200001", lang) // 客户不存在
+		}
 		return nil, i18n.NewI18nError("900004", lang, err.Error())
 	}
-	if !exists {
-		return nil, i18n.NewI18nError("200001", lang) // 客户不存在
+
+	// 检查客户状态：如果客户状态为停用（disabled），不允许创建授权
+	if customer.Status == "disabled" {
+		return nil, i18n.NewI18nError("200007", lang) // 客户已停用，无法创建授权
 	}
 
 	// 业务逻辑：计算开始时间和结束时间
