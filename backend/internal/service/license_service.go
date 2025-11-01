@@ -803,32 +803,32 @@ func (s *licenseService) GetStatsOverview(ctx context.Context) (*models.StatsOve
 			return err
 		}
 
-		// 5. 计算上月的授权码和许可证数量（用于计算增长率）
-		var lastMonthAuthCodes, lastMonthLicenses int64
+		// 5. 计算同比上月的授权码和许可证数量（用于计算增长率）
+		var lastMonthAuthCodes, lastMonthActiveLicenses int64
 
-		// 上月授权码数量
+		// 上月同期授权码总数（一个月前同一时刻的累计总数）
 		if err := tx.Model(&models.AuthorizationCode{}).
 			Where("created_at <= ?", lastMonth).
 			Count(&lastMonthAuthCodes).Error; err != nil {
 			return err
 		}
 
-		// 上月许可证数量
+		// 上月同期活跃许可证总数（一个月前同一时刻的状态为active的许可证数）
 		if err := tx.Model(&models.License{}).
-			Where("created_at <= ?", lastMonth).
-			Count(&lastMonthLicenses).Error; err != nil {
+			Where("status = ? AND created_at <= ?", "active", lastMonth).
+			Count(&lastMonthActiveLicenses).Error; err != nil {
 			return err
 		}
 
-		// 计算增长率
+		// 计算增长率（同比上月：当前总数相比一个月前总数的增长率）
 		if lastMonthAuthCodes > 0 {
 			stats.GrowthRate.AuthCodes = float64(stats.TotalAuthCodes-lastMonthAuthCodes) / float64(lastMonthAuthCodes) * 100
 		} else {
 			stats.GrowthRate.AuthCodes = 0
 		}
 
-		if lastMonthLicenses > 0 {
-			stats.GrowthRate.Licenses = float64(stats.ActiveLicenses-lastMonthLicenses) / float64(lastMonthLicenses) * 100
+		if lastMonthActiveLicenses > 0 {
+			stats.GrowthRate.Licenses = float64(stats.ActiveLicenses-lastMonthActiveLicenses) / float64(lastMonthActiveLicenses) * 100
 		} else {
 			stats.GrowthRate.Licenses = 0
 		}

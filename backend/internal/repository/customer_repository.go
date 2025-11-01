@@ -237,3 +237,71 @@ func (r *customerRepository) GetCustomerCount(ctx context.Context, filters map[s
 	
 	return count, nil
 }
+
+// GetCustomerAuthorizationStats 获取客户授权统计信息
+func (r *customerRepository) GetCustomerAuthorizationStats(ctx context.Context, customerID string) (*models.AuthorizationStats, error) {
+	stats := &models.AuthorizationStats{}
+
+	// 1. 授权码统计
+	// 总授权码数量
+	var totalAuthCodes int64
+	if err := r.db.Model(&models.AuthorizationCode{}).
+		Where("customer_id = ?", customerID).
+		Count(&totalAuthCodes).Error; err != nil {
+		return nil, fmt.Errorf("failed to count total auth codes: %w", err)
+	}
+	stats.TotalAuthCodes = totalAuthCodes
+
+	// 已过期授权码数量（end_date < NOW()，不考虑锁定状态）
+	var expiredAuthCodes int64
+	if err := r.db.Model(&models.AuthorizationCode{}).
+		Where("customer_id = ? AND end_date < NOW()", customerID).
+		Count(&expiredAuthCodes).Error; err != nil {
+		return nil, fmt.Errorf("failed to count expired auth codes: %w", err)
+	}
+	stats.ExpiredAuthCodes = expiredAuthCodes
+
+	// 30日内即将到期授权码数量（end_date >= NOW() AND end_date <= DATE_ADD(NOW(), INTERVAL 30 DAY)，不考虑锁定状态）
+	var expiringSoonAuthCodes int64
+	if err := r.db.Model(&models.AuthorizationCode{}).
+		Where("customer_id = ? AND end_date >= NOW() AND end_date <= DATE_ADD(NOW(), INTERVAL 30 DAY)", customerID).
+		Count(&expiringSoonAuthCodes).Error; err != nil {
+		return nil, fmt.Errorf("failed to count expiring soon auth codes: %w", err)
+	}
+	stats.ExpiringSoonAuthCodes = expiringSoonAuthCodes
+
+	// 2. 许可证统计
+	// 总许可证数量
+	var totalLicenses int64
+	if err := r.db.Model(&models.License{}).
+		Where("customer_id = ? AND deleted_at IS NULL", customerID).
+		Count(&totalLicenses).Error; err != nil {
+		return nil, fmt.Errorf("failed to count total licenses: %w", err)
+	}
+	stats.TotalLicenses = totalLicenses
+
+	// 已激活许可证数量（status = 'active'）
+	var activeLicenses int64
+	if err := r.db.Model(&models.License{}).
+		Where("customer_id = ? AND status = 'active' AND deleted_at IS NULL", customerID).
+		Count(&activeLicenses).Error; err != nil {
+		return nil, fmt.Errorf("failed to count active licenses: %w", err)
+	}
+	stats.ActiveLicenses = activeLicenses
+
+	// 未激活许可证数量（total - active）
+	stats.InactiveLicenses = totalLicenses - activeLicenses
+
+	// 已过期许可证数量（关联的授权码已过期）
+	// 需要通过JOIN authorization_codes表来判断
+	var expiredLicenses int64
+	if err := r.db.Model(&models.License{}).
+		Joins("INNER JOIN authorization_codes ON licenses.authorization_code_id = authorization_codes.id").
+		Where("licenses.customer_id = ? AND authorization_codes.end_date < NOW() AND licenses.deleted_at IS NULL", customerID).
+		Count(&expiredLicenses).Error; err != nil {
+		return nil, fmt.Errorf("failed to count expired licenses: %w", err)
+	}
+	stats.ExpiredLicenses = expiredLicenses
+
+	return stats, nil
+}

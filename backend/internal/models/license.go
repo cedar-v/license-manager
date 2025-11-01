@@ -171,15 +171,15 @@ type HeartbeatResponse struct {
 
 // StatsOverviewResponse 授权概览统计响应结构
 type StatsOverviewResponse struct {
-	TotalAuthCodes int64      `json:"total_auth_codes"` // 总授权码数量
-	ActiveLicenses int64      `json:"active_licenses"`  // 活跃许可证数量
-	ExpiringSoon   int64      `json:"expiring_soon"`    // 即将过期数量
-	AbnormalAlerts int64      `json:"abnormal_alerts"`  // 异常告警数量
-	GrowthRate     GrowthRate `json:"growth_rate"`      // 增长率
+	TotalAuthCodes int64      `json:"total_auth_codes"` // 总授权码数量（所有授权码的累计总数）
+	ActiveLicenses int64      `json:"active_licenses"`  // 活跃许可证数量（状态为active的许可证总数）
+	ExpiringSoon   int64      `json:"expiring_soon"`    // 即将过期数量（30天内即将过期的授权码，且未被锁定）
+	AbnormalAlerts int64      `json:"abnormal_alerts"`  // 异常告警数量（活跃许可证中心跳超时的数量，超过配置的心跳超时时间未收到心跳）
+	GrowthRate     GrowthRate `json:"growth_rate"`      // 增长率（同比上月）
 }
 
-// GrowthRate 增长率结构
+// GrowthRate 增长率结构（同比上月：当前值相比一个月前同一时刻值的增长率）
 type GrowthRate struct {
-	AuthCodes float64 `json:"auth_codes"` // 授权码增长率(%)
-	Licenses  float64 `json:"licenses"`   // 许可证增长率(%)
+	AuthCodes float64 `json:"auth_codes"` // 授权码增长率(%)（当前总授权码数相比一个月前总授权码数的增长率）
+	Licenses  float64 `json:"licenses"`   // 许可证增长率(%)（当前活跃许可证数相比一个月前活跃许可证数的增长率）
 }

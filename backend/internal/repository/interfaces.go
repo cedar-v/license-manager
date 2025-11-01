@@ -31,6 +31,9 @@ type CustomerRepository interface {
 
 	// CheckCustomerHasLicenses 检查客户是否有关联的许可证
 	CheckCustomerHasLicenses(ctx context.Context, customerID string) (bool, error)
+
+	// GetCustomerAuthorizationStats 获取客户授权统计信息
+	GetCustomerAuthorizationStats(ctx context.Context, customerID string) (*models.AuthorizationStats, error)
 }
 
 // UserRepository 用户数据访问接口

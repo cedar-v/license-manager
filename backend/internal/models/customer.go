@@ -31,6 +31,9 @@ type Customer struct {
 	CreatedBy            string         `gorm:"type:varchar(36);not null;index" json:"created_by"`
 	UpdatedBy            *string        `gorm:"type:varchar(36)" json:"updated_by"`
 	DeletedAt            gorm.DeletedAt `gorm:"index" json:"-"`
+
+	// 授权统计信息（仅在详情接口返回）
+	AuthorizationStats *AuthorizationStats `gorm:"-" json:"authorization_stats,omitempty"`
 }
 
 // CustomerCodeSequence 客户编码序列模型
@@ -145,4 +148,15 @@ type CustomerUpdateRequest struct {
 // CustomerStatusUpdateRequest 客户状态更新请求结构
 type CustomerStatusUpdateRequest struct {
 	Status string `json:"status" binding:"required,oneof=active disabled"` // 状态，必填
+}
+
+// AuthorizationStats 授权统计信息
+type AuthorizationStats struct {
+	TotalAuthCodes        int64 `json:"total_auth_codes"`         // 总授权码数量
+	ExpiredAuthCodes      int64 `json:"expired_auth_codes"`       // 已过期授权码数量
+	ExpiringSoonAuthCodes int64 `json:"expiring_soon_auth_codes"` // 30日内即将到期授权码数量
+	TotalLicenses         int64 `json:"total_licenses"`           // 总许可证数量
+	ActiveLicenses        int64 `json:"active_licenses"`          // 已激活许可证数量
+	InactiveLicenses      int64 `json:"inactive_licenses"`        // 未激活许可证数量
+	ExpiredLicenses       int64 `json:"expired_licenses"`         // 已过期许可证数量
 }

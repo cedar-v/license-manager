@@ -72,6 +72,16 @@ func (s *customerService) GetCustomer(ctx context.Context, id string) (*models.C
 		return nil, i18n.NewI18nError("900004", lang, err.Error())
 	}
 
+	// 获取授权统计信息
+	stats, err := s.customerRepo.GetCustomerAuthorizationStats(ctx, id)
+	if err != nil {
+		// 统计信息获取失败不影响主流程，记录错误但继续执行
+		// 如果获取失败，stats 为 nil，客户详情仍然可以返回，只是没有统计信息
+		// 根据需求文档，空数据时应该返回0，所以这里创建一个空的统计对象
+		stats = &models.AuthorizationStats{}
+	}
+	customer.AuthorizationStats = stats
+
 	// 填充多语言显示字段
 	s.fillCustomerDisplayFields(customer, lang)
 
