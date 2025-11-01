@@ -433,11 +433,6 @@ definitions:
         type: string
       company_size:
         description: 企业规模，可选
-        enum:
-        - small
-        - medium
-        - large
-        - enterprise
         type: string
       contact_person:
         description: 联系人姓名，必填
@@ -449,11 +444,6 @@ definitions:
         type: string
       customer_level:
         description: 客户等级，必填
-        enum:
-        - basic
-        - active
-        - vip
-        - strategic
         type: string
       customer_name:
         description: 客户名称，必填
@@ -580,11 +570,6 @@ definitions:
         type: string
       company_size:
         description: 企业规模，可选
-        enum:
-        - small
-        - medium
-        - large
-        - enterprise
         type: string
       contact_person:
         description: 联系人姓名，可选
@@ -596,11 +581,6 @@ definitions:
         type: string
       customer_level:
         description: 客户等级，可选
-        enum:
-        - basic
-        - active
-        - vip
-        - strategic
         type: string
       customer_name:
         description: 客户名称，可选

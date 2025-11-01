@@ -81,7 +81,7 @@ type CustomerListRequest struct {
 	PageSize      int    `form:"page_size" binding:"omitempty,min=1,max=100"`                                        // 每页条数，默认20，最大100
 	Search        string `form:"search" binding:"omitempty,max=100"`                                                 // 搜索关键词(支持客户编码、名称、联系人、邮箱)
 	CustomerType  string `form:"customer_type" binding:"omitempty,oneof=individual enterprise government education"` // 客户类型筛选
-	CustomerLevel string `form:"customer_level" binding:"omitempty,oneof=basic active vip strategic"`                // 客户等级筛选
+	CustomerLevel string `form:"customer_level" binding:"omitempty"`                                                 // 客户等级筛选
 	Status        string `form:"status" binding:"omitempty,oneof=active disabled"`                                   // 状态筛选
 	Sort          string `form:"sort" binding:"omitempty,oneof=created_at updated_at customer_name customer_code"`   // 排序字段，默认created_at
 	Order         string `form:"order" binding:"omitempty,oneof=asc desc"`                                           // 排序方向，默认desc
@@ -121,8 +121,8 @@ type CustomerCreateRequest struct {
 	Email         *string `json:"email" binding:"omitempty,email,max=255"`                                           // 邮箱，可选
 	Phone         *string `json:"phone" binding:"omitempty,max=20"`                                                  // 电话，可选
 	Address       *string `json:"address" binding:"omitempty,max=500"`                                               // 地址，可选
-	CompanySize   *string `json:"company_size" binding:"omitempty,oneof=small medium large enterprise"`              // 企业规模，可选
-	CustomerLevel string  `json:"customer_level" binding:"required,oneof=basic active vip strategic"`                // 客户等级，必填
+	CompanySize   *string `json:"company_size" binding:"omitempty"`                                                  // 企业规模，可选
+	CustomerLevel string  `json:"customer_level" binding:"required"`                                                 // 客户等级，必填
 	Status        string  `json:"status" binding:"required,oneof=active disabled"`                                   // 状态，必填
 	Description   *string `json:"description" binding:"omitempty,max=1000"`                                          // 描述，可选
 }
@@ -136,8 +136,8 @@ type CustomerUpdateRequest struct {
 	Email         *string `json:"email" binding:"omitempty,email,max=255"`                                            // 邮箱，可选
 	Phone         *string `json:"phone" binding:"omitempty,max=20"`                                                   // 电话，可选
 	Address       *string `json:"address" binding:"omitempty,max=500"`                                                // 地址，可选
-	CompanySize   *string `json:"company_size" binding:"omitempty,oneof=small medium large enterprise"`               // 企业规模，可选
-	CustomerLevel *string `json:"customer_level" binding:"omitempty,oneof=basic active vip strategic"`                // 客户等级，可选
+	CompanySize   *string `json:"company_size" binding:"omitempty"`                                                   // 企业规模，可选
+	CustomerLevel *string `json:"customer_level" binding:"omitempty"`                                                 // 客户等级，可选
 	Status        *string `json:"status" binding:"omitempty,oneof=active disabled"`                                   // 状态，可选
 	Description   *string `json:"description" binding:"omitempty,max=1000"`                                           // 描述，可选
 }

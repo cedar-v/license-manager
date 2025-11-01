@@ -32,7 +32,7 @@ export interface CustomerQueryRequest {
   search?: string;
   customer_name?: string;
   customer_type?: 'individual' | 'enterprise' | 'government' | 'education';
-  customer_level?: 'basic' | 'active' | 'vip' | 'strategic';
+  customer_level?: string;
   status?: 'active' | 'disabled';
   sort?: 'created_at' | 'updated_at' | 'customer_name' | 'customer_code';
   order?: 'asc' | 'desc';
@@ -47,9 +47,9 @@ export interface CustomerCreateRequest {
   email?: string;
   phone?: string;
   address?: string;
-  customer_level: 'basic' | 'active' | 'vip' | 'strategic';
+  customer_level: string;
   status: 'active' | 'disabled';
-  company_size?: 'small' | 'medium' | 'large' | 'enterprise';
+  company_size?: string;
   description?: string;
 }
 
@@ -62,9 +62,9 @@ export interface CustomerUpdateRequest {
   email?: string;
   phone?: string;
   address?: string;
-  customer_level?: 'basic' | 'active' | 'vip' | 'strategic';
+  customer_level?: string;
   status?: 'active' | 'disabled';
-  company_size?: 'small' | 'medium' | 'large' | 'enterprise';
+  company_size?: string;
   description?: string;
 }
 
