@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-12 00:00:00
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-09-15 10:17:45
+ * @LastEditTime: 2025-10-30 14:45:23
  * @FilePath: /frontend/src/views/Customers/index.vue
  * @Description: 客户管理页面  
 -->
@@ -95,11 +95,11 @@
             style="width: 100%;"
             :header-cell-style="{ backgroundColor: 'var(--app-bg-color)', color: 'var(--app-text-primary)' }"
             :row-style="getRowStyle"
-            :max-height="'calc(100vh - 280px)'"
+            :max-height="'calc(100vh - 265px)'"
           >
           <el-table-column prop="customer_code" :label="t('customers.table.customerCode')" :width="170" show-overflow-tooltip  align="left">
             <template #default="scope">
-              <span class="customer-code" style="white-space: nowrap; overflow: visible; text-overflow: initial;">{{ scope.row.customer_code }}</span>
+              <span class="customer-code customer-code-link" @click="handleViewCustomerDetail(scope.row)" style="cursor:pointer; color:var(--el-color-primary)">{{ scope.row.customer_code }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="customer_name" :label="t('customers.table.customerName')" :width="180" show-overflow-tooltip  align="center">
@@ -154,7 +154,7 @@
         <el-pagination
           v-model:current-page="currentPage"
           v-model:page-size="pageSize"
-          :page-sizes="[10, 20, 50, 100]"
+          :page-sizes="[16, 32, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
           :pager-count="7"
@@ -206,6 +206,8 @@ import {
   type RawEnumItem
 } from '@/api/enum'
 import { formatDateShort } from '@/utils/date'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
 // Customer类型已从API文件导入
 
@@ -401,10 +403,18 @@ const handleAddCustomer = () => {
   isEditMode.value = false
 }
 
-const handleViewLicense = (row: Customer) => {
+// --- 新增：客户编码点击跳转客户详情 ---
+const handleViewCustomerDetail = (row: Customer) => {
   showCustomerView.value = true
   showCustomerForm.value = false
   currentCustomerId.value = row.id
+}
+// --- 修改：查看授权跳转到LinenseList页面并带参数 ---
+const handleViewLicense = (row: Customer) => {
+  router.push({
+    path: '/licenses/list',
+    query: { customerId: row.id, customerName: row.customer_name }
+  })
 }
 
 const handleDelete = async (row: Customer) => {
@@ -616,8 +626,6 @@ onMounted(async () => {
   flex: 1; // 自动占满剩余空间
   display: flex;
   flex-direction: column;
-
-  // @include card-base;
   
   @include mobile {
     @include table-responsive;
@@ -684,6 +692,7 @@ onMounted(async () => {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    margin: 0 !important;
   }
   
   /* 列宽度分配 - 防止错位 */
@@ -955,8 +964,9 @@ onMounted(async () => {
       overflow: hidden !important;
       text-overflow: ellipsis !important;
       white-space: nowrap !important;
-      padding: 0.68vw 1.04vw !important;
+      padding: 0 !important; /* 12px 20px/1920 = 0.625vw 1.04vw */
       box-sizing: border-box !important;
+      margin: 0 !important;
     }
     
     /* 操作列自适应宽度 */
@@ -967,18 +977,25 @@ onMounted(async () => {
   }
   
   :deep(.el-table .el-table__header-wrapper) {
-    th {
+    th,
+    th.el-table__cell {
       height: 2.5vw !important; /* 48px/1920 = 2.5vw */
-      padding: 0.68vw 1.04vw !important; /* 13px 20px/1920 = 0.68vw 1.04vw */
+      padding: 0 !important; /* 12px 20px/1920 = 0.625vw 1.04vw */
+      margin: 0 !important;
+      box-sizing: border-box !important;
       font-size: 0.83vw !important; /* 16px/1920 = 0.83vw */
+      line-height: 1.25vw !important; /* 24px/1920 = 1.25vw */
     }
   }
-  
+
   :deep(.el-table .el-table__body-wrapper) {
-    td {
-      height: 2.5vw !important; /* 48px/1920 = 2.5vw */
-      padding: 0.68vw 1.04vw !important; /* 13px 20px/1920 = 0.68vw 1.04vw */
-      font-size: 0.73vw !important; /* 14px/1920 = 0.73vw */
+    td.el-table__cell {
+      height: 50px !important;
+      padding: 0!important;
+      margin: 0 !important;
+      box-sizing: border-box !important;
+      font-size: 14px !important;
+      line-height: 24px !important;
     }
   }
   
@@ -1373,43 +1390,6 @@ onMounted(async () => {
   line-height: 24px;  // 改为24px符合8px栅格
 }
 
-/* 表格精确样式 - 匹配Figma设计 */
-:deep(.el-table .el-table__header-wrapper) {
-  th {
-    background-color: var(--app-bg-color) !important;
-    height: 48px !important;
-    padding: 13px 20px !important;
-    font-family: 'Source Han Sans CN', sans-serif !important;
-    font-weight: 500 !important;
-    font-size: 16px !important;
-    line-height: 24px !important;
-    color: var(--app-text-primary) !important;
-    border-bottom: 1px solid var(--app-border-light) !important;
-  }
-}
-
-:deep(.el-table .el-table__body-wrapper) {
-  td {
-    height: 48px !important;
-    padding: 13px 20px !important;
-    font-family: 'Source Han Sans CN', sans-serif !important;
-    font-weight: 400 !important;
-    font-size: 14px !important;
-    line-height: 22px !important;
-    color: var(--app-text-primary) !important;
-    border-bottom: 1px solid var(--app-border-light) !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
-  
-  .cell {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
-}
-
 /* 状态标签样式 */
 .status-tag {
   padding: $spacing-extra-small $spacing-small;
@@ -1441,7 +1421,7 @@ onMounted(async () => {
 /* 操作按钮组样式 */
 .action-buttons {
   gap: $spacing-small;
-  padding: $spacing-base 0;
+  padding: 0;
   width: auto;
   min-width: max-content;
 
@@ -1458,7 +1438,7 @@ onMounted(async () => {
     max-width: 150px !important;
     justify-content: space-between !important;
     align-content: flex-start !important;
-    padding: $spacing-small 0 !important;
+    padding: 0 !important;
   }
   
   @include mobile {
@@ -1545,5 +1525,13 @@ onMounted(async () => {
       }
     }
   }
+}
+
+:deep(.el-table__body tr:hover > td) {
+  background: #e3f7f1 !important; /* 明亮突出，适合主色系，可根据品牌色微调 */
+  transition: background 0.2s;
+}
+[data-theme='dark'] :deep(.el-table__body tr:hover > td) {
+  background: rgba(16, 185, 129, 0.15) !important; /* 暗色模式下主色加透明度 */
 }
 </style>

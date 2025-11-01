@@ -44,7 +44,7 @@
             :label="t('pages.licenses.list.table.code')"
             :width="220"
             show-overflow-tooltip
-            align="left"
+            align="center"
           >
             <template #default="scope">
               <span
@@ -107,7 +107,7 @@
       <el-pagination
         :current-page="currentPage"
         :page-size="pageSize"
-        :page-sizes="[10, 20, 50, 100]"
+        :page-sizes="[16, 32, 50, 100]"
         :total="total"
         layout="total, sizes, prev, pager, next, jumper"
         :pager-count="7"
@@ -151,7 +151,7 @@ const filterStatus = ref('')
 const filterCode = ref('')
 const tableData = ref<AuthorizationCode[]>([])
 const currentPage = ref(1)
-const pageSize = ref(20)
+const pageSize = ref(16)
 const total = ref(0)
 const statusOptions = ref<RawEnumItem[]>([])
 
@@ -342,21 +342,20 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
-// Variables and mixins are auto-injected via Vite configuration
+// Variables and mixins are auto-injected via Vite配置
 @use 'sass:math';
 
 .license-list-page {
-  max-width: none !important; // 移除最大宽度限制，允许充满整个屏幕
-  height: 100%; // 占满父容器高度
-  padding: 0; // 移除padding，由父容器处理
+  max-width: none !important;
+  height: 100%;
+  padding: 0;
   background-color: var(--app-content-bg);
   display: flex;
   flex-direction: column;
-  overflow: hidden; // 防止内容超出
+  overflow: hidden;
   box-sizing: border-box;
   width: 100%;
   margin: 0 auto;
-
   @include mobile {
     padding: $spacing-base;
   }
@@ -419,15 +418,14 @@ onMounted(async () => {
 }
 
 .table-container {
-  width: calc(100% - #{$spacing-large * 2}); // 计算宽度减去左右padding
-  margin: 0 $spacing-large; // 水平居中并添加左右边距
+  width: calc(100% - #{$spacing-large * 2});
+  margin: 0 $spacing-large;
   border-radius: $border-radius-base;
   overflow: hidden;
   margin-bottom: $spacing-medium;
-  flex: 1; // 自动占满剩余空间
+  flex: 1;
   display: flex;
   flex-direction: column;
-
   @include mobile {
     @include table-responsive;
   }
@@ -435,11 +433,10 @@ onMounted(async () => {
 
 .table-wrapper {
   width: 100%;
-  height: 100%; // 占满表格容器高度
+  height: 100%;
   position: relative;
-  overflow: auto; // 启用滚动以支持固定列
+  overflow: auto;
   @include smooth-scroll;
-
   @include mobile {
     -webkit-overflow-scrolling: touch;
   }
@@ -448,9 +445,8 @@ onMounted(async () => {
 .pagination-container {
   @include flex-end;
   gap: $spacing-small;
-  padding: 0 $spacing-large $spacing-large $spacing-large; // 添加下部和两侧padding
+  padding: 0 $spacing-large $spacing-large $spacing-large;
   flex-shrink: 0;
-
   @include mobile {
     @include flex-center;
     flex-wrap: wrap;
@@ -460,49 +456,201 @@ onMounted(async () => {
 
 :deep(.el-table) {
   width: 100% !important;
-  min-width: 1408px; /* 改为1408px (176*8) */
+  min-width: 1408px !important;
   border: 1px solid var(--app-border-light);
-  table-layout: fixed; /* 固定表格布局防止错位 */
-
-  /* 表头和表体宽度一致 */
+  table-layout: fixed !important;
   .el-table__header-wrapper,
   .el-table__body-wrapper {
     width: 100% !important;
-    overflow-x: auto !important; /* 允许水平滚动以支持固定列 */
+    overflow-x: auto !important;
   }
-
   .el-table__body-wrapper {
     overflow-y: auto !important;
-    /* 使用flex布局自动计算高度 */
     flex: 1 !important;
-    /* 预留滚动条宽度空间 */
     margin-right: 0 !important;
     padding-right: 0 !important;
   }
-
-  /* 表格主体和表头宽度一致 */
   .el-table__header,
   .el-table__body {
     width: 100% !important;
     table-layout: fixed !important;
   }
-
-  /* 确保所有列宽度一致 */
-  th,
-  td {
-    box-sizing: border-box;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  th, td {
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 48px !important;
+    font-family: 'Source Han Sans CN', sans-serif !important;
+    font-size: 14px !important;
+    vertical-align: middle !important;
   }
-
-  /* 列宽度分配 - 防止错位 */
   colgroup {
     width: 100% !important;
   }
+  .el-table__header-wrapper th {
+    background-color: var(--app-bg-color) !important;
+    font-weight: 500 !important;
+    font-size: 16px !important;
+    line-height: 24px !important;
+    color: var(--app-text-primary) !important;
+    border-bottom: 1px solid var(--app-border-light) !important;
+  }
+  .el-table__body-wrapper td {
+    font-weight: 400 !important;
+    line-height: 22px !important;
+    color: var(--app-text-primary) !important;
+    border-bottom: 1px solid var(--app-border-light) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  .cell {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    padding: 0 !important;
+  }
 }
 
-/* 分页组件样式 - 匹配Figma设计 */
+.status-tag {
+  padding: $spacing-extra-small $spacing-small;
+  border-radius: $border-radius-small;
+  font-size: $font-size-base;
+  font-weight: $font-weight-secondary;
+  height: 24px;
+  min-width: fit-content;
+  @include flex-center;
+  @include text-ellipsis;
+  &.status-normal {
+    background: var(--el-color-primary-light-9);
+    color: var(--el-color-primary);
+  }
+  &.status-locked {
+    background: rgba(230, 162, 60, 0.08);
+    color: #e6a23c;
+  }
+  &.status-expired {
+    background: rgba(244, 108, 108, 0.08);
+    color: #f46c6c;
+  }
+}
+
+.license-code {
+  color: var(--el-color-primary);
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 24px; // 改为24px符合8px栅格
+}
+
+// 操作按钮组，严格复制 customers 页 action-btn/action-buttons 样式
+.action-buttons {
+  gap: $spacing-small;
+  padding: 0;
+  width: auto;
+  min-width: max-content;
+  @include flex-center-vertical;
+  justify-content: center;
+  flex-wrap: nowrap;
+  overflow: visible;
+  @include mobile {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: $spacing-extra-small !important;
+    width: 100% !important;
+    max-width: 150px !important;
+    justify-content: space-between !important;
+    align-content: flex-start !important;
+    padding: 0 !important;
+  }
+  @include mobile {
+    max-width: 130px !important;
+    gap: math.div($spacing-extra-small, 2) !important;
+  }
+}
+.action-btn {
+  padding: $spacing-extra-small $spacing-base;
+  height: 32px; // 改为32px符合8px栅格
+  border-radius: $border-radius-small;
+  font-size: $font-size-small;
+  font-weight: $font-weight-primary;
+  line-height: 20px; // 改为20px符合8px栅格
+  flex-shrink: 0;
+  width: auto;
+  min-width: fit-content;
+  white-space: nowrap;
+  @include button-base;
+  @include mobile {
+    flex: 0 0 calc(50% - #{math.div($spacing-extra-small, 2)}) !important;
+    width: calc(50% - #{math.div($spacing-extra-small, 2)}) !important;
+    max-width: calc(50% - #{math.div($spacing-extra-small, 2)}) !important;
+    padding: math.div($spacing-extra-small, 2) $spacing-extra-small !important;
+    font-size: 9px !important;
+    height: 20px !important;
+    min-width: 0 !important;
+  }
+  @include mobile {
+    padding: 1px 2px !important;
+    font-size: 8px !important;
+    height: 18px !important;
+    flex: 0 0 calc(50% - 1.5px) !important;
+    width: calc(50% - 1.5px) !important;
+    max-width: calc(50% - 1.5px) !important;
+  }
+}
+.action-btn {
+  &.primary {
+    background: var(--el-color-primary-light-9);
+    color: var(--el-color-primary);
+    @include non-touch-device {
+      &:hover {
+        background: var(--el-color-primary-light-8);
+      }
+    }
+  }
+  &.danger {
+    background: rgba(244, 108, 108, 0.08);
+    color: #f46c6c;
+    @include non-touch-device {
+      &:hover {
+        background: rgba(244, 108, 108, 0.15);
+      }
+    }
+  }
+  &.warning {
+    background: rgba(230, 162, 60, 0.08);
+    color: #e6a23c;
+    @include non-touch-device {
+      &:hover {
+        background: rgba(230, 162, 60, 0.15);
+      }
+    }
+  }
+  &.success {
+    background: rgba(103, 194, 58, 0.08);
+    color: #67C23A;
+    @include non-touch-device {
+      &:hover {
+        background: rgba(103, 194, 58, 0.15);
+      }
+    }
+  }
+}
+
+.pagination-container {
+  @include flex-end;
+  gap: $spacing-small;
+  padding: 0 $spacing-large $spacing-large $spacing-large;
+  flex-shrink: 0;
+  @include mobile {
+    @include flex-center;
+    flex-wrap: wrap;
+    gap: $spacing-extra-small;
+  }
+}
 :deep(.el-pagination) {
   justify-content: flex-end;
   gap: 8px;
@@ -513,11 +661,7 @@ onMounted(async () => {
   --el-pagination-hover-color: #019c7c;
   font-family: 'Source Han Sans CN', sans-serif;
 }
-
-/* 页码按钮样式 */
-:deep(.el-pagination .btn-prev),
-:deep(.el-pagination .btn-next),
-:deep(.el-pagination .el-pager li) {
+:deep(.el-pagination .btn-prev), :deep(.el-pagination .btn-next), :deep(.el-pagination .el-pager li) {
   width: 32px;
   height: 32px;
   min-width: 32px;
@@ -534,44 +678,30 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
 }
-
-/* 当前页样式 */
 :deep(.el-pagination .el-pager li.is-active) {
   background: var(--el-color-primary) !important;
   border-color: var(--el-color-primary) !important;
   color: white !important;
 }
-
-/* 悬停效果 */
-:deep(.el-pagination .btn-prev:hover),
-:deep(.el-pagination .btn-next:hover),
-:deep(.el-pagination .el-pager li:hover) {
+:deep(.el-pagination .btn-prev:hover), :deep(.el-pagination .btn-next:hover), :deep(.el-pagination .el-pager li:hover) {
   color: var(--el-color-primary);
   border-color: var(--el-color-primary);
 }
-
-/* 总数和每页条数样式 */
-:deep(.el-pagination .el-pagination__total),
-:deep(.el-pagination .el-pagination__sizes) {
+:deep(.el-pagination .el-pagination__total), :deep(.el-pagination .el-pagination__sizes) {
   font-family: 'Source Han Sans CN', sans-serif;
   font-weight: 350;
   font-size: 14px;
   color: var(--app-text-primary);
 }
-
-/* 每页条数选择器 */
 :deep(.el-pagination .el-pagination__sizes .el-select) {
-  width: 88px; // 88px符合8px栅格(11*8)
+  width: 88px;
 }
-
 :deep(.el-pagination .el-pagination__sizes .el-select .el-select__wrapper) {
   height: 32px;
   border: 1px solid var(--app-border-color);
   border-radius: 4px;
   background: var(--app-content-bg);
 }
-
-/* 跳转输入框 */
 :deep(.el-pagination .el-pagination__jump) {
   font-family: 'Source Han Sans CN', sans-serif;
   font-weight: 350;
@@ -579,458 +709,27 @@ onMounted(async () => {
   color: var(--app-text-primary);
   margin-left: 8px;
 }
-
 :deep(.el-pagination .el-pagination__jump .el-input) {
-  width: 48px; // 符合8px栅格
+  width: 48px;
   margin: 0 8px;
 }
-
 :deep(.el-pagination .el-pagination__jump .el-input__wrapper) {
   height: 32px;
   border: 1px solid var(--app-border-color);
   border-radius: 4px;
   background: var(--app-content-bg);
 }
-
 :deep(.el-pagination .el-pagination__jump .el-input__inner) {
   text-align: center;
   font-family: 'Source Han Sans CN', sans-serif;
   font-size: 14px;
   color: var(--app-text-primary);
 }
-
-/* 筛选器样式 - 统一输入框和下拉框高度 */
-:deep(.filter-input .el-input__wrapper) {
-  height: 36px;
-  min-height: 36px;
-  padding: 1px 11px;
+:deep(.el-table__body tr:hover > td) {
+  background: #e3f7f1 !important;
+  transition: background 0.2s;
 }
-
-:deep(.filter-select .el-select__wrapper) {
-  align-items: center;
-  background-color: var(--el-fill-color-blank);
-  border-radius: var(--el-border-radius-base);
-  box-shadow: 0 0 0 1px #dcdee2 inset;
-  box-sizing: border-box;
-  cursor: pointer;
-  display: flex;
-  font-size: 14px;
-  gap: 8px; // 改为8px符合8px栅格
-  line-height: 24px;
-  height: 36px;
-  min-height: 36px;
-  padding: 0px 12px;
-  position: relative;
-  text-align: left;
-  transform: translateZ(0);
-  transition: var(--el-transition-duration);
-}
-
-:deep(.filter-select .el-select__selected-item) {
-  font-size: 14px;
-  color: var(--app-text-secondary);
-  font-family: 'Source Han Sans CN', sans-serif;
-  font-weight: 400;
-  line-height: 24px;
-}
-
-:deep(.filter-select .el-select__placeholder) {
-  font-size: 14px;
-  color: var(--app-text-secondary);
-  font-family: 'Source Han Sans CN', sans-serif;
-  font-weight: 400;
-  line-height: 24px;
-}
-
-:deep(.filter-select .el-select__suffix) {
-  display: flex;
-  align-items: center;
-}
-
-:deep(.filter-select .el-select__icon) {
-  width: 14px;
-  height: 14px;
-  color: var(--app-text-secondary);
-}
-
-:deep(.filter-select.is-focus .el-select__wrapper) {
-  box-shadow: 0 0 0 1px #019c7c inset;
-}
-
-:deep(.filter-select:hover .el-select__wrapper) {
-  box-shadow: 0 0 0 1px #019c7c inset;
-}
-
-/* 授权码样式 */
-.license-code {
-  color: var(--el-color-primary);
-  font-family: 'Source Han Sans CN', sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 24px; // 改为24px符合8px栅格
-}
-
-/* 表格精确样式 - 匹配Figma设计 */
-:deep(.el-table .el-table__header-wrapper) {
-  th {
-    background-color: var(--app-bg-color) !important;
-    height: 48px !important;
-    padding: 13px 20px !important;
-    font-family: 'Source Han Sans CN', sans-serif !important;
-    font-weight: 500 !important;
-    font-size: 16px !important;
-    line-height: 24px !important;
-    color: var(--app-text-primary) !important;
-    border-bottom: 1px solid var(--app-border-light) !important;
-  }
-}
-
-:deep(.el-table .el-table__body-wrapper) {
-  td {
-    height: 48px !important;
-    padding: 13px 20px !important;
-    font-family: 'Source Han Sans CN', sans-serif !important;
-    font-weight: 400 !important;
-    font-size: 14px !important;
-    line-height: 22px !important;
-    color: var(--app-text-primary) !important;
-    border-bottom: 1px solid var(--app-border-light) !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
-
-  .cell {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
-}
-
-/* 状态标签样式 */
-.status-tag {
-  padding: $spacing-extra-small $spacing-small;
-  border-radius: $border-radius-small;
-  font-size: $font-size-base;
-  font-weight: $font-weight-secondary;
-  height: 24px; // 改为24px符合8px栅格
-  min-width: fit-content;
-
-  @include flex-center;
-  @include text-ellipsis;
-
-  &.status-normal {
-    background: var(--el-color-primary-light-9);
-    color: var(--el-color-primary);
-  }
-
-  &.status-locked {
-    background: rgba(230, 162, 60, 0.08);
-    color: #e6a23c;
-  }
-
-  &.status-expired {
-    background: rgba(244, 108, 108, 0.08);
-    color: #f46c6c;
-  }
-}
-
-/* 操作按钮组样式 */
-.action-buttons {
-  gap: $spacing-small;
-  padding: $spacing-base 0;
-  width: auto;
-  min-width: max-content;
-
-  @include flex-center-vertical;
-  justify-content: center;
-  flex-wrap: nowrap;
-  overflow: visible;
-
-  @include mobile {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: $spacing-extra-small !important;
-    width: 100% !important;
-    max-width: 150px !important;
-    justify-content: space-between !important;
-    align-content: flex-start !important;
-    padding: $spacing-small 0 !important;
-  }
-
-  @include mobile {
-    max-width: 130px !important;
-    gap: math.div($spacing-extra-small, 2) !important;
-  }
-}
-
-.action-btn {
-  padding: $spacing-extra-small $spacing-base;
-  height: 32px; // 改为32px符合8px栅格
-  border-radius: $border-radius-small;
-  font-size: $font-size-small;
-  font-weight: $font-weight-primary;
-  line-height: 20px; // 改为20px符合8px栅格
-  flex-shrink: 0;
-  width: auto;
-  min-width: fit-content;
-  white-space: nowrap;
-
-  @include button-base;
-
-  @include mobile {
-    flex: 0 0 calc(50% - #{math.div($spacing-extra-small, 2)}) !important;
-    width: calc(50% - #{math.div($spacing-extra-small, 2)}) !important;
-    max-width: calc(50% - #{math.div($spacing-extra-small, 2)}) !important;
-    padding: math.div($spacing-extra-small, 2) $spacing-extra-small !important;
-    font-size: 9px !important;
-    height: 20px !important;
-    min-width: 0 !important;
-  }
-
-  @include mobile {
-    padding: 1px 2px !important;
-    font-size: 8px !important;
-    height: 18px !important;
-    flex: 0 0 calc(50% - 1.5px) !important;
-    width: calc(50% - 1.5px) !important;
-    max-width: calc(50% - 1.5px) !important;
-  }
-}
-
-.action-btn {
-  &.primary {
-    background: var(--el-color-primary-light-9);
-    color: var(--el-color-primary);
-
-    @include non-touch-device {
-      &:hover {
-        background: var(--el-color-primary-light-8);
-      }
-    }
-  }
-
-  &.danger {
-    background: rgba(244, 108, 108, 0.08);
-    color: #f46c6c;
-
-    @include non-touch-device {
-      &:hover {
-        background: rgba(244, 108, 108, 0.15);
-      }
-    }
-  }
-
-  &.warning {
-    background: rgba(230, 162, 60, 0.08);
-    color: #e6a23c;
-
-    @include non-touch-device {
-      &:hover {
-        background: rgba(230, 162, 60, 0.15);
-      }
-    }
-  }
-
-  &.success {
-    background: rgba(103, 194, 58, 0.08);
-    color: #67c23a;
-
-    @include non-touch-device {
-      &:hover {
-        background: rgba(103, 194, 58, 0.15);
-      }
-    }
-  }
-}
-
-/* 移动端响应式布局 - 修复表头错位 */
-@media (max-width: 768px) {
-  .license-list-page {
-    padding: 16px;
-  }
-
-  .top-actions {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-  }
-
-  .filters {
-    width: 100%;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .filter-label {
-    width: auto;
-    margin-right: 8px;
-  }
-
-  .filter-input,
-  .filter-select {
-    flex: 1;
-    min-width: 100px;
-  }
-
-  /* 表格容器移动端优化 */
-  .table-wrapper {
-    overflow-x: scroll !important;
-    -webkit-overflow-scrolling: touch;
-    width: 100% !important;
-  }
-
-  /* 移动端表格样式修复 */
-  :deep(.el-table) {
-    min-width: 1200px !important; /* 移动端最小宽度 */
-
-    .el-table__header-wrapper,
-    .el-table__body-wrapper {
-      width: 100% !important;
-      overflow-x: visible !important;
-    }
-
-    .el-table__body-wrapper {
-      max-height: calc(100vh - 300px) !important;
-    }
-
-    /* 移动端表头和表体对齐 */
-    .el-table__header,
-    .el-table__body {
-      width: 100% !important;
-      min-width: 1200px !important;
-    }
-
-    /* 移动端列宽度修复 */
-    th,
-    td {
-      min-width: 80px !important;
-      white-space: nowrap !important;
-      padding: 8px 12px !important;
-    }
-
-    /* 移动端操作列自适应宽度 */
-    .action-column {
-      width: auto !important;
-      min-width: max-content !important;
-    }
-  }
-
-  /* 移动端操作列宽度调整 - 覆盖所有可能的Element Plus样式 */
-  :deep(.el-table) {
-    --el-table-action-column-width: 160px;
-  }
-
-  :deep(.el-table__header-wrapper colgroup col:last-child),
-  :deep(.el-table__body-wrapper colgroup col:last-child),
-  :deep(.el-table__fixed-right colgroup col:last-child) {
-    width: 160px !important;
-  }
-
-  :deep(.el-table__header-wrapper .action-column),
-  :deep(.el-table__body-wrapper .action-column),
-  :deep(.el-table th:last-child),
-  :deep(.el-table td:last-child) {
-    width: 160px !important;
-    min-width: 160px !important;
-    max-width: 160px !important;
-  }
-
-  :deep(.el-table__fixed-right) {
-    width: 160px !important;
-    right: 0 !important;
-  }
-
-  :deep(.el-table__fixed-right .el-table__fixed-body-wrapper),
-  :deep(.el-table__fixed-right .el-table__fixed-header-wrapper),
-  :deep(.el-table__fixed-right .el-table__fixed-footer-wrapper) {
-    width: 160px !important;
-  }
-
-  :deep(.el-table__fixed-right-patch) {
-    width: 160px !important;
-  }
-
-  /* 强制覆盖内联样式 */
-  :deep(.el-table [style*='width: 300px']) {
-    width: 160px !important;
-  }
-
-  /* 移动端操作按钮样式 - 2行2列布局 */
-  .action-buttons {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 4px !important;
-    width: 100% !important;
-    max-width: 150px !important;
-    justify-content: space-between !important;
-    align-content: flex-start !important;
-    padding: 6px 0 !important;
-  }
-
-  .action-btn {
-    flex: 0 0 calc(50% - 2px) !important;
-    width: calc(50% - 2px) !important;
-    max-width: calc(50% - 2px) !important;
-    padding: 2px 3px !important;
-    font-size: 9px !important;
-    height: 20px !important;
-    min-width: 0 !important;
-    white-space: nowrap !important;
-    text-overflow: ellipsis !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
-    border-radius: 2px !important;
-  }
-
-  /* 移动端分页样式 */
-  :deep(.el-pagination) {
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-
-  :deep(.el-pagination .el-pagination__total),
-  :deep(.el-pagination .el-pagination__sizes) {
-    order: -1;
-    width: 100%;
-    text-align: center;
-    margin-bottom: 8px;
-  }
-}
-
-@media (max-width: 480px) {
-  .license-list-page {
-    padding: 12px;
-  }
-
-  .filters {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .filter-label {
-    align-self: flex-start;
-  }
-
-  .filter-input,
-  .filter-select {
-    width: 100% !important;
-  }
-
-  /* 超小屏幕进一步压缩 */
-  .action-buttons {
-    max-width: 130px !important;
-    gap: 3px !important;
-  }
-
-  .action-btn {
-    padding: 1px 2px !important;
-    font-size: 8px !important;
-    height: 18px !important;
-    flex: 0 0 calc(50% - 1.5px) !important;
-    width: calc(50% - 1.5px) !important;
-    max-width: calc(50% - 1.5px) !important;
-  }
+[data-theme='dark'] :deep(.el-table__body tr:hover > td) {
+  background: rgba(16, 185, 129, 0.15) !important;
 }
 </style>
