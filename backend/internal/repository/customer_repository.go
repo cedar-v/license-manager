@@ -189,9 +189,9 @@ func (r *customerRepository) UpdateCustomer(ctx context.Context, customer *model
 	return nil
 }
 
-// DeleteCustomer 删除客户
+// DeleteCustomer 删除客户（物理删除）
 func (r *customerRepository) DeleteCustomer(ctx context.Context, id string) error {
-	result := r.db.Where("id = ?", id).Delete(&models.Customer{})
+	result := r.db.Unscoped().Where("id = ?", id).Delete(&models.Customer{})
 	if result.Error != nil {
 		return fmt.Errorf("failed to delete customer: %w", result.Error)
 	}
@@ -199,6 +199,26 @@ func (r *customerRepository) DeleteCustomer(ctx context.Context, id string) erro
 		return ErrCustomerNotFound
 	}
 	return nil
+}
+
+// CheckCustomerHasAuthorizationCodes 检查客户是否有关联的授权码
+func (r *customerRepository) CheckCustomerHasAuthorizationCodes(ctx context.Context, customerID string) (bool, error) {
+	var count int64
+	err := r.db.Model(&models.AuthorizationCode{}).Where("customer_id = ?", customerID).Count(&count).Error
+	if err != nil {
+		return false, fmt.Errorf("failed to check authorization codes: %w", err)
+	}
+	return count > 0, nil
+}
+
+// CheckCustomerHasLicenses 检查客户是否有关联的许可证
+func (r *customerRepository) CheckCustomerHasLicenses(ctx context.Context, customerID string) (bool, error) {
+	var count int64
+	err := r.db.Model(&models.License{}).Where("customer_id = ?", customerID).Count(&count).Error
+	if err != nil {
+		return false, fmt.Errorf("failed to check licenses: %w", err)
+	}
+	return count > 0, nil
 }
 
 // GetCustomerCount 获取客户总数（用于统计）

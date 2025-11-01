@@ -21,6 +21,7 @@ errors:
     "200003": "客户名称不能为空"
     "200004": "客户信息格式无效"
     "200005": "客户列表查询失败"
+    "200006": "客户仍有授权，无法删除，请先删除授权"
   
   # 授权模块 (30xxxx)
   authorization:
@@ -72,10 +73,10 @@ enums:
     expired: "已过期"
   
   customer_level:
-    "normal": "普通客户"
+    "basic": "基础客户"
+    "active": "活跃客户"
     "vip": "VIP客户"
-    "enterprise": "企业客户"
-    "strategic": "战略客户"
+    "strategic": "战略合作客户"
   
   customer_status:
     "active": "激活"

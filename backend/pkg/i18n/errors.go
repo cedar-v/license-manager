@@ -108,7 +108,7 @@ func getHTTPStatusByCode(code string) int {
 		return StatusForbidden
 	case "900002", "200001", "300001": // 资源不存在
 		return StatusNotFound
-	case "900003", "200002", "300004": // 资源冲突
+	case "900003", "200002", "200006", "300004": // 资源冲突
 		return StatusConflict
 	case "900004": // 服务器内部错误
 		return StatusInternalServerError

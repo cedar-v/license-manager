@@ -21,6 +21,7 @@ errors:
     "200003": "Customer name is required"
     "200004": "Invalid customer information format"
     "200005": "Failed to query customer list"
+    "200006": "Customer has authorization codes, cannot delete. Please delete authorizations first"
   
   # Authorization module (30xxxx)
   authorization:
@@ -72,10 +73,10 @@ enums:
     expired: "Expired"
   
   customer_level:
-    "normal": "Normal"
-    "vip": "VIP"
-    "enterprise": "Enterprise"
-    "strategic": "Strategic"
+    "basic": "Basic Customer"
+    "active": "Active Customer"
+    "vip": "VIP Customer"
+    "strategic": "Strategic Partner"
   
   customer_status:
     "active": "Active"
