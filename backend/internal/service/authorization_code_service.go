@@ -548,6 +548,8 @@ func (s *authorizationCodeService) fillAuthCodeDisplayFields(item *models.Author
 }
 
 // generateAuthorizationCode 生成授权码
+// 格式: LIC-{4位客户代码}-{12位随机}-{4位校验码}
+// 安全性：12位随机字符（62字符集）提供约 3.23 × 10^21 种可能组合
 func (s *authorizationCodeService) generateAuthorizationCode(customerID string) (string, error) {
 	// 获取客户编码的前4位作为前缀
 	customerCode := "COMP" // 默认前缀
@@ -555,8 +557,8 @@ func (s *authorizationCodeService) generateAuthorizationCode(customerID string) 
 		customerCode = strings.ToUpper(customerID[:4])
 	}
 
-	// 生成8位随机字符串
-	randomStr, err := s.generateRandomString(8)
+	// 生成12位随机字符串（从8位增加到12位以提升安全性）
+	randomStr, err := s.generateRandomString(12)
 	if err != nil {
 		return "", err
 	}
@@ -569,8 +571,10 @@ func (s *authorizationCodeService) generateAuthorizationCode(customerID string) 
 }
 
 // generateRandomString 生成随机字符串
+// 使用62字符集（A-Z, a-z, 0-9）提供更高的熵值
 func (s *authorizationCodeService) generateRandomString(length int) (string, error) {
-	const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	// 扩展字符集到62字符（A-Z, a-z, 0-9）以提升安全性
+	const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 	bytes := make([]byte, length)
 	if _, err := rand.Read(bytes); err != nil {
 		return "", err
@@ -582,12 +586,71 @@ func (s *authorizationCodeService) generateRandomString(length int) (string, err
 }
 
 // generateChecksum 生成校验码
+// 基于输入字符串的ASCII值计算，用于格式验证
 func (s *authorizationCodeService) generateChecksum(input string) string {
 	sum := 0
 	for _, char := range input {
 		sum += int(char)
 	}
-	const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	// 使用与随机字符串相同的62字符集以保持一致性
+	const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+	checksum := ""
+	for i := 0; i < 4; i++ {
+		checksum += string(chars[sum%len(chars)])
+		sum = sum / len(chars)
+	}
+	return checksum
+}
+
+// ValidateAuthorizationCodeFormat 验证授权码格式和校验和
+// 格式: LIC-{4位客户代码}-{8或12位随机}-{4位校验码}
+// 兼容旧格式（8位随机，36字符集）和新格式（12位随机，62字符集）
+func (s *authorizationCodeService) ValidateAuthorizationCodeFormat(code string) bool {
+	// 解析格式
+	parts := strings.Split(code, "-")
+	if len(parts) != 4 || parts[0] != "LIC" {
+		return false
+	}
+
+	// 验证各部分长度（兼容旧格式8位和新格式12位）
+	customerCodeLen := len(parts[1])
+	randomLen := len(parts[2])
+	checksumLen := len(parts[3])
+
+	// 客户代码必须为4位，校验和必须为4位
+	if customerCodeLen != 4 || checksumLen != 4 {
+		return false
+	}
+
+	// 随机部分：兼容8位（旧格式）和12位（新格式）
+	if randomLen != 8 && randomLen != 12 {
+		return false
+	}
+
+	// 根据随机部分长度选择字符集验证校验和
+	// 8位：使用36字符集（旧格式）
+	// 12位：使用62字符集（新格式）
+	expectedChecksum := s.generateChecksumWithCharset(parts[1]+parts[2], randomLen == 12)
+	return expectedChecksum == parts[3]
+}
+
+// generateChecksumWithCharset 生成校验码（支持指定字符集）
+// useExtendedCharset: true使用62字符集（新格式），false使用36字符集（旧格式）
+func (s *authorizationCodeService) generateChecksumWithCharset(input string, useExtendedCharset bool) string {
+	sum := 0
+	for _, char := range input {
+		sum += int(char)
+	}
+
+	var chars string
+	if useExtendedCharset {
+		// 使用62字符集（A-Z, a-z, 0-9）用于新格式
+		chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+	} else {
+		// 使用36字符集（A-Z, 0-9）用于旧格式
+		chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	}
+
 	checksum := ""
 	for i := 0; i < 4; i++ {
 		checksum += string(chars[sum%len(chars)])
