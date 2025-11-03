@@ -72,6 +72,7 @@
       "licenses": "ライセンス管理",
       "licenseList": "ライセンス一覧",
       "createLicense": "ライセンス作成",
+      "viewLicense": "ライセンス表示",
       "roles": "ロールと権限",
       "users": "システムユーザー",
       "login": "ログイン",
@@ -214,7 +215,7 @@
         "expired": "期限切れ",
         "expiring": "期限近し"
       },
-      "form": {
+      "formBasic": {
         "basicInfo": "基本情報",
         "selectCustomer": "顧客選択",
         "description": "ライセンス説明",
@@ -562,12 +563,12 @@
       "updater": "更新者",
       "updateTime": "更新日時",
       "totalLicenses": "総ライセンス数",
-      "activeLicenses": "アクティブライセンス",
-      "recentLicense": "最近のライセンス",
-      "expiringSoon": "期限近し",
-      "expiringSoonTime": "期限近し日時",
-      "expiredLicenses": "期限切れライセンス",
-      "expiredTime": "期限切れ日時",
+      "activeLicenses": "期限切れライセンス",
+      "recentLicense": "30日以内に期限切れするライセンスコード数量",
+      "expiringSoon": "総ライセンス数量",
+      "expiringSoonTime": "アクティベート済みライセンス数量",
+      "expiredLicenses": "未アクティベートライセンス数量",
+      "expiredTime": "期限切れライセンス数量",
       "noData": "--",
       "onlineLicense": "オンラインライセンス",
       "customerNotExist": "顧客データが存在しません"

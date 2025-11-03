@@ -66,20 +66,21 @@
       "language": "Switch Language",
       "theme": "Switch Theme"
     },
-    "breadcrumb": {
-      "dashboard": "Dashboard",
-      "customers": "Customer Management",
-      "licenses": "License Management",
-      "licenseList": "License List",
-      "createLicense": "Create License",
-      "roles": "Roles & Permissions",
-      "users": "System Users",
-      "login": "Login",
-      "settings": "Settings",
-      "profile": "Profile",
-      "workspace": "Workspace",
-      "unknown": "Unknown Page"
-    }
+      "breadcrumb": {
+        "dashboard": "Dashboard",
+        "customers": "Customer Management",
+        "licenses": "License Management",
+        "licenseList": "License List",
+        "createLicense": "Create License",
+        "viewLicense": "View License",
+        "roles": "Roles & Permissions",
+        "users": "System Users",
+        "login": "Login",
+        "settings": "Settings",
+        "profile": "Profile",
+        "workspace": "Workspace",
+        "unknown": "Unknown Page"
+      }
   },
   "chart": {
     "licenseTrend": {
@@ -214,7 +215,7 @@
         "expired": "Expired",
         "expiring": "Expiring Soon"
       },
-      "form": {
+      "formBasic": {
         "basicInfo": "Basic Information",
         "selectCustomer": "Select Customer",
         "description": "License Description",
@@ -562,12 +563,12 @@
       "updater": "Updater",
       "updateTime": "Update Time",
       "totalLicenses": "Total Licenses",
-      "activeLicenses": "Active Licenses",
-      "recentLicense": "Recent License",
-      "expiringSoon": "Expiring Soon",
-      "expiringSoonTime": "Expiring Soon Time",
-      "expiredLicenses": "Expired Licenses",
-      "expiredTime": "Expired Time",
+      "activeLicenses": "Expired Licenses",
+      "recentLicense": "Licenses Expiring Within 30 Days",
+      "expiringSoon": "Total License Count",
+      "expiringSoonTime": "Activated License Count",
+      "expiredLicenses": "Unactivated License Count",
+      "expiredTime": "Expired License Count",
       "noData": "--",
       "onlineLicense": "Online License",
       "customerNotExist": "Customer data does not exist"

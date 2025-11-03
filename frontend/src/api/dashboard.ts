@@ -57,7 +57,7 @@ export const getAuthorizationTrend = (params: {
   return Axios.get('/api/v1/dashboard/authorization-trend', { params })
 }
 
-// 获取仪表盘统计数据
-export const getDashboardStats = (): Promise<ApiResponse<any>> => {
-  return Axios.get('/api/v1/dashboard/stats')
+// 获取仪表盘统计数据（新接口，返回卡片区数据）
+export const getOverviewStats = () => {
+  return Axios.get('/api/v1/stats/overview')
 }

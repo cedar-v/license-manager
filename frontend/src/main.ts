@@ -11,6 +11,7 @@ import App from './App.vue'
 import router from './router'
 
 // 全局样式系统
+import './assets/styles/fonts.css' // 本地字体（优先加载）
 import './assets/styles/global.scss'
 import './assets/styles/element-theme.scss'
 
