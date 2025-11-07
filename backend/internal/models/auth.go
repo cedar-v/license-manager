@@ -35,36 +35,36 @@ type UserInfo struct {
 
 // AuthorizationCode 授权码模型
 type AuthorizationCode struct {
-	ID                    string     `gorm:"type:varchar(36);primaryKey" json:"id"`                                 // 授权码ID
-	Code                  string     `gorm:"type:varchar(100);uniqueIndex;not null" json:"code"`                    // 授权码
-	CustomerID            string     `gorm:"type:varchar(36);not null;index" json:"customer_id"`                    // 客户ID
-	CustomerName          string     `gorm:"-" json:"customer_name,omitempty"`                                      // 客户名称
-	CustomerNameDisplay   string     `gorm:"-" json:"customer_name_display,omitempty"`                              // 客户名称显示（多语言）
-	CreatedBy             string     `gorm:"type:varchar(36);not null" json:"created_by"`                           // 创建人ID
-	SoftwareID            *string    `gorm:"type:varchar(50)" json:"software_id"`                                   // 软件ID
-	Description           *string    `gorm:"type:text" json:"description"`                                          // 描述
-	StartDate             time.Time  `gorm:"type:datetime(3);not null" json:"start_date"`                           // 生效日期
-	EndDate               time.Time  `gorm:"type:datetime(3);not null" json:"end_date"`                             // 失效日期
-	DeploymentType        string     `gorm:"type:varchar(20);not null;default:'standalone'" json:"deployment_type"` // 部署类型：standalone/cloud/hybrid
-	DeploymentTypeDisplay string     `gorm:"-" json:"deployment_type_display,omitempty"`                            // 部署类型显示（多语言）
-	EncryptionType        *string    `gorm:"type:varchar(20);default:'standard'" json:"encryption_type"`            // 加密类型：standard/advanced
-	EncryptionTypeDisplay string     `gorm:"-" json:"encryption_type_display,omitempty"`                            // 加密类型显示（多语言）
-	SoftwareVersion       *string    `gorm:"type:varchar(50)" json:"software_version"`                              // 软件版本
-	MaxActivations        int        `gorm:"not null;default:1" json:"max_activations"`                             // 最大激活次数
-	CurrentActivations    int        `gorm:"-" json:"current_activations,omitempty"`                                // 当前激活次数
-	IsLocked              bool       `gorm:"not null;default:false" json:"is_locked"`                               // 是否锁定
-	LockReason            *string    `gorm:"type:text" json:"lock_reason"`                                          // 锁定原因
-	LockedAt              *time.Time `gorm:"type:datetime(3)" json:"locked_at"`                                     // 锁定时间
-	LockedBy              *string    `gorm:"type:varchar(36)" json:"locked_by"`                                     // 锁定人ID
-	FeatureConfig         JSON       `gorm:"type:json" json:"feature_config" swaggertype:"object"`                  // 功能配置（JSON对象）
-	UsageLimits           JSON       `gorm:"type:json" json:"usage_limits" swaggertype:"object"`                    // 使用限制（JSON对象）
-	CustomParameters      JSON       `gorm:"type:json" json:"custom_parameters" swaggertype:"object"`               // 自定义参数（JSON对象）
-	Status                  string                    `gorm:"-" json:"status,omitempty"`                             // 状态：normal/locked/expired
-	StatusDisplay           string                    `gorm:"-" json:"status_display,omitempty"`                     // 状态显示（多语言）
-	CreatedAt               time.Time                 `gorm:"type:datetime(3);not null" json:"created_at"`           // 创建时间
-	UpdatedAt               time.Time                 `gorm:"type:datetime(3);not null" json:"updated_at"`           // 更新时间
-	CustomerInfo            *CustomerInfoForAuthCode  `gorm:"-" json:"customer_info,omitempty"`                      // 客户信息（仅在详情接口返回）
-	ActivatedLicensesCount  int64                     `gorm:"-" json:"activated_licenses_count,omitempty"`           // 该授权码下已激活的许可证数量
+	ID                     string                   `gorm:"type:varchar(36);primaryKey" json:"id"`                                 // 授权码ID
+	Code                   string                   `gorm:"type:varchar(100);uniqueIndex;not null" json:"code"`                    // 授权码
+	CustomerID             string                   `gorm:"type:varchar(36);not null;index" json:"customer_id"`                    // 客户ID
+	CustomerName           string                   `gorm:"-" json:"customer_name,omitempty"`                                      // 客户名称
+	CustomerNameDisplay    string                   `gorm:"-" json:"customer_name_display,omitempty"`                              // 客户名称显示（多语言）
+	CreatedBy              string                   `gorm:"type:varchar(36);not null" json:"created_by"`                           // 创建人ID
+	SoftwareID             *string                  `gorm:"type:varchar(50)" json:"software_id"`                                   // 软件ID
+	Description            *string                  `gorm:"type:text" json:"description"`                                          // 描述
+	StartDate              time.Time                `gorm:"type:datetime(3);not null" json:"start_date"`                           // 生效日期
+	EndDate                time.Time                `gorm:"type:datetime(3);not null" json:"end_date"`                             // 失效日期
+	DeploymentType         string                   `gorm:"type:varchar(20);not null;default:'standalone'" json:"deployment_type"` // 部署类型：standalone/cloud/hybrid
+	DeploymentTypeDisplay  string                   `gorm:"-" json:"deployment_type_display,omitempty"`                            // 部署类型显示（多语言）
+	EncryptionType         *string                  `gorm:"type:varchar(20);default:'standard'" json:"encryption_type"`            // 加密类型：standard/advanced
+	EncryptionTypeDisplay  string                   `gorm:"-" json:"encryption_type_display,omitempty"`                            // 加密类型显示（多语言）
+	SoftwareVersion        *string                  `gorm:"type:varchar(50)" json:"software_version"`                              // 软件版本
+	MaxActivations         int                      `gorm:"not null;default:1" json:"max_activations"`                             // 最大激活次数
+	CurrentActivations     int                      `gorm:"-" json:"current_activations,omitempty"`                                // 当前激活次数
+	IsLocked               bool                     `gorm:"not null;default:false" json:"is_locked"`                               // 是否锁定
+	LockReason             *string                  `gorm:"type:text" json:"lock_reason"`                                          // 锁定原因
+	LockedAt               *time.Time               `gorm:"type:datetime(3)" json:"locked_at"`                                     // 锁定时间
+	LockedBy               *string                  `gorm:"type:varchar(36)" json:"locked_by"`                                     // 锁定人ID
+	FeatureConfig          JSON                     `gorm:"type:json" json:"feature_config" swaggertype:"object"`                  // 功能配置（JSON对象）
+	UsageLimits            JSON                     `gorm:"type:json" json:"usage_limits" swaggertype:"object"`                    // 使用限制（JSON对象）
+	CustomParameters       JSON                     `gorm:"type:json" json:"custom_parameters" swaggertype:"object"`               // 自定义参数（JSON对象）
+	Status                 string                   `gorm:"-" json:"status,omitempty"`                                             // 状态：normal/locked/expired
+	StatusDisplay          string                   `gorm:"-" json:"status_display,omitempty"`                                     // 状态显示（多语言）
+	CreatedAt              time.Time                `gorm:"type:datetime(3);not null" json:"created_at"`                           // 创建时间
+	UpdatedAt              time.Time                `gorm:"type:datetime(3);not null" json:"updated_at"`                           // 更新时间
+	CustomerInfo           *CustomerInfoForAuthCode `gorm:"-" json:"customer_info,omitempty"`                                      // 客户信息（仅在详情接口返回）
+	ActivatedLicensesCount int64                    `gorm:"-" json:"activated_licenses_count,omitempty"`                           // 该授权码下已激活的许可证数量
 }
 
 // CustomerInfoForAuthCode 授权码详情中的客户信息结构
@@ -111,7 +111,7 @@ type AuthorizationCodeCreateRequest struct {
 	CustomerID       string      `json:"customer_id" binding:"required"`                                   // 客户ID
 	SoftwareID       *string     `json:"software_id" binding:"omitempty"`                                  // 软件ID
 	Description      *string     `json:"description" binding:"omitempty,max=1000"`                         // 描述
-	ValidityDays     int         `json:"validity_days" binding:"required,min=1,max=36500"`                 // 有效天数（1-36500天）
+	ValidityDays     int         `json:"validity_days" binding:"required,min=1,max=365000"`                // 有效天数（1-365000天，365000代表永久有效）
 	DeploymentType   string      `json:"deployment_type" binding:"required,oneof=standalone cloud hybrid"` // 部署类型：standalone/cloud/hybrid
 	EncryptionType   *string     `json:"encryption_type" binding:"omitempty,oneof=standard advanced"`      // 加密类型：standard/advanced
 	SoftwareVersion  *string     `json:"software_version" binding:"omitempty"`                             // 软件版本
@@ -172,7 +172,7 @@ type AuthorizationCodeListResponse struct {
 type AuthorizationCodeUpdateRequest struct {
 	SoftwareID       *string     `json:"software_id" binding:"omitempty"`                                                                    // 软件ID
 	Description      *string     `json:"description" binding:"omitempty,max=1000"`                                                           // 描述
-	ValidityDays     *int        `json:"validity_days" binding:"omitempty,min=1,max=36500"`                                                  // 有效天数
+	ValidityDays     *int        `json:"validity_days" binding:"omitempty,min=1,max=365000"`                                                 // 有效天数（1-365000天，365000代表永久有效）
 	DeploymentType   *string     `json:"deployment_type" binding:"omitempty,oneof=standalone cloud hybrid"`                                  // 部署类型：standalone/cloud/hybrid
 	EncryptionType   *string     `json:"encryption_type" binding:"omitempty,oneof=standard advanced"`                                        // 加密类型：standard/advanced
 	SoftwareVersion  *string     `json:"software_version" binding:"omitempty"`                                                               // 软件版本

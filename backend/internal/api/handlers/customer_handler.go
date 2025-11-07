@@ -293,7 +293,7 @@ func (h *CustomerHandler) UpdateCustomer(c *gin.Context) {
 
 // DeleteCustomer 删除客户
 // @Summary 删除客户
-// @Description 软删除客户记录
+// @Description 直接删除客户记录，删除前会检查是否有关联的授权码或许可证，如有则提示先删除授权
 // @Tags 客户管理
 // @Accept json
 // @Produce json
@@ -303,6 +303,7 @@ func (h *CustomerHandler) UpdateCustomer(c *gin.Context) {
 // @Failure 400 {object} models.ErrorResponse "请求参数无效"
 // @Failure 401 {object} models.ErrorResponse "未认证"
 // @Failure 404 {object} models.ErrorResponse "客户不存在"
+// @Failure 409 {object} models.ErrorResponse "客户仍有授权，无法删除"
 // @Failure 500 {object} models.ErrorResponse "服务器内部错误"
 // @Router /api/customers/{id} [delete]
 func (h *CustomerHandler) DeleteCustomer(c *gin.Context) {

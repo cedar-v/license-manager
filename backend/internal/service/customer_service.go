@@ -72,6 +72,16 @@ func (s *customerService) GetCustomer(ctx context.Context, id string) (*models.C
 		return nil, i18n.NewI18nError("900004", lang, err.Error())
 	}
 
+	// 获取授权统计信息
+	stats, err := s.customerRepo.GetCustomerAuthorizationStats(ctx, id)
+	if err != nil {
+		// 统计信息获取失败不影响主流程，记录错误但继续执行
+		// 如果获取失败，stats 为 nil，客户详情仍然可以返回，只是没有统计信息
+		// 根据需求文档，空数据时应该返回0，所以这里创建一个空的统计对象
+		stats = &models.AuthorizationStats{}
+	}
+	customer.AuthorizationStats = stats
+
 	// 填充多语言显示字段
 	s.fillCustomerDisplayFields(customer, lang)
 
@@ -88,7 +98,7 @@ func (s *customerService) fillDisplayFields(item *models.CustomerListItem, lang 
 // CreateCustomer 创建客户
 func (s *customerService) CreateCustomer(ctx context.Context, req *models.CustomerCreateRequest) (*models.Customer, error) {
 	lang := pkgcontext.GetLanguageFromContext(ctx)
-	
+
 	// 业务逻辑：参数验证
 	if req == nil {
 		return nil, i18n.NewI18nError("900001", lang)
@@ -122,7 +132,7 @@ func (s *customerService) CreateCustomer(ctx context.Context, req *models.Custom
 		if strings.Contains(err.Error(), "duplicate") || strings.Contains(err.Error(), "unique") {
 			return nil, i18n.NewI18nError("200002", lang) // 客户已存在
 		}
-		
+
 		// 数据库相关错误
 		return nil, i18n.NewI18nError("900004", lang, err.Error())
 	}
@@ -136,7 +146,7 @@ func (s *customerService) CreateCustomer(ctx context.Context, req *models.Custom
 // UpdateCustomer 更新客户信息
 func (s *customerService) UpdateCustomer(ctx context.Context, id string, req *models.CustomerUpdateRequest) (*models.Customer, error) {
 	lang := pkgcontext.GetLanguageFromContext(ctx)
-	
+
 	// 业务逻辑：参数验证
 	if id == "" {
 		return nil, i18n.NewI18nError("900001", lang)
@@ -191,7 +201,7 @@ func (s *customerService) UpdateCustomer(ctx context.Context, id string, req *mo
 	if req.Description != nil {
 		existingCustomer.Description = req.Description
 	}
-	
+
 	// 设置更新者
 	existingCustomer.UpdatedBy = &currentUserID
 
@@ -206,16 +216,43 @@ func (s *customerService) UpdateCustomer(ctx context.Context, id string, req *mo
 	return existingCustomer, nil
 }
 
-// DeleteCustomer 删除客户
+// DeleteCustomer 删除客户（物理删除，删除前检查是否有授权）
 func (s *customerService) DeleteCustomer(ctx context.Context, id string) error {
 	lang := pkgcontext.GetLanguageFromContext(ctx)
-	
+
 	// 业务逻辑：参数验证
 	if id == "" {
 		return i18n.NewI18nError("900001", lang)
 	}
 
-	// 委托给Repository层进行数据删除
+	// 检查客户是否存在
+	_, err := s.customerRepo.GetCustomerByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, repository.ErrCustomerNotFound) {
+			return i18n.NewI18nError("200001", lang)
+		}
+		return i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	// 检查是否有关联的授权码
+	hasAuthCodes, err := s.customerRepo.CheckCustomerHasAuthorizationCodes(ctx, id)
+	if err != nil {
+		return i18n.NewI18nError("900004", lang, err.Error())
+	}
+	if hasAuthCodes {
+		return i18n.NewI18nError("200006", lang)
+	}
+
+	// 检查是否有关联的许可证
+	hasLicenses, err := s.customerRepo.CheckCustomerHasLicenses(ctx, id)
+	if err != nil {
+		return i18n.NewI18nError("900004", lang, err.Error())
+	}
+	if hasLicenses {
+		return i18n.NewI18nError("200006", lang)
+	}
+
+	// 委托给Repository层进行物理删除
 	if err := s.customerRepo.DeleteCustomer(ctx, id); err != nil {
 		if errors.Is(err, repository.ErrCustomerNotFound) {
 			return i18n.NewI18nError("200001", lang)
@@ -229,7 +266,7 @@ func (s *customerService) DeleteCustomer(ctx context.Context, id string) error {
 // UpdateCustomerStatus 更新客户状态
 func (s *customerService) UpdateCustomerStatus(ctx context.Context, id string, req *models.CustomerStatusUpdateRequest) (*models.Customer, error) {
 	lang := pkgcontext.GetLanguageFromContext(ctx)
-	
+
 	// 业务逻辑：参数验证
 	if id == "" {
 		return nil, i18n.NewI18nError("900001", lang)

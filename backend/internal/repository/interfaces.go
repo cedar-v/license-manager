@@ -20,11 +20,20 @@ type CustomerRepository interface {
 	// UpdateCustomer 更新客户信息
 	UpdateCustomer(ctx context.Context, customer *models.Customer) error
 
-	// DeleteCustomer 删除客户
+	// DeleteCustomer 删除客户（物理删除）
 	DeleteCustomer(ctx context.Context, id string) error
 
 	// GetCustomerCount 获取客户总数（用于统计）
 	GetCustomerCount(ctx context.Context, filters map[string]interface{}) (int64, error)
+
+	// CheckCustomerHasAuthorizationCodes 检查客户是否有关联的授权码
+	CheckCustomerHasAuthorizationCodes(ctx context.Context, customerID string) (bool, error)
+
+	// CheckCustomerHasLicenses 检查客户是否有关联的许可证
+	CheckCustomerHasLicenses(ctx context.Context, customerID string) (bool, error)
+
+	// GetCustomerAuthorizationStats 获取客户授权统计信息
+	GetCustomerAuthorizationStats(ctx context.Context, customerID string) (*models.AuthorizationStats, error)
 }
 
 // UserRepository 用户数据访问接口

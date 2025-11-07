@@ -23,7 +23,7 @@ CREATE TABLE customers (
     company_size VARCHAR(20) COMMENT '企业规模: small, medium, large, enterprise',
     
     -- 客户分级
-    customer_level VARCHAR(20) NOT NULL DEFAULT 'normal' COMMENT '客户等级: normal, vip, enterprise, strategic',
+    customer_level VARCHAR(20) NOT NULL DEFAULT 'basic' COMMENT '客户等级: basic, active, vip, strategic',
     
     -- 状态管理
     status VARCHAR(20) NOT NULL DEFAULT 'active' COMMENT '状态: active, disabled',

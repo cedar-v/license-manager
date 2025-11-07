@@ -218,8 +218,8 @@ definitions:
       usage_limits:
         description: 使用限制（JSON对象）
       validity_days:
-        description: 有效天数（1-36500天）
-        maximum: 36500
+        description: 有效天数（1-365000天，365000代表永久有效）
+        maximum: 365000
         minimum: 1
         type: integer
     required:
@@ -373,17 +373,45 @@ definitions:
       usage_limits:
         description: 使用限制
       validity_days:
-        description: 有效天数
-        maximum: 36500
+        description: 有效天数（1-365000天，365000代表永久有效）
+        maximum: 365000
         minimum: 1
         type: integer
     required:
     - change_type
     type: object
+  models.AuthorizationStats:
+    properties:
+      active_licenses:
+        description: 已激活许可证数量
+        type: integer
+      expired_auth_codes:
+        description: 已过期授权码数量
+        type: integer
+      expired_licenses:
+        description: 已过期许可证数量
+        type: integer
+      expiring_soon_auth_codes:
+        description: 30日内即将到期授权码数量
+        type: integer
+      inactive_licenses:
+        description: 未激活许可证数量
+        type: integer
+      total_auth_codes:
+        description: 总授权码数量
+        type: integer
+      total_licenses:
+        description: 总许可证数量
+        type: integer
+    type: object
   models.Customer:
     properties:
       address:
         type: string
+      authorization_stats:
+        allOf:
+        - $ref: '#/definitions/models.AuthorizationStats'
+        description: 授权统计信息（仅在详情接口返回）
       company_size:
         type: string
       company_size_display:
@@ -433,11 +461,6 @@ definitions:
         type: string
       company_size:
         description: 企业规模，可选
-        enum:
-        - small
-        - medium
-        - large
-        - enterprise
         type: string
       contact_person:
         description: 联系人姓名，必填
@@ -449,11 +472,6 @@ definitions:
         type: string
       customer_level:
         description: 客户等级，必填
-        enum:
-        - normal
-        - vip
-        - enterprise
-        - strategic
         type: string
       customer_name:
         description: 客户名称，必填
@@ -580,11 +598,6 @@ definitions:
         type: string
       company_size:
         description: 企业规模，可选
-        enum:
-        - small
-        - medium
-        - large
-        - enterprise
         type: string
       contact_person:
         description: 联系人姓名，可选
@@ -596,11 +609,6 @@ definitions:
         type: string
       customer_level:
         description: 客户等级，可选
-        enum:
-        - normal
-        - vip
-        - enterprise
-        - strategic
         type: string
       customer_name:
         description: 客户名称，可选
@@ -703,10 +711,10 @@ definitions:
   models.GrowthRate:
     properties:
       auth_codes:
-        description: 授权码增长率(%)
+        description: 授权码增长率(%)（当前总授权码数相比一个月前总授权码数的增长率）
         type: number
       licenses:
-        description: 许可证增长率(%)
+        description: 许可证增长率(%)（当前活跃许可证数相比一个月前活跃许可证数的增长率）
         type: number
     type: object
   models.HealthResponse:
@@ -1027,20 +1035,20 @@ definitions:
   models.StatsOverviewResponse:
     properties:
       abnormal_alerts:
-        description: 异常告警数量
+        description: 异常告警数量（活跃许可证中心跳超时的数量，超过配置的心跳超时时间未收到心跳）
         type: integer
       active_licenses:
-        description: 活跃许可证数量
+        description: 活跃许可证数量（状态为active的许可证总数）
         type: integer
       expiring_soon:
-        description: 即将过期数量
+        description: 即将过期数量（30天内即将过期的授权码，且未被锁定）
         type: integer
       growth_rate:
         allOf:
         - $ref: '#/definitions/models.GrowthRate'
-        description: 增长率
+        description: 增长率（同比上月）
       total_auth_codes:
-        description: 总授权码数量
+        description: 总授权码数量（所有授权码的累计总数）
         type: integer
     type: object
   models.SystemInfo:
@@ -1253,7 +1261,7 @@ paths:
     delete:
       consumes:
       - application/json
-      description: 软删除客户记录
+      description: 直接删除客户记录，删除前会检查是否有关联的授权码或许可证，如有则提示先删除授权
       parameters:
       - description: 客户ID
         in: path
@@ -1277,6 +1285,10 @@ paths:
             $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: 客户不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: 客户仍有授权，无法删除
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "500":

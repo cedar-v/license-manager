@@ -392,7 +392,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "软删除客户记录",
+                "description": "直接删除客户记录，删除前会检查是否有关联的授权码或许可证，如有则提示先删除授权",
                 "consumes": [
                     "application/json"
                 ],
@@ -433,6 +433,12 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "客户不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "客户仍有授权，无法删除",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -2590,9 +2596,9 @@ const docTemplate = `{
                     "description": "使用限制（JSON对象）"
                 },
                 "validity_days": {
-                    "description": "有效天数（1-36500天）",
+                    "description": "有效天数（1-365000天，365000代表永久有效）",
                     "type": "integer",
-                    "maximum": 36500,
+                    "maximum": 365000,
                     "minimum": 1
                 }
             }
@@ -2795,10 +2801,43 @@ const docTemplate = `{
                     "description": "使用限制"
                 },
                 "validity_days": {
-                    "description": "有效天数",
+                    "description": "有效天数（1-365000天，365000代表永久有效）",
                     "type": "integer",
-                    "maximum": 36500,
+                    "maximum": 365000,
                     "minimum": 1
+                }
+            }
+        },
+        "models.AuthorizationStats": {
+            "type": "object",
+            "properties": {
+                "active_licenses": {
+                    "description": "已激活许可证数量",
+                    "type": "integer"
+                },
+                "expired_auth_codes": {
+                    "description": "已过期授权码数量",
+                    "type": "integer"
+                },
+                "expired_licenses": {
+                    "description": "已过期许可证数量",
+                    "type": "integer"
+                },
+                "expiring_soon_auth_codes": {
+                    "description": "30日内即将到期授权码数量",
+                    "type": "integer"
+                },
+                "inactive_licenses": {
+                    "description": "未激活许可证数量",
+                    "type": "integer"
+                },
+                "total_auth_codes": {
+                    "description": "总授权码数量",
+                    "type": "integer"
+                },
+                "total_licenses": {
+                    "description": "总许可证数量",
+                    "type": "integer"
                 }
             }
         },
@@ -2807,6 +2846,14 @@ const docTemplate = `{
             "properties": {
                 "address": {
                     "type": "string"
+                },
+                "authorization_stats": {
+                    "description": "授权统计信息（仅在详情接口返回）",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.AuthorizationStats"
+                        }
+                    ]
                 },
                 "company_size": {
                     "type": "string"
@@ -2887,13 +2934,7 @@ const docTemplate = `{
                 },
                 "company_size": {
                     "description": "企业规模，可选",
-                    "type": "string",
-                    "enum": [
-                        "small",
-                        "medium",
-                        "large",
-                        "enterprise"
-                    ]
+                    "type": "string"
                 },
                 "contact_person": {
                     "description": "联系人姓名，必填",
@@ -2907,13 +2948,7 @@ const docTemplate = `{
                 },
                 "customer_level": {
                     "description": "客户等级，必填",
-                    "type": "string",
-                    "enum": [
-                        "normal",
-                        "vip",
-                        "enterprise",
-                        "strategic"
-                    ]
+                    "type": "string"
                 },
                 "customer_name": {
                     "description": "客户名称，必填",
@@ -3082,13 +3117,7 @@ const docTemplate = `{
                 },
                 "company_size": {
                     "description": "企业规模，可选",
-                    "type": "string",
-                    "enum": [
-                        "small",
-                        "medium",
-                        "large",
-                        "enterprise"
-                    ]
+                    "type": "string"
                 },
                 "contact_person": {
                     "description": "联系人姓名，可选",
@@ -3102,13 +3131,7 @@ const docTemplate = `{
                 },
                 "customer_level": {
                     "description": "客户等级，可选",
-                    "type": "string",
-                    "enum": [
-                        "normal",
-                        "vip",
-                        "enterprise",
-                        "strategic"
-                    ]
+                    "type": "string"
                 },
                 "customer_name": {
                     "description": "客户名称，可选",
@@ -3256,11 +3279,11 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "auth_codes": {
-                    "description": "授权码增长率(%)",
+                    "description": "授权码增长率(%)（当前总授权码数相比一个月前总授权码数的增长率）",
                     "type": "number"
                 },
                 "licenses": {
-                    "description": "许可证增长率(%)",
+                    "description": "许可证增长率(%)（当前活跃许可证数相比一个月前活跃许可证数的增长率）",
                     "type": "number"
                 }
             }
@@ -3713,19 +3736,19 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "abnormal_alerts": {
-                    "description": "异常告警数量",
+                    "description": "异常告警数量（活跃许可证中心跳超时的数量，超过配置的心跳超时时间未收到心跳）",
                     "type": "integer"
                 },
                 "active_licenses": {
-                    "description": "活跃许可证数量",
+                    "description": "活跃许可证数量（状态为active的许可证总数）",
                     "type": "integer"
                 },
                 "expiring_soon": {
-                    "description": "即将过期数量",
+                    "description": "即将过期数量（30天内即将过期的授权码，且未被锁定）",
                     "type": "integer"
                 },
                 "growth_rate": {
-                    "description": "增长率",
+                    "description": "增长率（同比上月）",
                     "allOf": [
                         {
                             "$ref": "#/definitions/models.GrowthRate"
@@ -3733,7 +3756,7 @@ const docTemplate = `{
                     ]
                 },
                 "total_auth_codes": {
-                    "description": "总授权码数量",
+                    "description": "总授权码数量（所有授权码的累计总数）",
                     "type": "integer"
                 }
             }
