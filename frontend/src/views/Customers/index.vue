@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-12 00:00:00
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-10-30 14:45:23
+ * @LastEditTime: 2025-11-03 11:19:50
  * @FilePath: /frontend/src/views/Customers/index.vue
  * @Description: 客户管理页面  
 -->
@@ -129,7 +129,7 @@
               {{ formatDateShort(scope.row.created_at) }}
             </template>
           </el-table-column>
-          <el-table-column :label="t('customers.table.operation')" fixed="right" class-name="action-column" align="center">
+          <el-table-column :label="t('customers.table.operation')" fixed="right" class-name="action-column" align="center" :width="320">
             <template #default="scope">
               <div class="action-buttons">
                 <button class="action-btn primary" @click="handleViewLicense(scope.row)">{{ t('customers.actions.viewLicense') }}</button>

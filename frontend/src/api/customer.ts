@@ -1,5 +1,16 @@
 import Axios from './https'
 
+// 授权统计信息类型
+export interface AuthorizationStats {
+  active_licenses?: number;           // 已激活许可证数量
+  expired_auth_codes?: number;        // 已过期授权码数量
+  expired_licenses?: number;          // 已过期许可证数量
+  expiring_soon_auth_codes?: number;  // 30日内即将到期授权码数量
+  inactive_licenses?: number;         // 未激活许可证数量
+  total_auth_codes?: number;          // 总授权码数量
+  total_licenses?: number;            // 总许可证数量
+}
+
 // 客户接口类型定义 - 完全使用接口提供的字段名称
 export interface Customer {
   id: string;
@@ -23,6 +34,7 @@ export interface Customer {
   updated_at: string;
   created_by: string;
   updated_by: string;
+  authorization_stats?: AuthorizationStats; // 授权统计信息
 }
 
 // 客户查询请求参数

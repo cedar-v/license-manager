@@ -31,7 +31,7 @@
         <div class="license-form">
           <h3 class="section-title">{{ t('pages.licenses.form.sections.basicInfo') }}</h3>
 
-          <!-- 第一行：关联客户名称，客户ID，创建人 -->
+          <!-- 第一行：关联客户名称，客户ID -->
           <div class="fields-row">
             <el-form-item
               :label="t('pages.licenses.form.fields.customerName')"
@@ -69,19 +69,6 @@
                 disabled
               />
             </el-form-item>
-
-            <el-form-item
-              :label="t('pages.licenses.form.fields.createdBy')"
-              prop="created_by"
-              required
-              class="field-item"
-            >
-              <el-input
-                v-model="formData.created_by"
-                :placeholder="t('pages.licenses.form.placeholders.currentUser')"
-                disabled
-              />
-            </el-form-item>
           </div>
 
           <!-- 第二行：备注单独一行 -->
@@ -94,6 +81,8 @@
             >
               <el-input
                 v-model="formData.description"
+                type="textarea"
+                :rows="4"
                 :placeholder="t('pages.licenses.form.placeholders.enterDescription')"
               />
             </el-form-item>
@@ -240,11 +229,9 @@ import {
 } from '@/api/license'
 import { getCustomers, type Customer } from '@/api/customer'
 import { getEnumOptions, type RawEnumItem } from '@/api/enum'
-import { useUserStore } from '@/store/modules/user'
 
 const router = useRouter()
 const route = useRoute()
-const userStore = useUserStore()
 const { t } = useI18n()
 
 // 表单引用
@@ -263,13 +250,11 @@ const encryptionTypeOptions = ref<RawEnumItem[]>([])
 const formData = reactive<
   AuthorizationCodeCreateRequest & {
     customer_code: string
-    created_by: string
     validity_type: 'permanent' | 'limited'
   }
 >({
   customer_id: '',
   customer_code: '',
-  created_by: '',
   validity_type: 'limited',
   description: '',
   validity_days: 365,
@@ -511,12 +496,6 @@ const loadCustomerInfo = () => {
     } as Customer]
   }
 
-  // 设置创建人（从用户store获取当前登录用户）
-  if (userStore.userInfo) {
-    formData.created_by = userStore.userInfo.username
-  } else {
-    formData.created_by = t('pages.licenses.form.placeholders.currentUser')
-  }
 }
 
 // 处理授权期限类型变化
@@ -570,12 +549,6 @@ const loadLicenseDetail = async () => {
 
       // 设置表单字段
       formData.customer_code = (data as any).customer_code || data.customer_id || ''
-      // 编辑模式下显示原始创建人，如果没有则显示当前用户
-      formData.created_by =
-        (data as any).created_by ||
-        (userStore.userInfo
-          ? userStore.userInfo.username
-          : t('pages.licenses.form.placeholders.currentUser'))
 
       // 计算有效期天数和设置日期范围
       if (data.start_date && data.end_date) {

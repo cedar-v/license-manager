@@ -2,7 +2,7 @@
  * @Author: 13895237362 2205451508@qq.com
  * @Date: 2025-08-01 09:32:42
  * @LastEditors: 13895237362 2205451508@qq.com
- * @LastEditTime: 2025-10-28 17:28:18
+ * @LastEditTime: 2025-11-04 15:19:44
  * @FilePath: /frontend/src/views/Dashboard.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -27,10 +27,6 @@
             <div class="stat-label">{{ stat.label }}</div>
             <div class="stat-value-row">
               <div class="stat-value">{{ stat.value }}</div>
-              <div class="stat-trend" v-if="stat.trend">
-                <img :src="upIcon" alt="trend up" class="trend-icon" width="16" height="16" />
-                <span class="trend-value">{{ stat.trend }}</span>
-              </div>
             </div>
           </div>
         </div>
@@ -114,11 +110,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Layout from '@/components/common/layout/Layout.vue'
 import LicenseTrendChart from '@/components/charts/LicenseTrendChart.vue'
-import { getRecentAuthorizations, type RecentAuthorizationItem } from '@/api/dashboard'
+import { getRecentAuthorizations, type RecentAuthorizationItem, getOverviewStats} from '@/api/dashboard'
 import { ElMessage } from 'element-plus'
 import { formatDate } from '@/utils/date'
 
@@ -130,62 +126,20 @@ import icon4 from '@/assets/icons/dashboard/icon4.png'
 import icon5 from '@/assets/icons/dashboard/icon5.png'
 import icon6 from '@/assets/icons/dashboard/icon6.png'
 import icon7 from '@/assets/icons/dashboard/icon7.png'
-import upIcon from '@/assets/icons/up-icon.svg'
 
 // 使用国际化
 const { t } = useI18n()
 
-// 统计卡片数据
-const statsData = computed(() => [
-  {
-    id: 1,
-    value: '100',
-    label: t('dashboard.stats.totalCustomers'),
-    trend: '+1.5%',
-    icon: icon1
-  },
-  {
-    id: 2,
-    value: '100',
-    label: t('dashboard.stats.totalLicenses'),
-    trend: '+8.5%',
-    icon: icon2
-  },
-  {
-    id: 3,
-    value: '98',
-    label: t('dashboard.stats.activeLicenses'),
-    trend: '+15.6%',
-    icon: icon3
-  },
-  {
-    id: 4,
-    value: '2',
-    label: t('dashboard.stats.expired'),
-    trend: '+8.6%',
-    icon: icon4
-  },
-  {
-    id: 5,
-    value: '600',
-    label: t('dashboard.stats.onlineClients'),
-    trend: '',
-    icon: icon5
-  },
-  {
-    id: 6,
-    value: '50',
-    label: t('dashboard.stats.expiringSoon'),
-    trend: '',
-    icon: icon6
-  },
-  {
-    id: 7,
-    value: '98%',
-    label: t('dashboard.stats.authSuccessRate24h'),
-    trend: '',
-    icon: icon7
-  }
+// 统计卡片数据（接口动态获取 value，其余静态配置）
+const statsData = ref([
+
+  { id: 1, key: 'total_auth_codes', value: '', label: t('dashboard.stats.totalCustomers'), icon: icon1 },//总授权码
+  { id: 2, key: 'active_licenses', value: '', label: t('dashboard.stats.totalLicenses'), icon: icon2 },//活跃许可证
+  { id: 3, key: 'expiring_soon', value: '', label: t('dashboard.stats.activeLicenses'), icon: icon3 },//即将过期
+  { id: 4, key: 'abnormal_alerts', value: '', label: t('dashboard.stats.expired'), icon: icon4 },//异常警告
+  { id: 5, key: 'growth_rate', value: '', label: t('dashboard.stats.onlineClients'), icon: icon5 },//增长率
+  { id: 6, key: 'auth_codes', value: '', label: t('dashboard.stats.expiringSoon'), icon: icon6 },//授权码增长率
+  { id: 7, key: 'licenses', value: '', label: t('dashboard.stats.authSuccessRate24h'), icon: icon7 }//许可证增长率
 ])
 
 // 最近授权数据 - 响应式数据
@@ -221,9 +175,30 @@ const fetchRecentAuthorizations = async () => {
   }
 }
 
+// 获取仪表盘统计数据
+const fetchDashboardStats = async () => {
+  try {
+    const resp = await getOverviewStats()
+    const data = resp.data
+    statsData.value.forEach(item => {
+      // 处理直接映射的字段
+      if (data[item.key] !== undefined && typeof data[item.key] !== 'object') {
+        item.value = data[item.key]
+      }
+      // 处理嵌套在 growth_rate 中的字段
+      if (data.growth_rate && data.growth_rate[item.key] !== undefined) {
+        item.value = data.growth_rate[item.key]
+      }
+    })
+  } catch (e) {
+    ElMessage.error('获取仪表盘统计数据失败')
+  }
+}
+
 // 组件挂载时获取数据
 onMounted(() => {
   console.log('Dashboard 组件已挂载')
+  fetchDashboardStats()
   fetchRecentAuthorizations()
 })
 </script>
@@ -282,7 +257,7 @@ onMounted(() => {
 
 .stats-card {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 0.83vw; /* 16px/1920 = 0.83vw */
   position: relative;
   z-index: 1;
@@ -306,9 +281,13 @@ onMounted(() => {
 }
 
 .stat-icon {
+  display: flex;
+  align-items: center;
+  height: 100%;
+
   .icon-circle {
-    width: 2.08vw; /* 40px/1920 = 2.08vw */
-    height: 2.08vw; /* 40px/1920 = 2.08vw */
+    height: 100%;
+    aspect-ratio: 1; /* 保持圆形 */
     background: rgba(255, 255, 255, 0.2);
     border-radius: 50%;
     display: flex;
@@ -316,8 +295,8 @@ onMounted(() => {
     justify-content: center;
 
     .stat-icon-img {
-      width: 0.83vw; /* 16px/1920 = 0.83vw */
-      height: 0.83vw; /* 16px/1920 = 0.83vw */
+      width: 50%; /* icon-circle 的一半 */
+      height: 50%; /* icon-circle 的一半 */
       filter: brightness(0) invert(1) opacity(0.9); /* 将图标转为白色半透明 */
       object-fit: contain;
     }
@@ -327,6 +306,10 @@ onMounted(() => {
 .stat-content {
   flex: 0 1 auto;
   min-width: 4.17vw; /* 80px/1920 = 4.17vw */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
 
   .stat-label {
     font-size: 0.83vw; /* 16px/1920 = 0.83vw */
@@ -349,35 +332,14 @@ onMounted(() => {
   }
 }
 
-.stat-trend {
-  display: flex;
-  align-items: center;
-  gap: 0.21vw; /* 4px/1920 = 0.21vw */
-  color: rgba(255, 255, 255, 0.8);
-
-  .trend-icon {
-    filter: brightness(0) invert(1) opacity(0.8);
-    object-fit: contain;
-  }
-
-  .trend-value {
-    font-size: 0.73vw; /* 14px/1920 = 0.73vw */
-    font-weight: 500;
-  }
-}
-
 // 紧凑型卡片样式（专门针对到期提醒）
-.stats-card.compact-card {
-  .stat-content {
-    min-width: 2.5vw !important; /* 48px/1920 = 2.5vw */
-  }
+.stats-card.compact-card  {
+  min-width: 10vw !important; /* 48px/1920 = 2.5vw */
 }
 
 // 大型卡片样式（专门针对近24小时授权验证成功率）
-.stats-card.large-card {
-  .stat-content {
-    min-width: 6vw !important; /* 115px/1920 = 6vw */
-  }
+.stats-card.large-card  {
+  min-width: 10vw !important; /* 115px/1920 = 6vw */
 }
 
 // 内容区域 - 默认上下布局，充满屏幕宽度和高度
@@ -534,13 +496,19 @@ onMounted(() => {
     }
   }
 
+  .stat-icon {
+    height: auto;
+  }
+
   .stat-icon .icon-circle {
-    width: 36px; /* 移动端固定大小 */
-    height: 36px;
+    height: 100%;
+    aspect-ratio: 1; /* 保持圆形 */
+    min-width: 36px; /* 移动端最小大小 */
+    min-height: 36px;
 
     .stat-icon-img {
-      width: 14px;
-      height: 14px;
+      width: 50%; /* icon-circle 的一半 */
+      height: 50%; /* icon-circle 的一半 */
       filter: brightness(0) invert(1) opacity(0.9); /* 将图标转为白色半透明 */
       object-fit: contain;
     }
@@ -561,10 +529,6 @@ onMounted(() => {
       margin-top: 4px;
       white-space: nowrap;
     }
-  }
-
-  .stat-trend .trend-value {
-    font-size: 12px;
   }
 
   .content-section {

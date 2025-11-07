@@ -62,11 +62,25 @@
             </template>
           </el-table-column>
           <el-table-column
-            prop="deployment_type_display"
-            :label="t('pages.licenses.list.table.deploymentType')"
-            :width="140"
+            :label="t('pages.licenses.list.table.activationProgress')"
+            :width="220"
             align="center"
-          />
+          >
+            <template #default="scope">
+              <div 
+                class="progress-container"
+                :class="{ 'zero-activated': (scope.row.activated_licenses_count || 0) === 0 }"
+              >
+                <el-progress
+                  :percentage="getActivationProgress(scope.row)"
+                  :stroke-width="8"
+                  :show-text="true"
+                  :text-inside="true"
+                  :format="() => `${scope.row.activated_licenses_count || 0}/${scope.row.max_activations}`"
+                />
+              </div>
+            </template>
+          </el-table-column>
           <el-table-column prop="end_date" :label="t('pages.licenses.list.table.endDate')" :width="180" align="center">
             <template #default="scope">
               {{ formatDate(scope.row.end_date) }}
@@ -170,6 +184,15 @@ const getStatusClass = (status: string) => {
     'status-expired': status === 'expired'
   }
 }
+
+const getActivationProgress = (row: AuthorizationCode) => {
+  if (!row.max_activations || row.max_activations === 0) {
+    return 0
+  }
+  const activated = row.activated_licenses_count || 0
+  return Math.round((activated / row.max_activations) * 100)
+}
+
 
 const handleCreate = () => {
   router.push({
@@ -517,6 +540,7 @@ onMounted(async () => {
 
 .status-tag {
   padding: $spacing-extra-small $spacing-small;
+  margin: 0 10px;
   border-radius: $border-radius-small;
   font-size: $font-size-base;
   font-weight: $font-weight-secondary;
@@ -544,6 +568,64 @@ onMounted(async () => {
   font-weight: 400;
   font-size: 14px;
   line-height: 24px; // 改为24px符合8px栅格
+}
+
+.progress-container {
+  width: 100%;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  :deep(.el-progress) {
+    width: 100%;
+    min-width: 160px;
+  }
+  
+  :deep(.el-progress-bar__outer) {
+    background: #4763FF1A !important;
+    min-height: 24px;
+    position: relative;
+  }
+  
+  :deep(.el-progress-bar__inner) {
+    background: #4763FF !important;
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  
+  :deep(.el-progress-bar__innerText) {
+    color: #FFFFFF !important;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    z-index: 10;
+    pointer-events: none;
+  }
+  
+  :deep(.el-progress__text) {
+    color: #FFFFFF !important;
+    font-size: 12px;
+    font-weight: 500;
+    z-index: 10;
+  }
+
+  // 当 activated_licenses_count 为 0 时，文字显示为红色
+  &.zero-activated {
+    :deep(.el-progress-bar__innerText),
+    :deep(.el-progress__text) {
+      color: #F56C6C !important;
+      margin-left: 50px !important;
+    }
+    
+    // 当百分比为0时，确保外部文字可见且为红色
+    :deep(.el-progress-bar__outer) {
+      position: relative;
+    }
+  }
 }
 
 // 操作按钮组，严格复制 customers 页 action-btn/action-buttons 样式

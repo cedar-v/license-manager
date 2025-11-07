@@ -26,13 +26,13 @@
   "dashboard": {
     "title": "仪表盘",
     "stats": {
-      "totalCustomers": "客户总数",
-      "totalLicenses": "总授权",
-      "activeLicenses": "有效授权",
-      "expired": "过期授权",
-      "onlineClients": "在线客户端数量",
-      "expiringSoon": "到期提醒",
-      "authSuccessRate24h": "近24小时授权验证成功率"
+      "totalCustomers": "总授权码",
+      "totalLicenses": "活跃许可证",
+      "activeLicenses": "即将过期",
+      "expired": "异常警告",
+      "onlineClients": "增长率",
+      "expiringSoon": "授权码增长率",
+      "authSuccessRate24h": "许可证增长率"
     },
     "recentLicenses": {
       "title": "最近授权",
@@ -136,7 +136,7 @@
         "table": {
           "code": "授权码",
           "status": "状态",
-          "deploymentType": "部署类型",
+          "activationProgress": "激活进度",
           "endDate": "到期时间",
           "description": "备注",
           "operation": "操作",
@@ -567,8 +567,8 @@
         "recentLicense": "30日内即将到期授权码数量 ",
         "expiringSoon": "总许可证数量",
         "expiringSoonTime": "已激活许可证数量",
-        "expiredLicenses": "未激活许可证数量",
-        "expiredTime": "已过期许可证数量",
+        "expiredLicenses": "已过期许可证数量",
+        "expiredTime": "未激活许可证数量",
         "noData": "--",
         "onlineLicense": "在线授权",
         "customerNotExist": "客户数据不存在"
