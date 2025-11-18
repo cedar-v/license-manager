@@ -9,8 +9,8 @@
           <div class="info-value">{{ licenseData?.customer_info.customer_name|| '-' }}</div>
         </div>
         <div class="info-row">
-          <div class="info-label">{{ t('pages.licenses.detail.authorizationInfo.customerId') }}：</div>
-          <div class="info-value">{{ licenseData?.customer_id || '-' }}</div>
+          <div class="info-label">{{ t('pages.licenses.detail.authorizationInfo.customerCode') }}：</div>
+          <div class="info-value">{{ licenseData?.customer_info?.customer_code || '-' }}</div>
         </div>
         <div class="info-row">
           <div class="info-label">{{ t('pages.licenses.detail.authorizationInfo.createdBy') }}：</div>

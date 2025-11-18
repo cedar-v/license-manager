@@ -3,8 +3,8 @@
     <!-- 基础信息部分 -->
     <div class="info-section">
       <div class="info-row">
-        <div class="info-label">{{ $t('customers.basicInfo.customerId') }}</div>
-        <div class="info-value">{{ licenseData?.customer_id || '-' }}</div>
+        <div class="info-label">{{ $t('customers.basicInfo.customerCode') }}</div>
+        <div class="info-value">{{ licenseData?.customer_info?.customer_code || '-' }}</div>
       </div>
       <div class="info-row">
         <div class="info-label">{{ $t('customers.basicInfo.customerName') }}</div>
@@ -17,7 +17,7 @@
       <!-- 已激活设备数量 -->
       <div class="stat-card stat-card-1">
         <div class="card-content">
-          <div class="stat-value">{{ licenseData?.activated_licenses_count || 0 }}</div>
+          <div class="stat-value">{{ getActivatedLicenses(licenseData) }}</div>
           <div class="stat-label">{{ $t('customers.basicInfo.activatedDevices') }}</div>
         </div>
       </div>
@@ -58,6 +58,17 @@ interface Props {
 }
 
 defineProps<Props>()
+
+const getActivatedLicenses = (license?: AuthorizationCode | null) => {
+  if (!license) return 0
+  if (typeof license.current_activations === 'number') {
+    return license.current_activations
+  }
+  if (typeof license.activated_licenses_count === 'number') {
+    return license.activated_licenses_count
+  }
+  return 0
+}
 
 const formatDateShort = (date?: string) => {
   if (!date) return '-'

@@ -20,6 +20,7 @@ export interface AuthorizationCode {
   encryption_type_display?: string;
   software_version?: string;
   max_activations: number;
+  current_activations?: number;
   activated_licenses_count?: number;
   is_locked?: boolean;
   feature_config?: any;
@@ -299,6 +300,23 @@ export function getLicenseDevices(params: LicenseListQueryRequest): Promise<Lice
  */
 export function getLicenseDeviceDetail(id: string): Promise<ApiResponse<LicenseDetail>> {
   return Axios.get(`/api/v1/licenses/${id}`)
+}
+
+// 创建许可证请求（手动绑定设备）
+export interface LicenseDeviceCreateRequest {
+  authorization_code_id: string
+  hardware_fingerprint: string
+  device_info?: Record<string, any>
+  activation_ip?: string
+}
+
+/**
+ * 手动创建许可证
+ */
+export function createLicenseDevice(
+  data: LicenseDeviceCreateRequest
+): Promise<ApiResponse<LicenseDevice>> {
+  return Axios.post('/api/v1/licenses', data)
 }
 
 // 授权变更历史相关类型定义

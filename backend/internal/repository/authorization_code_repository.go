@@ -58,10 +58,11 @@ func (r *authorizationCodeRepository) GetAuthorizationCodeList(ctx context.Conte
 		order = "desc"
 	}
 
-	// 构建查询，包含状态计算
+	// 构建查询，包含状态计算与当前激活数量
 	query := r.db.WithContext(ctx).Table("authorization_codes ac").
 		Select(`ac.id, ac.code, ac.customer_id, c.customer_name, 
 				ac.start_date, ac.end_date, ac.max_activations, 
+				COALESCE(l.active_count, 0) AS current_activations,
 				ac.deployment_type, ac.is_locked, ac.description, ac.created_at,
 				CASE 
 					WHEN ac.is_locked = true THEN 'locked'
@@ -69,7 +70,13 @@ func (r *authorizationCodeRepository) GetAuthorizationCodeList(ctx context.Conte
 					WHEN ac.start_date <= NOW() AND ac.end_date >= NOW() THEN 'normal'
 					ELSE 'expired'
 				END AS status`).
-		Joins("LEFT JOIN customers c ON ac.customer_id = c.id AND c.deleted_at IS NULL")
+		Joins("LEFT JOIN customers c ON ac.customer_id = c.id AND c.deleted_at IS NULL").
+		Joins(`LEFT JOIN (
+			SELECT authorization_code_id, COUNT(*) AS active_count
+			FROM licenses
+			WHERE status = 'active' AND deleted_at IS NULL
+			GROUP BY authorization_code_id
+		) l ON ac.id = l.authorization_code_id`)
 
 	// 添加筛选条件
 	if req.CustomerID != "" {
@@ -103,18 +110,19 @@ func (r *authorizationCodeRepository) GetAuthorizationCodeList(ctx context.Conte
 
 	// 分页查询
 	var results []struct {
-		ID             string  `json:"id"`
-		Code           string  `json:"code"`
-		CustomerID     string  `json:"customer_id"`
-		CustomerName   *string `json:"customer_name"`
-		StartDate      string  `json:"start_date"`
-		EndDate        string  `json:"end_date"`
-		MaxActivations int     `json:"max_activations"`
-		DeploymentType string  `json:"deployment_type"`
-		IsLocked       bool    `json:"is_locked"`
-		Description    *string `json:"description"`
-		CreatedAt      string  `json:"created_at"`
-		Status         string  `json:"status"` // 添加状态字段
+		ID                 string  `json:"id"`
+		Code               string  `json:"code"`
+		CustomerID         string  `json:"customer_id"`
+		CustomerName       *string `json:"customer_name"`
+		StartDate          string  `json:"start_date"`
+		EndDate            string  `json:"end_date"`
+		MaxActivations     int     `json:"max_activations"`
+		CurrentActivations int     `json:"current_activations" gorm:"column:current_activations"`
+		DeploymentType     string  `json:"deployment_type"`
+		IsLocked           bool    `json:"is_locked"`
+		Description        *string `json:"description"`
+		CreatedAt          string  `json:"created_at"`
+		Status             string  `json:"status"` // 添加状态字段
 	}
 
 	offset := (page - 1) * pageSize
@@ -140,7 +148,7 @@ func (r *authorizationCodeRepository) GetAuthorizationCodeList(ctx context.Conte
 			StartDate:          result.StartDate,
 			EndDate:            result.EndDate,
 			MaxActivations:     result.MaxActivations,
-			CurrentActivations: 0, // TODO: 从licenses表统计
+			CurrentActivations: result.CurrentActivations,
 			DeploymentType:     result.DeploymentType,
 			IsLocked:           result.IsLocked,
 			Description:        result.Description,

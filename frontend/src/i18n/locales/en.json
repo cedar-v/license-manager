@@ -316,7 +316,7 @@
         "authorizationInfo": {
           "basicInfo": "Basic Information",
           "customerName": "Customer Name",
-          "customerId": "Customer ID",
+          "customerCode": "Customer Code",
           "createdBy": "Created By",
           "description": "Description",
           "title": "Authorization Information",
@@ -333,6 +333,54 @@
           "forActivation": "(For Client Activation)",
           "code": "Authorization Code",
           "tipText": "Provide this authorization code to the customer, who can automatically obtain the software license after configuring it in the software product"
+        },
+        "licenseInfo": {
+          "addButton": "Add License",
+          "emptyDescription": "No device licenses yet",
+          "deviceTitle": "Device {index}",
+          "deviceAddress": "Device address",
+          "lastActiveTime": "Last active time",
+          "hardwareSectionTitle": "Hardware Information",
+          "hardwareSectionSubtitle": "(Binding info)",
+          "hardwareFingerprint": "Hardware fingerprint",
+          "softwareSectionTitle": "Software License",
+          "softwareSectionSubtitle": "(Used for validation)",
+          "licenseKey": "License key",
+          "licenseStatus": "License status",
+          "statusDescription": "This license is generated and bound to the specified hardware for runtime validation.",
+          "messages": {
+            "loadError": "Failed to load license devices"
+          }
+        },
+        "licenseModal": {
+          "title": "Add License",
+          "description": "Bind this authorization code to a hardware fingerprint.",
+          "fields": {
+            "authorizationCode": "Authorization Code",
+            "hardwareFingerprint": "Hardware Fingerprint",
+            "remark": "Remark"
+          },
+          "placeholders": {
+            "hardwareFingerprint": "Enter hardware fingerprint",
+            "remark": "Add a remark (optional)"
+          },
+          "validation": {
+            "hardwareRequired": "Hardware fingerprint is required",
+            "hardwareMax": "Hardware fingerprint cannot exceed 200 characters",
+            "remarkMax": "Remark cannot exceed 3000 characters"
+          },
+          "messages": {
+            "success": "License created successfully",
+            "error": "Failed to create license",
+            "missingAuthorization": "Missing authorization code information",
+            "copySuccess": "Authorization code copied",
+            "copyError": "Failed to copy authorization code"
+          },
+          "buttons": {
+            "cancel": "Cancel",
+            "submit": "Create",
+            "copy": "Copy"
+          }
         },
         "actions": {
           "copyCode": "Copy License Code",
@@ -574,7 +622,7 @@
       "customerNotExist": "Customer data does not exist"
     },
     "basicInfo": {
-      "customerId": "Customer ID",
+      "customerCode": "Customer Code",
       "customerName": "Customer Name",
       "activatedDevices": "Activated Devices Count",
       "creationTime": "Creation Time",

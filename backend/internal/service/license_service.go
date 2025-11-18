@@ -125,14 +125,17 @@ func (s *licenseService) CreateLicense(ctx context.Context, req *models.LicenseC
 		return nil, i18n.NewI18nError("900004", lang, err.Error())
 	}
 
-	// 构建许可证实体
+	now := time.Now()
+
+	// 构建许可证实体，手动添加的离线许可证直接视为已激活
 	license := &models.License{
 		LicenseKey:          licenseKey,
 		AuthorizationCodeID: req.AuthorizationCodeID,
 		CustomerID:          authCode.CustomerID, // 从授权码获取客户ID
 		HardwareFingerprint: req.HardwareFingerprint,
 		ActivationIP:        req.ActivationIP,
-		Status:              "inactive", // 手动创建的许可证默认为未激活状态
+		Status:              "active",
+		ActivatedAt:         &now,
 	}
 
 	// 设置设备信息

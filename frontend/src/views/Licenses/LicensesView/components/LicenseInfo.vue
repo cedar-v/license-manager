@@ -1,48 +1,116 @@
 <template>
   <div class="license-info-container" v-loading="loading">
+    <el-dialog
+      v-model="addLicenseVisible"
+      class="license-add-dialog"
+      :title="t('pages.licenses.detail.licenseModal.title')"
+      width="520px"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      align-center
+      @closed="resetAddForm"
+    >
+      <p class="dialog-description">
+        {{ t('pages.licenses.detail.licenseModal.description') }}
+      </p>
+      <el-form
+        ref="addFormRef"
+        :model="addForm"
+        :rules="addFormRules"
+        label-position="top"
+        class="license-form-dialog"
+      >
+        <el-form-item :label="t('pages.licenses.detail.licenseModal.fields.authorizationCode')">
+          <div class="auth-code-row">
+            <el-input :model-value="authorizationCodeValue" readonly />
+            <el-button text type="primary" class="copy-btn" @click="handleCopyAuthorizationCode">
+              {{ t('pages.licenses.detail.licenseModal.buttons.copy') }}
+            </el-button>
+          </div>
+        </el-form-item>
+        <el-form-item
+          :label="t('pages.licenses.detail.licenseModal.fields.hardwareFingerprint')"
+          prop="hardware_fingerprint"
+        >
+          <el-input
+            v-model="addForm.hardware_fingerprint"
+            type="textarea"
+            :autosize="{ minRows: 3, maxRows: 5 }"
+            :placeholder="t('pages.licenses.detail.licenseModal.placeholders.hardwareFingerprint')"
+            maxlength="200"
+            show-word-limit
+          />
+        </el-form-item>
+        <el-form-item :label="t('pages.licenses.detail.licenseModal.fields.remark')" prop="remark">
+          <el-input
+            v-model="addForm.remark"
+            type="textarea"
+            :autosize="{ minRows: 3, maxRows: 5 }"
+            :placeholder="t('pages.licenses.detail.licenseModal.placeholders.remark')"
+            maxlength="3000"
+            show-word-limit
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="handleDialogCancel" :disabled="submitting">
+            {{ t('pages.licenses.detail.licenseModal.buttons.cancel') }}
+          </el-button>
+          <el-button type="primary" @click="submitAddLicense" :loading="submitting">
+            {{ t('pages.licenses.detail.licenseModal.buttons.submit') }}
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
+
     <!-- 新增许可证按钮 -->
     <div class="action-bar">
-      <el-button type="primary" @click="handleAddLicense">新增许可证</el-button>
+      <el-button type="primary" @click="handleAddLicense">{{
+        t('pages.licenses.detail.licenseInfo.addButton')
+      }}</el-button>
     </div>
 
     <!-- 设备列表 -->
     <div v-if="!loading && devices.length > 0" class="devices-list">
-      <div v-for="(device, index) in devices" :key="device.id" class="device-card">
+        <div v-for="(device, index) in devices" :key="device.id" class="device-card">
         <!-- 设备头部 -->
         <div class="device-header">
           <div class="device-title-row">
-            <span class="device-title">设备{{ index + 1 }}</span>
+              <span class="device-title">
+                {{ t('pages.licenses.detail.licenseInfo.deviceTitle', { index: index + 1 }) }}
+              </span>
             <el-tag :type="device.is_online ? 'success' : 'danger'" size="small">
-              {{ device.is_online_display}}
+                {{ device.is_online_display }}
             </el-tag>
           </div>
           <div class="device-info-row">
-            <span class="device-info-item">设备地址：{{ device.last_online_ip || device.activation_ip || '-' }}</span>
-            <span class="device-info-item">最后活跃时间：{{ formatDateTime(device.last_heartbeat || '') }}</span>
+              <span class="device-info-item">
+                {{ t('pages.licenses.detail.licenseInfo.deviceAddress') }}：
+                {{ device.last_online_ip || device.activation_ip || '-' }}
+              </span>
+              <span class="device-info-item">
+                {{ t('pages.licenses.detail.licenseInfo.lastActiveTime') }}：
+                {{ formatDateTime(device.last_heartbeat || '') }}
+              </span>
           </div>
         </div>
 
         <!-- 硬件信息 -->
         <div class="info-section hardware-section">
           <div class="section-header">
-            <span class="section-title">硬件信息</span>
-            <span class="section-subtitle">（绑定信息）</span>
+            <span class="section-title">
+              {{ t('pages.licenses.detail.licenseInfo.hardwareSectionTitle') }}
+            </span>
+            <span class="section-subtitle">
+              {{ t('pages.licenses.detail.licenseInfo.hardwareSectionSubtitle') }}
+            </span>
           </div>
           <div class="info-grid">
             <div class="info-row">
-              <div class="info-label">机器序列号</div>
-              <div class="info-value">{{ device.device_info?.machine_code || '-' }}</div>
-            </div>
-            <div class="info-row">
-              <div class="info-label">MAC地址</div>
-              <div class="info-value">{{ device.device_info?.mac_address || '-' }}</div>
-            </div>
-            <div class="info-row">
-              <div class="info-label">CPU ID</div>
-              <div class="info-value">{{ device.device_info?.cpu_id || '-' }}</div>
-            </div>
-            <div class="info-row">
-              <div class="info-label">硬件哈希</div>
+              <div class="info-label">
+                {{ t('pages.licenses.detail.licenseInfo.hardwareFingerprint') }}
+              </div>
               <div class="info-value">{{ device.hardware_fingerprint || '-' }}</div>
             </div>
           </div>
@@ -51,17 +119,30 @@
         <!-- 软件许可证 -->
         <div class="info-section license-section">
           <div class="section-header">
-            <span class="section-title">软件许可证</span>
-            <span class="section-subtitle">（用于系统验证）</span>
+            <span class="section-title">
+              {{ t('pages.licenses.detail.licenseInfo.softwareSectionTitle') }}
+            </span>
+            <span class="section-subtitle">
+              {{ t('pages.licenses.detail.licenseInfo.softwareSectionSubtitle') }}
+            </span>
           </div>
           <div class="license-content">
             <div class="license-row">
-              <div class="license-label">许可证密钥</div>
+              <div class="license-label">
+                {{ t('pages.licenses.detail.licenseInfo.licenseKey') }}
+              </div>
               <div class="license-value">{{ device.license_key || '-' }}</div>
             </div>
             <div class="license-row">
-              <div class="license-label">许可证状态</div>
-              <div class="license-value status-text">{{ device.status_display || '此许可证已生成并绑定到指定硬件，可用于系统运行验证' }}</div>
+              <div class="license-label">
+                {{ t('pages.licenses.detail.licenseInfo.licenseStatus') }}
+              </div>
+              <div class="license-value status-text">
+                {{
+                  device.status_display ||
+                  t('pages.licenses.detail.licenseInfo.statusDescription')
+                }}
+              </div>
             </div>
           </div>
         </div>
@@ -70,18 +151,21 @@
 
     <!-- 空状态 -->
     <div v-if="!loading && devices.length === 0" class="empty-state">
-      <el-empty description="暂无设备许可证信息">
-        <el-button type="primary" @click="handleAddLicense">新增许可证</el-button>
+      <el-empty :description="t('pages.licenses.detail.licenseInfo.emptyDescription')">
+        <el-button type="primary" @click="handleAddLicense">
+          {{ t('pages.licenses.detail.licenseInfo.addButton') }}
+        </el-button>
       </el-empty>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
-import { ElMessage } from 'element-plus'
-import type { AuthorizationCode, LicenseDevice } from '@/api/license'
-import { getLicenseDevices, getLicenseDeviceDetail } from '@/api/license'
+import { ref, onMounted, watch, reactive, computed, nextTick } from 'vue'
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { useI18n } from 'vue-i18n'
+import type { AuthorizationCode, LicenseDevice, LicenseDeviceCreateRequest } from '@/api/license'
+import { getLicenseDevices, getLicenseDeviceDetail, createLicenseDevice } from '@/api/license'
 import { formatDate } from '@/utils/date'
 
 interface Props {
@@ -89,13 +173,53 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const { t } = useI18n()
 
 const devices = ref<LicenseDevice[]>([])
 const loading = ref(false)
+const addLicenseVisible = ref(false)
+const submitting = ref(false)
+const addFormRef = ref<FormInstance>()
+const addForm = reactive({
+  hardware_fingerprint: '',
+  remark: ''
+})
+
+const authorizationCodeId = computed(() => props.licenseData?.id || '')
+const authorizationCodeValue = computed(() => props.licenseData?.code || '--')
+
+const validateHardware = (_rule: any, value: string, callback: (error?: Error) => void) => {
+  const trimmed = value?.trim()
+  if (!trimmed) {
+    callback(new Error(t('pages.licenses.detail.licenseModal.validation.hardwareRequired')))
+    return
+  }
+  if (trimmed.length > 200) {
+    callback(new Error(t('pages.licenses.detail.licenseModal.validation.hardwareMax')))
+    return
+  }
+  callback()
+}
+
+const validateRemark = (_rule: any, value: string, callback: (error?: Error) => void) => {
+  const trimmed = value?.trim()
+  if (trimmed && trimmed.length > 3000) {
+    callback(new Error(t('pages.licenses.detail.licenseModal.validation.remarkMax')))
+    return
+  }
+  callback()
+}
+
+const addFormRules: FormRules = {
+  hardware_fingerprint: [
+    { validator: validateHardware, trigger: ['blur', 'change'] }
+  ],
+  remark: [{ validator: validateRemark, trigger: ['blur', 'change'] }]
+}
 
 // 获取设备列表
 const fetchDevices = async () => {
-  if (!props.licenseData?.id) {
+  if (!authorizationCodeId.value) {
     devices.value = []
     return
   }
@@ -103,7 +227,7 @@ const fetchDevices = async () => {
   loading.value = true
   try {
     const response = await getLicenseDevices({
-      authorization_code_id: props.licenseData.id,
+      authorization_code_id: authorizationCodeId.value,
       page: 1,
       page_size: 100
     })
@@ -133,7 +257,7 @@ const fetchDevices = async () => {
     }
   } catch (error) {
     console.error('获取设备列表失败:', error)
-    ElMessage.error('获取设备列表失败')
+    ElMessage.error(t('pages.licenses.detail.licenseInfo.messages.loadError'))
     devices.value = []
   } finally {
     loading.value = false
@@ -146,9 +270,12 @@ onMounted(() => {
 })
 
 // 监听licenseData变化，重新获取数据
-watch(() => props.licenseData?.id, () => {
-  fetchDevices()
-})
+watch(
+  () => authorizationCodeId.value,
+  () => {
+    fetchDevices()
+  }
+)
 
 // 格式化日期时间
 const formatDateTime = (dateTime: string) => {
@@ -156,16 +283,149 @@ const formatDateTime = (dateTime: string) => {
   return formatDate(dateTime)
 }
 
-// 处理新增许可证
+const resetAddForm = () => {
+  addForm.hardware_fingerprint = ''
+  addForm.remark = ''
+  nextTick(() => {
+    addFormRef.value?.clearValidate()
+  })
+}
+
+const handleDialogCancel = () => {
+  addLicenseVisible.value = false
+  resetAddForm()
+}
+
 const handleAddLicense = () => {
-  // TODO: 实现新增许可证逻辑
-  console.log('新增许可证')
+  if (!authorizationCodeId.value) {
+    ElMessage.warning(t('pages.licenses.detail.licenseModal.messages.missingAuthorization'))
+    return
+  }
+  addLicenseVisible.value = true
+  nextTick(() => {
+    addFormRef.value?.clearValidate()
+  })
+}
+
+const handleCopyAuthorizationCode = async () => {
+  if (!authorizationCodeValue.value || authorizationCodeValue.value === '--') {
+    ElMessage.warning(t('pages.licenses.detail.licenseModal.messages.missingAuthorization'))
+    return
+  }
+
+  try {
+    await navigator.clipboard.writeText(authorizationCodeValue.value)
+    ElMessage.success(t('pages.licenses.detail.licenseModal.messages.copySuccess'))
+  } catch (error) {
+    console.error('复制授权码失败:', error)
+    ElMessage.error(t('pages.licenses.detail.licenseModal.messages.copyError'))
+  }
+}
+
+const submitAddLicense = async () => {
+  if (!addFormRef.value) return
+
+  try {
+    await addFormRef.value.validate()
+    if (!authorizationCodeId.value) {
+      throw new Error(t('pages.licenses.detail.licenseModal.messages.missingAuthorization'))
+    }
+
+    submitting.value = true
+    const payload: LicenseDeviceCreateRequest = {
+      authorization_code_id: authorizationCodeId.value,
+      hardware_fingerprint: addForm.hardware_fingerprint.trim()
+    }
+
+    if (addForm.remark.trim()) {
+      payload.device_info = { remark: addForm.remark.trim() }
+    }
+
+    const response = await createLicenseDevice(payload)
+    if (response.code === '000000') {
+      ElMessage.success(
+        response.message || t('pages.licenses.detail.licenseModal.messages.success')
+      )
+      addLicenseVisible.value = false
+      resetAddForm()
+      await fetchDevices()
+    } else {
+      throw new Error(response.message || t('pages.licenses.detail.licenseModal.messages.error'))
+    }
+  } catch (error: any) {
+    console.error('创建许可证失败:', error)
+    ElMessage.error(error.message || t('pages.licenses.detail.licenseModal.messages.error'))
+  } finally {
+    submitting.value = false
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 .license-info-container {
   width: 100%;
+}
+
+.license-add-dialog {
+  :deep(.el-dialog) {
+    border-radius: 12px;
+    padding-bottom: 12px;
+  }
+
+  :deep(.el-dialog__header) {
+    margin-right: 0;
+    border-bottom: 1px solid #f0f2f5;
+    padding: 16px 24px;
+  }
+
+  :deep(.el-dialog__title) {
+    font-family: 'Source Han Sans CN', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1d1d1d;
+  }
+
+  :deep(.el-dialog__body) {
+    padding: 16px 24px 0;
+  }
+
+  :deep(.el-dialog__footer) {
+    padding: 0 24px 24px;
+  }
+}
+
+.dialog-description {
+  font-size: 14px;
+  color: #666;
+  line-height: 22px;
+  margin-bottom: 16px;
+}
+
+.license-form-dialog {
+  :deep(.el-form-item__label) {
+    font-weight: 500;
+    color: #1d1d1d;
+  }
+}
+
+.auth-code-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  :deep(.el-input__wrapper) {
+    background: rgba(247, 248, 250, 0.8);
+  }
+}
+
+.copy-btn {
+  padding: 0 8px;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
 }
 
 .action-bar {

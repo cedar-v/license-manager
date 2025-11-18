@@ -67,16 +67,16 @@
             align="center"
           >
             <template #default="scope">
-              <div 
+              <div
                 class="progress-container"
-                :class="{ 'zero-activated': (scope.row.activated_licenses_count || 0) === 0 }"
+                :class="{ 'zero-activated': getActivatedCount(scope.row) === 0 }"
               >
                 <el-progress
                   :percentage="getActivationProgress(scope.row)"
                   :stroke-width="8"
                   :show-text="true"
                   :text-inside="true"
-                  :format="() => `${scope.row.activated_licenses_count || 0}/${scope.row.max_activations}`"
+                  :format="() => `${getActivatedCount(scope.row)}/${scope.row.max_activations}`"
                 />
               </div>
             </template>
@@ -185,11 +185,21 @@ const getStatusClass = (status: string) => {
   }
 }
 
+const getActivatedCount = (row: AuthorizationCode) => {
+  if (typeof row.current_activations === 'number') {
+    return row.current_activations
+  }
+  if (typeof row.activated_licenses_count === 'number') {
+    return row.activated_licenses_count
+  }
+  return 0
+}
+
 const getActivationProgress = (row: AuthorizationCode) => {
   if (!row.max_activations || row.max_activations === 0) {
     return 0
   }
-  const activated = row.activated_licenses_count || 0
+  const activated = getActivatedCount(row)
   return Math.round((activated / row.max_activations) * 100)
 }
 
@@ -613,7 +623,7 @@ onMounted(async () => {
     z-index: 10;
   }
 
-  // 当 activated_licenses_count 为 0 时，文字显示为红色
+  // 当激活数量为 0 时，文字显示为红色
   &.zero-activated {
     :deep(.el-progress-bar__innerText),
     :deep(.el-progress__text) {

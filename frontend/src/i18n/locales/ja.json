@@ -316,7 +316,7 @@
         "authorizationInfo": {
           "basicInfo": "基本情報",
           "customerName": "顧客名",
-          "customerId": "顧客ID",
+          "customerCode": "顧客コード",
           "createdBy": "作成者",
           "description": "備考",
           "title": "認証情報",
@@ -333,6 +333,54 @@
           "forActivation": "（クライアントアクティベーション用）",
           "code": "認証コード",
           "tipText": "この認証コードを顧客に提供してください。顧客がソフトウェア製品で設定すると、ソフトウェアライセンスを自動的に取得できます"
+        },
+        "licenseInfo": {
+          "addButton": "ライセンスを追加",
+          "emptyDescription": "デバイスに紐づくライセンスはありません",
+          "deviceTitle": "デバイス{index}",
+          "deviceAddress": "デバイスアドレス",
+          "lastActiveTime": "最終アクティブ時間",
+          "hardwareSectionTitle": "ハードウェア情報",
+          "hardwareSectionSubtitle": "（バインド情報）",
+          "hardwareFingerprint": "ハードウェア指紋",
+          "softwareSectionTitle": "ソフトウェアライセンス",
+          "softwareSectionSubtitle": "（システム検証用）",
+          "licenseKey": "ライセンスキー",
+          "licenseStatus": "ライセンス状態",
+          "statusDescription": "このライセンスは指定ハードウェアにバインドされ、システム検証に利用されます",
+          "messages": {
+            "loadError": "デバイスライセンスの取得に失敗しました"
+          }
+        },
+        "licenseModal": {
+          "title": "ライセンスを追加",
+          "description": "この認証コードをハードウェア指紋に紐づけてください。",
+          "fields": {
+            "authorizationCode": "認証コード",
+            "hardwareFingerprint": "ハードウェア指紋",
+            "remark": "備考"
+          },
+          "placeholders": {
+            "hardwareFingerprint": "ハードウェア指紋を入力してください",
+            "remark": "備考（任意）を入力してください"
+          },
+          "validation": {
+            "hardwareRequired": "ハードウェア指紋を入力してください",
+            "hardwareMax": "ハードウェア指紋は200文字以内で入力してください",
+            "remarkMax": "備考は3000文字以内で入力してください"
+          },
+          "messages": {
+            "success": "ライセンスを作成しました",
+            "error": "ライセンスの作成に失敗しました",
+            "missingAuthorization": "認証コード情報が見つかりません",
+            "copySuccess": "認証コードをコピーしました",
+            "copyError": "認証コードのコピーに失敗しました"
+          },
+          "buttons": {
+            "cancel": "キャンセル",
+            "submit": "作成",
+            "copy": "コピー"
+          }
         },
         "actions": {
           "copyCode": "ライセンスコードをコピー",
@@ -574,7 +622,7 @@
       "customerNotExist": "顧客データが存在しません"
     },
     "basicInfo": {
-      "customerId": "顧客ID",
+      "customerCode": "顧客コード",
       "customerName": "顧客名",
       "activatedDevices": "アクティベート済みデバイス数",
       "creationTime": "作成日時",

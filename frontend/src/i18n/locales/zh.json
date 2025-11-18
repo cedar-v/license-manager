@@ -316,7 +316,7 @@
         "authorizationInfo": {
           "basicInfo": "基本信息",
           "customerName": "客户名称",
-          "customerId": "客户ID",
+          "customerCode": "客户编码",
           "createdBy": "创建人",
           "description": "备注",
           "title": "授权信息",
@@ -333,6 +333,54 @@
           "forActivation": "（用于客户端激活）",
           "code": "授权码",
           "tipText": "将此授权码提供给客户，客户在软件产品中配置后可自动获取软件许可证"
+        },
+        "licenseInfo": {
+          "addButton": "新增许可证",
+          "emptyDescription": "暂无设备许可证信息",
+          "deviceTitle": "设备{index}",
+          "deviceAddress": "设备地址",
+          "lastActiveTime": "最后活跃时间",
+          "hardwareSectionTitle": "硬件信息",
+          "hardwareSectionSubtitle": "（绑定信息）",
+          "hardwareFingerprint": "硬件指纹",
+          "softwareSectionTitle": "软件许可证",
+          "softwareSectionSubtitle": "（用于系统验证）",
+          "licenseKey": "许可证密钥",
+          "licenseStatus": "许可证状态",
+          "statusDescription": "此许可证已生成并绑定到指定硬件，可用于系统运行验证",
+          "messages": {
+            "loadError": "获取设备列表失败"
+          }
+        },
+        "licenseModal": {
+          "title": "新增许可证",
+          "description": "请填写硬件指纹信息，将授权码绑定到指定设备。",
+          "fields": {
+            "authorizationCode": "授权码",
+            "hardwareFingerprint": "硬件指纹",
+            "remark": "备注"
+          },
+          "placeholders": {
+            "hardwareFingerprint": "请输入硬件指纹信息",
+            "remark": "请输入备注信息（可选）"
+          },
+          "validation": {
+            "hardwareRequired": "请输入硬件指纹",
+            "hardwareMax": "硬件指纹长度不能超过200个字符",
+            "remarkMax": "备注长度不能超过3000个字符"
+          },
+          "messages": {
+            "success": "许可证创建成功",
+            "error": "许可证创建失败",
+            "missingAuthorization": "缺少授权码信息",
+            "copySuccess": "授权码已复制",
+            "copyError": "复制授权码失败"
+          },
+          "buttons": {
+            "cancel": "取消",
+            "submit": "创建",
+            "copy": "复制"
+          }
         },
         "actions": {
           "copyCode": "复制授权码",
@@ -574,7 +622,7 @@
         "customerNotExist": "客户数据不存在"
       },
       "basicInfo": {
-        "customerId": "客户ID",
+        "customerCode": "客户编码",
         "customerName": "客户名称",
         "activatedDevices": "已激活设备数量",
         "creationTime": "创建时间",

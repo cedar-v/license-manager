@@ -64,9 +64,10 @@ const { t } = useI18n()
 const defaultNavItems = computed(() => [
   { id: "dashboard", label: t('navigation.menu.dashboard'), href: "/dashboard", icon: "dashboard" },
   { id: "customers", label: t('navigation.menu.customers'), href: "/customers", icon: "customers" },
-  { id: "licenses", label: t('navigation.menu.licenses'), href: "/licenses", icon: "licenses" },
-  { id: "roles", label: t('navigation.menu.roles'), href: "/roles", icon: "roles" },
-  { id: "users", label: t('navigation.menu.users'), href: "/users", icon: "users" }
+  { id: "licenses", label: t('navigation.menu.licenses'), href: "/licenses", icon: "licenses" }
+  // 暂时隐藏角色和系统用户菜单，后续版本再开启
+  // { id: "roles", label: t('navigation.menu.roles'), href: "/roles", icon: "roles" },
+  // { id: "users", label: t('navigation.menu.users'), href: "/users", icon: "users" }
 ])
 
 // 使用 store 和路由
