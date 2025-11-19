@@ -6,7 +6,7 @@
       <div class="info-content">
         <div class="info-row">
           <div class="info-label">{{ t('pages.licenses.detail.authorizationInfo.customerName') }}：</div>
-          <div class="info-value">{{ licenseData?.customer_info.customer_name|| '-' }}</div>
+          <div class="info-value">{{ licenseData?.customer_info?.customer_name || '-' }}</div>
         </div>
         <div class="info-row">
           <div class="info-label">{{ t('pages.licenses.detail.authorizationInfo.customerCode') }}：</div>
