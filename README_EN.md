@@ -28,6 +28,9 @@ Access URL: [lm.cedar-v.com:18080](http://lm.cedar-v.com:18080)
 ### Customer Management
 ![Customer Management Page](docs/images/customer.png)
 
+### License Management
+![License Management Page](docs/images/license.png)
+
 The customer management module provides comprehensive customer information management features, including CRUD operations for customer data, status management, and authorization associations.
 
 ## Key Features
