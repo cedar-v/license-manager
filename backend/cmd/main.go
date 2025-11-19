@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"license-manager/internal/api/routes"
 	"license-manager/internal/config"
@@ -53,10 +54,27 @@ func main() {
 
 	cfg := config.GetConfig()
 
-	// 初始化数据库
-	if err := database.InitDatabase(&cfg.Database); err != nil {
-		log.Fatalf("数据库初始化失败: %v", err)
+	// 初始化数据库（失败时重试）
+	const (
+		maxDBRetries  = 200
+		retryInterval = 3 * time.Second
+	)
+
+	var dbErr error
+	for attempt := 1; attempt <= maxDBRetries; attempt++ {
+		dbErr = database.InitDatabase(&cfg.Database)
+		if dbErr == nil {
+			break
+		}
+
+		if attempt == maxDBRetries {
+			log.Fatalf("数据库初始化失败: %v", dbErr)
+		}
+
+		log.Warnf("数据库初始化失败(第%d次): %v，将在 %v 后重试...", attempt, dbErr, retryInterval)
+		time.Sleep(retryInterval)
 	}
+
 	defer database.Close()
 
 	// 运行数据库迁移
