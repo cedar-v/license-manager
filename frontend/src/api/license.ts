@@ -26,8 +26,9 @@ export interface AuthorizationCode {
   feature_config?: any;
   usage_limits?: any;
   custom_parameters?: any;
-  customer_info:{
-    customer_name: string;
+  customer_info?: {
+    customer_code?: string;
+    customer_name?: string;
   }
 }
 
