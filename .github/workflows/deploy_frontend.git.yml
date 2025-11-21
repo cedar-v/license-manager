@@ -58,8 +58,8 @@ jobs:
         echo "Build completed, checking production directory:"
         ls -la production/
 
-    # 预处理部署目录权限
-    - name: Prepare deployment directory
+    # 预处理临时部署目录（不影响当前服务）
+    - name: Prepare temp deployment directory
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.HOST_PI }}
@@ -67,18 +67,15 @@ jobs:
         password: ${{ secrets.PASS_PI }}
         port: 22
         script: |
-          echo "Preparing deployment directory..."
+          set -e
+          echo "Preparing temp deployment directory..."
           
-          # 停止nginx避免文件占用
-          sudo nginx -s quit 2>/dev/null || true
-          
-          # 清理旧文件并重建目录结构
-          sudo rm -rf /home/pi/lm-www/frontend
-          sudo mkdir -p /home/pi/lm-www/frontend
+          sudo rm -rf /home/pi/lm-www/frontend_tmp
+          sudo mkdir -p /home/pi/lm-www/frontend_tmp
           
           # 设置正确的目录权限供文件传输
-          sudo chown -R pi:pi /home/pi/lm-www/frontend
-          sudo chmod -R 755 /home/pi/lm-www/frontend
+          sudo chown -R pi:pi /home/pi/lm-www/frontend_tmp
+          sudo chmod -R 755 /home/pi/lm-www/frontend_tmp
 
     # 将构建产物传输到服务器
     - name: Copy build files to server
@@ -89,7 +86,7 @@ jobs:
         password: ${{ secrets.PASS_PI }}
         port: 22
         source: "frontend/production/*"
-        target: "/home/pi/lm-www/"
+        target: "/home/pi/lm-www/frontend_tmp/"
         overwrite: true
 
     # 完成部署配置
@@ -103,12 +100,28 @@ jobs:
         script: |
           echo "Finalizing deployment..."
           
-          # 设置Web服务器权限
+          set -e
+          
+          if [ ! -d /home/pi/lm-www/frontend_tmp ]; then
+            echo "❌ Temp directory not found, aborting."
+            exit 1
+          fi
+          
+          echo "Stopping nginx..."
+          sudo systemctl stop nginx || true
+          
+          echo "Switching deployment directories..."
+          sudo rm -rf /home/pi/lm-www/frontend_prev
+          if [ -d /home/pi/lm-www/frontend ]; then
+            sudo mv /home/pi/lm-www/frontend /home/pi/lm-www/frontend_prev
+          fi
+          sudo mv /home/pi/lm-www/frontend_tmp /home/pi/lm-www/frontend
+          
+          echo "Setting web server permissions..."
           sudo chown -R www-data:www-data /home/pi/lm-www/frontend/
           sudo chmod -R 644 /home/pi/lm-www/frontend/
           sudo find /home/pi/lm-www/frontend/ -type d -exec chmod 755 {} \;
           
-          # 启动nginx并验证
           echo "Starting nginx..."
           if sudo nginx -t; then
             sudo systemctl start nginx
@@ -116,12 +129,23 @@ jobs:
             
             if sudo systemctl is-active --quiet nginx; then
               echo "✅ Frontend deployment completed successfully!"
+              sudo rm -rf /home/pi/lm-www/frontend_prev
             else
-              echo "❌ Nginx failed to start"
+              echo "❌ Nginx failed to start, attempting rollback..."
+              if [ -d /home/pi/lm-www/frontend_prev ]; then
+                sudo rm -rf /home/pi/lm-www/frontend
+                sudo mv /home/pi/lm-www/frontend_prev /home/pi/lm-www/frontend
+              fi
+              sudo systemctl start nginx || true
+              sudo systemctl reload nginx || true
               sudo systemctl status nginx --no-pager -l
               exit 1
             fi
           else
-            echo "❌ Nginx configuration test failed!"
+            echo "❌ Nginx configuration test failed! Rolling back..."
+            if [ -d /home/pi/lm-www/frontend_prev ]; then
+              sudo rm -rf /home/pi/lm-www/frontend
+              sudo mv /home/pi/lm-www/frontend_prev /home/pi/lm-www/frontend
+            fi
             exit 1
           fi
