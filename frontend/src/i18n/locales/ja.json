@@ -405,6 +405,11 @@
           "revokeTitle": "警告",
           "revokeConfirmButton": "取り消し確認",
           "revokeCancelButton": "キャンセル",
+          "revokeReasonPlaceholder": "取り消し理由を入力してください",
+          "revokeReasonRequired": "取り消し理由は必須です",
+          "revokeReasonMax": "取り消し理由は500文字以内で入力してください",
+          "revokeSuccess": "ライセンスを正常に取り消しました",
+          "revokeError": "ライセンスの取り消しに失敗しました。後でもう一度お試しください",
           "loadError": "ライセンス詳細の読み込みに失敗しました",
           "missingId": "ライセンスIDが不足しています"
         }

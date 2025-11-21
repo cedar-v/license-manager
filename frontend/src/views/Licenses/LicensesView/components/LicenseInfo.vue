@@ -157,6 +157,16 @@
           >
             {{ t('pages.licenses.detail.licenseInfo.downloadButton') }}
           </el-button>
+          <el-button
+            class="revoke-license-btn"
+            type="danger"
+            plain
+            :loading="isRevoking(device.id)"
+            :disabled="device.status === 'revoked'"
+            @click="handleRevokeLicense(device)"
+          >
+            {{ t('pages.licenses.detail.actions.revokeLicense') }}
+          </el-button>
         </div>
       </div>
     </div>
@@ -174,15 +184,19 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, reactive, computed, nextTick } from 'vue'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import type { AuthorizationCode, LicenseDevice, LicenseDeviceCreateRequest } from '@/api/license'
-import { getLicenseDevices, getLicenseDeviceDetail, createLicenseDevice, downloadLicenseFile } from '@/api/license'
+import { getLicenseDevices, getLicenseDeviceDetail, createLicenseDevice, downloadLicenseFile, revokeLicense } from '@/api/license'
 import { formatDate } from '@/utils/date'
 
 interface Props {
   licenseData: AuthorizationCode | null
 }
+
+const emit = defineEmits<{
+  (e: 'licenseRevoked'): void
+}>()
 
 const props = defineProps<Props>()
 const { t } = useI18n()
@@ -197,6 +211,7 @@ const addForm = reactive({
   remark: ''
 })
 const downloadingMap = reactive<Record<string, boolean>>({})
+const revokingMap = reactive<Record<string, boolean>>({})
 
 const authorizationCodeId = computed(() => props.licenseData?.id || '')
 const authorizationCodeValue = computed(() => props.licenseData?.code || '--')
@@ -339,6 +354,10 @@ const isDownloading = (licenseId: string) => {
   return Boolean(licenseId && downloadingMap[licenseId])
 }
 
+const isRevoking = (licenseId: string) => {
+  return Boolean(licenseId && revokingMap[licenseId])
+}
+
 const extractFilename = (contentDisposition?: string) => {
   if (!contentDisposition) return ''
   const utfMatch = /filename\*=utf-8''([^;]+)/i.exec(contentDisposition)
@@ -387,6 +406,57 @@ const handleDownloadLicense = async (device: LicenseDevice) => {
     )
   } finally {
     downloadingMap[device.id] = false
+  }
+}
+
+const handleRevokeLicense = async (device: LicenseDevice) => {
+  if (!device?.id) {
+    ElMessage.error(t('pages.licenses.detail.messages.missingId'))
+    return
+  }
+
+  if (device.status === 'revoked') {
+    return
+  }
+
+  let reason = ''
+  try {
+    const { value } = await ElMessageBox.prompt(
+      t('pages.licenses.detail.messages.revokeConfirm'),
+      t('pages.licenses.detail.messages.revokeTitle'),
+      {
+        confirmButtonText: t('pages.licenses.detail.messages.revokeConfirmButton'),
+        cancelButtonText: t('pages.licenses.detail.messages.revokeCancelButton'),
+        type: 'warning',
+        inputType: 'textarea',
+        inputPlaceholder: t('pages.licenses.detail.messages.revokeReasonPlaceholder'),
+        inputValidator: (val: string) => {
+          if (!val || !val.trim()) {
+            return t('pages.licenses.detail.messages.revokeReasonRequired')
+          }
+          if (val.trim().length > 500) {
+            return t('pages.licenses.detail.messages.revokeReasonMax')
+          }
+          return true
+        },
+        inputErrorMessage: t('pages.licenses.detail.messages.revokeReasonRequired')
+      }
+    )
+    reason = value.trim()
+  } catch {
+    return
+  }
+
+  revokingMap[device.id] = true
+  try {
+    await revokeLicense(device.id, reason)
+    ElMessage.success(t('pages.licenses.detail.messages.revokeSuccess'))
+    await fetchDevices()
+    emit('licenseRevoked')
+  } catch (error: any) {
+    ElMessage.error(error?.message || t('pages.licenses.detail.messages.revokeError'))
+  } finally {
+    revokingMap[device.id] = false
   }
 }
 
@@ -710,6 +780,21 @@ const submitAddLicense = async () => {
 .download-section {
   display: flex;
   justify-content: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.revoke-license-btn {
+  min-width: 148px;
+  border: 1px solid #F0142F;
+  color: #F0142F;
+  background: transparent;
+
+  &:hover:not(.is-disabled) {
+    background: rgba(240, 20, 47, 0.08);
+    color: #d01228;
+    border-color: #d01228;
+  }
 }
 
 .empty-state {

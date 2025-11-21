@@ -405,6 +405,11 @@
           "revokeTitle": "Warning",
           "revokeConfirmButton": "Confirm Revoke",
           "revokeCancelButton": "Cancel",
+          "revokeReasonPlaceholder": "Please enter revocation reason",
+          "revokeReasonRequired": "Revocation reason is required",
+          "revokeReasonMax": "Revocation reason cannot exceed 500 characters",
+          "revokeSuccess": "License revoked successfully",
+          "revokeError": "Failed to revoke the license, please try again later",
           "loadError": "Failed to load license details",
           "missingId": "Missing license ID"
         }

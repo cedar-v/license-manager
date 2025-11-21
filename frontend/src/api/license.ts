@@ -215,6 +215,13 @@ export function deactivateLicense(id: string): Promise<ApiResponse<Authorization
   return Axios.patch(`/api/v1/authorization-codes/${id}/deactivate`)
 }
 
+/**
+ * 撤销许可证
+ */
+export function revokeLicense(id: string, reason: string): Promise<ApiResponse> {
+  return Axios.put(`/api/v1/licenses/${id}/revoke`, { reason })
+}
+
 // 许可证设备信息类型（与后端 LicenseListItem 对应）
 export interface LicenseDevice {
   id: string

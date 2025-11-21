@@ -62,9 +62,6 @@
             <el-button class="action-btn-inline renew-btn" @click="handleRenewLicense">
               {{ $t('pages.licenses.detail.actions.renewLicense') }}
             </el-button>
-            <el-button class="action-btn-inline revoke-btn" @click="handleRevokeLicense">
-              {{ $t('pages.licenses.detail.actions.revokeLicense') }}
-            </el-button>
             <el-button class="action-btn-inline download-btn" @click="handleDownloadCertificate">
               {{ $t('pages.licenses.detail.actions.downloadCertificate') }}
             </el-button>
@@ -75,7 +72,11 @@
         <div class="tab-content-area">
           <BasicInfo v-if="activeTab === 'basic'" :license-data="licenseData" />
           <AuthorizationInfo v-if="activeTab === 'authorization'" :license-data="licenseData" />
-          <LicenseInfo v-if="activeTab === 'license'" :license-data="licenseData" />
+          <LicenseInfo
+            v-if="activeTab === 'license'"
+            :license-data="licenseData"
+            @license-revoked="loadLicenseData"
+          />
           <ChangeHistory v-if="activeTab === 'history'" :license-data="licenseData" />
         </div>
       </div>
@@ -86,7 +87,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import { getLicenseDetail, type AuthorizationCode } from '@/api/license'
 import LicenseTabIcon from '@/components/common/icons/LicenseTabIcon.vue'
@@ -139,18 +140,6 @@ const handleUpdateLicense = () => {
 
 const handleRenewLicense = () => {
   ElMessage.info(t('pages.licenses.detail.messages.renewComingSoon'))
-}
-
-const handleRevokeLicense = () => {
-  ElMessageBox.confirm(t('pages.licenses.detail.messages.revokeConfirm'), t('pages.licenses.detail.messages.revokeTitle'), {
-    confirmButtonText: t('pages.licenses.detail.messages.revokeConfirmButton'),
-    cancelButtonText: t('pages.licenses.detail.messages.revokeCancelButton'),
-    type: 'warning'
-  }).then(() => {
-    ElMessage.info(t('pages.licenses.detail.messages.revokeComingSoon'))
-  }).catch(() => {
-    // 取消操作
-  })
 }
 
 const handleDownloadCertificate = () => {
@@ -396,16 +385,6 @@ onMounted(() => {
 
     &:hover {
       background: #019C7C;
-    }
-  }
-
-  &.revoke-btn {
-    background: #F0142F;
-    color: white;
-    border: none;
-
-    &:hover {
-      background: #d01228;
     }
   }
 

@@ -390,7 +390,7 @@
           "copyCode": "复制授权码",
           "updateLicense": "变更授权",
           "renewLicense": "延期授权",
-          "revokeLicense": "吊销授权",
+          "revokeLicense": "撤销许可证",
           "downloadCertificate": "下载部署包"
         },
         "messages": {
@@ -399,12 +399,17 @@
           "codeEmpty": "授权码为空",
           "updateComingSoon": "变更授权功能开发中...",
           "renewComingSoon": "延期授权功能开发中...",
-          "revokeComingSoon": "吊销授权功能开发中...",
+          "revokeComingSoon": "撤销许可证功能开发中...",
           "downloadComingSoon": "下载凭单功能开发中...",
-          "revokeConfirm": "确定要吊销此授权吗？此操作不可撤销！",
+          "revokeConfirm": "确定要撤销此许可证吗？此操作不可逆！",
           "revokeTitle": "警告",
-          "revokeConfirmButton": "确定吊销",
+          "revokeConfirmButton": "确定撤销",
           "revokeCancelButton": "取消",
+          "revokeReasonPlaceholder": "请输入撤销原因",
+          "revokeReasonRequired": "请填写撤销原因",
+          "revokeReasonMax": "撤销原因不能超过500个字符",
+          "revokeSuccess": "许可证已成功撤销",
+          "revokeError": "撤销许可证失败，请稍后重试",
           "loadError": "加载授权详情失败",
           "missingId": "缺少授权ID"
         }
