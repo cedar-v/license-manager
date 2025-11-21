@@ -98,15 +98,21 @@
 
       <!-- 操作按钮组 -->
       <div class="action-buttons">
-        <!-- 搜索按钮 -->
+        <!-- 搜索按钮（暂时禁用） -->
+        <!--
         <el-tooltip :content="t('navigation.tooltip.search')" placement="bottom">
           <button class="action-btn" @click="handleSearchClick">
             <NavIcon name="search" />
           </button>
         </el-tooltip>
+        -->
 
-        <!-- 通知按钮 -->
-        <el-tooltip :content="t('navigation.tooltip.notification')" placement="bottom">
+        <!-- 通知按钮（暂时隐藏） -->
+        <el-tooltip
+          v-if="showNotification"
+          :content="t('navigation.tooltip.notification')"
+          placement="bottom"
+        >
           <button class="action-btn notification-btn" @click="handleNotificationClick">
             <NavIcon name="notification" />
             <span v-if="notificationCount" class="notification-badge">
@@ -116,11 +122,28 @@
         </el-tooltip>
 
         <!-- 语言切换按钮 -->
-        <el-tooltip :content="t('navigation.tooltip.language')" placement="bottom">
-          <button class="action-btn" @click="handleLanguageClick">
-            <NavIcon name="language" />
-          </button>
-        </el-tooltip>
+        <el-dropdown trigger="click" @command="handleLanguageChange">
+          <span class="dropdown-trigger">
+            <el-tooltip :content="t('navigation.tooltip.language')" placement="bottom">
+              <button class="action-btn language-btn">
+                <NavIcon name="language" />
+                <span class="language-label">{{ currentLanguageLabel }}</span>
+              </button>
+            </el-tooltip>
+          </span>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item
+                v-for="option in languageOptions"
+                :key="option.code"
+                :command="option.code"
+                :class="{ active: option.code === currentLanguage }"
+              >
+                {{ option.label }}
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
 
         <!-- 主题切换按钮 -->
         <el-tooltip :content="t('navigation.tooltip.theme')" placement="bottom">
@@ -134,7 +157,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { ElMessageBox, ElMessage } from 'element-plus'
@@ -142,6 +165,7 @@ import { useAppStore } from '@/store/modules/app'
 import { useUserStore } from '@/store/modules/user'
 import NavIcon from '@/components/common/icons/NavIcon.vue'
 import { useBreadcrumb } from '@/utils/breadcrumb'
+import { changeLanguage, type SupportedLocale } from '@/utils/language'
 
 // 组件属性接口定义
 interface Props {
@@ -150,6 +174,9 @@ interface Props {
 
 // 定义组件属性和默认值
 const { notificationCount = 24 } = defineProps<Props>()
+
+// 功能暂未启用，隐藏通知入口
+const showNotification = false
 
 // 定义组件事件
 const emit = defineEmits<{
@@ -162,7 +189,7 @@ const emit = defineEmits<{
 }>()
 
 // 使用国际化
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 // 使用store和组合函数
 const router = useRouter()
@@ -207,10 +234,30 @@ const handleNotificationClick = () => {
   emit('notificationClick')
 }
 
-// 处理语言切换点击
-const handleLanguageClick = () => {
+// 语言切换
+const languageOptions: Array<{ code: SupportedLocale; label: string }> = [
+  { code: 'en', label: 'English' },
+  { code: 'zh', label: '中文' },
+  { code: 'ja', label: '日本語' }
+]
+const currentLanguage = ref(locale.value as SupportedLocale)
+const currentLanguageLabel = computed(
+  () => languageOptions.find(option => option.code === currentLanguage.value)?.label || ''
+)
+const handleLanguageChange = (lang: SupportedLocale) => {
+  if (lang === currentLanguage.value) return
+  changeLanguage(lang)
+  currentLanguage.value = lang
   emit('languageClick')
+  window.location.reload()
 }
+watch(
+  locale,
+  value => {
+    currentLanguage.value = value as SupportedLocale
+  },
+  { immediate: true }
+)
 
 // 处理主题切换点击
 const handleThemeClick = () => {
@@ -541,6 +588,25 @@ const handleUserCommand = async (command: string) => {
   background: var(--el-color-primary-light-9);
 }
 
+.dropdown-trigger {
+  display: inline-flex;
+}
+
+.language-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: auto;
+  min-width: 40px;
+  padding: 0 12px;
+}
+
+.language-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--app-text-primary);
+}
+
 /* 通知徽章 */
 .notification-badge {
   position: absolute;
@@ -559,6 +625,11 @@ const handleUserCommand = async (command: string) => {
   justify-content: center;
   font-family: 'Roboto', sans-serif;
   line-height: 1.3;
+}
+
+:deep(.el-dropdown-menu__item.active) {
+  color: var(--el-color-primary) !important;
+  font-weight: 600;
 }
 
 /* 侧边栏状态配合 - 桌面端 */
