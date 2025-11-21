@@ -1,3 +1,4 @@
+import type { AxiosResponse } from 'axios'
 import Axios from './https'
 // 授权码(AuthorizationCode)类型 - 供授权管理页面使用
 export interface AuthorizationCode {
@@ -301,6 +302,15 @@ export function getLicenseDevices(params: LicenseListQueryRequest): Promise<Lice
  */
 export function getLicenseDeviceDetail(id: string): Promise<ApiResponse<LicenseDetail>> {
   return Axios.get(`/api/v1/licenses/${id}`)
+}
+
+/**
+ * 下载许可证文件
+ */
+export function downloadLicenseFile(id: string): Promise<AxiosResponse<Blob>> {
+  return Axios.get(`/api/v1/licenses/${id}/download`, {
+    responseType: 'blob'
+  })
 }
 
 // 创建许可证请求（手动绑定设备）

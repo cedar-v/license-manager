@@ -38,10 +38,10 @@
         </div>
       </div>
 
-      <!-- 剩余时间（天） -->
+      <!-- 剩余时间 -->
       <div class="stat-card stat-card-4">
         <div class="card-content">
-          <div class="stat-value">{{ getRemainingDays(licenseData?.end_date) }}</div>
+          <div class="stat-value">{{ formatRemainingTime(licenseData?.end_date) }}</div>
           <div class="stat-label">{{ $t('customers.basicInfo.remainingDays') }}</div>
         </div>
       </div>
@@ -52,12 +52,14 @@
 <script setup lang="ts">
 import type { AuthorizationCode } from '@/api/license'
 import { formatDateShort as formatDateUtil } from '@/utils/date'
+import { useI18n } from 'vue-i18n'
 
 interface Props {
   licenseData: AuthorizationCode | null
 }
 
 defineProps<Props>()
+const { t } = useI18n()
 
 const getActivatedLicenses = (license?: AuthorizationCode | null) => {
   if (!license) return 0
@@ -75,13 +77,34 @@ const formatDateShort = (date?: string) => {
   return formatDateUtil(date)
 }
 
-const getRemainingDays = (endDate?: string) => {
+const formatRemainingTime = (endDate?: string) => {
   if (!endDate) return '-'
-  const now = new Date()
   const end = new Date(endDate)
-  const diff = end.getTime() - now.getTime()
-  const days = Math.ceil(diff / (1000 * 60 * 60 * 24))
-  return days > 0 ? days : 0
+  if (Number.isNaN(end.getTime())) return '-'
+  const now = new Date()
+  const diffMs = end.getTime() - now.getTime()
+  const days = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)))
+
+  if (days > 36500) {
+    return t('customers.basicInfo.remainingTime.permanent')
+  }
+
+  if (days >= 731) {
+    const years = Math.floor(days / 365)
+    return t('customers.basicInfo.remainingTime.years', { years })
+  }
+
+  if (days >= 366) {
+    const years = Math.floor(days / 365)
+    const remainingDays = days - years * 365
+    if (remainingDays === 0) {
+      return t('customers.basicInfo.remainingTime.years', { years })
+    }
+    const months = Math.max(1, Math.round(remainingDays / 30))
+    return t('customers.basicInfo.remainingTime.yearMonth', { years, months })
+  }
+
+  return t('customers.basicInfo.remainingTime.days', { days })
 }
 </script>
 

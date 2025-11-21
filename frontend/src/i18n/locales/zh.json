@@ -348,8 +348,12 @@
           "licenseKey": "许可证密钥",
           "licenseStatus": "许可证状态",
           "statusDescription": "此许可证已生成并绑定到指定硬件，可用于系统运行验证",
+          "downloadButton": "许可证文件下载",
           "messages": {
-            "loadError": "获取设备列表失败"
+            "loadError": "获取设备列表失败",
+            "downloadSuccess": "许可证文件已开始下载",
+            "downloadError": "下载许可证文件失败",
+            "missingLicense": "未找到许可证信息"
           }
         },
         "licenseModal": {
@@ -627,7 +631,13 @@
         "activatedDevices": "已激活设备数量",
         "creationTime": "创建时间",
         "expiryTime": "到期时间",
-        "remainingDays": "剩余时间（天）"
+      "remainingDays": "剩余时间",
+      "remainingTime": {
+        "permanent": "永久",
+        "years": "{years}年",
+        "yearMonth": "{years}年{months}个月",
+        "days": "{days}天"
+      }
       }
   }
 }

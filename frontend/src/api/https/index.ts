@@ -74,7 +74,11 @@ Axios.interceptors.request.use(config => {
 })
 // 添加响应拦截器
 Axios.interceptors.response.use(response => {
-  // console.log(response)
+  // 处理文件下载等二进制响应
+  if (response.config?.responseType === 'blob') {
+    return response
+  }
+
   const apiData = response.data as any
   // 这个 Code 是和后端约定的业务 Code
   const code = apiData.code

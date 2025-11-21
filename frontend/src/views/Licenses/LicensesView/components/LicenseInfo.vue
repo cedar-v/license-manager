@@ -146,6 +146,18 @@
             </div>
           </div>
         </div>
+
+        <!-- 下载按钮 -->
+        <div class="download-section">
+          <el-button
+            class="download-license-btn"
+            type="primary"
+            :loading="isDownloading(device.id)"
+            @click="handleDownloadLicense(device)"
+          >
+            {{ t('pages.licenses.detail.licenseInfo.downloadButton') }}
+          </el-button>
+        </div>
       </div>
     </div>
 
@@ -165,7 +177,7 @@ import { ref, onMounted, watch, reactive, computed, nextTick } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import type { AuthorizationCode, LicenseDevice, LicenseDeviceCreateRequest } from '@/api/license'
-import { getLicenseDevices, getLicenseDeviceDetail, createLicenseDevice } from '@/api/license'
+import { getLicenseDevices, getLicenseDeviceDetail, createLicenseDevice, downloadLicenseFile } from '@/api/license'
 import { formatDate } from '@/utils/date'
 
 interface Props {
@@ -184,6 +196,7 @@ const addForm = reactive({
   hardware_fingerprint: '',
   remark: ''
 })
+const downloadingMap = reactive<Record<string, boolean>>({})
 
 const authorizationCodeId = computed(() => props.licenseData?.id || '')
 const authorizationCodeValue = computed(() => props.licenseData?.code || '--')
@@ -319,6 +332,61 @@ const handleCopyAuthorizationCode = async () => {
   } catch (error) {
     console.error('复制授权码失败:', error)
     ElMessage.error(t('pages.licenses.detail.licenseModal.messages.copyError'))
+  }
+}
+
+const isDownloading = (licenseId: string) => {
+  return Boolean(licenseId && downloadingMap[licenseId])
+}
+
+const extractFilename = (contentDisposition?: string) => {
+  if (!contentDisposition) return ''
+  const utfMatch = /filename\*=utf-8''([^;]+)/i.exec(contentDisposition)
+  if (utfMatch?.[1]) {
+    try {
+      return decodeURIComponent(utfMatch[1])
+    } catch (error) {
+      console.warn('Failed to decode filename from header:', error)
+    }
+  }
+
+  const asciiMatch = /filename="?([^"]+)"?/i.exec(contentDisposition)
+  return asciiMatch?.[1] || ''
+}
+
+const handleDownloadLicense = async (device: LicenseDevice) => {
+  if (!device?.id) {
+    ElMessage.warning(t('pages.licenses.detail.licenseInfo.messages.missingLicense'))
+    return
+  }
+
+  downloadingMap[device.id] = true
+  try {
+    const response = await downloadLicenseFile(device.id)
+    const disposition =
+      response.headers?.['content-disposition'] || response.headers?.['Content-Disposition']
+    const filename =
+      extractFilename(disposition) ||
+      `${device.customer_name || 'license'}-${device.id}.lic`
+
+    const blobUrl = window.URL.createObjectURL(response.data)
+    const link = document.createElement('a')
+    link.href = blobUrl
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(blobUrl)
+
+    ElMessage.success(t('pages.licenses.detail.licenseInfo.messages.downloadSuccess'))
+  } catch (error: any) {
+    console.error('下载许可证失败:', error)
+    const backendMessage = error?.backendMessage || error?.message
+    ElMessage.error(
+      backendMessage || t('pages.licenses.detail.licenseInfo.messages.downloadError')
+    )
+  } finally {
+    downloadingMap[device.id] = false
   }
 }
 
@@ -621,6 +689,27 @@ const submitAddLicense = async () => {
       }
     }
   }
+
+  .download-license-btn {
+    min-width: 148px;
+    background: #00C27C;
+    border: none;
+    color: #FFFFFF;
+    font-family: 'Source Han Sans CN', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 21px;
+    border-radius: 4px;
+
+    &:hover {
+      background: #019C7C;
+    }
+  }
+}
+
+.download-section {
+  display: flex;
+  justify-content: flex-start;
 }
 
 .empty-state {

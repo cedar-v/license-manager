@@ -348,8 +348,12 @@
           "licenseKey": "License key",
           "licenseStatus": "License status",
           "statusDescription": "This license is generated and bound to the specified hardware for runtime validation.",
+          "downloadButton": "Download License File",
           "messages": {
-            "loadError": "Failed to load license devices"
+            "loadError": "Failed to load license devices",
+            "downloadSuccess": "License file download started",
+            "downloadError": "Failed to download license file",
+            "missingLicense": "License information not found"
           }
         },
         "licenseModal": {
@@ -627,7 +631,13 @@
       "activatedDevices": "Activated Devices Count",
       "creationTime": "Creation Time",
       "expiryTime": "Expiry Time",
-      "remainingDays": "Remaining Days"
+      "remainingDays": "Remaining Time",
+      "remainingTime": {
+        "permanent": "Permanent",
+        "years": "{years} year(s)",
+        "yearMonth": "{years} year(s) {months} month(s)",
+        "days": "{days} day(s)"
+      }
     }
   }
 }

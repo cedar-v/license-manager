@@ -13,10 +13,6 @@
           <div class="info-value">{{ licenseData?.customer_info?.customer_code || '-' }}</div>
         </div>
         <div class="info-row">
-          <div class="info-label">{{ t('pages.licenses.detail.authorizationInfo.createdBy') }}：</div>
-          <div class="info-value">{{ licenseData?.created_by || '-' }}</div>
-        </div>
-        <div class="info-row">
           <div class="info-label">{{ t('pages.licenses.detail.authorizationInfo.description') }}：</div>
           <div class="info-value">{{ licenseData?.description || '-' }}</div>
         </div>

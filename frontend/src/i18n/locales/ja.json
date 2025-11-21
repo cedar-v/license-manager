@@ -348,8 +348,12 @@
           "licenseKey": "ライセンスキー",
           "licenseStatus": "ライセンス状態",
           "statusDescription": "このライセンスは指定ハードウェアにバインドされ、システム検証に利用されます",
+          "downloadButton": "ライセンスファイルをダウンロード",
           "messages": {
-            "loadError": "デバイスライセンスの取得に失敗しました"
+            "loadError": "デバイスライセンスの取得に失敗しました",
+            "downloadSuccess": "ライセンスファイルのダウンロードを開始しました",
+            "downloadError": "ライセンスファイルのダウンロードに失敗しました",
+            "missingLicense": "ライセンス情報が見つかりません"
           }
         },
         "licenseModal": {
@@ -627,7 +631,13 @@
       "activatedDevices": "アクティベート済みデバイス数",
       "creationTime": "作成日時",
       "expiryTime": "有効期限",
-      "remainingDays": "残り日数"
+      "remainingDays": "残り時間",
+      "remainingTime": {
+        "permanent": "永久",
+        "years": "{years}年",
+        "yearMonth": "{years}年{months}ヶ月",
+        "days": "{days}日"
+      }
     }
   }
 }
