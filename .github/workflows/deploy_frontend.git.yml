@@ -50,6 +50,8 @@ jobs:
     - name: Type check and build
       run: |
         cd frontend
+        # 设置构建输出目录为 production
+        export VITE_OUTDIR=production
         # 并行执行类型检查和构建以节省时间
         npm run type-check &
         npm run build:prod &
@@ -68,7 +70,7 @@ jobs:
         port: 22
         script: |
           sudo rm -rf /home/pi/lm-www/frontend_tmp
-          sudo mkdir -p /home/pi/lm-www/frontend_tmp
+          sudo mkdir -p /home/pi/lm-www/frontend_tmp/production
           sudo chown -R pi:pi /home/pi/lm-www/frontend_tmp
 
     # 安装 rsync（用于带进度显示的文件传输）
@@ -94,7 +96,7 @@ jobs:
         sshpass -p "${{ secrets.PASS_PI }}" rsync -avz --info=progress2 \
           -e "ssh -o StrictHostKeyChecking=no" \
           frontend/production/ \
-          pi@${{ secrets.HOST_PI }}:/home/pi/lm-www/frontend_tmp/ > /tmp/rsync.log 2>&1 &
+          pi@${{ secrets.HOST_PI }}:/home/pi/lm-www/frontend_tmp/production/ > /tmp/rsync.log 2>&1 &
         RSYNC_PID=$!
         
         # 每10秒显示一次进度
@@ -103,10 +105,10 @@ jobs:
         
         while kill -0 $RSYNC_PID 2>/dev/null; do
           sleep 10
-          # 通过SSH检查目标目录大小
-          TRANSFERRED=$(sshpass -p "${{ secrets.PASS_PI }}" ssh -o StrictHostKeyChecking=no \
-            pi@${{ secrets.HOST_PI }} \
-            "du -sb /home/pi/lm-www/frontend_tmp 2>/dev/null | cut -f1" || echo "0")
+            # 通过SSH检查目标目录大小
+            TRANSFERRED=$(sshpass -p "${{ secrets.PASS_PI }}" ssh -o StrictHostKeyChecking=no \
+              pi@${{ secrets.HOST_PI }} \
+              "du -sb /home/pi/lm-www/frontend_tmp/production 2>/dev/null | cut -f1" || echo "0")
           
           if [ "$TRANSFERRED" != "0" ] && [ "$TOTAL_SIZE" != "0" ]; then
             PERCENT=$((TRANSFERRED * 100 / TOTAL_SIZE))
@@ -154,6 +156,10 @@ jobs:
           sudo chown -R www-data:www-data /home/pi/lm-www/frontend/
           sudo chmod -R 644 /home/pi/lm-www/frontend/
           sudo find /home/pi/lm-www/frontend/ -type d -exec chmod 755 {} \;
+          
+          echo "Verifying deployment structure..."
+          ls -la /home/pi/lm-www/frontend/
+          ls -la /home/pi/lm-www/frontend/production/ || echo "Warning: production directory not found"
           
           echo "Reloading nginx..."
           sudo systemctl reload nginx
