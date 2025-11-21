@@ -50,8 +50,9 @@ jobs:
     - name: Type check and build
       run: |
         cd frontend
-        # 设置构建输出目录为 production
+        # 设置构建环境变量，确保与本地构建一致
         export VITE_OUTDIR=production
+        export VITE_ADDRESS_BASE_URL=/production/
         # 并行执行类型检查和构建以节省时间
         npm run type-check &
         npm run build:prod &
@@ -59,6 +60,9 @@ jobs:
         # 检查构建结果
         echo "Build completed, checking production directory:"
         ls -la production/
+        # 验证构建产物中的 base 路径
+        echo "Verifying base path in index.html:"
+        grep -o 'href="/production/' production/index.html | head -1 || echo "Warning: base path not found"
 
     # 准备临时部署目录
     - name: Prepare temp directory
