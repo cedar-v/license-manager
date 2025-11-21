@@ -58,8 +58,8 @@ jobs:
         echo "Build completed, checking production directory:"
         ls -la production/
 
-    # 预处理临时部署目录（不影响当前服务）
-    - name: Prepare temp deployment directory
+    # 准备临时部署目录
+    - name: Prepare temp directory
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.HOST_PI }}
@@ -67,30 +67,76 @@ jobs:
         password: ${{ secrets.PASS_PI }}
         port: 22
         script: |
-          set -e
-          echo "Preparing temp deployment directory..."
-          
           sudo rm -rf /home/pi/lm-www/frontend_tmp
           sudo mkdir -p /home/pi/lm-www/frontend_tmp
-          
-          # 设置正确的目录权限供文件传输
           sudo chown -R pi:pi /home/pi/lm-www/frontend_tmp
-          sudo chmod -R 755 /home/pi/lm-www/frontend_tmp
 
-    # 将构建产物传输到服务器
-    - name: Copy build files to server
-      uses: appleboy/scp-action@v0.1.7
-      with:
-        host: ${{ secrets.HOST_PI }}
-        username: pi
-        password: ${{ secrets.PASS_PI }}
-        port: 22
-        source: "frontend/production/*"
-        target: "/home/pi/lm-www/frontend_tmp/"
-        overwrite: true
+    # 安装 rsync（用于带进度显示的文件传输）
+    - name: Install rsync
+      run: sudo apt-get update && sudo apt-get install -y rsync sshpass
 
-    # 完成部署配置
-    - name: Finalize deployment
+    # 计算要传输的文件总大小
+    - name: Calculate total size
+      id: calc_size
+      run: |
+        cd frontend/production
+        TOTAL_SIZE=$(du -sb . | cut -f1)
+        echo "total_size=$TOTAL_SIZE" >> $GITHUB_OUTPUT
+        echo "Total size to transfer: $(numfmt --to=iec-i --suffix=B $TOTAL_SIZE)"
+
+    # 将构建产物传输到服务器（带进度显示）
+    - name: Copy build files to server with progress
+      run: |
+        set -e
+        echo "Starting file transfer with rsync..."
+        
+        # 启动后台传输（使用 --info=progress2 只显示总体进度，减少输出）
+        sshpass -p "${{ secrets.PASS_PI }}" rsync -avz --info=progress2 \
+          -e "ssh -o StrictHostKeyChecking=no" \
+          frontend/production/ \
+          pi@${{ secrets.HOST_PI }}:/home/pi/lm-www/frontend_tmp/ > /tmp/rsync.log 2>&1 &
+        RSYNC_PID=$!
+        
+        # 每10秒显示一次进度
+        TOTAL_SIZE=${{ steps.calc_size.outputs.total_size }}
+        echo "📦 Total size: $(numfmt --to=iec-i --suffix=B $TOTAL_SIZE 2>/dev/null || echo "${TOTAL_SIZE}B")"
+        
+        while kill -0 $RSYNC_PID 2>/dev/null; do
+          sleep 10
+          # 通过SSH检查目标目录大小
+          TRANSFERRED=$(sshpass -p "${{ secrets.PASS_PI }}" ssh -o StrictHostKeyChecking=no \
+            pi@${{ secrets.HOST_PI }} \
+            "du -sb /home/pi/lm-www/frontend_tmp 2>/dev/null | cut -f1" || echo "0")
+          
+          if [ "$TRANSFERRED" != "0" ] && [ "$TOTAL_SIZE" != "0" ]; then
+            PERCENT=$((TRANSFERRED * 100 / TOTAL_SIZE))
+            TRANSFERRED_HR=$(numfmt --to=iec-i --suffix=B $TRANSFERRED 2>/dev/null || echo "${TRANSFERRED}B")
+            TOTAL_HR=$(numfmt --to=iec-i --suffix=B $TOTAL_SIZE 2>/dev/null || echo "${TOTAL_SIZE}B")
+            echo "📦 Transfer progress: $PERCENT% ($TRANSFERRED_HR / $TOTAL_HR)"
+          else
+            echo "📦 Transfer in progress..."
+          fi
+        done
+        
+        # 等待传输完成并检查退出码
+        wait $RSYNC_PID
+        EXIT_CODE=$?
+        
+        # 显示 rsync 的最后几行输出
+        echo "--- rsync output (last 20 lines) ---"
+        tail -20 /tmp/rsync.log || true
+        
+        if [ $EXIT_CODE -eq 0 ]; then
+          echo "✅ File transfer completed!"
+        else
+          echo "❌ File transfer failed with exit code $EXIT_CODE"
+          exit $EXIT_CODE
+        fi
+      env:
+        DEBIAN_FRONTEND: noninteractive
+
+    # 完成部署：直接替换并重启 nginx
+    - name: Deploy to production
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.HOST_PI }}
@@ -98,54 +144,18 @@ jobs:
         password: ${{ secrets.PASS_PI }}
         port: 22
         script: |
-          echo "Finalizing deployment..."
-          
           set -e
           
-          if [ ! -d /home/pi/lm-www/frontend_tmp ]; then
-            echo "❌ Temp directory not found, aborting."
-            exit 1
-          fi
-          
-          echo "Stopping nginx..."
-          sudo systemctl stop nginx || true
-          
-          echo "Switching deployment directories..."
-          sudo rm -rf /home/pi/lm-www/frontend_prev
-          if [ -d /home/pi/lm-www/frontend ]; then
-            sudo mv /home/pi/lm-www/frontend /home/pi/lm-www/frontend_prev
-          fi
+          echo "Deploying to production..."
+          sudo rm -rf /home/pi/lm-www/frontend
           sudo mv /home/pi/lm-www/frontend_tmp /home/pi/lm-www/frontend
           
-          echo "Setting web server permissions..."
+          echo "Setting permissions..."
           sudo chown -R www-data:www-data /home/pi/lm-www/frontend/
           sudo chmod -R 644 /home/pi/lm-www/frontend/
           sudo find /home/pi/lm-www/frontend/ -type d -exec chmod 755 {} \;
           
-          echo "Starting nginx..."
-          if sudo nginx -t; then
-            sudo systemctl start nginx
-            sudo systemctl reload nginx
-            
-            if sudo systemctl is-active --quiet nginx; then
-              echo "✅ Frontend deployment completed successfully!"
-              sudo rm -rf /home/pi/lm-www/frontend_prev
-            else
-              echo "❌ Nginx failed to start, attempting rollback..."
-              if [ -d /home/pi/lm-www/frontend_prev ]; then
-                sudo rm -rf /home/pi/lm-www/frontend
-                sudo mv /home/pi/lm-www/frontend_prev /home/pi/lm-www/frontend
-              fi
-              sudo systemctl start nginx || true
-              sudo systemctl reload nginx || true
-              sudo systemctl status nginx --no-pager -l
-              exit 1
-            fi
-          else
-            echo "❌ Nginx configuration test failed! Rolling back..."
-            if [ -d /home/pi/lm-www/frontend_prev ]; then
-              sudo rm -rf /home/pi/lm-www/frontend
-              sudo mv /home/pi/lm-www/frontend_prev /home/pi/lm-www/frontend
-            fi
-            exit 1
-          fi
+          echo "Reloading nginx..."
+          sudo systemctl reload nginx
+          
+          echo "✅ Deployment completed!"
