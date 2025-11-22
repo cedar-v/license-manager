@@ -224,11 +224,6 @@ const handleSidebarToggle = () => {
   emit('sidebarToggle')
 }
 
-// 处理搜索点击
-const handleSearchClick = () => {
-  emit('searchClick')
-}
-
 // 处理通知按钮点击
 const handleNotificationClick = () => {
   emit('notificationClick')
