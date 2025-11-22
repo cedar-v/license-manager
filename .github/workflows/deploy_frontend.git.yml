@@ -153,8 +153,14 @@ jobs:
           set -e
           
           echo "Deploying to production..."
-          sudo rm -rf /home/pi/lm-www/frontend
-          sudo mv /home/pi/lm-www/frontend_tmp /home/pi/lm-www/frontend
+          # 确保 frontend 目录存在
+          sudo mkdir -p /home/pi/lm-www/frontend
+          # 删除原有的 production 目录
+          sudo rm -rf /home/pi/lm-www/frontend/production
+          # 将新的 production 目录移过去
+          sudo mv /home/pi/lm-www/frontend_tmp/production /home/pi/lm-www/frontend/production
+          # 清理临时目录
+          sudo rm -rf /home/pi/lm-www/frontend_tmp
           
           echo "Setting permissions..."
           sudo chown -R www-data:www-data /home/pi/lm-www/frontend/
