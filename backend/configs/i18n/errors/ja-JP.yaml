@@ -96,7 +96,6 @@ enums:
   
   encryption_type:
     "standard": "標準暗号化"
-    "advanced": "高度暗号化"
   
   authorization_status:
     "normal": "正常"

@@ -1,11 +1,18 @@
 package handlers
 
 import (
+	"archive/zip"
+	"bytes"
 	"errors"
+	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"license-manager/internal/api/middleware"
+	"license-manager/internal/config"
 	"license-manager/internal/models"
 	"license-manager/internal/service"
 	"license-manager/pkg/i18n"
@@ -209,6 +216,148 @@ func (h *AuthorizationCodeHandler) GetAuthorizationCode(c *gin.Context) {
 		Message: successMessage,
 		Data:    data,
 	})
+}
+
+// DownloadAuthorizationFile 下载授权文件
+// @Summary 下载授权文件
+// @Description 下载授权码文件，包含授权码和RSA公钥，供客户端使用
+// @Tags 授权码管理
+// @Accept json
+// @Produce application/zip
+// @Security BearerAuth
+// @Param id path string true "授权码ID"
+// @Success 200 {file} binary "包含授权码文件和RSA公钥的压缩包"
+// @Failure 400 {object} models.ErrorResponse "请求参数无效"
+// @Failure 401 {object} models.ErrorResponse "未认证"
+// @Failure 404 {object} models.ErrorResponse "授权码不存在"
+// @Failure 409 {object} models.ErrorResponse "授权码不可用"
+// @Failure 500 {object} models.ErrorResponse "服务器内部错误"
+// @Router /api/v1/authorization-codes/{id}/download [get]
+func (h *AuthorizationCodeHandler) DownloadAuthorizationFile(c *gin.Context) {
+	lang := middleware.GetLanguage(c)
+	id := c.Param("id")
+	if id == "" {
+		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	ctx := middleware.WithLanguage(c.Request.Context(), c)
+
+	fileData, fileName, authCode, err := h.authCodeService.GenerateAuthorizationFile(ctx, id)
+	if err != nil {
+		var i18nErr *i18n.I18nError
+		if errors.As(err, &i18nErr) {
+			c.JSON(i18nErr.HttpCode, models.ErrorResponse{
+				Code:      i18nErr.Code,
+				Message:   i18nErr.Message,
+				Timestamp: time.Now().Format(time.RFC3339),
+			})
+		} else {
+			status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+			c.JSON(status, models.ErrorResponse{
+				Code:      errCode,
+				Message:   message,
+				Timestamp: time.Now().Format(time.RFC3339),
+			})
+		}
+		return
+	}
+
+	cfg := config.GetConfig()
+	if cfg == nil || cfg.License.RSA.PublicKeyPath == "" {
+		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	publicKeyPath := filepath.Clean(cfg.License.RSA.PublicKeyPath)
+	publicKeyData, err := os.ReadFile(publicKeyPath)
+	if err != nil {
+		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	var buffer bytes.Buffer
+	zipWriter := zip.NewWriter(&buffer)
+
+	const zipAuthFileName = "authorization_code.txt"
+	authFileWriter, err := zipWriter.Create(zipAuthFileName)
+	if err != nil {
+		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+	if _, err := authFileWriter.Write(fileData); err != nil {
+		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	publicKeyWriter, err := zipWriter.Create("rsa_public_key.pem")
+	if err != nil {
+		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+	if _, err := publicKeyWriter.Write(publicKeyData); err != nil {
+		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	if err := zipWriter.Close(); err != nil {
+		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	packageFileName := fmt.Sprintf("authorization_package_%s.zip", strings.TrimSpace(authCode))
+	if strings.TrimSpace(authCode) == "" {
+		baseName := strings.TrimSuffix(fileName, filepath.Ext(fileName))
+		packageFileName = fmt.Sprintf("%s_package.zip", baseName)
+	}
+
+	c.Header("Content-Description", "File Transfer")
+	c.Header("Content-Type", "application/zip")
+	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", packageFileName))
+	c.Header("Content-Transfer-Encoding", "binary")
+	c.Header("Cache-Control", "must-revalidate")
+	c.Header("Pragma", "public")
+	c.Data(http.StatusOK, "application/zip", buffer.Bytes())
 }
 
 // UpdateAuthorizationCode 更新授权码

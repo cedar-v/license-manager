@@ -43,6 +43,7 @@ type AuthorizationCodeService interface {
 	LockUnlockAuthorizationCode(ctx context.Context, id string, req *models.AuthorizationCodeLockRequest) (*models.AuthorizationCode, error)
 	DeleteAuthorizationCode(ctx context.Context, id string) error
 	GetAuthorizationChangeList(ctx context.Context, authCodeID string, req *models.AuthorizationChangeListRequest) (*models.AuthorizationChangeListResponse, error)
+	GenerateAuthorizationFile(ctx context.Context, id string) ([]byte, string, string, error)
 }
 
 // LicenseService 许可证服务接口
@@ -51,12 +52,12 @@ type LicenseService interface {
 	GetLicense(ctx context.Context, id string) (*models.LicenseDetailResponse, error)
 	CreateLicense(ctx context.Context, req *models.LicenseCreateRequest) (*models.License, error)
 	RevokeLicense(ctx context.Context, id string, req *models.LicenseRevokeRequest) (*models.License, error)
-	GenerateLicenseFile(ctx context.Context, id string) ([]byte, string, error)
-	
+	GenerateLicenseFile(ctx context.Context, id string) ([]byte, string, string, error)
+
 	// 客户端激活和心跳接口
 	ActivateLicense(ctx context.Context, req *models.ActivateRequest, clientIP string) (*models.ActivateResponse, error)
 	Heartbeat(ctx context.Context, req *models.HeartbeatRequest, clientIP string) (*models.HeartbeatResponse, error)
-	
+
 	// 统计接口
 	GetStatsOverview(ctx context.Context) (*models.StatsOverviewResponse, error)
 }
@@ -65,7 +66,7 @@ type LicenseService interface {
 type DashboardService interface {
 	// 获取授权趋势数据
 	GetAuthorizationTrend(ctx context.Context, req *models.DashboardAuthorizationTrendRequest) (*models.DashboardAuthorizationTrendResponse, error)
-	
+
 	// 获取最近授权列表
 	GetRecentAuthorizations(ctx context.Context, req *models.DashboardRecentAuthorizationsRequest) (*models.DashboardRecentAuthorizationsResponse, error)
 }

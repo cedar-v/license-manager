@@ -64,7 +64,13 @@
       "search": "搜索",
       "notification": "消息通知",
       "language": "切换语言",
-      "theme": "切换主题"
+      "theme": "切换主题",
+      "docs": "查看文档",
+      "github": "打开 GitHub"
+    },
+    "external": {
+      "docs": "文档",
+      "github": "GitHub"
     },
       "breadcrumb": {
         "dashboard": "仪表盘",
@@ -391,7 +397,7 @@
           "updateLicense": "变更授权",
           "renewLicense": "延期授权",
           "revokeLicense": "撤销许可证",
-          "downloadCertificate": "下载部署包"
+          "downloadCertificate": "授权文件下载"
         },
         "messages": {
           "copySuccess": "授权码已复制到剪贴板",
@@ -400,7 +406,8 @@
           "updateComingSoon": "变更授权功能开发中...",
           "renewComingSoon": "延期授权功能开发中...",
           "revokeComingSoon": "撤销许可证功能开发中...",
-          "downloadComingSoon": "下载凭单功能开发中...",
+          "downloadSuccess": "授权文件已开始下载",
+          "downloadError": "下载授权文件失败，请稍后重试",
           "revokeConfirm": "确定要撤销此许可证吗？此操作不可逆！",
           "revokeTitle": "警告",
           "revokeConfirmButton": "确定撤销",

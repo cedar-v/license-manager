@@ -1,0 +1,28 @@
+{
+  // Vue 文件类型检查配置
+  "volar.takeOverMode.enabled": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  
+  // TypeScript 检查配置
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.suggest.autoImports": true,
+  
+  // 启用实时类型检查
+  "typescript.validate.enable": true,
+  "javascript.validate.enable": true,
+  
+  // 显示所有诊断信息（包括未使用的变量）
+  "typescript.preferences.showUnused": true,
+  "javascript.preferences.showUnused": true,
+  
+  // Vue 文件检查
+  "volar.codeLens.pugTools": false,
+  "volar.codeLens.scriptSetupTools": true,
+  
+  // 文件关联
+  "files.associations": {
+    "*.vue": "vue"
+  }
+}
+

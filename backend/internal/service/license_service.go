@@ -251,14 +251,14 @@ func (s *licenseService) RevokeLicense(ctx context.Context, id string, req *mode
 
 	// 更新许可证状态为撤销
 	existingLicense.Status = "revoked"
-	
+
 	// 如果提供了撤销原因，保存到使用数据中
 	if req.Reason != "" {
 		revokeData := map[string]interface{}{
-			"revoked_at":     time.Now().Format(time.RFC3339),
-			"revoke_reason":  req.Reason,
+			"revoked_at":    time.Now().Format(time.RFC3339),
+			"revoke_reason": req.Reason,
 		}
-		
+
 		// 保留原有的使用数据
 		if len(existingLicense.UsageData) > 0 {
 			var existingUsageData map[string]interface{}
@@ -268,7 +268,7 @@ func (s *licenseService) RevokeLicense(ctx context.Context, id string, req *mode
 				}
 			}
 		}
-		
+
 		usageDataBytes, err := json.Marshal(revokeData)
 		if err == nil {
 			existingLicense.UsageData = models.JSON(usageDataBytes)
@@ -284,14 +284,14 @@ func (s *licenseService) RevokeLicense(ctx context.Context, id string, req *mode
 }
 
 // GenerateLicenseFile 生成许可证文件
-func (s *licenseService) GenerateLicenseFile(ctx context.Context, id string) ([]byte, string, error) {
+func (s *licenseService) GenerateLicenseFile(ctx context.Context, id string) ([]byte, string, string, error) {
 	lang := pkgcontext.GetLanguageFromContext(ctx)
 	s.logger.Infof("[GenerateLicenseFile] 开始生成许可证文件，license_id: %s", id)
 
 	// 业务逻辑：参数验证
 	if id == "" {
 		s.logger.Error("[GenerateLicenseFile] 错误：许可证ID为空")
-		return nil, "", i18n.NewI18nError("900001", lang)
+		return nil, "", "", i18n.NewI18nError("900001", lang)
 	}
 
 	// 获取许可证信息
@@ -300,9 +300,9 @@ func (s *licenseService) GenerateLicenseFile(ctx context.Context, id string) ([]
 	if err != nil {
 		s.logger.Errorf("[GenerateLicenseFile] 查询许可证失败，license_id: %s, error: %v", id, err)
 		if errors.Is(err, repository.ErrLicenseNotFound) {
-			return nil, "", i18n.NewI18nError("300006", lang) // 许可证不存在
+			return nil, "", "", i18n.NewI18nError("300006", lang) // 许可证不存在
 		}
-		return nil, "", i18n.NewI18nError("900004", lang, err.Error())
+		return nil, "", "", i18n.NewI18nError("900004", lang, err.Error())
 	}
 
 	s.logger.Infof("[GenerateLicenseFile] 许可证信息查询成功，license_key: %s, status: %s", license.LicenseKey, license.Status)
@@ -310,7 +310,7 @@ func (s *licenseService) GenerateLicenseFile(ctx context.Context, id string) ([]
 	// 检查许可证状态
 	if license.Status == "revoked" {
 		s.logger.Warnf("[GenerateLicenseFile] 许可证已被撤销，license_id: %s", id)
-		return nil, "", i18n.NewI18nError("300007", lang) // 许可证已被撤销
+		return nil, "", "", i18n.NewI18nError("300007", lang) // 许可证已被撤销
 	}
 
 	// 构建许可证文件内容
@@ -318,10 +318,10 @@ func (s *licenseService) GenerateLicenseFile(ctx context.Context, id string) ([]
 		"license_key":           license.LicenseKey,
 		"authorization_code_id": license.AuthorizationCodeID,
 		"hardware_fingerprint":  license.HardwareFingerprint,
-		"status":               license.Status,
-		"activated_at":         license.ActivatedAt,
-		"config_updated_at":    license.ConfigUpdatedAt,
-		"generated_at":         time.Now().Format(time.RFC3339),
+		"status":                license.Status,
+		"activated_at":          license.ActivatedAt,
+		"config_updated_at":     license.ConfigUpdatedAt,
+		"generated_at":          time.Now().Format(time.RFC3339),
 	}
 
 	// 包含授权码信息
@@ -331,7 +331,7 @@ func (s *licenseService) GenerateLicenseFile(ctx context.Context, id string) ([]
 		licenseFileData["end_date"] = license.AuthorizationCode.EndDate
 		licenseFileData["deployment_type"] = license.AuthorizationCode.DeploymentType
 		licenseFileData["max_activations"] = license.AuthorizationCode.MaxActivations
-		
+
 		// 包含功能配置
 		if len(license.AuthorizationCode.FeatureConfig) > 0 {
 			var featureConfig map[string]interface{}
@@ -339,7 +339,7 @@ func (s *licenseService) GenerateLicenseFile(ctx context.Context, id string) ([]
 				licenseFileData["feature_config"] = featureConfig
 			}
 		}
-		
+
 		// 包含使用限制
 		if len(license.AuthorizationCode.UsageLimits) > 0 {
 			var usageLimits map[string]interface{}
@@ -347,7 +347,7 @@ func (s *licenseService) GenerateLicenseFile(ctx context.Context, id string) ([]
 				licenseFileData["usage_limits"] = usageLimits
 			}
 		}
-		
+
 		// 包含自定义参数
 		if len(license.AuthorizationCode.CustomParameters) > 0 {
 			var customParameters map[string]interface{}
@@ -360,19 +360,19 @@ func (s *licenseService) GenerateLicenseFile(ctx context.Context, id string) ([]
 	// 序列化许可证数据
 	licenseJSON, err := json.Marshal(licenseFileData)
 	if err != nil {
-		return nil, "", i18n.NewI18nError("300009", lang) // 许可证文件生成失败
+		return nil, "", "", i18n.NewI18nError("300009", lang) // 许可证文件生成失败
 	}
 
 	// 使用RSA数字签名
 	encryptedData, err := s.signLicenseFile(licenseJSON)
 	if err != nil {
-		return nil, "", i18n.NewI18nError("300009", lang) // 许可证文件生成失败
+		return nil, "", "", i18n.NewI18nError("300009", lang) // 许可证文件生成失败
 	}
 
 	// 生成文件名
 	fileName := fmt.Sprintf("license_%s.lic", license.LicenseKey)
 
-	return encryptedData, fileName, nil
+	return encryptedData, fileName, license.LicenseKey, nil
 }
 
 // generateLicenseKey 生成许可证密钥
@@ -489,9 +489,9 @@ func (s *licenseService) ActivateLicense(ctx context.Context, req *models.Activa
 
 		// 检查是否已存在相同硬件指纹的许可证
 		var existingLicense models.License
-		err = tx.Where("authorization_code_id = ? AND hardware_fingerprint = ?", 
+		err = tx.Where("authorization_code_id = ? AND hardware_fingerprint = ?",
 			authCode.ID, req.HardwareFingerprint).First(&existingLicense).Error
-		
+
 		if err == nil {
 			// 已存在，直接激活
 			existingLicense.Status = "active"
@@ -500,7 +500,7 @@ func (s *licenseService) ActivateLicense(ctx context.Context, req *models.Activa
 			existingLicense.ActivatedAt = &now
 			existingLicense.LastHeartbeat = &now
 			existingLicense.LastOnlineIP = &clientIP
-			
+
 			if err := tx.Save(&existingLicense).Error; err != nil {
 				return err
 			}
@@ -655,10 +655,10 @@ func (s *licenseService) generateLicenseFileContent(license *models.License, aut
 		"license_key":           license.LicenseKey,
 		"authorization_code_id": license.AuthorizationCodeID,
 		"hardware_fingerprint":  license.HardwareFingerprint,
-		"status":               license.Status,
-		"activated_at":         license.ActivatedAt,
-		"config_updated_at":    license.ConfigUpdatedAt,
-		"generated_at":         time.Now().Format(time.RFC3339),
+		"status":                license.Status,
+		"activated_at":          license.ActivatedAt,
+		"config_updated_at":     license.ConfigUpdatedAt,
+		"generated_at":          time.Now().Format(time.RFC3339),
 	}
 
 	if authCode != nil {
@@ -667,7 +667,7 @@ func (s *licenseService) generateLicenseFileContent(license *models.License, aut
 		licenseFileData["end_date"] = authCode.EndDate
 		licenseFileData["deployment_type"] = authCode.DeploymentType
 		licenseFileData["max_activations"] = authCode.MaxActivations
-		
+
 		// 包含功能配置等
 		if len(authCode.FeatureConfig) > 0 {
 			var featureConfig map[string]interface{}
@@ -675,14 +675,14 @@ func (s *licenseService) generateLicenseFileContent(license *models.License, aut
 				licenseFileData["feature_config"] = featureConfig
 			}
 		}
-		
+
 		if len(authCode.UsageLimits) > 0 {
 			var usageLimits map[string]interface{}
 			if err := json.Unmarshal(authCode.UsageLimits, &usageLimits); err == nil {
 				licenseFileData["usage_limits"] = usageLimits
 			}
 		}
-		
+
 		if len(authCode.CustomParameters) > 0 {
 			var customParameters map[string]interface{}
 			if err := json.Unmarshal(authCode.CustomParameters, &customParameters); err == nil {
@@ -748,7 +748,7 @@ func (s *licenseService) signLicenseFile(data []byte) ([]byte, error) {
 	// 构建签名后的许可证文件结构
 	licenseWithSignature := map[string]interface{}{
 		"data":      string(data), // 原始数据（JSON字符串）
-		"signature": signature,   // 数字签名
+		"signature": signature,    // 数字签名
 		"algorithm": "RSA-PSS-SHA256",
 	}
 

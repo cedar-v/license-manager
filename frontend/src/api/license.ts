@@ -320,6 +320,15 @@ export function downloadLicenseFile(id: string): Promise<AxiosResponse<Blob>> {
   })
 }
 
+/**
+ * 下载授权文件包（授权码+公钥）
+ */
+export function downloadAuthorizationFile(id: string): Promise<AxiosResponse<Blob>> {
+  return Axios.get(`/api/v1/authorization-codes/${id}/download`, {
+    responseType: 'blob'
+  })
+}
+
 // 创建许可证请求（手动绑定设备）
 export interface LicenseDeviceCreateRequest {
   authorization_code_id: string

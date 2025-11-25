@@ -28,17 +28,15 @@ jobs:
         cache: 'npm'
         cache-dependency-path: frontend/package-lock.json
 
-    # 缓存node_modules和构建输出
-    - name: Cache dependencies and build
+    # 缓存node_modules（不缓存构建输出，确保每次都是最新构建）
+    - name: Cache dependencies
       uses: actions/cache@v4
       with:
         path: |
           frontend/node_modules
-          frontend/production
-        key: ${{ runner.os }}-frontend-${{ hashFiles('frontend/package-lock.json', 'frontend/src/**/*', 'frontend/vite.config.ts') }}
+        key: ${{ runner.os }}-frontend-deps-${{ hashFiles('frontend/package-lock.json') }}
         restore-keys: |
-          ${{ runner.os }}-frontend-${{ hashFiles('frontend/package-lock.json') }}
-          ${{ runner.os }}-frontend-
+          ${{ runner.os }}-frontend-deps-
 
     # 安装依赖
     - name: Install dependencies
@@ -46,23 +44,33 @@ jobs:
         cd frontend
         npm ci
 
-    # 并行执行类型检查和构建
+    # 清理旧的构建目录（确保使用最新代码构建）
+    - name: Clean old build artifacts
+      run: |
+        cd frontend
+        rm -rf production dist
+        echo "Cleaned old build directories"
+
+    # 执行类型检查和构建
     - name: Type check and build
       run: |
         cd frontend
         # 设置构建环境变量，确保与本地构建一致
         export VITE_OUTDIR=production
         export VITE_ADDRESS_BASE_URL=/production/
-        # 并行执行类型检查和构建以节省时间
-        npm run type-check &
-        npm run build:prod &
-        wait
+        # 先执行类型检查
+        npm run type-check
+        # 然后执行构建
+        npm run build:prod
         # 检查构建结果
         echo "Build completed, checking production directory:"
         ls -la production/
         # 验证构建产物中的 base 路径
         echo "Verifying base path in index.html:"
         grep -o 'href="/production/' production/index.html | head -1 || echo "Warning: base path not found"
+        # 显示构建产物的时间戳，确认是新构建的
+        echo "Build timestamp:"
+        stat production/index.html 2>/dev/null || ls -la production/index.html
 
     # 准备临时部署目录
     - name: Prepare temp directory

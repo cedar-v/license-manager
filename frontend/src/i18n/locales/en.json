@@ -64,7 +64,13 @@
       "search": "Search",
       "notification": "Notifications",
       "language": "Switch Language",
-      "theme": "Switch Theme"
+      "theme": "Switch Theme",
+      "docs": "Open Documentation",
+      "github": "Open GitHub"
+    },
+    "external": {
+      "docs": "Docs",
+      "github": "GitHub"
     },
       "breadcrumb": {
         "dashboard": "Dashboard",
@@ -391,7 +397,7 @@
           "updateLicense": "Update License",
           "renewLicense": "Renew License",
           "revokeLicense": "Revoke License",
-          "downloadCertificate": "Download Deployment Package"
+          "downloadCertificate": "Download Authorization File"
         },
         "messages": {
           "copySuccess": "License code copied to clipboard",
@@ -400,7 +406,8 @@
           "updateComingSoon": "Update license feature is under development...",
           "renewComingSoon": "Renew license feature is under development...",
           "revokeComingSoon": "Revoke license feature is under development...",
-          "downloadComingSoon": "Download certificate feature is under development...",
+          "downloadSuccess": "Authorization file download started",
+          "downloadError": "Failed to download authorization file, please try again later",
           "revokeConfirm": "Are you sure you want to revoke this license? This action cannot be undone!",
           "revokeTitle": "Warning",
           "revokeConfirmButton": "Confirm Revoke",

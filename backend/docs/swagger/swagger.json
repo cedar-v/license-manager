@@ -1360,6 +1360,73 @@
                 }
             }
         },
+        "/api/v1/authorization-codes/{id}/download": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "下载授权码文件，包含授权码和RSA公钥，供客户端使用",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/zip"
+                ],
+                "tags": [
+                    "授权码管理"
+                ],
+                "summary": "下载授权文件",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "授权码ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "包含授权码文件和RSA公钥的压缩包",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "授权码不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "授权码不可用",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/authorization-codes/{id}/lock": {
             "put": {
                 "security": [
@@ -1981,7 +2048,7 @@
                     "application/json"
                 ],
                 "produces": [
-                    "application/octet-stream"
+                    "application/zip"
                 ],
                 "tags": [
                     "许可证管理"
@@ -1998,7 +2065,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "许可证文件",
+                        "description": "包含许可证文件和RSA公钥的压缩包",
                         "schema": {
                             "type": "file"
                         }

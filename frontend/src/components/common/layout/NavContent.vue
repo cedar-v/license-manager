@@ -98,6 +98,19 @@
 
       <!-- 操作按钮组 -->
       <div class="action-buttons">
+        <!-- 文档 & GitHub 外部链接 -->
+        <template v-for="link in externalLinks" :key="link.key">
+          <el-tooltip :content="t(`navigation.tooltip.${link.key}`)" placement="bottom">
+            <button
+              class="action-btn external-link-btn"
+              type="button"
+              @click="handleExternalLink(link.url)"
+            >
+              <span class="external-link-label">{{ t(`navigation.external.${link.key}`) }}</span>
+            </button>
+          </el-tooltip>
+        </template>
+
         <!-- 搜索按钮（暂时禁用） -->
         <!--
         <el-tooltip :content="t('navigation.tooltip.search')" placement="bottom">
@@ -178,6 +191,17 @@ const { notificationCount = 24 } = defineProps<Props>()
 // 功能暂未启用，隐藏通知入口
 const showNotification = false
 
+type ExternalLinkKey = 'docs' | 'github'
+interface ExternalLink {
+  key: ExternalLinkKey
+  url: string
+}
+
+const externalLinks: ExternalLink[] = [
+  { key: 'docs', url: 'https://docs.lm.cedar-v.com/' },
+  { key: 'github', url: 'https://github.com/cedar-v/license-manager' }
+]
+
 // 定义组件事件
 const emit = defineEmits<{
   sidebarToggle: []
@@ -227,6 +251,10 @@ const handleSidebarToggle = () => {
 // 处理通知按钮点击
 const handleNotificationClick = () => {
   emit('notificationClick')
+}
+
+const handleExternalLink = (url: string) => {
+  window.open(url, '_blank', 'noopener,noreferrer')
 }
 
 // 语言切换
@@ -579,6 +607,20 @@ const handleUserCommand = async (command: string) => {
   transition: all 0.2s;
 }
 
+.external-link-btn {
+  min-width: 72px;
+  padding: 0 16px;
+  width: auto;
+  gap: 6px;
+}
+
+.external-link-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-text-primary);
+  white-space: nowrap;
+}
+
 .action-btn:hover {
   background: var(--el-color-primary-light-9);
 }
@@ -808,6 +850,10 @@ const handleUserCommand = async (command: string) => {
 /* 操作按钮暗模式 */
 [data-theme="dark"] .action-btn {
   background: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .external-link-label {
+  color: #f9fafb !important;
 }
 
 [data-theme="dark"] .action-btn:hover {

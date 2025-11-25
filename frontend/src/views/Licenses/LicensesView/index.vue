@@ -89,7 +89,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useI18n } from 'vue-i18n'
-import { getLicenseDetail, type AuthorizationCode } from '@/api/license'
+import { getLicenseDetail, downloadAuthorizationFile, type AuthorizationCode } from '@/api/license'
 import LicenseTabIcon from '@/components/common/icons/LicenseTabIcon.vue'
 import BasicInfo from './components/BasicInfo.vue'
 import AuthorizationInfo from './components/AuthorizationInfo.vue'
@@ -142,8 +142,62 @@ const handleRenewLicense = () => {
   ElMessage.info(t('pages.licenses.detail.messages.renewComingSoon'))
 }
 
-const handleDownloadCertificate = () => {
-  ElMessage.info(t('pages.licenses.detail.messages.downloadComingSoon'))
+const getFileNameFromDisposition = (disposition?: string | null) => {
+  const defaultName = 'authorization_package.zip'
+  if (!disposition) return defaultName
+
+  const utf8Match = disposition.match(/filename\*=UTF-8''([^;]+)/i)
+  if (utf8Match?.[1]) {
+    try {
+      return decodeURIComponent(utf8Match[1])
+    } catch {
+      return utf8Match[1]
+    }
+  }
+
+  const asciiMatch = disposition.match(/filename="?([^";]+)"?/i)
+  if (asciiMatch?.[1]) {
+    return asciiMatch[1]
+  }
+
+  return defaultName
+}
+
+const handleDownloadCertificate = async () => {
+  if (!licenseData.value?.id) {
+    ElMessage.error(t('pages.licenses.detail.messages.missingId'))
+    return
+  }
+
+  try {
+    const response = await downloadAuthorizationFile(licenseData.value.id)
+    const fileName = getFileNameFromDisposition(response.headers['content-disposition'])
+    const blob = new Blob([response.data], { type: 'application/zip' })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = fileName
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+    ElMessage.success(t('pages.licenses.detail.messages.downloadSuccess'))
+  } catch (error: any) {
+    console.error('下载授权文件失败:', error)
+    let message = t('pages.licenses.detail.messages.downloadError')
+    if (error?.response?.data instanceof Blob) {
+      try {
+        const text = await error.response.data.text()
+        const parsed = JSON.parse(text)
+        if (parsed?.message) {
+          message = parsed.message
+        }
+      } catch {
+        // ignore parse errors
+      }
+    }
+    ElMessage.error(message)
+  }
 }
 
 const loadLicenseData = async () => {

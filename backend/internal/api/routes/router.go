@@ -76,7 +76,7 @@ func SetupRouter() *gin.Engine {
 		public := api.Group("")
 		{
 			public.POST("/v1/login", authHandler.Login)
-			
+
 			// 许可证激活接口（客户端软件使用）
 			public.POST("/v1/activate", licenseHandler.ActivateLicense)
 			public.POST("/v1/heartbeat", licenseHandler.Heartbeat)
@@ -89,7 +89,7 @@ func SetupRouter() *gin.Engine {
 			// 认证相关
 			auth.POST("/v1/logout", authHandler.Logout)
 			auth.POST("/v1/auth/refresh", authHandler.RefreshToken)
-			
+
 			// 客户管理
 			auth.GET("/customers", customerHandler.GetCustomerList)
 			auth.GET("/customers/:id", customerHandler.GetCustomer)
@@ -97,30 +97,31 @@ func SetupRouter() *gin.Engine {
 			auth.PUT("/customers/:id", customerHandler.UpdateCustomer)
 			auth.DELETE("/customers/:id", customerHandler.DeleteCustomer)
 			auth.PATCH("/customers/:id/status", customerHandler.UpdateCustomerStatus)
-			
+
 			// 枚举管理
 			auth.GET("/enums", enumHandler.GetAllEnums)
 			auth.GET("/enums/:type", enumHandler.GetEnumsByType)
-			
+
 			// 授权码管理
 			auth.GET("/v1/authorization-codes", authCodeHandler.GetAuthorizationCodeList)
 			auth.POST("/v1/authorization-codes", authCodeHandler.CreateAuthorizationCode)
 			auth.GET("/v1/authorization-codes/:id", authCodeHandler.GetAuthorizationCode)
+			auth.GET("/v1/authorization-codes/:id/download", authCodeHandler.DownloadAuthorizationFile)
 			auth.PUT("/v1/authorization-codes/:id", authCodeHandler.UpdateAuthorizationCode)
 			auth.PUT("/v1/authorization-codes/:id/lock", authCodeHandler.LockUnlockAuthorizationCode)
 			auth.DELETE("/v1/authorization-codes/:id", authCodeHandler.DeleteAuthorizationCode)
 			auth.GET("/v1/authorization-codes/:id/changes", authCodeHandler.GetAuthorizationChangeList)
-			
+
 			// 许可证管理
 			auth.GET("/v1/licenses", licenseHandler.GetLicenseList)
 			auth.GET("/v1/licenses/:id", licenseHandler.GetLicense)
 			auth.POST("/v1/licenses", licenseHandler.CreateLicense)
 			auth.PUT("/v1/licenses/:id/revoke", licenseHandler.RevokeLicense)
 			auth.GET("/v1/licenses/:id/download", licenseHandler.DownloadLicenseFile)
-			
+
 			// 统计分析
 			auth.GET("/v1/stats/overview", licenseHandler.GetStatsOverview)
-			
+
 			// 仪表盘接口
 			auth.GET("/v1/dashboard/authorization-trend", dashboardHandler.GetAuthorizationTrend)
 			auth.GET("/v1/dashboard/recent-authorizations", dashboardHandler.GetRecentAuthorizations)

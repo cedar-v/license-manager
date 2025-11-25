@@ -386,7 +386,7 @@ const handleDownloadLicense = async (device: LicenseDevice) => {
       response.headers?.['content-disposition'] || response.headers?.['Content-Disposition']
     const filename =
       extractFilename(disposition) ||
-      `${device.customer_name || 'license'}-${device.id}.lic`
+      `${device.customer_name || 'license'}-${device.id}.zip`
 
     const blobUrl = window.URL.createObjectURL(response.data)
     const link = document.createElement('a')

@@ -1,12 +1,18 @@
 package handlers
 
 import (
+	"archive/zip"
+	"bytes"
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"license-manager/internal/api/middleware"
+	"license-manager/internal/config"
 	"license-manager/internal/models"
 	"license-manager/internal/service"
 	"license-manager/pkg/i18n"
@@ -298,10 +304,10 @@ func (h *LicenseHandler) RevokeLicense(c *gin.Context) {
 // @Description 下载加密的许可证文件，用于客户端软件激活
 // @Tags 许可证管理
 // @Accept json
-// @Produce application/octet-stream
+// @Produce application/zip
 // @Security BearerAuth
 // @Param id path string true "许可证ID"
-// @Success 200 {file} binary "许可证文件"
+// @Success 200 {file} binary "包含许可证文件和RSA公钥的压缩包"
 // @Failure 400 {object} models.ErrorResponse "请求参数无效"
 // @Failure 401 {object} models.ErrorResponse "未认证"
 // @Failure 404 {object} models.ErrorResponse "许可证不存在"
@@ -309,9 +315,9 @@ func (h *LicenseHandler) RevokeLicense(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse "服务器内部错误"
 // @Router /api/v1/licenses/{id}/download [get]
 func (h *LicenseHandler) DownloadLicenseFile(c *gin.Context) {
+	lang := middleware.GetLanguage(c)
 	id := c.Param("id")
 	if id == "" {
-		lang := middleware.GetLanguage(c)
 		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
 		c.JSON(status, models.ErrorResponse{
 			Code:      errCode,
@@ -324,7 +330,7 @@ func (h *LicenseHandler) DownloadLicenseFile(c *gin.Context) {
 	// 设置语言到Context中
 	ctx := middleware.WithLanguage(c.Request.Context(), c)
 
-	fileData, fileName, err := h.licenseService.GenerateLicenseFile(ctx, id)
+	fileData, fileName, licenseKey, err := h.licenseService.GenerateLicenseFile(ctx, id)
 	if err != nil {
 		// 错误已经在Service层完全包装好了，直接使用
 		var i18nErr *i18n.I18nError
@@ -347,16 +353,99 @@ func (h *LicenseHandler) DownloadLicenseFile(c *gin.Context) {
 		return
 	}
 
+	cfg := config.GetConfig()
+	if cfg == nil || cfg.License.RSA.PublicKeyPath == "" {
+		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	publicKeyPath := filepath.Clean(cfg.License.RSA.PublicKeyPath)
+	publicKeyData, err := os.ReadFile(publicKeyPath)
+	if err != nil {
+		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	var buffer bytes.Buffer
+	zipWriter := zip.NewWriter(&buffer)
+
+	const zipLicenseFileName = "license.lic"
+	licenseFileWriter, err := zipWriter.Create(zipLicenseFileName)
+	if err != nil {
+		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+	if _, err := licenseFileWriter.Write(fileData); err != nil {
+		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	publicKeyWriter, err := zipWriter.Create("rsa_public_key.pem")
+	if err != nil {
+		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+	if _, err := publicKeyWriter.Write(publicKeyData); err != nil {
+		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	if err := zipWriter.Close(); err != nil {
+		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+		return
+	}
+
+	packageFileName := fmt.Sprintf("license_package_%s.zip", strings.TrimSpace(licenseKey))
+	if strings.TrimSpace(licenseKey) == "" {
+		baseName := strings.TrimSuffix(fileName, filepath.Ext(fileName))
+		packageFileName = fmt.Sprintf("%s_package.zip", baseName)
+	}
+
 	// 设置响应头，指示这是一个文件下载
 	c.Header("Content-Description", "File Transfer")
-	c.Header("Content-Type", "application/octet-stream")
-	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fileName))
+	c.Header("Content-Type", "application/zip")
+	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", packageFileName))
 	c.Header("Content-Transfer-Encoding", "binary")
 	c.Header("Cache-Control", "must-revalidate")
 	c.Header("Pragma", "public")
 
 	// 返回文件内容
-	c.Data(http.StatusOK, "application/octet-stream", fileData)
+	c.Data(http.StatusOK, "application/zip", buffer.Bytes())
 }
 
 // ActivateLicense 激活许可证

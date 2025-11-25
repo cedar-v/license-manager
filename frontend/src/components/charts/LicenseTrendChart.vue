@@ -128,8 +128,19 @@ const quickOptions = computed(() => [
 
 // 响应式数据
 const { isMobile } = useDevice()
-const selectedQuick = ref('week')
-const dateRange = ref<[string, string]>(['2024-05-13', '2024-05-17']) // 初始值会被handleQuickSelect('week')覆盖
+const selectedQuick = ref('month')
+
+const getCurrentMonthRange = (): [string, string] => {
+  const today = new Date()
+  const startDate = new Date(today.getFullYear(), today.getMonth(), 1)
+  const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+  return [
+    startDate.toISOString().split('T')[0],
+    endDate.toISOString().split('T')[0]
+  ]
+}
+
+const dateRange = ref<[string, string]>(getCurrentMonthRange())
 const chartRef = ref()
 const datePickerRef = ref()
 
@@ -141,6 +152,11 @@ const chartLoading = ref(false)
 const chartOption = computed(() => {
   const dates = trendData.value.map(item => item.date.substring(5)) // 只显示月-日
   const values = trendData.value.map(item => item.value)
+  const rawMax = values.length ? Math.max(...values) : 0
+  const baseMax = Math.max(rawMax, 20)
+  const minTickCount = 4 // 至少展示4个区间
+  const niceInterval = Math.max(5, Math.ceil(baseMax / minTickCount / 5) * 5)
+  const niceMax = Math.ceil(baseMax / niceInterval) * niceInterval
   
   return {
     grid: {
@@ -169,8 +185,8 @@ const chartOption = computed(() => {
     yAxis: {
       type: 'value',
       min: 0,
-      max: 20,
-      interval: 5,
+      max: niceMax,
+      interval: niceInterval,
       axisLine: {
         show: false
       },
@@ -367,9 +383,9 @@ const updateChartData = () => {
 
 onMounted(() => {
   console.log('LicenseTrendChart 组件已挂载，开始初始化')
-  // 初始化时直接调用快捷选择，设置为本周
-  handleQuickSelect('week')
-  console.log('已调用 handleQuickSelect(week)')
+  // 初始化时直接调用快捷选择，设置为本月
+  handleQuickSelect('month')
+  console.log('已调用 handleQuickSelect(month)')
 })
 </script>
 

@@ -64,7 +64,13 @@
       "search": "検索",
       "notification": "通知",
       "language": "言語切り替え",
-      "theme": "テーマ切り替え"
+      "theme": "テーマ切り替え",
+      "docs": "ドキュメントを開く",
+      "github": "GitHub を開く"
+    },
+    "external": {
+      "docs": "ドキュメント",
+      "github": "GitHub"
     },
     "breadcrumb": {
       "dashboard": "ダッシュボード",
@@ -391,7 +397,7 @@
           "updateLicense": "ライセンス更新",
           "renewLicense": "ライセンス延長",
           "revokeLicense": "ライセンス取り消し",
-          "downloadCertificate": "デプロイメントパッケージをダウンロード"
+          "downloadCertificate": "認証ファイルをダウンロード"
         },
         "messages": {
           "copySuccess": "ライセンスコードがクリップボードにコピーされました",
@@ -400,7 +406,8 @@
           "updateComingSoon": "ライセンス更新機能は開発中です...",
           "renewComingSoon": "ライセンス延長機能は開発中です...",
           "revokeComingSoon": "ライセンス取り消し機能は開発中です...",
-          "downloadComingSoon": "証明書ダウンロード機能は開発中です...",
+          "downloadSuccess": "認証ファイルのダウンロードを開始しました",
+          "downloadError": "認証ファイルのダウンロードに失敗しました。後でもう一度お試しください",
           "revokeConfirm": "このライセンスを取り消してもよろしいですか？この操作は元に戻せません！",
           "revokeTitle": "警告",
           "revokeConfirmButton": "取り消し確認",

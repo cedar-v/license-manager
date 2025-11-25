@@ -228,6 +228,34 @@ func (s *authorizationCodeService) GetAuthorizationCode(ctx context.Context, id 
 	return authCode, nil
 }
 
+// GenerateAuthorizationFile 生成授权码文件内容
+func (s *authorizationCodeService) GenerateAuthorizationFile(ctx context.Context, id string) ([]byte, string, string, error) {
+	lang := pkgcontext.GetLanguageFromContext(ctx)
+
+	if id == "" {
+		return nil, "", "", i18n.NewI18nError("900001", lang)
+	}
+
+	authCode, err := s.authCodeRepo.GetAuthorizationCodeByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, repository.ErrAuthorizationCodeNotFound) {
+			return nil, "", "", i18n.NewI18nError("300001", lang) // 授权码不存在
+		}
+		return nil, "", "", i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	now := time.Now()
+	if authCode.IsLocked {
+		return nil, "", "", i18n.NewI18nError("300003", lang) // 授权码已锁定
+	}
+	if now.Before(authCode.StartDate) || now.After(authCode.EndDate) {
+		return nil, "", "", i18n.NewI18nError("300001", lang) // 授权码未生效或已过期
+	}
+
+	fileName := fmt.Sprintf("authorization_%s.txt", authCode.Code)
+	return []byte(authCode.Code), fileName, authCode.Code, nil
+}
+
 // fillAuthorizationCodeDisplayFields 填充完整授权码模型的多语言显示字段
 func (s *authorizationCodeService) fillAuthorizationCodeDisplayFields(authCode *models.AuthorizationCode, lang string) {
 	// 计算状态

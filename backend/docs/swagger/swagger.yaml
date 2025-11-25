@@ -1959,6 +1959,49 @@ paths:
       summary: 查询授权变更历史列表
       tags:
       - 授权码管理
+  /api/v1/authorization-codes/{id}/download:
+    get:
+      consumes:
+      - application/json
+      description: 下载授权码文件，包含授权码和RSA公钥，供客户端使用
+      parameters:
+      - description: 授权码ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/zip
+      responses:
+        "200":
+          description: 包含授权码文件和RSA公钥的压缩包
+          schema:
+            type: file
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 授权码不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: 授权码不可用
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 下载授权文件
+      tags:
+      - 授权码管理
   /api/v1/authorization-codes/{id}/lock:
     put:
       consumes:
@@ -2349,10 +2392,10 @@ paths:
         required: true
         type: string
       produces:
-      - application/octet-stream
+      - application/zip
       responses:
         "200":
-          description: 许可证文件
+          description: 包含许可证文件和RSA公钥的压缩包
           schema:
             type: file
         "400":
