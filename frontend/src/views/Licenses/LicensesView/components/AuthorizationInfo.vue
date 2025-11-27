@@ -65,10 +65,51 @@
         </div>
       </div>
     </div>
+
+    <!-- 功能设置 -->
+    <div class="info-card">
+      <div class="card-title">{{ t('pages.licenses.detail.authorizationInfo.customParameters') }}</div>
+      <div v-if="customParameters.length" class="key-value-table">
+        <div class="key-value-header">
+          <span>{{ t('pages.licenses.detail.authorizationInfo.keyColumn') }}</span>
+          <span>{{ t('pages.licenses.detail.authorizationInfo.typeColumn') }}</span>
+          <span>{{ t('pages.licenses.detail.authorizationInfo.valueColumn') }}</span>
+        </div>
+        <div v-for="item in customParameters" :key="`feature-${item.key}`" class="key-value-row">
+          <span class="key-cell">{{ item.key }}</span>
+          <span class="type-cell">{{ t(`pages.licenses.detail.authorizationInfo.typeOptions.${item.type}`) }}</span>
+          <span class="value-cell">{{ item.value || '-' }}</span>
+        </div>
+      </div>
+      <div v-else class="key-value-empty">
+        {{ t('pages.licenses.detail.authorizationInfo.keyValueEmpty') }}
+      </div>
+    </div>
+
+    <!-- 限制设置 -->
+    <div class="info-card">
+      <div class="card-title">{{ t('pages.licenses.detail.authorizationInfo.usageLimits') }}</div>
+      <div v-if="usageLimits.length" class="key-value-table">
+        <div class="key-value-header">
+          <span>{{ t('pages.licenses.detail.authorizationInfo.keyColumn') }}</span>
+          <span>{{ t('pages.licenses.detail.authorizationInfo.typeColumn') }}</span>
+          <span>{{ t('pages.licenses.detail.authorizationInfo.valueColumn') }}</span>
+        </div>
+        <div v-for="item in usageLimits" :key="`limit-${item.key}`" class="key-value-row">
+          <span class="key-cell">{{ item.key }}</span>
+          <span class="type-cell">{{ t(`pages.licenses.detail.authorizationInfo.typeOptions.${item.type}`) }}</span>
+          <span class="value-cell">{{ item.value || '-' }}</span>
+        </div>
+      </div>
+      <div v-else class="key-value-empty">
+        {{ t('pages.licenses.detail.authorizationInfo.keyValueEmpty') }}
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { AuthorizationCode } from '@/api/license'
 import { formatDateShort as formatDateUtil } from '@/utils/date'
@@ -79,6 +120,56 @@ interface Props {
 
 const props = defineProps<Props>()
 const { t } = useI18n()
+
+type KeyValueType = 'string' | 'number' | 'bool'
+
+interface KeyValueItem {
+  key: string
+  value: string
+  type: KeyValueType
+}
+
+const parseKeyValueData = (source: unknown): KeyValueItem[] => {
+  if (!source) return []
+
+  let parsed: Record<string, any> | null = null
+  if (typeof source === 'string') {
+    if (!source.trim()) return []
+    try {
+      parsed = JSON.parse(source)
+    } catch (error) {
+      console.warn('[AuthorizationInfo] Failed to parse JSON:', error)
+      return []
+    }
+  } else if (typeof source === 'object') {
+    parsed = source as Record<string, any>
+  }
+
+  if (!parsed) return []
+
+  return Object.entries(parsed).map(([key, value]) => {
+    let type: KeyValueType = 'string'
+    let normalizedValue = ''
+    if (typeof value === 'number') {
+      type = 'number'
+      normalizedValue = String(value)
+    } else if (typeof value === 'boolean') {
+      type = 'bool'
+      normalizedValue = value ? 'true' : 'false'
+    } else {
+      normalizedValue = value === undefined || value === null ? '' : String(value)
+    }
+
+    return {
+      key,
+      value: normalizedValue,
+      type
+    }
+  })
+}
+
+const customParameters = computed(() => parseKeyValueData(props.licenseData?.custom_parameters))
+const usageLimits = computed(() => parseKeyValueData(props.licenseData?.usage_limits))
 
 // 获取授权期限类型
 const getLicensePeriodType = () => {
@@ -199,6 +290,54 @@ const formatDateRange = () => {
       color: #4763FF;
       flex: 1;
     }
+  }
+
+  .key-value-table {
+    border: 1px solid #eef0f2;
+    border-radius: 4px;
+    overflow: hidden;
+
+    .key-value-header,
+    .key-value-row {
+      display: grid;
+      grid-template-columns: 200px 140px 1fr;
+      padding: 10px 16px;
+      gap: 12px;
+    }
+
+    .key-value-header {
+      background: #f5f6f8;
+      font-weight: 600;
+      font-size: 13px;
+      color: #1d1d1d;
+    }
+
+    .key-value-row {
+      font-size: 13px;
+      color: #1d1d1d;
+      border-top: 1px solid #eef0f2;
+
+      .key-cell {
+        font-weight: 600;
+      }
+
+      .type-cell {
+        color: #606266;
+        font-weight: 500;
+      }
+
+      .value-cell {
+        word-break: break-all;
+      }
+    }
+  }
+
+  .key-value-empty {
+    border: 1px dashed #d7dbe2;
+    border-radius: 4px;
+    padding: 12px 16px;
+    color: #909399;
+    font-size: 13px;
   }
 }
 

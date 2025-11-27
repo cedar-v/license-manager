@@ -338,7 +338,18 @@
           "authorizationCode": "認証コード",
           "forActivation": "（クライアントアクティベーション用）",
           "code": "認証コード",
-          "tipText": "この認証コードを顧客に提供してください。顧客がソフトウェア製品で設定すると、ソフトウェアライセンスを自動的に取得できます"
+          "tipText": "この認証コードを顧客に提供してください。顧客がソフトウェア製品で設定すると、ソフトウェアライセンスを自動的に取得できます",
+          "customParameters": "機能設定",
+          "usageLimits": "制限設定",
+          "typeColumn": "タイプ",
+          "keyColumn": "キー",
+          "valueColumn": "値",
+          "keyValueEmpty": "設定はありません",
+          "typeOptions": {
+            "string": "文字列",
+            "number": "数値",
+            "bool": "ブール"
+          }
         },
         "licenseInfo": {
           "addButton": "ライセンスを追加",
@@ -437,7 +448,9 @@
         },
         "sections": {
           "basicInfo": "基本情報",
-          "licenseConfig": "ライセンス設定"
+          "licenseConfig": "ライセンス設定",
+          "customParameters": "機能設定",
+          "usageLimits": "制限設定"
         },
         "fields": {
           "customerName": "関連顧客名",
@@ -506,6 +519,46 @@
           "cancelTitle": "確認",
           "cancelConfirmButton": "確認",
           "cancelCancelButton": "編集を続行"
+        },
+        "keyValue": {
+          "addItem": "項目を追加",
+          "clearAll": "すべてクリア",
+          "copyJson": "JSONをコピー",
+          "copySuccess": "JSONをコピーしました",
+          "copyError": "JSONのコピーに失敗しました。後でもう一度お試しください",
+          "copyEmpty": "コピーできる内容がありません",
+          "keyLabel": "キー",
+          "valueLabel": "値",
+          "typeLabel": "タイプ",
+          "typeOptions": {
+            "string": "文字列",
+            "number": "数値",
+            "bool": "ブール"
+          },
+          "keyPlaceholder": "例: feature_dashboard",
+          "valuePlaceholder": "値または説明を入力してください",
+          "remove": "削除",
+          "emptyState": "まだ項目がありません。「項目を追加」をクリックしてください",
+          "preview": "JSONプレビュー",
+          "keyRequired": "キーを入力してください",
+          "keyFormat": "キーは小文字英数字とハイフンのみ、1〜32文字で入力してください",
+          "keyDuplicate": "キーは重複できません",
+          "valueRequired": "値を入力してください",
+          "numberRequired": "有効な数値を入力してください",
+          "boolRequired": "ブール型は true / false のみサポートします",
+          "booleanTrue": "true",
+          "booleanFalse": "false",
+          "validationFailed": "送信前に機能設定または制限設定のエラーを修正してください",
+          "importJson": "JSONをインポート",
+          "importTitleFeature": "機能設定 JSON をインポート",
+          "importTitleLimit": "制限設定 JSON をインポート",
+          "importDescription": "キーを設定名とするオブジェクト形式の JSON を貼り付けてください。値は文字列・数値・ブールをサポートします。確定すると現在のリストを上書きします。",
+          "importPlaceholder": "{ \"feature_dashboard\": \"enabled\" }",
+          "importCancel": "キャンセル",
+          "importConfirm": "解析して上書き",
+          "importSuccess": "JSON を取り込みました",
+          "importFailed": "JSON の解析に失敗しました。形式を確認してください",
+          "importEmpty": "JSON が空です"
         }
       }
     }

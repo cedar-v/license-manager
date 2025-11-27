@@ -338,7 +338,18 @@
           "authorizationCode": "授权码",
           "forActivation": "（用于客户端激活）",
           "code": "授权码",
-          "tipText": "将此授权码提供给客户，客户在软件产品中配置后可自动获取软件许可证"
+          "tipText": "将此授权码提供给客户，客户在软件产品中配置后可自动获取软件许可证",
+          "customParameters": "功能设置",
+          "usageLimits": "限制设置",
+          "typeColumn": "类型",
+          "keyColumn": "键",
+          "valueColumn": "值",
+          "keyValueEmpty": "暂无配置",
+          "typeOptions": {
+            "string": "字符串",
+            "number": "数字",
+            "bool": "布尔"
+          }
         },
         "licenseInfo": {
           "addButton": "新增许可证",
@@ -437,7 +448,9 @@
         },
         "sections": {
           "basicInfo": "基本信息",
-          "licenseConfig": "授权配置"
+          "licenseConfig": "授权配置",
+          "customParameters": "功能设置",
+          "usageLimits": "限制设置"
         },
         "fields": {
           "customerName": "关联客户名称",
@@ -506,6 +519,46 @@
           "cancelTitle": "提示",
           "cancelConfirmButton": "确定",
           "cancelCancelButton": "继续编辑"
+        },
+        "keyValue": {
+          "addItem": "添加条目",
+          "clearAll": "清空",
+          "copyJson": "复制JSON",
+          "copySuccess": "JSON已复制",
+          "copyError": "复制失败，请稍后重试",
+          "copyEmpty": "暂无内容可复制",
+          "keyLabel": "键",
+          "valueLabel": "值",
+          "typeLabel": "类型",
+          "typeOptions": {
+            "string": "字符串",
+            "number": "数字",
+            "bool": "布尔"
+          },
+          "keyPlaceholder": "例如 feature_dashboard",
+          "valuePlaceholder": "请输入值或说明",
+          "remove": "删除",
+          "emptyState": "暂无配置，请点击添加条目",
+          "preview": "JSON 预览",
+          "keyRequired": "请输入键",
+          "keyFormat": "键仅支持小写字母、数字和连字符，长度1-32字符",
+          "keyDuplicate": "键不能重复",
+          "valueRequired": "请输入值",
+          "numberRequired": "请输入合法的数字",
+          "boolRequired": "布尔类型仅支持 true / false",
+          "booleanTrue": "true",
+          "booleanFalse": "false",
+          "validationFailed": "请先修复功能或限制设置中的错误再提交",
+          "importJson": "导入JSON",
+          "importTitleFeature": "导入功能设置 JSON",
+          "importTitleLimit": "导入限制设置 JSON",
+          "importDescription": "粘贴一个对象格式的 JSON，键为配置项，值支持字符串、数字或布尔类型。提交后将覆盖当前列表。",
+          "importPlaceholder": "{ \"feature_dashboard\": \"enabled\" }",
+          "importCancel": "取消",
+          "importConfirm": "解析并覆盖",
+          "importSuccess": "JSON 解析成功",
+          "importFailed": "JSON 解析失败，请检查格式",
+          "importEmpty": "JSON 内容为空"
         }
       }
     }

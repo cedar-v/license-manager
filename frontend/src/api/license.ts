@@ -84,8 +84,8 @@ export interface AuthorizationCodeCreateRequest {
   software_version?: string;
   max_activations: number;
   feature_config?: any;
-  usage_limits?: any;
-  custom_parameters?: any;
+  usage_limits?: string | null;
+  custom_parameters?: string | null;
 }
 
 // 更新授权请求参数
@@ -98,8 +98,8 @@ export interface LicenseUpdateRequest {
   software_version?: string;
   max_activations?: number;
   feature_config?: any;
-  usage_limits?: any;
-  custom_parameters?: any;
+  usage_limits?: string | null;
+  custom_parameters?: string | null;
   change_type: string;
   reason?: string;
 }

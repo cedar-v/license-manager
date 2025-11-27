@@ -338,7 +338,18 @@
           "authorizationCode": "Authorization Code",
           "forActivation": "(For Client Activation)",
           "code": "Authorization Code",
-          "tipText": "Provide this authorization code to the customer, who can automatically obtain the software license after configuring it in the software product"
+          "tipText": "Provide this authorization code to the customer, who can automatically obtain the software license after configuring it in the software product",
+          "customParameters": "Feature Settings",
+          "usageLimits": "Usage Limits",
+          "typeColumn": "Type",
+          "keyColumn": "Key",
+          "valueColumn": "Value",
+          "keyValueEmpty": "No configuration available",
+          "typeOptions": {
+            "string": "String",
+            "number": "Number",
+            "bool": "Boolean"
+          }
         },
         "licenseInfo": {
           "addButton": "Add License",
@@ -437,7 +448,9 @@
         },
         "sections": {
           "basicInfo": "Basic Information",
-          "licenseConfig": "License Configuration"
+          "licenseConfig": "License Configuration",
+          "customParameters": "Feature Settings",
+          "usageLimits": "Usage Limits"
         },
         "fields": {
           "customerName": "Associated Customer Name",
@@ -506,6 +519,46 @@
           "cancelTitle": "Confirm",
           "cancelConfirmButton": "Confirm",
           "cancelCancelButton": "Continue Editing"
+        },
+        "keyValue": {
+          "addItem": "Add Item",
+          "clearAll": "Clear All",
+          "copyJson": "Copy JSON",
+          "copySuccess": "JSON copied",
+          "copyError": "Failed to copy JSON, please try again",
+          "copyEmpty": "Nothing to copy yet",
+          "keyLabel": "Key",
+          "valueLabel": "Value",
+          "typeLabel": "Type",
+          "typeOptions": {
+            "string": "String",
+            "number": "Number",
+            "bool": "Boolean"
+          },
+          "keyPlaceholder": "e.g. feature_dashboard",
+          "valuePlaceholder": "Enter value or description",
+          "remove": "Delete",
+          "emptyState": "No entries yet. Click Add Item to configure.",
+          "preview": "JSON Preview",
+          "keyRequired": "Please enter a key",
+          "keyFormat": "Key must be 1-32 characters using lowercase letters, numbers, or hyphens",
+          "keyDuplicate": "Key must be unique",
+          "valueRequired": "Please enter a value",
+          "numberRequired": "Please enter a valid number",
+          "boolRequired": "Boolean type only accepts true / false",
+          "booleanTrue": "true",
+          "booleanFalse": "false",
+          "validationFailed": "Fix the errors in feature or limit settings before submitting",
+          "importJson": "Import JSON",
+          "importTitleFeature": "Import Feature Settings JSON",
+          "importTitleLimit": "Import Usage Limits JSON",
+          "importDescription": "Paste a JSON object whose values can be string, number, or boolean. Confirming will overwrite current entries.",
+          "importPlaceholder": "{ \"feature_dashboard\": \"enabled\" }",
+          "importCancel": "Cancel",
+          "importConfirm": "Parse & Overwrite",
+          "importSuccess": "JSON imported successfully",
+          "importFailed": "Failed to parse JSON, please check the format",
+          "importEmpty": "JSON content is empty"
         }
       }
     }
