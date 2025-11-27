@@ -26,6 +26,8 @@
 
 软件授权管理平台是一个独立的软件授权管理系统，为软件系统提供授权码生成、分发、验证和管理服务。支持在线和离线两种授权模式，基于硬件绑定的授权机制确保安全性。
 
+✨同时支持**任何开发语言**、**任何类型的软件产品**通过标准化 **HTTP API** 与**跨平台客户端 SDK** **快速集成授权能力**。
+
 ## Demo环境
   <a href="https://lm.cedar-v.com:18080">
     <img src="https://img.shields.io/badge/Demo-Online-success?logo=googlechrome" alt="Live Demo">
@@ -56,6 +58,10 @@
 ## 客户端SDK
 
 客户端SDK请访问：[https://github.com/cedar-v/license-manager-sdk](https://github.com/cedar-v/license-manage-sdk-go)
+
+## 商业咨询与合作
+
+商业咨询与合作请联系QQ群管理员。
 
 ## 系统界面
 

@@ -26,6 +26,8 @@
 
 License Manager is an independent software licensing platform that provides license code generation, distribution, validation, and management services for IoT platforms and other software systems. It offers both online and offline licensing modes with hardware-based binding for enhanced security.
 
+✨It enables **any programming language** and **any type of software product** to **quickly integrate licensing capabilities** via standardized **HTTP APIs** and **cross-platform client SDKs**.
+
 ## Demo Environment
   <a href="https://lm.cedar-v.com:18080">
     <img src="https://img.shields.io/badge/Demo-Online-success?logo=googlechrome" alt="Live Demo">
