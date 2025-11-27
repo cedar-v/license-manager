@@ -339,8 +339,9 @@
           "forActivation": "（クライアントアクティベーション用）",
           "code": "認証コード",
           "tipText": "この認証コードを顧客に提供してください。顧客がソフトウェア製品で設定すると、ソフトウェアライセンスを自動的に取得できます",
-          "customParameters": "機能設定",
-          "usageLimits": "制限設定",
+          "featureConfig": "機能構成",
+          "usageLimits": "利用制限",
+          "customParameters": "カスタムパラメータ",
           "typeColumn": "タイプ",
           "keyColumn": "キー",
           "valueColumn": "値",
@@ -449,8 +450,9 @@
         "sections": {
           "basicInfo": "基本情報",
           "licenseConfig": "ライセンス設定",
-          "customParameters": "機能設定",
-          "usageLimits": "制限設定"
+          "featureConfig": "機能構成",
+          "usageLimits": "利用制限",
+          "customParameters": "カスタムパラメータ"
         },
         "fields": {
           "customerName": "関連顧客名",
@@ -550,8 +552,9 @@
           "booleanFalse": "false",
           "validationFailed": "送信前に機能設定または制限設定のエラーを修正してください",
           "importJson": "JSONをインポート",
-          "importTitleFeature": "機能設定 JSON をインポート",
-          "importTitleLimit": "制限設定 JSON をインポート",
+          "importTitleFeature": "機能構成 JSON をインポート",
+          "importTitleLimit": "利用制限 JSON をインポート",
+          "importTitleCustom": "カスタムパラメータ JSON をインポート",
           "importDescription": "キーを設定名とするオブジェクト形式の JSON を貼り付けてください。値は文字列・数値・ブールをサポートします。確定すると現在のリストを上書きします。",
           "importPlaceholder": "{ \"feature_dashboard\": \"enabled\" }",
           "importCancel": "キャンセル",

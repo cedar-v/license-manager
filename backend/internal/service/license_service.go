@@ -11,14 +11,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sirupsen/logrus"
-	"gorm.io/gorm"
 	"license-manager/internal/config"
 	"license-manager/internal/models"
 	"license-manager/internal/repository"
 	pkgcontext "license-manager/pkg/context"
 	"license-manager/pkg/i18n"
 	"license-manager/pkg/utils"
+
+	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 type licenseService struct {
@@ -333,27 +334,16 @@ func (s *licenseService) GenerateLicenseFile(ctx context.Context, id string) ([]
 		licenseFileData["max_activations"] = license.AuthorizationCode.MaxActivations
 
 		// 包含功能配置
-		if len(license.AuthorizationCode.FeatureConfig) > 0 {
-			var featureConfig map[string]interface{}
-			if err := json.Unmarshal(license.AuthorizationCode.FeatureConfig, &featureConfig); err == nil {
-				licenseFileData["feature_config"] = featureConfig
-			}
+		if featureConfig := parseJSONField(license.AuthorizationCode.FeatureConfig); len(featureConfig) > 0 {
+			licenseFileData["feature_config"] = featureConfig
 		}
 
-		// 包含使用限制
-		if len(license.AuthorizationCode.UsageLimits) > 0 {
-			var usageLimits map[string]interface{}
-			if err := json.Unmarshal(license.AuthorizationCode.UsageLimits, &usageLimits); err == nil {
-				licenseFileData["usage_limits"] = usageLimits
-			}
+		if usageLimits := parseJSONField(license.AuthorizationCode.UsageLimits); len(usageLimits) > 0 {
+			licenseFileData["usage_limits"] = usageLimits
 		}
 
-		// 包含自定义参数
-		if len(license.AuthorizationCode.CustomParameters) > 0 {
-			var customParameters map[string]interface{}
-			if err := json.Unmarshal(license.AuthorizationCode.CustomParameters, &customParameters); err == nil {
-				licenseFileData["custom_parameters"] = customParameters
-			}
+		if customParameters := parseJSONField(license.AuthorizationCode.CustomParameters); len(customParameters) > 0 {
+			licenseFileData["custom_parameters"] = customParameters
 		}
 	}
 
@@ -669,25 +659,16 @@ func (s *licenseService) generateLicenseFileContent(license *models.License, aut
 		licenseFileData["max_activations"] = authCode.MaxActivations
 
 		// 包含功能配置等
-		if len(authCode.FeatureConfig) > 0 {
-			var featureConfig map[string]interface{}
-			if err := json.Unmarshal(authCode.FeatureConfig, &featureConfig); err == nil {
-				licenseFileData["feature_config"] = featureConfig
-			}
+		if featureConfig := parseJSONField(authCode.FeatureConfig); len(featureConfig) > 0 {
+			licenseFileData["feature_config"] = featureConfig
 		}
 
-		if len(authCode.UsageLimits) > 0 {
-			var usageLimits map[string]interface{}
-			if err := json.Unmarshal(authCode.UsageLimits, &usageLimits); err == nil {
-				licenseFileData["usage_limits"] = usageLimits
-			}
+		if usageLimits := parseJSONField(authCode.UsageLimits); len(usageLimits) > 0 {
+			licenseFileData["usage_limits"] = usageLimits
 		}
 
-		if len(authCode.CustomParameters) > 0 {
-			var customParameters map[string]interface{}
-			if err := json.Unmarshal(authCode.CustomParameters, &customParameters); err == nil {
-				licenseFileData["custom_parameters"] = customParameters
-			}
+		if customParameters := parseJSONField(authCode.CustomParameters); len(customParameters) > 0 {
+			licenseFileData["custom_parameters"] = customParameters
 		}
 	}
 
@@ -762,6 +743,29 @@ func (s *licenseService) signLicenseFile(data []byte) ([]byte, error) {
 	encoded := base64.StdEncoding.EncodeToString(licenseJSON)
 
 	return []byte(encoded), nil
+}
+
+// parseJSONField 将数据库中的 JSON 字段解析为 map，兼容被字符串包裹的情况
+func parseJSONField(raw models.JSON) map[string]interface{} {
+	if len(raw) == 0 {
+		return nil
+	}
+
+	var result map[string]interface{}
+	if err := json.Unmarshal(raw, &result); err == nil {
+		return result
+	}
+
+	// 兼容字段以字符串形式保存 JSON 的情况，例如 "\"{\\\"key\\\":123}\""
+	var rawString string
+	if err := json.Unmarshal(raw, &rawString); err != nil {
+		return nil
+	}
+
+	if err := json.Unmarshal([]byte(rawString), &result); err != nil {
+		return nil
+	}
+	return result
 }
 
 // GetStatsOverview 获取授权概览统计

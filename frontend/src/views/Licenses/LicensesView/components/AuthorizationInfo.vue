@@ -66,16 +66,16 @@
       </div>
     </div>
 
-    <!-- 功能设置 -->
+    <!-- 功能配置 -->
     <div class="info-card">
-      <div class="card-title">{{ t('pages.licenses.detail.authorizationInfo.customParameters') }}</div>
-      <div v-if="customParameters.length" class="key-value-table">
+      <div class="card-title">{{ t('pages.licenses.detail.authorizationInfo.featureConfig') }}</div>
+      <div v-if="featureConfig.length" class="key-value-table">
         <div class="key-value-header">
           <span>{{ t('pages.licenses.detail.authorizationInfo.keyColumn') }}</span>
           <span>{{ t('pages.licenses.detail.authorizationInfo.typeColumn') }}</span>
           <span>{{ t('pages.licenses.detail.authorizationInfo.valueColumn') }}</span>
         </div>
-        <div v-for="item in customParameters" :key="`feature-${item.key}`" class="key-value-row">
+        <div v-for="item in featureConfig" :key="`feature-${item.key}`" class="key-value-row">
           <span class="key-cell">{{ item.key }}</span>
           <span class="type-cell">{{ t(`pages.licenses.detail.authorizationInfo.typeOptions.${item.type}`) }}</span>
           <span class="value-cell">{{ item.value || '-' }}</span>
@@ -86,7 +86,7 @@
       </div>
     </div>
 
-    <!-- 限制设置 -->
+    <!-- 使用限制 -->
     <div class="info-card">
       <div class="card-title">{{ t('pages.licenses.detail.authorizationInfo.usageLimits') }}</div>
       <div v-if="usageLimits.length" class="key-value-table">
@@ -96,6 +96,26 @@
           <span>{{ t('pages.licenses.detail.authorizationInfo.valueColumn') }}</span>
         </div>
         <div v-for="item in usageLimits" :key="`limit-${item.key}`" class="key-value-row">
+          <span class="key-cell">{{ item.key }}</span>
+          <span class="type-cell">{{ t(`pages.licenses.detail.authorizationInfo.typeOptions.${item.type}`) }}</span>
+          <span class="value-cell">{{ item.value || '-' }}</span>
+        </div>
+      </div>
+      <div v-else class="key-value-empty">
+        {{ t('pages.licenses.detail.authorizationInfo.keyValueEmpty') }}
+      </div>
+    </div>
+
+    <!-- 自定义参数 -->
+    <div class="info-card">
+      <div class="card-title">{{ t('pages.licenses.detail.authorizationInfo.customParameters') }}</div>
+      <div v-if="customParameters.length" class="key-value-table">
+        <div class="key-value-header">
+          <span>{{ t('pages.licenses.detail.authorizationInfo.keyColumn') }}</span>
+          <span>{{ t('pages.licenses.detail.authorizationInfo.typeColumn') }}</span>
+          <span>{{ t('pages.licenses.detail.authorizationInfo.valueColumn') }}</span>
+        </div>
+        <div v-for="item in customParameters" :key="`custom-${item.key}`" class="key-value-row">
           <span class="key-cell">{{ item.key }}</span>
           <span class="type-cell">{{ t(`pages.licenses.detail.authorizationInfo.typeOptions.${item.type}`) }}</span>
           <span class="value-cell">{{ item.value || '-' }}</span>
@@ -168,8 +188,9 @@ const parseKeyValueData = (source: unknown): KeyValueItem[] => {
   })
 }
 
-const customParameters = computed(() => parseKeyValueData(props.licenseData?.custom_parameters))
+const featureConfig = computed(() => parseKeyValueData(props.licenseData?.feature_config))
 const usageLimits = computed(() => parseKeyValueData(props.licenseData?.usage_limits))
+const customParameters = computed(() => parseKeyValueData(props.licenseData?.custom_parameters))
 
 // 获取授权期限类型
 const getLicensePeriodType = () => {

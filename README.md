@@ -1,5 +1,23 @@
 # 软件授权管理平台
 
+<p align="center">
+  <a href="https://github.com/cedar-v/license-manager/releases">
+    <img src="https://img.shields.io/github/v/release/cedar-v/license-manager?logo=git&label=Latest%20Release" alt="Latest Release">
+  </a>
+  <a href="https://github.com/cedar-v/license-manager/releases">
+    <img src="https://img.shields.io/github/downloads/cedar-v/license-manager/total?label=Downloads&logo=github" alt="Downloads">
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/github/license/cedar-v/license-manager?label=License&color=blue" alt="License: GPL-3.0">
+  </a>
+  <a href="https://github.com/cedar-v/license-manager/issues">
+    <img src="https://img.shields.io/github/issues/cedar-v/license-manager?label=Issues&logo=github" alt="Open Issues">
+  </a>
+  <a href="https://github.com/cedar-v/license-manager/pulls">
+    <img src="https://img.shields.io/github/issues-pr/cedar-v/license-manager?label=PRs&logo=github" alt="Open PRs">
+  </a>
+</p>
+
 [中文](README.md) | [English](README_EN.md) 
 
 ---
@@ -9,13 +27,35 @@
 软件授权管理平台是一个独立的软件授权管理系统，为软件系统提供授权码生成、分发、验证和管理服务。支持在线和离线两种授权模式，基于硬件绑定的授权机制确保安全性。
 
 ## Demo环境
+  <a href="https://lm.cedar-v.com:18080">
+    <img src="https://img.shields.io/badge/Demo-Online-success?logo=googlechrome" alt="Live Demo">
+  </a>
 
 访问地址：[lm.cedar-v.com:18080](http://lm.cedar-v.com:18080)  
 **登录凭证：**  
 - 用户名：`admin`  
 - 密码：`admin@123`
 
-> 💡 这是一个当前功能的演示环境，您可以体验已开发的核心特性。我们正在持续开发中，更多功能将陆续上线。
+> 💡 这是一个当前功能的演示环境，您可以体验已开发的核心特性。
+
+## 官方文档
+
+官方文档请访问：[https://docs.cedar-v.com](https://docs.lm.cedar-v.com)
+
+## Star收藏与关注
+
+<a href="https://github.com/cedar-v/license-manager" target="_blank">
+  <img src="https://img.shields.io/github/stars/cedar-v/license-manager?style=social" alt="GitHub Stars">
+</a>
+<a href="https://github.com/cedar-v/license-manager" target="_blank">
+  <img src="https://img.shields.io/github/watchers/cedar-v/license-manager?style=social" alt="GitHub Watchers">
+</a>
+
+如果这个项目对你有帮助，请给个star收藏，你的支持是我们最大的动力！
+
+## 客户端SDK
+
+客户端SDK请访问：[https://github.com/cedar-v/license-manager-sdk](https://github.com/cedar-v/license-manage-sdk-go)
 
 ## 系统界面
 

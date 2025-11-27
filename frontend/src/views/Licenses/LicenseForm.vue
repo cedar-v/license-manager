@@ -211,22 +211,27 @@
           </div>
         </div>
 
-        <!-- 功能设置 -->
+        <!-- 功能配置 -->
         <div class="license-form">
           <div class="key-value-section-header">
-            <h3 class="section-title">{{ t('pages.licenses.form.sections.customParameters') }}</h3>
+            <h3 class="section-title">{{ t('pages.licenses.form.sections.featureConfig') }}</h3>
             <div class="key-value-section-actions">
-              <el-button size="small" @click="addFeatureEntry">
+              <el-button size="small" @click="addFeatureConfigEntry">
                 {{ t('pages.licenses.form.keyValue.addItem') }}
               </el-button>
-              <el-button size="small" text :disabled="!featureEntries.length" @click="clearFeatureEntries">
+              <el-button
+                size="small"
+                text
+                :disabled="!featureConfigEntries.length"
+                @click="clearFeatureConfigEntries"
+              >
                 {{ t('pages.licenses.form.keyValue.clearAll') }}
               </el-button>
               <el-button
                 size="small"
                 text
-                :disabled="!featureJsonPreview"
-                @click="copyJson(featureJsonPreview)"
+                :disabled="!featureConfigPreview"
+                @click="copyJson(featureConfigPreview)"
               >
                 {{ t('pages.licenses.form.keyValue.copyJson') }}
               </el-button>
@@ -237,7 +242,7 @@
           </div>
 
           <div class="key-value-list">
-            <div v-for="(item, index) in featureEntries" :key="item.id" class="key-value-row">
+            <div v-for="(item, index) in featureConfigEntries" :key="item.id" class="key-value-row">
               <div class="key-value-field">
                 <label>{{ t('pages.licenses.form.keyValue.keyLabel') }}</label>
                 <el-input
@@ -279,12 +284,12 @@
                 />
                 <p v-if="item.valueError" class="key-value-error">{{ item.valueError }}</p>
               </div>
-              <el-button link type="danger" @click="removeFeatureEntry(index)">
+              <el-button link type="danger" @click="removeFeatureConfigEntry(index)">
                 {{ t('pages.licenses.form.keyValue.remove') }}
               </el-button>
             </div>
 
-            <div v-if="!featureEntries.length" class="key-value-empty">
+            <div v-if="!featureConfigEntries.length" class="key-value-empty">
               {{ t('pages.licenses.form.keyValue.emptyState') }}
             </div>
           </div>
@@ -293,7 +298,7 @@
             <div class="key-value-preview-label">
               {{ t('pages.licenses.form.keyValue.preview') }}
             </div>
-            <el-input type="textarea" :rows="3" :model-value="featureJsonPreview" readonly />
+            <el-input type="textarea" :rows="3" :model-value="featureConfigPreview" readonly />
           </div>
         </div>
 
@@ -382,17 +387,99 @@
             <el-input type="textarea" :rows="3" :model-value="usageJsonPreview" readonly />
           </div>
         </div>
+
+        <!-- 自定义参数 -->
+        <div class="license-form">
+          <div class="key-value-section-header">
+            <h3 class="section-title">{{ t('pages.licenses.form.sections.customParameters') }}</h3>
+            <div class="key-value-section-actions">
+              <el-button size="small" @click="addCustomEntry">
+                {{ t('pages.licenses.form.keyValue.addItem') }}
+              </el-button>
+              <el-button size="small" text :disabled="!customEntries.length" @click="clearCustomEntries">
+                {{ t('pages.licenses.form.keyValue.clearAll') }}
+              </el-button>
+              <el-button
+                size="small"
+                text
+                :disabled="!customJsonPreview"
+                @click="copyJson(customJsonPreview)"
+              >
+                {{ t('pages.licenses.form.keyValue.copyJson') }}
+              </el-button>
+              <el-button size="small" text @click="openImportDialog('custom')">
+                {{ t('pages.licenses.form.keyValue.importJson') }}
+              </el-button>
+            </div>
+          </div>
+
+          <div class="key-value-list">
+            <div v-for="(item, index) in customEntries" :key="item.id" class="key-value-row">
+              <div class="key-value-field">
+                <label>{{ t('pages.licenses.form.keyValue.keyLabel') }}</label>
+                <el-input
+                  v-model="item.key"
+                  :placeholder="t('pages.licenses.form.keyValue.keyPlaceholder')"
+                  @input="item.keyError = ''"
+                />
+                <p v-if="item.keyError" class="key-value-error">{{ item.keyError }}</p>
+              </div>
+              <div class="key-value-field type-field">
+                <label>{{ t('pages.licenses.form.keyValue.typeLabel') }}</label>
+                <el-select v-model="item.type" @change="handleEntryTypeChange(item)">
+                  <el-option
+                    v-for="type in typeOptions"
+                    :key="type"
+                    :label="t(`pages.licenses.form.keyValue.typeOptions.${type}`)"
+                    :value="type"
+                  />
+                </el-select>
+              </div>
+              <div class="key-value-field">
+                <label>{{ t('pages.licenses.form.keyValue.valueLabel') }}</label>
+                <template v-if="item.type === 'bool'">
+                  <el-select v-model="item.value" @change="item.valueError = ''">
+                    <el-option
+                      v-for="option in boolOptions"
+                      :key="option.value"
+                      :label="option.label"
+                      :value="option.value"
+                    />
+                  </el-select>
+                </template>
+                <el-input
+                  v-else
+                  v-model="item.value"
+                  :placeholder="t('pages.licenses.form.keyValue.valuePlaceholder')"
+                  @input="item.valueError = ''"
+                  :inputmode="item.type === 'number' ? 'decimal' : 'text'"
+                />
+                <p v-if="item.valueError" class="key-value-error">{{ item.valueError }}</p>
+              </div>
+              <el-button link type="danger" @click="removeCustomEntry(index)">
+                {{ t('pages.licenses.form.keyValue.remove') }}
+              </el-button>
+            </div>
+
+            <div v-if="!customEntries.length" class="key-value-empty">
+              {{ t('pages.licenses.form.keyValue.emptyState') }}
+            </div>
+          </div>
+
+          <div class="key-value-preview">
+            <div class="key-value-preview-label">
+              {{ t('pages.licenses.form.keyValue.preview') }}
+            </div>
+            <el-input type="textarea" :rows="3" :model-value="customJsonPreview" readonly />
+          </div>
+        </div>
       </el-form>
     </div>
   </div>
 
   <el-dialog
     v-model="importDialogVisible"
-    :title="
-      importDialogTarget === 'feature'
-        ? t('pages.licenses.form.keyValue.importTitleFeature')
-        : t('pages.licenses.form.keyValue.importTitleLimit')
-    "
+    :title="importDialogTitle"
     width="520px"
     destroy-on-close
   >
@@ -462,10 +549,20 @@ const submitting = ref(false)
 const customerLoading = ref(false)
 const customerOptions = ref<Customer[]>([])
 
-const featureEntries = ref<KeyValueItem[]>([])
+const featureConfigEntries = ref<KeyValueItem[]>([])
 const limitEntries = ref<KeyValueItem[]>([])
+const customEntries = ref<KeyValueItem[]>([])
 const importDialogVisible = ref(false)
-const importDialogTarget = ref<'feature' | 'limit'>('feature')
+const importDialogTarget = ref<'feature' | 'limit' | 'custom'>('feature')
+const importDialogTitle = computed(() => {
+  if (importDialogTarget.value === 'limit') {
+    return t('pages.licenses.form.keyValue.importTitleLimit')
+  }
+  if (importDialogTarget.value === 'custom') {
+    return t('pages.licenses.form.keyValue.importTitleCustom')
+  }
+  return t('pages.licenses.form.keyValue.importTitleFeature')
+})
 const importDialogContent = ref('')
 const importDialogError = ref('')
 
@@ -497,8 +594,9 @@ const formData = reactive<
 // 独立的响应式变量
 const dateRange = ref<[string, string] | null>(null)
 
-const featureJsonPreview = computed(() => buildJsonString(featureEntries.value))
+const featureConfigPreview = computed(() => buildJsonString(featureConfigEntries.value))
 const usageJsonPreview = computed(() => buildJsonString(limitEntries.value))
+const customJsonPreview = computed(() => buildJsonString(customEntries.value))
 
 // 计算属性
 const isEdit = computed(() => {
@@ -671,9 +769,9 @@ const convertValueByType = (value: string, type: KeyValueType) => {
   return value
 }
 
-const buildJsonString = (entries: KeyValueItem[]) => {
+const buildJsonRecord = (entries: KeyValueItem[]) => {
   if (!entries.length) {
-    return ''
+    return null
   }
   const result: Record<string, string | number | boolean> = {}
   entries.forEach(item => {
@@ -686,31 +784,48 @@ const buildJsonString = (entries: KeyValueItem[]) => {
       }
     }
   })
-  return Object.keys(result).length ? JSON.stringify(result) : ''
+  return Object.keys(result).length ? result : null
 }
 
-const addFeatureEntry = () => {
-  featureEntries.value.push(createEmptyEntry())
+const buildJsonString = (entries: KeyValueItem[]) => {
+  const record = buildJsonRecord(entries)
+  return record ? JSON.stringify(record) : ''
+}
+
+const addFeatureConfigEntry = () => {
+  featureConfigEntries.value.push(createEmptyEntry())
 }
 
 const addLimitEntry = () => {
   limitEntries.value.push(createEmptyEntry())
 }
 
-const removeFeatureEntry = (index: number) => {
-  featureEntries.value.splice(index, 1)
+const addCustomEntry = () => {
+  customEntries.value.push(createEmptyEntry())
+}
+
+const removeFeatureConfigEntry = (index: number) => {
+  featureConfigEntries.value.splice(index, 1)
 }
 
 const removeLimitEntry = (index: number) => {
   limitEntries.value.splice(index, 1)
 }
 
-const clearFeatureEntries = () => {
-  featureEntries.value = []
+const removeCustomEntry = (index: number) => {
+  customEntries.value.splice(index, 1)
+}
+
+const clearFeatureConfigEntries = () => {
+  featureConfigEntries.value = []
 }
 
 const clearLimitEntries = () => {
   limitEntries.value = []
+}
+
+const clearCustomEntries = () => {
+  customEntries.value = []
 }
 
 const handleEntryTypeChange = (entry: KeyValueItem) => {
@@ -799,10 +914,14 @@ const validateKeyValueEntries = (entries: KeyValueItem[]) => {
   return isValid
 }
 
-const openImportDialog = (target: 'feature' | 'limit') => {
+const openImportDialog = (target: 'feature' | 'limit' | 'custom') => {
   importDialogTarget.value = target
   importDialogContent.value =
-    target === 'feature' ? featureJsonPreview.value : usageJsonPreview.value
+    target === 'feature'
+      ? featureConfigPreview.value
+      : target === 'limit'
+        ? usageJsonPreview.value
+        : customJsonPreview.value
   importDialogError.value = ''
   importDialogVisible.value = true
 }
@@ -813,9 +932,11 @@ const handleImportConfirm = () => {
     const content = importDialogContent.value.trim()
     if (!content) {
       if (importDialogTarget.value === 'feature') {
-        featureEntries.value = []
-      } else {
+        featureConfigEntries.value = []
+      } else if (importDialogTarget.value === 'limit') {
         limitEntries.value = []
+      } else {
+        customEntries.value = []
       }
     } else {
       const entries = parseJsonToEntries(content, { strict: true })
@@ -823,9 +944,11 @@ const handleImportConfirm = () => {
         throw new Error(t('pages.licenses.form.keyValue.importEmpty'))
       }
       if (importDialogTarget.value === 'feature') {
-        featureEntries.value = entries
-      } else {
+        featureConfigEntries.value = entries
+      } else if (importDialogTarget.value === 'limit') {
         limitEntries.value = entries
+      } else {
+        customEntries.value = entries
       }
     }
     importDialogVisible.value = false
@@ -1078,8 +1201,9 @@ const loadLicenseDetail = async () => {
         ]
       }
 
-      hydrateEntriesFromField(data.custom_parameters, featureEntries)
+      hydrateEntriesFromField(data.feature_config, featureConfigEntries)
       hydrateEntriesFromField(data.usage_limits, limitEntries)
+      hydrateEntriesFromField(data.custom_parameters, customEntries)
     } else {
       throw new Error(response.message || t('pages.licenses.form.messages.loadDetailError'))
     }
@@ -1102,15 +1226,17 @@ const handleSubmit = async () => {
     // 执行表单验证
     await formRef.value.validate()
 
-    const customValid = validateKeyValueEntries(featureEntries.value)
+    const featureConfigValid = validateKeyValueEntries(featureConfigEntries.value)
     const limitValid = validateKeyValueEntries(limitEntries.value)
-    if (!customValid || !limitValid) {
+    const customValid = validateKeyValueEntries(customEntries.value)
+    if (!featureConfigValid || !limitValid || !customValid) {
       ElMessage.error(t('pages.licenses.form.keyValue.validationFailed'))
       return
     }
 
-    formData.custom_parameters = featureJsonPreview.value
+    formData.feature_config = buildJsonRecord(featureConfigEntries.value) || {}
     formData.usage_limits = usageJsonPreview.value
+    formData.custom_parameters = customJsonPreview.value
 
     submitting.value = true
 
@@ -1200,17 +1326,25 @@ watch(
 )
 
 watch(
-  featureEntries,
+  limitEntries,
   () => {
-    formData.custom_parameters = featureJsonPreview.value
+    formData.usage_limits = usageJsonPreview.value
   },
   { deep: true }
 )
 
 watch(
-  limitEntries,
+  featureConfigEntries,
   () => {
-    formData.usage_limits = usageJsonPreview.value
+    formData.feature_config = buildJsonRecord(featureConfigEntries.value) || {}
+  },
+  { deep: true }
+)
+
+watch(
+  customEntries,
+  () => {
+    formData.custom_parameters = customJsonPreview.value
   },
   { deep: true }
 )

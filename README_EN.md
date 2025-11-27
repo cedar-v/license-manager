@@ -1,5 +1,23 @@
 # License Manager
 
+<p align="center">
+  <a href="https://github.com/cedar-v/license-manager/releases">
+    <img src="https://img.shields.io/github/v/release/cedar-v/license-manager?logo=git&label=Latest%20Release" alt="Latest Release">
+  </a>
+  <a href="https://github.com/cedar-v/license-manager/releases">
+    <img src="https://img.shields.io/github/downloads/cedar-v/license-manager/total?label=Downloads&logo=github" alt="Downloads">
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/github/license/cedar-v/license-manager?label=License&color=blue" alt="License: GPL-3.0">
+  </a>
+  <a href="https://github.com/cedar-v/license-manager/issues">
+    <img src="https://img.shields.io/github/issues/cedar-v/license-manager?label=Issues&logo=github" alt="Open Issues">
+  </a>
+  <a href="https://github.com/cedar-v/license-manager/pulls">
+    <img src="https://img.shields.io/github/issues-pr/cedar-v/license-manager?label=PRs&logo=github" alt="Open PRs">
+  </a>
+</p>
+
 [中文](README.md) | [English](README_EN.md) 
 
 ---
@@ -9,6 +27,9 @@
 License Manager is an independent software licensing platform that provides license code generation, distribution, validation, and management services for IoT platforms and other software systems. It offers both online and offline licensing modes with hardware-based binding for enhanced security.
 
 ## Demo Environment
+  <a href="https://lm.cedar-v.com:18080">
+    <img src="https://img.shields.io/badge/Demo-Online-success?logo=googlechrome" alt="Live Demo">
+  </a>
 
 Access URL: [lm.cedar-v.com:18080](http://lm.cedar-v.com:18080)  
 **Login Credentials:**  
@@ -16,6 +37,21 @@ Access URL: [lm.cedar-v.com:18080](http://lm.cedar-v.com:18080)
 - Password: `admin@123`
 
 > 💡 This is a demo environment showcasing our current features. You can experience the implemented core functionalities while we continue active development with more features coming soon.
+
+## Stars & Followers
+
+<a href="https://github.com/cedar-v/license-manager" target="_blank">
+  <img src="https://img.shields.io/github/stars/cedar-v/license-manager?style=social" alt="GitHub Stars">
+</a>
+<a href="https://github.com/cedar-v/license-manager" target="_blank">
+  <img src="https://img.shields.io/github/watchers/cedar-v/license-manager?style=social" alt="GitHub Watchers">
+</a>
+
+If this project helps you, please give it a star—your support keeps us moving!
+
+## Client SDK
+
+Client SDK repository: [https://github.com/cedar-v/license-manager-sdk](https://github.com/cedar-v/license-manage-sdk-go)
 
 ## System Interface
 

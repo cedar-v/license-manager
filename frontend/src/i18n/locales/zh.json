@@ -339,8 +339,9 @@
           "forActivation": "（用于客户端激活）",
           "code": "授权码",
           "tipText": "将此授权码提供给客户，客户在软件产品中配置后可自动获取软件许可证",
-          "customParameters": "功能设置",
-          "usageLimits": "限制设置",
+          "featureConfig": "功能配置",
+          "usageLimits": "使用限制",
+          "customParameters": "自定义参数",
           "typeColumn": "类型",
           "keyColumn": "键",
           "valueColumn": "值",
@@ -449,8 +450,9 @@
         "sections": {
           "basicInfo": "基本信息",
           "licenseConfig": "授权配置",
-          "customParameters": "功能设置",
-          "usageLimits": "限制设置"
+          "featureConfig": "功能配置",
+          "usageLimits": "使用限制",
+          "customParameters": "自定义参数"
         },
         "fields": {
           "customerName": "关联客户名称",
@@ -550,8 +552,9 @@
           "booleanFalse": "false",
           "validationFailed": "请先修复功能或限制设置中的错误再提交",
           "importJson": "导入JSON",
-          "importTitleFeature": "导入功能设置 JSON",
-          "importTitleLimit": "导入限制设置 JSON",
+          "importTitleFeature": "导入功能配置 JSON",
+          "importTitleLimit": "导入使用限制 JSON",
+          "importTitleCustom": "导入自定义参数 JSON",
           "importDescription": "粘贴一个对象格式的 JSON，键为配置项，值支持字符串、数字或布尔类型。提交后将覆盖当前列表。",
           "importPlaceholder": "{ \"feature_dashboard\": \"enabled\" }",
           "importCancel": "取消",

@@ -339,8 +339,9 @@
           "forActivation": "(For Client Activation)",
           "code": "Authorization Code",
           "tipText": "Provide this authorization code to the customer, who can automatically obtain the software license after configuring it in the software product",
-          "customParameters": "Feature Settings",
+          "featureConfig": "Feature Configuration",
           "usageLimits": "Usage Limits",
+          "customParameters": "Custom Parameters",
           "typeColumn": "Type",
           "keyColumn": "Key",
           "valueColumn": "Value",
@@ -449,8 +450,9 @@
         "sections": {
           "basicInfo": "Basic Information",
           "licenseConfig": "License Configuration",
-          "customParameters": "Feature Settings",
-          "usageLimits": "Usage Limits"
+          "featureConfig": "Feature Configuration",
+          "usageLimits": "Usage Limits",
+          "customParameters": "Custom Parameters"
         },
         "fields": {
           "customerName": "Associated Customer Name",
@@ -550,8 +552,9 @@
           "booleanFalse": "false",
           "validationFailed": "Fix the errors in feature or limit settings before submitting",
           "importJson": "Import JSON",
-          "importTitleFeature": "Import Feature Settings JSON",
+          "importTitleFeature": "Import Feature Configuration JSON",
           "importTitleLimit": "Import Usage Limits JSON",
+          "importTitleCustom": "Import Custom Parameters JSON",
           "importDescription": "Paste a JSON object whose values can be string, number, or boolean. Confirming will overwrite current entries.",
           "importPlaceholder": "{ \"feature_dashboard\": \"enabled\" }",
           "importCancel": "Cancel",
