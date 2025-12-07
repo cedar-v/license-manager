@@ -185,9 +185,15 @@ const fetchDashboardStats = async () => {
       if (data[item.key] !== undefined && typeof data[item.key] !== 'object') {
         item.value = data[item.key]
       }
-      // 处理嵌套在 growth_rate 中的字段
+      // 处理嵌套在 growth_rate 中的字段（授权码增长率和许可证增长率）
       if (data.growth_rate && data.growth_rate[item.key] !== undefined) {
-        item.value = data.growth_rate[item.key]
+        const rateValue = data.growth_rate[item.key]
+        // 如果是数字类型，格式化为保留两位小数的百分比
+        if (typeof rateValue === 'number') {
+          item.value = `${rateValue.toFixed(2)}%`
+        } else {
+          item.value = rateValue
+        }
       }
     })
   } catch (e) {
@@ -228,10 +234,26 @@ onMounted(() => {
   gap: 1.04vw; /* 20px/1920 = 1.04vw */
   margin-bottom: 2.08vw; /* 40px/1920 = 2.08vw */
   padding: 1.25vw; /* 24px/1920 = 1.25vw */
-  background: linear-gradient(135deg, #1db584 0%, #5ad8a6 100%);
+  background: linear-gradient(135deg, #019C7C 0%, #1db584 100%);
   border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
   position: relative;
+  overflow: hidden; /* 确保背景图片不溢出 */
 
+  // 背景图片层
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('@/assets/images/dashboard-bg.png') lightgray 50% / cover no-repeat;
+    mix-blend-mode: soft-light;
+    border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
+    z-index: 0;
+  }
+
+  // 网格纹理层
   &::before {
     content: '';
     position: absolute;
@@ -252,6 +274,7 @@ onMounted(() => {
       -0.52vw 0vw; /* 10px/1920 = 0.52vw */
     opacity: 0.15;
     border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
+    z-index: 1;
   }
 }
 
@@ -260,7 +283,7 @@ onMounted(() => {
   align-items: stretch;
   gap: 0.83vw; /* 16px/1920 = 0.83vw */
   position: relative;
-  z-index: 1;
+  z-index: 2; /* 确保内容显示在背景图片和网格纹理之上 */
   min-width: 0;
 
   &:not(:last-child)::after {
@@ -634,9 +657,14 @@ onMounted(() => {
 
 /* 统计卡片区域暗模式优化 */
 [data-theme='dark'] .stats-section {
-  // background: linear-gradient(135deg, #10b981 0%, #34d399 100%) !important;
-  background:  rgba(1, 156, 124, 1) !important;
+  background: linear-gradient(135deg, #019C7C 0%, #10b981 100%) !important;
   box-shadow: 0 4px 20px rgba(16, 185, 129, 0.15) !important;
+
+  // 暗色模式下的背景图片
+  &::after {
+    background: url('@/assets/images/dashboard-bg.png') lightgray 50% / cover no-repeat;
+    mix-blend-mode: soft-light;
+  }
 }
 
 /* 表格卡片暗模式 */

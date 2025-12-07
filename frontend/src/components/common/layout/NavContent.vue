@@ -158,8 +158,12 @@
           </template>
         </el-dropdown>
 
-        <!-- 主题切换按钮 -->
-        <el-tooltip :content="t('navigation.tooltip.theme')" placement="bottom">
+        <!-- 主题切换按钮（暂时禁用） -->
+        <el-tooltip
+          v-if="showThemeToggle"
+          :content="t('navigation.tooltip.theme')"
+          placement="bottom"
+        >
           <button class="action-btn" @click="handleThemeClick">
             <NavIcon name="dark-mode" />
           </button>
@@ -190,6 +194,9 @@ const { notificationCount = 24 } = defineProps<Props>()
 
 // 功能暂未启用，隐藏通知入口
 const showNotification = false
+
+// 主题功能暂未开发完成，禁用主题切换
+const showThemeToggle = false
 
 type ExternalLinkKey = 'docs' | 'github'
 interface ExternalLink {

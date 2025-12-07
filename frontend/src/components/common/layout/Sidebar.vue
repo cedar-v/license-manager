@@ -144,7 +144,7 @@ const handleNavClick = (item: NavItem, event: Event) => {
 .sidebar__header {
   height: 80px;
   @include flex-between;
-  border-bottom: 1px solid var(--app-border-light);
+  border-bottom: none;
 }
 
 .sidebar__logo {
@@ -418,7 +418,7 @@ const handleNavClick = (item: NavItem, event: Event) => {
 
 /* 侧边栏头部分割线 */
 [data-theme="dark"] .sidebar__header {
-  border-bottom-color: rgba(255, 255, 255, 0.12) !important;
+  border-bottom: none !important;
 }
 
 /* Logo文字颜色 */
