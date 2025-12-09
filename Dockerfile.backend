@@ -6,7 +6,7 @@ RUN go mod download
 COPY backend/ ./
 RUN go build -ldflags="-s -w" -o license-manager cmd/main.go
 
-FROM alpine:latest
+FROM alpine:3.18
 RUN apk --no-cache add ca-certificates tzdata curl
 WORKDIR /app/backend/cmd
 COPY --from=builder /app/backend/license-manager ./license-manager
