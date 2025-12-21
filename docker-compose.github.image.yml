@@ -32,7 +32,7 @@ services:
 
   # Backend service - using GitHub registry image
   backend:
-    image: ghcr.io/cedar-v/license-manager-backend:v1.0.3
+    image: ghcr.io/cedar-v/license-manager-backend:v1.0.4
     container_name: license-manager-backend-git
     restart: unless-stopped
     environment:
@@ -69,7 +69,7 @@ services:
 
   # Frontend service - using GitHub registry image
   frontend:
-    image: ghcr.io/cedar-v/license-manager-frontend:v1.0.3
+    image: ghcr.io/cedar-v/license-manager-frontend:v1.0.4
     container_name: license-manager-frontend-git
     restart: unless-stopped
     environment:
