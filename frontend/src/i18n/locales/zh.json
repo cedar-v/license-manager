@@ -88,6 +88,10 @@
         "unknown": "未知页面"
       }
   },
+  "common": {
+    "cancel": "取消",
+    "confirm": "确定"
+  },
   "chart": {
     "licenseTrend": {
       "title": "授权趋势",
@@ -407,9 +411,40 @@
         "actions": {
           "copyCode": "复制授权码",
           "updateLicense": "变更授权",
-          "renewLicense": "延期授权",
+          "changeValidity": "变更授权期限",
           "revokeLicense": "撤销许可证",
           "downloadCertificate": "授权文件下载"
+        },
+        "updateDialog": {
+          "title": "变更授权",
+          "fields": {
+            "changeType": "变更类型",
+            "maxActivations": "最大激活设备数",
+            "featureConfig": "功能配置 (JSON)",
+            "usageLimits": "使用限制 (JSON)",
+            "customParameters": "自定义参数 (JSON)",
+            "reason": "变更原因"
+          },
+          "validation": {
+            "changeTypeRequired": "请选择变更类型",
+            "reasonRequired": "请输入变更原因",
+            "featureConfigInvalid": "功能配置 JSON 格式错误",
+            "usageLimitsInvalid": "使用限制 JSON 格式错误",
+            "customParametersInvalid": "自定义参数 JSON 格式错误"
+          },
+          "messages": {
+            "updateSuccess": "变更已提交",
+            "updateError": "变更提交失败"
+          }
+        },
+        "dialogs": {
+          "changeValidityTitle": "变更授权期限",
+          "validityType": "期限类型",
+          "limited": "有限",
+          "permanent": "永久",
+          "dateRange": "起止时间",
+          "reason": "变更原因",
+          "reasonPlaceholder": "请输入变更原因（最多500字符）"
         },
         "messages": {
           "copySuccess": "授权码已复制到剪贴板",
@@ -417,6 +452,9 @@
           "codeEmpty": "授权码为空",
           "updateComingSoon": "变更授权功能开发中...",
           "renewComingSoon": "延期授权功能开发中...",
+          "changeValiditySuccess": "授权期限变更成功",
+          "changeValidityError": "变更授权期限失败",
+          "changeValidityReasonRequired": "请填写变更原因",
           "revokeComingSoon": "撤销许可证功能开发中...",
           "downloadSuccess": "授权文件已开始下载",
           "downloadError": "下载授权文件失败，请稍后重试",

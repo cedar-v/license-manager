@@ -88,6 +88,10 @@
         "unknown": "Unknown Page"
       }
   },
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  },
   "chart": {
     "licenseTrend": {
       "title": "License Trend",
@@ -407,9 +411,40 @@
         "actions": {
           "copyCode": "Copy License Code",
           "updateLicense": "Update License",
-          "renewLicense": "Renew License",
+          "changeValidity": "Change Validity Period",
           "revokeLicense": "Revoke License",
           "downloadCertificate": "Download Authorization File"
+        },
+        "updateDialog": {
+          "title": "Update Authorization",
+          "fields": {
+            "changeType": "Change Type",
+            "maxActivations": "Max Activations",
+            "featureConfig": "Feature Config (JSON)",
+            "usageLimits": "Usage Limits (JSON)",
+            "customParameters": "Custom Parameters (JSON)",
+            "reason": "Change Reason"
+          },
+          "validation": {
+            "changeTypeRequired": "Please select change type",
+            "reasonRequired": "Please enter change reason",
+            "featureConfigInvalid": "Feature config JSON is invalid",
+            "usageLimitsInvalid": "Usage limits JSON is invalid",
+            "customParametersInvalid": "Custom parameters JSON is invalid"
+          },
+          "messages": {
+            "updateSuccess": "Update submitted",
+            "updateError": "Failed to submit update"
+          }
+        },
+        "dialogs": {
+          "changeValidityTitle": "Change Validity Period",
+          "validityType": "Validity Type",
+          "limited": "Limited",
+          "permanent": "Permanent",
+          "dateRange": "Date Range",
+          "reason": "Change Reason",
+          "reasonPlaceholder": "Please enter change reason (max 500 chars)"
         },
         "messages": {
           "copySuccess": "License code copied to clipboard",
@@ -417,6 +452,9 @@
           "codeEmpty": "License code is empty",
           "updateComingSoon": "Update license feature is under development...",
           "renewComingSoon": "Renew license feature is under development...",
+          "changeValiditySuccess": "Validity period changed successfully",
+          "changeValidityError": "Failed to change validity period",
+          "changeValidityReasonRequired": "Please provide a reason for the change",
           "revokeComingSoon": "Revoke license feature is under development...",
           "downloadSuccess": "Authorization file download started",
           "downloadError": "Failed to download authorization file, please try again later",

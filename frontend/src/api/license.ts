@@ -93,6 +93,8 @@ export interface LicenseUpdateRequest {
   software_id?: string;
   description?: string;
   validity_days?: number;
+  start_date?: string;
+  end_date?: string;
   deployment_type?: string;
   encryption_type?: string;
   software_version?: string;

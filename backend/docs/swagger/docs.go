@@ -2811,9 +2811,7 @@ const docTemplate = `{
                     "type": "string",
                     "enum": [
                         "renewal",
-                        "upgrade",
-                        "limit_change",
-                        "feature_toggle",
+                        "feature_limit_change",
                         "lock",
                         "unlock",
                         "other"
@@ -2844,6 +2842,10 @@ const docTemplate = `{
                         "advanced"
                     ]
                 },
+                "end_date": {
+                    "description": "失效日期（YYYY-MM-DD）",
+                    "type": "string"
+                },
                 "feature_config": {
                     "description": "功能配置"
                 },
@@ -2863,6 +2865,10 @@ const docTemplate = `{
                 },
                 "software_version": {
                     "description": "软件版本",
+                    "type": "string"
+                },
+                "start_date": {
+                    "description": "可选的起止时间（优先于 validity_days），格式：YYYY-MM-DD",
                     "type": "string"
                 },
                 "usage_limits": {

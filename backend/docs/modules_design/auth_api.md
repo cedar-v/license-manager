@@ -484,7 +484,7 @@ GET /api/v1/authorization-codes/{id}/changes
 **查询参数**
 - `page` - 页码（默认1）
 - `page_size` - 每页数量（默认20，最大100）
-- `change_type` - 变更类型筛选 (renewal/upgrade/limit_change/feature_toggle/lock/unlock/other)
+- `change_type` - 变更类型筛选 (renewal/feature_limit_change/lock/unlock/other)
 - `operator_id` - 操作人筛选
 - `start_date` - 开始时间 (YYYY-MM-DD格式)
 - `end_date` - 结束时间 (YYYY-MM-DD格式)

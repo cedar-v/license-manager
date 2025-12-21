@@ -113,9 +113,7 @@ enums:
   
   authorization_change_type:
     "renewal": "Renewal"
-    "upgrade": "Upgrade"
-    "limit_change": "Limit Change"
-    "feature_toggle": "Feature Toggle"
+    "feature_limit_change": "Feature Limit Change"
     "lock": "Lock"
     "unlock": "Unlock"
     "other": "Other"

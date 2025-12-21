@@ -319,8 +319,26 @@ func (s *authorizationCodeService) UpdateAuthorizationCode(ctx context.Context, 
 	if req.Description != nil {
 		existingAuthCode.Description = req.Description
 	}
-	if req.ValidityDays != nil {
-		// 重新计算开始时间和结束时间
+	// 支持通过起止时间直接设置（优先），格式 YYYY-MM-DD；若未提供，则继续支持 validity_days（向后兼容）
+	if req.StartDate != nil || req.EndDate != nil {
+		if req.StartDate == nil || req.EndDate == nil {
+			return nil, i18n.NewI18nError("900001", lang)
+		}
+		startParsed, err := time.Parse("2006-01-02", *req.StartDate)
+		if err != nil {
+			return nil, i18n.NewI18nError("900001", lang)
+		}
+		endParsed, err := time.Parse("2006-01-02", *req.EndDate)
+		if err != nil {
+			return nil, i18n.NewI18nError("900001", lang)
+		}
+		// 规范化到本地时区的 00:00:00 / 23:59:59
+		startDate := time.Date(startParsed.Year(), startParsed.Month(), startParsed.Day(), 0, 0, 0, 0, time.Local)
+		endDate := time.Date(endParsed.Year(), endParsed.Month(), endParsed.Day(), 23, 59, 59, 0, time.Local)
+		existingAuthCode.StartDate = startDate
+		existingAuthCode.EndDate = endDate
+	} else if req.ValidityDays != nil {
+		// 重新计算开始时间和结束时间（兼容旧的 validity_days 字段）
 		now := time.Now()
 		startDate := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 		endDate := startDate.AddDate(0, 0, *req.ValidityDays-1).Add(23*time.Hour + 59*time.Minute + 59*time.Second)

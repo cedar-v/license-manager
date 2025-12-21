@@ -112,10 +112,8 @@ enums:
     "offline": "离线"
   
   authorization_change_type:
-    "renewal": "续期"
-    "upgrade": "升级"
-    "limit_change": "限制变更"
-    "feature_toggle": "功能切换"
+    "renewal": "日期变更"
+    "feature_limit_change": "功能限制变更"
     "lock": "锁定"
     "unlock": "解锁"
     "other": "其他"

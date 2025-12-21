@@ -88,6 +88,10 @@
       "unknown": "未知ページ"
     }
   },
+  "common": {
+    "cancel": "キャンセル",
+    "confirm": "確認"
+  },
   "chart": {
     "licenseTrend": {
       "title": "ライセンストレンド",
@@ -407,9 +411,40 @@
         "actions": {
           "copyCode": "ライセンスコードをコピー",
           "updateLicense": "ライセンス更新",
-          "renewLicense": "ライセンス延長",
+          "changeValidity": "有効期限を変更",
           "revokeLicense": "ライセンス取り消し",
           "downloadCertificate": "認証ファイルをダウンロード"
+        },
+        "updateDialog": {
+          "title": "ライセンスを変更",
+          "fields": {
+            "changeType": "変更タイプ",
+            "maxActivations": "最大アクティベーション数",
+            "featureConfig": "機能設定 (JSON)",
+            "usageLimits": "利用制限 (JSON)",
+            "customParameters": "カスタムパラメータ (JSON)",
+            "reason": "変更理由"
+          },
+          "validation": {
+            "changeTypeRequired": "変更タイプを選択してください",
+            "reasonRequired": "変更理由を入力してください",
+            "featureConfigInvalid": "機能設定のJSONが不正です",
+            "usageLimitsInvalid": "利用制限のJSONが不正です",
+            "customParametersInvalid": "カスタムパラメータのJSONが不正です"
+          },
+          "messages": {
+            "updateSuccess": "変更が送信されました",
+            "updateError": "変更の送信に失敗しました"
+          }
+        },
+        "dialogs": {
+          "changeValidityTitle": "有効期限の変更",
+          "validityType": "期限タイプ",
+          "limited": "限定",
+          "permanent": "永久",
+          "dateRange": "期間",
+          "reason": "変更理由",
+          "reasonPlaceholder": "変更理由を入力してください（最大500文字）"
         },
         "messages": {
           "copySuccess": "ライセンスコードがクリップボードにコピーされました",
@@ -417,6 +452,9 @@
           "codeEmpty": "ライセンスコードが空です",
           "updateComingSoon": "ライセンス更新機能は開発中です...",
           "renewComingSoon": "ライセンス延長機能は開発中です...",
+          "changeValiditySuccess": "有効期限の変更が完了しました",
+          "changeValidityError": "有効期限の変更に失敗しました",
+          "changeValidityReasonRequired": "変更理由を入力してください",
           "revokeComingSoon": "ライセンス取り消し機能は開発中です...",
           "downloadSuccess": "認証ファイルのダウンロードを開始しました",
           "downloadError": "認証ファイルのダウンロードに失敗しました。後でもう一度お試しください",

@@ -170,18 +170,21 @@ type AuthorizationCodeListResponse struct {
 
 // AuthorizationCodeUpdateRequest 更新授权码请求结构
 type AuthorizationCodeUpdateRequest struct {
-	SoftwareID       *string     `json:"software_id" binding:"omitempty"`                                                                    // 软件ID
-	Description      *string     `json:"description" binding:"omitempty,max=1000"`                                                           // 描述
-	ValidityDays     *int        `json:"validity_days" binding:"omitempty,min=1,max=365000"`                                                 // 有效天数（1-365000天，365000代表永久有效）
-	DeploymentType   *string     `json:"deployment_type" binding:"omitempty,oneof=standalone cloud hybrid"`                                  // 部署类型：standalone/cloud/hybrid
-	EncryptionType   *string     `json:"encryption_type" binding:"omitempty,oneof=standard advanced"`                                        // 加密类型：standard/advanced
-	SoftwareVersion  *string     `json:"software_version" binding:"omitempty"`                                                               // 软件版本
-	MaxActivations   *int        `json:"max_activations" binding:"omitempty,min=1"`                                                          // 最大激活次数
-	FeatureConfig    interface{} `json:"feature_config" binding:"omitempty"`                                                                 // 功能配置
-	UsageLimits      interface{} `json:"usage_limits" binding:"omitempty"`                                                                   // 使用限制
-	CustomParameters interface{} `json:"custom_parameters" binding:"omitempty"`                                                              // 自定义参数
-	ChangeType       string      `json:"change_type" binding:"required,oneof=renewal upgrade limit_change feature_toggle lock unlock other"` // 变更类型：renewal/upgrade/limit_change/feature_toggle/lock/unlock/other
-	Reason           *string     `json:"reason" binding:"omitempty,max=500"`                                                                 // 变更原因
+	SoftwareID       *string     `json:"software_id" binding:"omitempty"`                                   // 软件ID
+	Description      *string     `json:"description" binding:"omitempty,max=1000"`                          // 描述
+	ValidityDays     *int        `json:"validity_days" binding:"omitempty,min=1,max=365000"`                // 有效天数（1-365000天，365000代表永久有效）
+	DeploymentType   *string     `json:"deployment_type" binding:"omitempty,oneof=standalone cloud hybrid"` // 部署类型：standalone/cloud/hybrid
+	EncryptionType   *string     `json:"encryption_type" binding:"omitempty,oneof=standard advanced"`       // 加密类型：standard/advanced
+	SoftwareVersion  *string     `json:"software_version" binding:"omitempty"`                              // 软件版本
+	MaxActivations   *int        `json:"max_activations" binding:"omitempty,min=1"`                         // 最大激活次数
+	FeatureConfig    interface{} `json:"feature_config" binding:"omitempty"`                                // 功能配置
+	UsageLimits      interface{} `json:"usage_limits" binding:"omitempty"`                                  // 使用限制
+	CustomParameters interface{} `json:"custom_parameters" binding:"omitempty"`                             // 自定义参数
+	// 可选的起止时间（优先于 validity_days），格式：YYYY-MM-DD
+	StartDate  *string `json:"start_date" binding:"omitempty"`                                                      // 生效日期（YYYY-MM-DD）
+	EndDate    *string `json:"end_date" binding:"omitempty"`                                                        // 失效日期（YYYY-MM-DD）
+	ChangeType string  `json:"change_type" binding:"required,oneof=renewal feature_limit_change lock unlock other"` // 变更类型：renewal/upgrade/limit_change/feature_toggle/lock/unlock/other
+	Reason     *string `json:"reason" binding:"omitempty,max=500"`                                                  // 变更原因
 }
 
 // AuthorizationCodeLockRequest 锁定/解锁授权码请求结构
