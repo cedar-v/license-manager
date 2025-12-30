@@ -38,6 +38,7 @@ func SetupRouter() *gin.Engine {
 	db := database.GetDB()
 	customerRepo := repository.NewCustomerRepository(db)
 	userRepo := repository.NewUserRepository(db)
+	cuUserRepo := repository.NewCuUserRepository(db)
 	authCodeRepo := repository.NewAuthorizationCodeRepository(db)
 	licenseRepo := repository.NewLicenseRepository(db)
 	dashboardRepo := repository.NewDashboardRepository(db)
@@ -49,6 +50,7 @@ func SetupRouter() *gin.Engine {
 	authService := service.NewAuthService(userRepo)
 	systemService := service.NewSystemService()
 	customerService := service.NewCustomerService(customerRepo)
+	cuUserService := service.NewCuUserService(cuUserRepo, customerRepo, db)
 	enumService := service.NewEnumService()
 	authCodeService := service.NewAuthorizationCodeService(authCodeRepo, customerRepo, licenseRepo)
 	licenseService := service.NewLicenseService(licenseRepo, db, log)
@@ -58,6 +60,8 @@ func SetupRouter() *gin.Engine {
 	authHandler := handlers.NewAuthHandler(authService)
 	systemHandler := handlers.NewSystemHandler(systemService)
 	customerHandler := handlers.NewCustomerHandler(customerService)
+	cuAuthHandler := handlers.NewCuAuthHandler(cuUserService)
+	cuProfileHandler := handlers.NewCuProfileHandler(cuUserService)
 	enumHandler := handlers.NewEnumHandler(enumService)
 	authCodeHandler := handlers.NewAuthorizationCodeHandler(authCodeService)
 	licenseHandler := handlers.NewLicenseHandler(licenseService)
@@ -132,6 +136,30 @@ func SetupRouter() *gin.Engine {
 		admin.Use(middleware.AuthMiddleware(), middleware.AdminOnlyMiddleware())
 		{
 			admin.GET("/system/info", systemHandler.GetSystemInfo)
+		}
+	}
+
+	// 客户用户API路由组
+	cuGroup := router.Group("/api/cu")
+	{
+		// 公开接口（无需认证）
+		cuPublic := cuGroup.Group("")
+		{
+			cuPublic.POST("/register", cuAuthHandler.CuUserRegister)
+			cuPublic.POST("/login", cuAuthHandler.CuUserLogin)
+			cuPublic.POST("/forgot-password", cuAuthHandler.CuUserForgotPassword)
+			cuPublic.POST("/reset-password", cuAuthHandler.CuUserResetPassword)
+		}
+
+		// 需要认证的接口
+		cuAuth := cuGroup.Group("")
+		cuAuth.Use(middleware.CustomerAuth())
+		{
+			// 用户个人资料
+			cuAuth.GET("/profile", cuProfileHandler.GetCuUserProfile)
+			cuAuth.PUT("/profile", cuProfileHandler.UpdateCuUserProfile)
+			cuAuth.PUT("/profile/phone", cuProfileHandler.UpdateCuUserPhone)
+			cuAuth.PUT("/profile/password", cuProfileHandler.ChangeCuUserPassword)
 		}
 	}
 

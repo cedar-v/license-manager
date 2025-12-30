@@ -7,6 +7,7 @@ import (
 	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/pem"
 	"errors"
 	"fmt"
@@ -21,9 +22,33 @@ func HashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
+// HashPasswordWithSalt 使用盐值哈希密码
+func HashPasswordWithSalt(password, salt string) (string, error) {
+	combined := password + salt
+	bytes, err := bcrypt.GenerateFromPassword([]byte(combined), bcrypt.DefaultCost)
+	return string(bytes), err
+}
+
 // CheckPasswordHash 验证密码
 func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
+// GenerateSalt 生成随机盐值
+func GenerateSalt() string {
+	bytes := make([]byte, 16)
+	if _, err := rand.Read(bytes); err != nil {
+		// 如果随机数生成失败，使用固定值（不推荐用于生产环境）
+		return "defaultsalt123"
+	}
+	return hex.EncodeToString(bytes)
+}
+
+// CheckPassword 使用盐值验证密码
+func CheckPassword(password, hash, salt string) bool {
+	combined := password + salt
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(combined))
 	return err == nil
 }
 

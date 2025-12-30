@@ -40,10 +40,17 @@ type DatabaseConfig struct {
 
 type AuthConfig struct {
 	JWT      JWTConfig      `mapstructure:"jwt"`
+	CuJWT    CuJWTConfig    `mapstructure:"cu_jwt"` // 客户用户JWT配置
 	Security SecurityConfig `mapstructure:"security"`
 }
 
 type JWTConfig struct {
+	Secret                  string `mapstructure:"secret"`
+	ExpireHours             int    `mapstructure:"expire_hours"`
+	RefreshThresholdMinutes int    `mapstructure:"refresh_threshold_minutes"`
+}
+
+type CuJWTConfig struct {
 	Secret                  string `mapstructure:"secret"`
 	ExpireHours             int    `mapstructure:"expire_hours"`
 	RefreshThresholdMinutes int    `mapstructure:"refresh_threshold_minutes"`
@@ -69,7 +76,7 @@ type I18nConfig struct {
 type LicenseConfig struct {
 	// RSA非对称加密配置
 	RSA RSAConfig `mapstructure:"rsa"`
-	
+
 	HeartbeatTimeout int `mapstructure:"heartbeat_timeout"` // 心跳超时时间(秒)
 	OfflineTimeout   int `mapstructure:"offline_timeout"`   // 离线超时时间(分钟)
 	ExpiringDays     int `mapstructure:"expiring_days"`     // 即将过期天数
@@ -78,7 +85,7 @@ type LicenseConfig struct {
 type RSAConfig struct {
 	PrivateKeyPath string `mapstructure:"private_key_path"` // RSA私钥文件路径
 	PublicKeyPath  string `mapstructure:"public_key_path"`  // RSA公钥文件路径
-	KeySize        int    `mapstructure:"key_size"`        // 密钥大小（2048或4096），默认2048
+	KeySize        int    `mapstructure:"key_size"`         // 密钥大小（2048或4096），默认2048
 }
 
 var AppConfig *Config
@@ -138,6 +145,11 @@ func setDefaults() {
 	viper.SetDefault("auth.jwt.secret", "license-manager-default-secret-key")
 	viper.SetDefault("auth.jwt.expire_hours", 1)
 	viper.SetDefault("auth.jwt.refresh_threshold_minutes", 30)
+
+	// Cu Auth defaults (客户用户)
+	viper.SetDefault("auth.cu_jwt.secret", "license-manager-cu-default-secret-key")
+	viper.SetDefault("auth.cu_jwt.expire_hours", 24)
+	viper.SetDefault("auth.cu_jwt.refresh_threshold_minutes", 30)
 
 	viper.SetDefault("auth.security.max_login_attempts", 5)
 	viper.SetDefault("auth.security.lockout_duration_minutes", 15)

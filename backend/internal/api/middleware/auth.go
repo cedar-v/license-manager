@@ -12,6 +12,7 @@ const (
 	AuthorizationHeaderKey  = "authorization"
 	AuthorizationTypeBearer = "bearer"
 	AuthorizationPayloadKey = "authorization_payload"
+	CuUserPayloadKey        = "cu_user"
 )
 
 // AuthMiddleware 认证中间件
@@ -149,6 +150,78 @@ func AdminOnlyMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+
+		c.Next()
+	}
+}
+
+// CustomerAuth 客户用户认证中间件
+func CustomerAuth() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		authorizationHeader := c.GetHeader(AuthorizationHeaderKey)
+		if len(authorizationHeader) == 0 {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"code":    "400010",
+				"message": "缺少认证令牌",
+				"data":    nil,
+			})
+			c.Abort()
+			return
+		}
+
+		fields := strings.Fields(authorizationHeader)
+		if len(fields) < 2 {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"code":    "400011",
+				"message": "认证令牌格式无效",
+				"data":    nil,
+			})
+			c.Abort()
+			return
+		}
+
+		authorizationType := strings.ToLower(fields[0])
+		if authorizationType != AuthorizationTypeBearer {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"code":    "400011",
+				"message": "不支持的认证类型",
+				"data":    nil,
+			})
+			c.Abort()
+			return
+		}
+
+		accessToken := fields[1]
+		claims, err := utils.ValidateCuToken(accessToken)
+		if err != nil {
+			var errorCode, message string
+			switch err {
+			case utils.ErrCuTokenExpired:
+				errorCode = "400012"
+				message = "令牌已过期"
+			case utils.ErrCuTokenMalformed:
+				errorCode = "400011"
+				message = "令牌格式错误"
+			default:
+				errorCode = "400011"
+				message = "令牌无效"
+			}
+
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"code":    errorCode,
+				"message": message,
+				"data":    nil,
+			})
+			c.Abort()
+			return
+		}
+
+		// 将客户用户信息存储到上下文
+		c.Set("cu_user_id", claims.UserID)
+		c.Set("cu_customer_id", claims.CustomerID)
+		c.Set("cu_user_role", claims.UserRole)
+		c.Set("cu_phone", claims.Phone)
+		c.Set(CuUserPayloadKey, claims)
 
 		c.Next()
 	}

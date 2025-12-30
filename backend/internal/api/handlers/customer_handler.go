@@ -258,7 +258,7 @@ func (h *CustomerHandler) UpdateCustomer(c *gin.Context) {
 
 	// 设置语言到Context中
 	ctx := middleware.WithLanguage(c.Request.Context(), c)
-	
+
 	data, err := h.customerService.UpdateCustomer(ctx, id, &req)
 	if err != nil {
 		// 错误已经在Service层完全包装好了，直接使用
@@ -321,7 +321,7 @@ func (h *CustomerHandler) DeleteCustomer(c *gin.Context) {
 
 	// 设置语言到Context中
 	ctx := middleware.WithLanguage(c.Request.Context(), c)
-	
+
 	err := h.customerService.DeleteCustomer(ctx, id)
 	if err != nil {
 		// 错误已经在Service层完全包装好了，直接使用
@@ -396,7 +396,7 @@ func (h *CustomerHandler) UpdateCustomerStatus(c *gin.Context) {
 
 	// 设置语言到Context中
 	ctx := middleware.WithLanguage(c.Request.Context(), c)
-	
+
 	data, err := h.customerService.UpdateCustomerStatus(ctx, id, &req)
 	if err != nil {
 		// 错误已经在Service层完全包装好了，直接使用

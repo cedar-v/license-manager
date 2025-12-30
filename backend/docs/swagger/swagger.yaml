@@ -408,6 +408,172 @@ definitions:
         description: 总许可证数量
         type: integer
     type: object
+  models.CuUserChangePasswordRequest:
+    properties:
+      new_password:
+        maxLength: 50
+        minLength: 8
+        type: string
+      old_password:
+        type: string
+    required:
+    - new_password
+    - old_password
+    type: object
+  models.CuUserForgotPasswordRequest:
+    properties:
+      phone:
+        maxLength: 20
+        minLength: 7
+        type: string
+      phone_country_code:
+        description: 可选，默认+86
+        type: string
+    required:
+    - phone
+    type: object
+  models.CuUserLoginRequest:
+    properties:
+      password:
+        type: string
+      phone:
+        type: string
+    required:
+    - password
+    - phone
+    type: object
+  models.CuUserPhoneUpdateRequest:
+    properties:
+      current_sms_code:
+        description: 当前手机号验证码
+        type: string
+      new_phone:
+        type: string
+      new_phone_country_code:
+        type: string
+      new_sms_code:
+        description: 新手机号验证码
+        type: string
+    required:
+    - current_sms_code
+    - new_phone
+    - new_phone_country_code
+    - new_sms_code
+    type: object
+  models.CuUserProfileUpdateRequest:
+    properties:
+      additional_info:
+        type: string
+      avatar_url:
+        maxLength: 500
+        type: string
+      email:
+        maxLength: 255
+        type: string
+      language:
+        enum:
+        - zh-CN
+        - en-US
+        - ja-JP
+        type: string
+      real_name:
+        maxLength: 100
+        type: string
+      remark:
+        maxLength: 1000
+        type: string
+      timezone:
+        maxLength: 50
+        type: string
+    type: object
+  models.CuUserRegisterRequest:
+    properties:
+      customer_id:
+        description: 可选，不提供则自动创建客户
+        type: string
+      email:
+        maxLength: 255
+        type: string
+      password:
+        maxLength: 50
+        minLength: 8
+        type: string
+      phone:
+        type: string
+      phone_country_code:
+        description: 可选，默认+86
+        type: string
+      real_name:
+        maxLength: 100
+        type: string
+      sms_code:
+        type: string
+    required:
+    - password
+    - phone
+    - sms_code
+    type: object
+  models.CuUserResetPasswordRequest:
+    properties:
+      new_password:
+        maxLength: 50
+        minLength: 8
+        type: string
+      phone:
+        maxLength: 20
+        minLength: 7
+        type: string
+      phone_country_code:
+        description: 可选，默认+86
+        type: string
+      sms_code:
+        type: string
+    required:
+    - new_password
+    - phone
+    - sms_code
+    type: object
+  models.CuUserResponse:
+    properties:
+      additional_info:
+        type: string
+      avatar_url:
+        type: string
+      created_at:
+        type: string
+      customer_id:
+        type: string
+      email:
+        type: string
+      email_verified:
+        type: boolean
+      id:
+        type: string
+      language:
+        type: string
+      last_login_at:
+        type: string
+      last_login_ip:
+        type: string
+      phone:
+        type: string
+      phone_country_code:
+        type: string
+      phone_verified:
+        type: boolean
+      real_name:
+        type: string
+      remark:
+        type: string
+      status:
+        type: string
+      timezone:
+        type: string
+      updated_at:
+        type: string
+      user_role:
+        type: string
+    type: object
   models.Customer:
     properties:
       address:
@@ -1126,6 +1292,345 @@ info:
   title: License Manager API
   version: "1.0"
 paths:
+  /api/cu/forgot-password:
+    post:
+      consumes:
+      - application/json
+      description: 提交手机号，发送密码重置验证码到手机
+      parameters:
+      - description: 忘记密码请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CuUserForgotPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 验证码发送成功
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 用户不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 忘记密码 - 发送验证码
+      tags:
+      - 客户用户管理
+  /api/cu/login:
+    post:
+      consumes:
+      - application/json
+      description: 通过手机号和密码登录客户用户账号
+      parameters:
+      - description: 登录信息
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.CuUserLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  properties:
+                    token:
+                      type: string
+                    user:
+                      properties:
+                        customer_id:
+                          type: string
+                        email:
+                          type: string
+                        id:
+                          type: string
+                        phone:
+                          type: string
+                        real_name:
+                          type: string
+                        status:
+                          type: string
+                        user_role:
+                          type: string
+                      type: object
+                  type: object
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 手机号或密码错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 客户用户登录
+      tags:
+      - 客户用户管理
+  /api/cu/profile:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前登录用户的个人资料信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.CuUserResponse'
+              type: object
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 用户不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取用户个人资料
+      tags:
+      - 客户用户管理
+    put:
+      consumes:
+      - application/json
+      description: 更新当前登录用户的个人资料信息
+      parameters:
+      - description: 个人资料信息
+        in: body
+        name: profile
+        required: true
+        schema:
+          $ref: '#/definitions/models.CuUserProfileUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: 个人资料更新失败
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 更新用户个人资料
+      tags:
+      - 客户用户管理
+  /api/cu/profile/password:
+    put:
+      consumes:
+      - application/json
+      description: 修改当前登录用户的密码，需要提供旧密码
+      parameters:
+      - description: 密码修改信息
+        in: body
+        name: password
+        required: true
+        schema:
+          $ref: '#/definitions/models.CuUserChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: 密码修改失败
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 修改用户密码
+      tags:
+      - 客户用户管理
+  /api/cu/profile/phone:
+    put:
+      consumes:
+      - application/json
+      description: 更新当前登录用户的手机号，需要验证新旧手机号
+      parameters:
+      - description: 手机号更新信息
+        in: body
+        name: phone
+        required: true
+        schema:
+          $ref: '#/definitions/models.CuUserPhoneUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: 手机号更新失败
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 更新用户手机号
+      tags:
+      - 客户用户管理
+  /api/cu/register:
+    post:
+      consumes:
+      - application/json
+      description: 通过手机号注册客户用户账号
+      parameters:
+      - description: 注册信息
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.CuUserRegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  properties:
+                    token:
+                      type: string
+                    user:
+                      properties:
+                        customer_id:
+                          type: string
+                        email:
+                          type: string
+                        id:
+                          type: string
+                        phone:
+                          type: string
+                        real_name:
+                          type: string
+                        status:
+                          type: string
+                        user_role:
+                          type: string
+                      type: object
+                  type: object
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: 手机号已被注册
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 客户用户注册
+      tags:
+      - 客户用户管理
+  /api/cu/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: 通过验证码重置密码
+      parameters:
+      - description: 重置密码请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CuUserResetPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: 重置密码失败
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 重置密码
+      tags:
+      - 客户用户管理
   /api/customers:
     get:
       consumes:

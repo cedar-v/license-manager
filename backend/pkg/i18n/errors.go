@@ -22,15 +22,15 @@ func NewErrorI18n(manager I18nManager) *ErrorI18n {
 func NewI18nErrorResponse(code, lang string, customMessage ...string) (int, string, string) {
 	// 获取本地化错误信息
 	message := GetI18nErrorMessage(code, lang)
-	
+
 	// 支持自定义消息覆盖
 	if len(customMessage) > 0 && customMessage[0] != "" {
 		message = customMessage[0]
 	}
-	
+
 	// 获取对应的HTTP状态码
 	httpStatus := getHTTPStatusByCode(code)
-	
+
 	return httpStatus, code, message
 }
 
@@ -40,7 +40,7 @@ func GetI18nErrorMessage(code, lang string) string {
 		// 如果多语言系统未初始化，降级到默认错误处理
 		return getDefaultErrorMessage(code)
 	}
-	
+
 	return globalManager.GetErrorMessage(code, lang)
 }
 
@@ -49,7 +49,7 @@ func GetI18nErrorMessageWithManager(manager I18nManager, code, lang string) stri
 	if manager == nil {
 		return getDefaultErrorMessage(code)
 	}
-	
+
 	return manager.GetErrorMessage(code, lang)
 }
 
@@ -77,7 +77,7 @@ func getDefaultErrorMessage(code string) string {
 		"900003": "Resource conflict",
 		"900004": "Internal server error",
 	}
-	
+
 	if msg, ok := defaultMessages[code]; ok {
 		return msg
 	}
@@ -96,7 +96,7 @@ func getHTTPStatusByCode(code string) int {
 		StatusConflict            = 409
 		StatusInternalServerError = 500
 	)
-	
+
 	switch code {
 	case "000000": // 成功
 		return StatusOK
@@ -149,7 +149,7 @@ func (e *I18nError) Error() string {
 // NewI18nError 创建多语言错误
 func NewI18nError(code, lang string, customMessage ...string) *I18nError {
 	httpCode, _, message := NewI18nErrorResponse(code, lang, customMessage...)
-	
+
 	return &I18nError{
 		Code:     code,
 		Lang:     lang,
@@ -196,12 +196,12 @@ func ValidateI18nSupport() error {
 	if globalManager == nil {
 		return fmt.Errorf("i18n manager not initialized")
 	}
-	
+
 	supportedLangs := globalManager.SupportedLanguages()
 	if len(supportedLangs) == 0 {
 		return fmt.Errorf("no languages loaded")
 	}
-	
+
 	return nil
 }
 

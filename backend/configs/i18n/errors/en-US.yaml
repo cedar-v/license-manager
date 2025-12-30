@@ -45,7 +45,23 @@ errors:
     "400004": "Time range exceeds limit (over one year)"
     "400005": "Start date cannot be later than end date"
     "400006": "Invalid limit parameter"
-  
+
+  # Customer User module (50xxxx)
+  cu_user:
+    "500001": "Invalid phone number format"
+    "500002": "Phone number already registered"
+    "500003": "Invalid phone or password"
+    "500004": "Forgot password failed"
+    "500005": "Reset password failed"
+    "500006": "Profile update failed"
+    "500007": "Phone update failed"
+    "500008": "Password change failed"
+    "500009": "User not found"
+    "500010": "Authentication token required"
+    "500011": "Invalid authentication token"
+    "500012": "Authentication token expired"
+    "500013": "Failed to generate token"
+
   # System general (90xxxx)
   system:
     "900001": "Invalid request parameters"

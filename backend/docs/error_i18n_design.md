@@ -113,6 +113,34 @@ errors:
 default_error: "Unknown error"
 ```
 
+## 核心设计原则
+
+### 1. 错误消息规范
+
+- **错误消息**: 使用业务错误码，通过 `i18n.NewI18nErrorResponse()` 获取本地化错误信息
+- **成功消息**: 统一使用 `i18n.GetErrorMessage("000000", lang)` 获取本地化的"成功"消息
+
+### 2. 响应格式统一
+
+```go
+// 错误响应
+status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
+c.JSON(status, models.ErrorResponse{
+    Code:      errCode,
+    Message:   message + ": " + err.Error(),
+    Timestamp: getCurrentTimestamp(),
+})
+
+// 成功响应
+lang := middleware.GetLanguage(c)
+successMessage := i18n.GetErrorMessage("000000", lang)
+c.JSON(http.StatusOK, models.APIResponse{
+    Code:    "000000",
+    Message: successMessage,
+    Data:    result,
+})
+```
+
 ## 核心组件设计
 
 ### 1. 多语言管理器

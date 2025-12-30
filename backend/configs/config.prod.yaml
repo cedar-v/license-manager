@@ -23,6 +23,10 @@ auth:
     secret: "please-change-in-prod"
     expire_hours: 1
     refresh_threshold_minutes: 30
+  cu_jwt:
+    secret: "please-change-cu-jwt-secret-in-prod"
+    expire_hours: 24
+    refresh_threshold_minutes: 60
   security:
     max_login_attempts: 5
     lockout_duration_minutes: 15
