@@ -408,6 +408,64 @@ definitions:
         description: 总许可证数量
         type: integer
     type: object
+  models.CuOrderCreateRequest:
+    properties:
+      license_count:
+        maximum: 1000
+        minimum: 1
+        type: integer
+      package_id:
+        type: string
+    required:
+    - license_count
+    - package_id
+    type: object
+  models.CuOrderListResponse:
+    properties:
+      orders:
+        items:
+          $ref: '#/definitions/models.CuOrderResponse'
+        type: array
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total_count:
+        type: integer
+    type: object
+  models.CuOrderResponse:
+    properties:
+      authorization_code:
+        type: string
+      created_at:
+        type: string
+      cu_user_id:
+        type: string
+      customer_id:
+        type: string
+      discount_rate:
+        type: number
+      expired_at:
+        type: string
+      id:
+        type: string
+      license_count:
+        type: integer
+      order_no:
+        type: string
+      package_id:
+        type: string
+      package_name:
+        type: string
+      status:
+        type: string
+      total_amount:
+        type: number
+      unit_price:
+        type: number
+      updated_at:
+        type: string
+    type: object
   models.CuUserChangePasswordRequest:
     properties:
       new_password:
@@ -437,6 +495,11 @@ definitions:
       password:
         type: string
       phone:
+        maxLength: 20
+        minLength: 7
+        type: string
+      phone_country_code:
+        description: 可选，默认+86
         type: string
     required:
     - password
@@ -1385,6 +1448,226 @@ paths:
       summary: 客户用户登录
       tags:
       - 客户用户管理
+  /api/cu/orders:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前用户的订单列表，支持分页
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.CuOrderListResponse'
+              type: object
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取用户订单列表
+      tags:
+      - 客户订单管理
+    post:
+      consumes:
+      - application/json
+      description: 创建新的产品套餐订单
+      parameters:
+      - description: 订单创建信息
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/models.CuOrderCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  properties:
+                    authorization_code:
+                      type: string
+                    id:
+                      type: string
+                    order_no:
+                      type: string
+                    total_amount:
+                      type: number
+                  type: object
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 套餐不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: 当月已购买试用版
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 创建订单
+      tags:
+      - 客户订单管理
+  /api/cu/orders/{order_id}:
+    get:
+      consumes:
+      - application/json
+      description: 根据订单ID获取订单详细信息
+      parameters:
+      - description: 订单ID
+        in: path
+        name: order_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.CuOrderResponse'
+              type: object
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 订单不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取订单详情
+      tags:
+      - 客户订单管理
+  /api/cu/orders/calculate:
+    post:
+      consumes:
+      - application/json
+      description: 根据套餐和许可数量计算价格和折扣
+      parameters:
+      - description: 价格计算请求
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            license_count:
+              type: integer
+            package_id:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  properties:
+                    discount_description:
+                      type: string
+                    discount_rate:
+                      type: number
+                    license_count:
+                      type: integer
+                    total_amount:
+                      type: number
+                    unit_price:
+                      type: number
+                  type: object
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 套餐不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 计算订单价格
+      tags:
+      - 客户订单管理
+  /api/cu/packages:
+    get:
+      consumes:
+      - application/json
+      description: 获取所有可用的产品套餐信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  items:
+                    properties:
+                      id:
+                        type: string
+                      max_devices:
+                        type: integer
+                      name:
+                        type: string
+                      price:
+                        type: number
+                      type:
+                        type: string
+                    type: object
+                  type: array
+              type: object
+      summary: 获取套餐列表
+      tags:
+      - 客户订单管理
   /api/cu/profile:
     get:
       consumes:

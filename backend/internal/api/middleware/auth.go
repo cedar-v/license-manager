@@ -4,8 +4,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/gin-gonic/gin"
 	"license-manager/pkg/utils"
+
+	"github.com/gin-gonic/gin"
 )
 
 const (

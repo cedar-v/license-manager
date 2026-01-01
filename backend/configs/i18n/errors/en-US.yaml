@@ -62,6 +62,19 @@ errors:
     "500012": "Authentication token expired"
     "500013": "Failed to generate token"
 
+  # Package order module (60xxxx)
+  cu_package:
+    "600001": "Package does not exist"
+    "600002": "Package is discontinued"
+    "600003": "Trial version purchase time limit"
+    "600004": "Trial version does not support bulk purchase"
+    "600005": "Trial version already purchased this month"
+
+  # Order module (61xxxx)
+  cu_order:
+      "601001": "Order does not exist"
+      "601005": "License quantity exceeds limit"
+
   # System general (90xxxx)
   system:
     "900001": "Invalid request parameters"

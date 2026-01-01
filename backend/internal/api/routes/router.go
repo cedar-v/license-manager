@@ -39,6 +39,7 @@ func SetupRouter() *gin.Engine {
 	customerRepo := repository.NewCustomerRepository(db)
 	userRepo := repository.NewUserRepository(db)
 	cuUserRepo := repository.NewCuUserRepository(db)
+	cuOrderRepo := repository.NewCuOrderRepository(db)
 	authCodeRepo := repository.NewAuthorizationCodeRepository(db)
 	licenseRepo := repository.NewLicenseRepository(db)
 	dashboardRepo := repository.NewDashboardRepository(db)
@@ -51,8 +52,9 @@ func SetupRouter() *gin.Engine {
 	systemService := service.NewSystemService()
 	customerService := service.NewCustomerService(customerRepo)
 	cuUserService := service.NewCuUserService(cuUserRepo, customerRepo, db)
-	enumService := service.NewEnumService()
 	authCodeService := service.NewAuthorizationCodeService(authCodeRepo, customerRepo, licenseRepo)
+	cuOrderService := service.NewCuOrderService(cuOrderRepo, cuUserRepo, authCodeRepo, db)
+	enumService := service.NewEnumService()
 	licenseService := service.NewLicenseService(licenseRepo, db, log)
 	dashboardService := service.NewDashboardService(dashboardRepo)
 
@@ -62,6 +64,7 @@ func SetupRouter() *gin.Engine {
 	customerHandler := handlers.NewCustomerHandler(customerService)
 	cuAuthHandler := handlers.NewCuAuthHandler(cuUserService)
 	cuProfileHandler := handlers.NewCuProfileHandler(cuUserService)
+	cuOrderHandler := handlers.NewCuOrderHandler(cuOrderService)
 	enumHandler := handlers.NewEnumHandler(enumService)
 	authCodeHandler := handlers.NewAuthorizationCodeHandler(authCodeService)
 	licenseHandler := handlers.NewLicenseHandler(licenseService)
@@ -149,6 +152,7 @@ func SetupRouter() *gin.Engine {
 			cuPublic.POST("/login", cuAuthHandler.CuUserLogin)
 			cuPublic.POST("/forgot-password", cuAuthHandler.CuUserForgotPassword)
 			cuPublic.POST("/reset-password", cuAuthHandler.CuUserResetPassword)
+			cuPublic.GET("/packages", cuOrderHandler.GetPackages)
 		}
 
 		// 需要认证的接口
@@ -160,6 +164,12 @@ func SetupRouter() *gin.Engine {
 			cuAuth.PUT("/profile", cuProfileHandler.UpdateCuUserProfile)
 			cuAuth.PUT("/profile/phone", cuProfileHandler.UpdateCuUserPhone)
 			cuAuth.PUT("/profile/password", cuProfileHandler.ChangeCuUserPassword)
+
+			// 套餐和订单管理
+			cuAuth.POST("/orders/calculate", cuOrderHandler.CalculatePrice)
+			cuAuth.POST("/orders", cuOrderHandler.CreateOrder)
+			cuAuth.GET("/orders/:order_id", cuOrderHandler.GetOrder)
+			cuAuth.GET("/orders", cuOrderHandler.GetUserOrders)
 		}
 	}
 

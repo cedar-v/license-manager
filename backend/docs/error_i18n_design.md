@@ -119,15 +119,32 @@ default_error: "Unknown error"
 
 - **错误消息**: 使用业务错误码，通过 `i18n.NewI18nErrorResponse()` 获取本地化错误信息
 - **成功消息**: 统一使用 `i18n.GetErrorMessage("000000", lang)` 获取本地化的"成功"消息
+- **自定义消息**: 支持通过第三个参数传入自定义错误消息，优先级高于本地化消息
 
 ### 2. 响应格式统一
 
 ```go
-// 错误响应
+// 错误响应 - 使用本地化消息
+status, errCode, message := i18n.NewI18nErrorResponse("200001", lang)
+c.JSON(status, models.ErrorResponse{
+    Code:      errCode,
+    Message:   message, // 显示本地化的错误消息
+    Timestamp: getCurrentTimestamp(),
+})
+
+// 错误响应 - 使用自定义消息（显示具体错误信息）
+status, errCode, message := i18n.NewI18nErrorResponse("900004", lang, err.Error())
+c.JSON(status, models.ErrorResponse{
+    Code:      errCode,
+    Message:   message, // 显示具体的错误信息，如"RSA私钥文件不存在..."
+    Timestamp: getCurrentTimestamp(),
+})
+
+// 错误响应 - 结合本地化消息和具体错误
 status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
 c.JSON(status, models.ErrorResponse{
     Code:      errCode,
-    Message:   message + ": " + err.Error(),
+    Message:   message + ": " + err.Error(), // 本地化消息 + 具体错误信息
     Timestamp: getCurrentTimestamp(),
 })
 

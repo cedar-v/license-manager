@@ -23,7 +23,8 @@ func NewI18nErrorResponse(code, lang string, customMessage ...string) (int, stri
 	// 获取本地化错误信息
 	message := GetI18nErrorMessage(code, lang)
 
-	// 支持自定义消息覆盖
+	// 如果提供了自定义消息，则使用自定义消息
+	// 这样可以让调用方根据需要显示具体错误信息或本地化消息
 	if len(customMessage) > 0 && customMessage[0] != "" {
 		message = customMessage[0]
 	}

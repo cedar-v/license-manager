@@ -3,7 +3,6 @@ package database
 import (
 	"fmt"
 	"log"
-	"strings"
 	"time"
 
 	"license-manager/internal/config"
@@ -25,6 +24,7 @@ func AutoMigrate() error {
 		&models.CustomerCodeSequence{},
 		&models.User{},
 		&models.CuUser{},
+		&models.CuOrder{},
 		&models.AuthorizationCode{},
 		&models.License{},
 		&models.AuthorizationChange{},
@@ -96,26 +96,9 @@ func createCuUserIndexes() error {
 
 	switch dbType {
 	case "mysql":
-		// 创建复合索引用于优化查询性能
-		// 使用兼容所有MySQL版本的语法（不支持IF NOT EXISTS的版本会忽略重复错误）
-		indexes := []string{
-			"CREATE INDEX idx_cu_users_phone ON cu_users(phone, phone_country_code)",
-			"CREATE INDEX idx_cu_users_customer_status ON cu_users(customer_id, status)",
-			"CREATE INDEX idx_cu_users_status_locked ON cu_users(status, locked_until)",
-		}
-
-		for _, indexSQL := range indexes {
-			if err := DB.Exec(indexSQL).Error; err != nil {
-				// 检查是否是索引已存在的错误（MySQL错误码1061），如果是则忽略
-				if strings.Contains(err.Error(), "Duplicate key name") || strings.Contains(err.Error(), "already exists") {
-					// 索引已存在，跳过
-					continue
-				}
-				log.Printf("Warning: failed to create index: %v", err)
-				// 不返回错误，允许索引创建失败（可能已存在）
-			}
-		}
-		log.Println("Created cu_users composite indexes")
+		// 注意：所有必要的索引都已在SQL迁移文件中创建
+		// 这里不再重复创建，避免"Duplicate key name"错误
+		log.Println("All cu_users indexes already created in SQL migration file")
 	default:
 		log.Printf("Skipping composite index creation for database type: %s", dbType)
 	}

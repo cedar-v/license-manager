@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"time"
 
 	"license-manager/internal/api/middleware"
 	"license-manager/internal/models"
@@ -49,7 +50,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	// 获取客户端IP
 	clientIP := c.ClientIP()
-	
+
 	data, err := h.authService.Login(c.Request.Context(), &req, clientIP)
 	if err != nil {
 		errorCode := "100003" // 登录失败
@@ -154,7 +155,7 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 
 // getCurrentTimestamp 获取当前时间戳
 func getCurrentTimestamp() string {
-	return "2024-07-30T12:00:00Z" // 简化实现，实际应该使用time.Now().Format(time.RFC3339)
+	return time.Now().Format(time.RFC3339)
 }
 
 // extractTokenFromHeader 从请求头提取Token

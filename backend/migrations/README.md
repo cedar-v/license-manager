@@ -7,8 +7,16 @@
 ```
 sql/
 ├── migrations/          # 数据库迁移文件
-│   ├── 001_create_customers_table.sql    # 客户表结构
-│   └── 002_insert_sample_data.sql        # 示例数据
+│   ├── 001_create_customers_table.sql       # 客户表结构
+│   ├── 002_insert_sample_data.sql           # 示例数据
+│   ├── 003_create_authorization_codes_table.sql  # 授权码表结构
+│   ├── 004_create_licenses_table.sql        # 许可证表结构
+│   ├── 005_create_authorization_changes_table.sql # 授权变更表结构
+│   ├── 006_create_users_table.sql           # 管理员用户表结构
+│   ├── 007_create_cu_users_table.sql        # 客户用户表结构
+│   ├── 008_create_cu_orders_table.sql       # 客户用户订单表结构
+│   ├── 009_update_authorization_codes_code_length.sql # 更新授权码字段长度
+│   └── 010_update_cu_orders_authorization_code_length.sql # 更新订单表授权码字段长度
 └── README.md           # 本文件
 ```
 
@@ -34,6 +42,40 @@ sql/
 - 政府客户
 - 教育客户
 - 禁用状态客户
+
+### 008_create_cu_orders_table.sql
+创建客户用户订单表结构，包括：
+
+- **订单主表** (`cu_orders`)：存储客户用户购买套餐的订单信息
+- **许可管理**：记录许可数量、价格、折扣等购买信息
+- **状态跟踪**：订单状态从创建到支付完成的生命周期
+- **授权关联**：存储生成的授权码和过期时间
+
+### 009_update_authorization_codes_code_length.sql
+更新授权码表结构以支持自包含配置授权码：
+
+- **字段更新**：`code VARCHAR(100) → VARCHAR(1000)`
+- **功能增强**：支持包含完整配置信息的自包含授权码
+- **向后兼容**：保持对现有短授权码的支持
+- **安全考虑**：RSA签名确保配置信息完整性
+
+**执行注意事项**：
+- 此迁移会修改现有表结构
+- 生产环境执行前务必备份数据
+- 现有短授权码继续有效
+- 新授权码可包含完整配置信息
+
+### 010_update_cu_orders_authorization_code_length.sql
+更新客户订单表授权码字段长度以支持新的HMAC签名授权码：
+
+- **字段更新**：`authorization_code VARCHAR(50) → VARCHAR(500)`
+- **兼容性**：支持约150-200字符的新格式授权码
+- **安全升级**：从RSA签名升级到HMAC签名，显著缩短授权码长度
+
+**执行注意事项**：
+- 扩展字段长度以适应新的授权码格式
+- 不会影响现有数据
+- 支持更高效的离线验证
 
 ## 执行顺序
 

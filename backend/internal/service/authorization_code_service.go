@@ -10,10 +10,14 @@ import (
 	"strings"
 	"time"
 
+	"license-manager/internal/config"
 	"license-manager/internal/models"
 	"license-manager/internal/repository"
 	pkgcontext "license-manager/pkg/context"
 	"license-manager/pkg/i18n"
+	"license-manager/pkg/utils"
+
+	"github.com/google/uuid"
 )
 
 type authorizationCodeService struct {
@@ -69,13 +73,40 @@ func (s *authorizationCodeService) CreateAuthorizationCode(ctx context.Context, 
 		return nil, i18n.NewI18nError("100004", lang) // 缺少认证信息
 	}
 
-	// 生成授权码
-	authCode, err := s.generateAuthorizationCode(req.CustomerID)
+	// 生成自包含授权码
+	var featureConfigMap, usageLimitsMap, customParametersMap map[string]interface{}
+
+	if req.FeatureConfig != nil {
+		if fc, ok := req.FeatureConfig.(map[string]interface{}); ok {
+			featureConfigMap = fc
+		}
+	}
+	if req.UsageLimits != nil {
+		if ul, ok := req.UsageLimits.(map[string]interface{}); ok {
+			usageLimitsMap = ul
+		}
+	}
+	if req.CustomParameters != nil {
+		if cp, ok := req.CustomParameters.(map[string]interface{}); ok {
+			customParametersMap = cp
+		}
+	}
+
+	licenseConfig := &utils.LicenseConfig{
+		EndDate:          endDate,
+		FeatureConfig:    featureConfigMap,
+		UsageLimits:      usageLimitsMap,
+		CustomParameters: customParametersMap,
+	}
+
+	// 从配置获取RSA私钥路径
+	privateKeyPath := config.GetConfig().License.RSA.PrivateKeyPath
+	authCode, err := utils.EncodeLicenseData(licenseConfig, privateKeyPath)
 	if err != nil {
 		return nil, i18n.NewI18nError("900004", lang, err.Error())
 	}
 
-	// 处理JSON字段
+	// 处理JSON字段（用于数据库存储）
 	var featureConfig, usageLimits, customParameters models.JSON
 	if req.FeatureConfig != nil {
 		featureConfigBytes, err := json.Marshal(req.FeatureConfig)
@@ -108,6 +139,7 @@ func (s *authorizationCodeService) CreateAuthorizationCode(ctx context.Context, 
 
 	// 构建授权码实体
 	authCodeEntity := &models.AuthorizationCode{
+		ID:               uuid.New().String(), // 生成新的UUID作为主键
 		Code:             authCode,
 		CustomerID:       req.CustomerID,
 		CreatedBy:        currentUserID,

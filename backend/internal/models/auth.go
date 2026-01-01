@@ -36,7 +36,7 @@ type UserInfo struct {
 // AuthorizationCode 授权码模型
 type AuthorizationCode struct {
 	ID                     string                   `gorm:"type:varchar(36);primaryKey" json:"id"`                                 // 授权码ID
-	Code                   string                   `gorm:"type:varchar(100);uniqueIndex;not null" json:"code"`                    // 授权码
+	Code                   string                   `gorm:"type:varchar(1000);not null" json:"code"`                               // 授权码
 	CustomerID             string                   `gorm:"type:varchar(36);not null;index" json:"customer_id"`                    // 客户ID
 	CustomerName           string                   `gorm:"-" json:"customer_name,omitempty"`                                      // 客户名称
 	CustomerNameDisplay    string                   `gorm:"-" json:"customer_name_display,omitempty"`                              // 客户名称显示（多语言）
