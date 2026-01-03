@@ -54,6 +54,7 @@ func SetupRouter() *gin.Engine {
 	cuUserService := service.NewCuUserService(cuUserRepo, customerRepo, db)
 	authCodeService := service.NewAuthorizationCodeService(authCodeRepo, customerRepo, licenseRepo)
 	cuOrderService := service.NewCuOrderService(cuOrderRepo, cuUserRepo, authCodeRepo, db)
+	cuDeviceService := service.NewCuDeviceService(licenseRepo)
 	enumService := service.NewEnumService()
 	licenseService := service.NewLicenseService(licenseRepo, db, log)
 	dashboardService := service.NewDashboardService(dashboardRepo)
@@ -65,6 +66,7 @@ func SetupRouter() *gin.Engine {
 	cuAuthHandler := handlers.NewCuAuthHandler(cuUserService)
 	cuProfileHandler := handlers.NewCuProfileHandler(cuUserService)
 	cuOrderHandler := handlers.NewCuOrderHandler(cuOrderService)
+	cuDeviceHandler := handlers.NewCuDeviceHandler(cuDeviceService)
 	enumHandler := handlers.NewEnumHandler(enumService)
 	authCodeHandler := handlers.NewAuthorizationCodeHandler(authCodeService)
 	licenseHandler := handlers.NewLicenseHandler(licenseService)
@@ -170,6 +172,10 @@ func SetupRouter() *gin.Engine {
 			cuAuth.POST("/orders", cuOrderHandler.CreateOrder)
 			cuAuth.GET("/orders/:order_id", cuOrderHandler.GetOrder)
 			cuAuth.GET("/orders", cuOrderHandler.GetUserOrders)
+
+			// 设备管理
+			cuAuth.GET("/devices", cuDeviceHandler.GetDevices)
+			cuAuth.DELETE("/devices/:id", cuDeviceHandler.UnbindDevice)
 		}
 	}
 

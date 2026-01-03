@@ -183,3 +183,38 @@ type GrowthRate struct {
 	AuthCodes float64 `json:"auth_codes"` // 授权码增长率(%)（当前总授权码数相比一个月前总授权码数的增长率）
 	Licenses  float64 `json:"licenses"`   // 许可证增长率(%)（当前活跃许可证数相比一个月前活跃许可证数的增长率）
 }
+
+// DeviceListRequest 设备列表查询请求结构（客户用户接口）
+type DeviceListRequest struct {
+	Page                int    `form:"page" binding:"omitempty,min=1"`                   // 页码，默认1
+	PageSize            int    `form:"page_size" binding:"omitempty,min=1,max=100"`      // 每页数量，默认20，最大100
+	DeviceName          string `form:"device_name" binding:"omitempty,max=100"`          // 设备名称模糊搜索（匹配device_info.name）
+	AuthorizationCodeID string `form:"authorization_code_id" binding:"omitempty,len=36"` // 按授权码ID筛选设备
+}
+
+// DeviceListItem 设备列表项结构（客户用户接口）
+type DeviceListItem struct {
+	ID                string                 `json:"id"`                 // 许可证ID
+	DeviceInfo        map[string]interface{} `json:"device_info"`        // 设备信息
+	IsOnline          bool                   `json:"is_online"`          // 是否在线
+	LastOnlineIP      *string                `json:"last_online_ip"`     // 最后在线IP
+	LastHeartbeat     *string                `json:"last_heartbeat"`     // 最后心跳时间
+	ActivatedAt       *string                `json:"activated_at"`       // 激活时间
+	AuthorizationInfo AuthorizationInfo      `json:"authorization_info"` // 授权信息
+}
+
+// AuthorizationInfo 授权信息结构
+type AuthorizationInfo struct {
+	AuthorizationCode   string `json:"authorization_code"`    // 授权码
+	AuthorizationCodeID string `json:"authorization_code_id"` // 授权码ID
+	EndDate             string `json:"end_date"`              // 授权到期时间
+	Description         string `json:"description"`           // 授权描述
+}
+
+// DeviceListResponse 设备列表响应结构（客户用户接口）
+type DeviceListResponse struct {
+	List     []DeviceListItem `json:"list"`      // 设备列表
+	Total    int64            `json:"total"`     // 总数量
+	Page     int              `json:"page"`      // 当前页码
+	PageSize int              `json:"page_size"` // 每页数量
+}

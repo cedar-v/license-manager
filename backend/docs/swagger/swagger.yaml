@@ -384,6 +384,21 @@ definitions:
     required:
     - change_type
     type: object
+  models.AuthorizationInfo:
+    properties:
+      authorization_code:
+        description: 授权码
+        type: string
+      authorization_code_id:
+        description: 授权码ID
+        type: string
+      description:
+        description: 授权描述
+        type: string
+      end_date:
+        description: 授权到期时间
+        type: string
+    type: object
   models.AuthorizationStats:
     properties:
       active_licenses:
@@ -901,6 +916,49 @@ definitions:
         description: 符合条件的授权总数量
         type: integer
     type: object
+  models.DeviceListItem:
+    properties:
+      activated_at:
+        description: 激活时间
+        type: string
+      authorization_info:
+        allOf:
+        - $ref: '#/definitions/models.AuthorizationInfo'
+        description: 授权信息
+      device_info:
+        additionalProperties: true
+        description: 设备信息
+        type: object
+      id:
+        description: 许可证ID
+        type: string
+      is_online:
+        description: 是否在线
+        type: boolean
+      last_heartbeat:
+        description: 最后心跳时间
+        type: string
+      last_online_ip:
+        description: 最后在线IP
+        type: string
+    type: object
+  models.DeviceListResponse:
+    properties:
+      list:
+        description: 设备列表
+        items:
+          $ref: '#/definitions/models.DeviceListItem'
+        type: array
+      page:
+        description: 当前页码
+        type: integer
+      page_size:
+        description: 每页数量
+        type: integer
+      total:
+        description: 总数量
+        type: integer
+    type: object
   models.EnumItem:
     properties:
       display:
@@ -1355,6 +1413,100 @@ info:
   title: License Manager API
   version: "1.0"
 paths:
+  /api/cu/devices:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前登录用户的设备列表，支持分页和筛选
+      parameters:
+      - description: 页码，默认1
+        in: query
+        name: page
+        type: integer
+      - description: 每页数量，默认20，最大100
+        in: query
+        name: page_size
+        type: integer
+      - description: 设备名称模糊搜索
+        in: query
+        name: device_name
+        type: string
+      - description: 按授权码ID筛选设备
+        in: query
+        name: authorization_code_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.DeviceListResponse'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取设备列表
+      tags:
+      - 客户设备管理
+  /api/cu/devices/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 解绑指定的设备，物理删除许可证记录
+      parameters:
+      - description: 许可证ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 解绑成功
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 无权限操作此设备
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 设备不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 解绑设备
+      tags:
+      - 客户设备管理
   /api/cu/forgot-password:
     post:
       consumes:

@@ -112,6 +112,15 @@ type LicenseRepository interface {
 
 	// GetActiveLicenseCount 获取指定授权码的激活许可证数量
 	GetActiveLicenseCount(ctx context.Context, authCodeID string) (int64, error)
+
+	// GetCustomerDeviceList 查询客户设备列表（关联授权码信息）
+	GetCustomerDeviceList(ctx context.Context, customerID string, req *models.DeviceListRequest) (*models.DeviceListResponse, error)
+
+	// DeleteLicenseByID 根据ID删除许可证（物理删除，用于设备解绑）
+	DeleteLicenseByID(ctx context.Context, id string) error
+
+	// CheckLicenseBelongsToCustomer 检查许可证是否属于指定客户
+	CheckLicenseBelongsToCustomer(ctx context.Context, licenseID, customerID string) (bool, error)
 }
 
 // DashboardRepository 仪表盘数据访问接口

@@ -21,6 +21,157 @@
     },
     "basePath": "/",
     "paths": {
+        "/api/cu/devices": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "获取当前登录用户的设备列表，支持分页和筛选",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "客户设备管理"
+                ],
+                "summary": "获取设备列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "页码，默认1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量，默认20，最大100",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "设备名称模糊搜索",
+                        "name": "device_name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "按授权码ID筛选设备",
+                        "name": "authorization_code_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "获取成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.DeviceListResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cu/devices/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "解绑指定的设备，物理删除许可证记录",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "客户设备管理"
+                ],
+                "summary": "解绑设备",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "许可证ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "解绑成功",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "无权限操作此设备",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "设备不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/cu/forgot-password": {
             "post": {
                 "description": "提交手机号，发送密码重置验证码到手机",
@@ -3782,6 +3933,27 @@
                 }
             }
         },
+        "models.AuthorizationInfo": {
+            "type": "object",
+            "properties": {
+                "authorization_code": {
+                    "description": "授权码",
+                    "type": "string"
+                },
+                "authorization_code_id": {
+                    "description": "授权码ID",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "授权描述",
+                    "type": "string"
+                },
+                "end_date": {
+                    "description": "授权到期时间",
+                    "type": "string"
+                }
+            }
+        },
         "models.AuthorizationStats": {
             "type": "object",
             "properties": {
@@ -4516,6 +4688,68 @@
                 },
                 "total": {
                     "description": "符合条件的授权总数量",
+                    "type": "integer"
+                }
+            }
+        },
+        "models.DeviceListItem": {
+            "type": "object",
+            "properties": {
+                "activated_at": {
+                    "description": "激活时间",
+                    "type": "string"
+                },
+                "authorization_info": {
+                    "description": "授权信息",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.AuthorizationInfo"
+                        }
+                    ]
+                },
+                "device_info": {
+                    "description": "设备信息",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "id": {
+                    "description": "许可证ID",
+                    "type": "string"
+                },
+                "is_online": {
+                    "description": "是否在线",
+                    "type": "boolean"
+                },
+                "last_heartbeat": {
+                    "description": "最后心跳时间",
+                    "type": "string"
+                },
+                "last_online_ip": {
+                    "description": "最后在线IP",
+                    "type": "string"
+                }
+            }
+        },
+        "models.DeviceListResponse": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "description": "设备列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.DeviceListItem"
+                    }
+                },
+                "page": {
+                    "description": "当前页码",
+                    "type": "integer"
+                },
+                "page_size": {
+                    "description": "每页数量",
+                    "type": "integer"
+                },
+                "total": {
+                    "description": "总数量",
                     "type": "integer"
                 }
             }

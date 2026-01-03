@@ -7,6 +7,7 @@ import (
 
 	"gorm.io/gorm"
 
+	"license-manager/internal/config"
 	"license-manager/internal/models"
 )
 
@@ -155,10 +156,10 @@ func (r *licenseRepository) GetLicenseList(ctx context.Context, req *models.Lice
 // GetLicenseByID 根据ID获取许可证信息
 func (r *licenseRepository) GetLicenseByID(ctx context.Context, id string) (*models.License, error) {
 	var license models.License
-	
+
 	err := r.db.Preload("AuthorizationCode").Preload("Customer").
 		Where("id = ?", id).First(&license).Error
-	
+
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, ErrLicenseNotFound
@@ -224,10 +225,10 @@ func (r *licenseRepository) GetAuthorizationCodeByCode(ctx context.Context, code
 // GetLicenseByKey 根据许可证密钥获取许可证信息
 func (r *licenseRepository) GetLicenseByKey(ctx context.Context, licenseKey string) (*models.License, error) {
 	var license models.License
-	
+
 	err := r.db.Preload("AuthorizationCode").Preload("Customer").
 		Where("license_key = ?", licenseKey).First(&license).Error
-	
+
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, ErrLicenseNotFound
@@ -251,4 +252,146 @@ func (r *licenseRepository) GetActiveLicenseCount(ctx context.Context, authCodeI
 		Where("authorization_code_id = ? AND status = ?", authCodeID, "active").
 		Count(&count).Error
 	return count, err
+}
+
+// GetCustomerDeviceList 查询客户设备列表（关联授权码信息）
+func (r *licenseRepository) GetCustomerDeviceList(ctx context.Context, customerID string, req *models.DeviceListRequest) (*models.DeviceListResponse, error) {
+	// 设置默认值
+	if req.Page <= 0 {
+		req.Page = 1
+	}
+	if req.PageSize <= 0 {
+		req.PageSize = 20
+	}
+	if req.PageSize > 100 {
+		req.PageSize = 100
+	}
+
+	// 构建查询
+	query := r.db.Model(&models.License{}).
+		Select(`licenses.id, licenses.device_info, licenses.last_online_ip,
+				licenses.activated_at, licenses.last_heartbeat,
+				authorization_codes.code as authorization_code,
+				authorization_codes.id as authorization_code_id,
+				authorization_codes.end_date, authorization_codes.description`).
+		Joins("LEFT JOIN authorization_codes ON licenses.authorization_code_id = authorization_codes.id").
+		Where("licenses.customer_id = ? AND licenses.status = ? AND licenses.deleted_at IS NULL",
+			customerID, "active")
+
+	// 按授权码ID筛选
+	if req.AuthorizationCodeID != "" {
+		query = query.Where("licenses.authorization_code_id = ?", req.AuthorizationCodeID)
+	}
+
+	// 设备名称模糊搜索
+	if req.DeviceName != "" {
+		query = query.Where("JSON_EXTRACT(licenses.device_info, '$.name') LIKE ?", "%"+req.DeviceName+"%")
+	}
+
+	// 获取总数
+	var total int64
+	if err := query.Count(&total).Error; err != nil {
+		return nil, err
+	}
+
+	// 定义扫描结构体
+	type deviceScanResult struct {
+		ID                  string     `json:"id"`
+		DeviceInfo          string     `json:"device_info"`
+		LastOnlineIP        *string    `json:"last_online_ip"`
+		ActivatedAt         *time.Time `json:"activated_at"`
+		LastHeartbeat       *time.Time `json:"last_heartbeat"`
+		AuthorizationCode   string     `json:"authorization_code"`
+		AuthorizationCodeID string     `json:"authorization_code_id"`
+		EndDate             time.Time  `json:"end_date"`
+		Description         *string    `json:"description"`
+	}
+
+	// 分页查询
+	offset := (req.Page - 1) * req.PageSize
+	var scanResults []deviceScanResult
+	err := query.Order("licenses.activated_at DESC").
+		Offset(offset).Limit(req.PageSize).
+		Scan(&scanResults).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// 获取心跳超时配置（秒）
+	cfg := config.GetConfig()
+	heartbeatTimeoutSeconds := cfg.License.HeartbeatTimeout
+	if heartbeatTimeoutSeconds <= 0 {
+		heartbeatTimeoutSeconds = 300 // 默认5分钟
+	}
+
+	now := time.Now()
+	devices := make([]models.DeviceListItem, len(scanResults))
+
+	for i, result := range scanResults {
+		// 解析device_info JSON
+		var deviceInfo map[string]interface{}
+		if result.DeviceInfo != "" {
+			// 这里需要JSON解析，暂时简化处理
+			deviceInfo = map[string]interface{}{"raw": result.DeviceInfo}
+		}
+
+		// 计算在线状态（使用心跳超时配置）
+		isOnline := false
+		if result.LastHeartbeat != nil && result.LastHeartbeat.After(now.Add(-time.Duration(heartbeatTimeoutSeconds)*time.Second)) {
+			isOnline = true
+		}
+
+		// 格式化时间字段
+		var activatedAtStr, lastHeartbeatStr *string
+		if result.ActivatedAt != nil {
+			str := result.ActivatedAt.Format("2006-01-02T15:04:05Z")
+			activatedAtStr = &str
+		}
+		if result.LastHeartbeat != nil {
+			str := result.LastHeartbeat.Format("2006-01-02T15:04:05Z")
+			lastHeartbeatStr = &str
+		}
+
+		// 构建授权信息
+		description := ""
+		if result.Description != nil {
+			description = *result.Description
+		}
+
+		devices[i] = models.DeviceListItem{
+			ID:            result.ID,
+			DeviceInfo:    deviceInfo,
+			IsOnline:      isOnline,
+			LastOnlineIP:  result.LastOnlineIP,
+			LastHeartbeat: lastHeartbeatStr,
+			ActivatedAt:   activatedAtStr,
+			AuthorizationInfo: models.AuthorizationInfo{
+				AuthorizationCode:   result.AuthorizationCode,
+				AuthorizationCodeID: result.AuthorizationCodeID,
+				EndDate:             result.EndDate.Format("2006-01-02T15:04:05Z"),
+				Description:         description,
+			},
+		}
+	}
+
+	return &models.DeviceListResponse{
+		List:     devices,
+		Total:    total,
+		Page:     req.Page,
+		PageSize: req.PageSize,
+	}, nil
+}
+
+// DeleteLicenseByID 根据ID删除许可证（物理删除，用于设备解绑）
+func (r *licenseRepository) DeleteLicenseByID(ctx context.Context, id string) error {
+	return r.db.Unscoped().Delete(&models.License{}, "id = ?", id).Error
+}
+
+// CheckLicenseBelongsToCustomer 检查许可证是否属于指定客户
+func (r *licenseRepository) CheckLicenseBelongsToCustomer(ctx context.Context, licenseID, customerID string) (bool, error) {
+	var count int64
+	err := r.db.Model(&models.License{}).
+		Where("id = ? AND customer_id = ? AND deleted_at IS NULL", licenseID, customerID).
+		Count(&count).Error
+	return count > 0, err
 }

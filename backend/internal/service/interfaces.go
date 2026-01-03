@@ -70,3 +70,12 @@ type DashboardService interface {
 	// 获取最近授权列表
 	GetRecentAuthorizations(ctx context.Context, req *models.DashboardRecentAuthorizationsRequest) (*models.DashboardRecentAuthorizationsResponse, error)
 }
+
+// CuDeviceService 客户设备服务接口
+type CuDeviceService interface {
+	// 获取设备列表
+	GetDeviceList(ctx context.Context, customerID string, req *models.DeviceListRequest) (*models.DeviceListResponse, error)
+
+	// 解绑设备
+	UnbindDevice(ctx context.Context, customerID, licenseID string) error
+}
