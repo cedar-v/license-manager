@@ -30,6 +30,7 @@ var (
 	ErrDatabaseCreate     = errors.New("database create failed")
 	ErrDatabaseUpdate     = errors.New("database update failed")
 	ErrDatabaseDelete     = errors.New("database delete failed")
+	ErrInvalidTransaction = errors.New("invalid transaction object")
 )
 
 // 辅助函数：判断错误类型

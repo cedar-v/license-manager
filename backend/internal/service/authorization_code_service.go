@@ -18,11 +18,13 @@ import (
 	"license-manager/pkg/utils"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type authorizationCodeService struct {
 	authCodeRepo repository.AuthorizationCodeRepository
 	customerRepo repository.CustomerRepository
+	cuUserRepo   repository.CuUserRepository
 	licenseRepo  repository.LicenseRepository
 }
 
@@ -30,11 +32,13 @@ type authorizationCodeService struct {
 func NewAuthorizationCodeService(
 	authCodeRepo repository.AuthorizationCodeRepository,
 	customerRepo repository.CustomerRepository,
+	cuUserRepo repository.CuUserRepository,
 	licenseRepo repository.LicenseRepository,
 ) AuthorizationCodeService {
 	return &authorizationCodeService{
 		authCodeRepo: authCodeRepo,
 		customerRepo: customerRepo,
+		cuUserRepo:   cuUserRepo,
 		licenseRepo:  licenseRepo,
 	}
 }
@@ -781,4 +785,148 @@ func (s *authorizationCodeService) GetAuthorizationChangeList(ctx context.Contex
 func (s *authorizationCodeService) fillChangeDisplayFields(item *models.AuthorizationChangeListItem, lang string) {
 	// 填充变更类型显示字段
 	item.ChangeTypeDisplay = i18n.GetEnumMessage("authorization_change_type", item.ChangeType, lang)
+}
+
+// ShareAuthorizationCode 用户分享授权码
+func (s *authorizationCodeService) ShareAuthorizationCode(ctx context.Context, authCodeID, userID string, req *models.AuthorizationCodeShareRequest) (*models.AuthorizationCodeShareResponse, error) {
+	lang := pkgcontext.GetLanguageFromContext(ctx)
+
+	// 业务逻辑：参数验证
+	if authCodeID == "" || userID == "" || req == nil {
+		return nil, i18n.NewI18nError("900001", lang)
+	}
+
+	// 验证不能分享给自己
+	if req.TargetUserID == userID {
+		return nil, i18n.NewI18nError("300105", lang) // 不能分享给自己
+	}
+
+	// 验证目标用户是否存在
+	targetUser, err := s.cuUserRepo.GetByID(req.TargetUserID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, i18n.NewI18nError("300104", lang) // 目标用户不存在
+		}
+		return nil, i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	// 验证目标用户状态
+	if targetUser.Status != "active" {
+		return nil, i18n.NewI18nError("300104", lang) // 目标用户不存在或状态异常
+	}
+
+	// 获取原授权码
+	authCode, err := s.authCodeRepo.GetAuthorizationCodeByID(ctx, authCodeID)
+	if err != nil {
+		if errors.Is(err, repository.ErrAuthorizationCodeNotFound) {
+			return nil, i18n.NewI18nError("300101", lang) // 授权码不存在
+		}
+		return nil, i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	// 验证授权码所有权（只能分享自己的授权码）
+	if authCode.CreatedBy != userID {
+		return nil, i18n.NewI18nError("300101", lang) // 授权码不存在（无权限访问）
+	}
+
+	// 验证授权码状态
+	if authCode.IsLocked {
+		return nil, i18n.NewI18nError("300102", lang) // 授权码已被锁定
+	}
+
+	// 计算当前已激活次数
+	currentActivations, err := s.licenseRepo.GetActiveLicenseCount(ctx, authCodeID)
+	if err != nil {
+		return nil, i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	// 计算可分享次数
+	availableActivations := authCode.MaxActivations - int(currentActivations)
+	if req.ShareCount > availableActivations {
+		return nil, i18n.NewI18nError("300103", lang) // 分享数量超过可用激活数
+	}
+
+	var newAuthCode *models.AuthorizationCode
+
+	// 开启事务
+	tx := s.authCodeRepo.BeginTransaction(ctx)
+	if tx == nil {
+		return nil, i18n.NewI18nError("300106", lang) // 数据库事务失败
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			if gormTx, ok := tx.(*gorm.DB); ok {
+				gormTx.Rollback()
+			}
+			panic(r)
+		}
+	}()
+
+	// 在事务中执行操作
+	txErr := func() error {
+		// 1. 减少原授权码的max_activations
+		newMaxActivations := authCode.MaxActivations - req.ShareCount
+		err := s.authCodeRepo.UpdateMaxActivationsWithTx(ctx, tx, authCodeID, newMaxActivations)
+		if err != nil {
+			return err
+		}
+
+		// 2. 为目标用户创建新的授权码
+		now := time.Now()
+		code, err := s.generateAuthorizationCode(targetUser.CustomerID)
+		if err != nil {
+			return i18n.NewI18nError("900004", lang, err.Error())
+		}
+		newAuthCode = &models.AuthorizationCode{
+			Code:             code,
+			CustomerID:       targetUser.CustomerID, // 使用目标用户的客户ID
+			CreatedBy:        req.TargetUserID,      // 记录为目标用户创建的
+			SoftwareID:       authCode.SoftwareID,
+			Description:      authCode.Description,
+			StartDate:        now,              // 从分享时刻开始
+			EndDate:          authCode.EndDate, // 到原授权码结束时间
+			DeploymentType:   authCode.DeploymentType,
+			EncryptionType:   authCode.EncryptionType,
+			SoftwareVersion:  authCode.SoftwareVersion,
+			MaxActivations:   req.ShareCount,
+			IsLocked:         false,
+			FeatureConfig:    authCode.FeatureConfig,
+			UsageLimits:      authCode.UsageLimits,
+			CustomParameters: authCode.CustomParameters,
+		}
+
+		err = s.authCodeRepo.CreateAuthorizationCodeWithTx(ctx, tx, newAuthCode)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}()
+
+	if txErr != nil {
+		if gormTx, ok := tx.(*gorm.DB); ok {
+			gormTx.Rollback()
+		}
+		return nil, i18n.NewI18nError("300106", lang, txErr.Error()) // 数据库事务失败
+	}
+
+	// 提交事务
+	if gormTx, ok := tx.(*gorm.DB); ok {
+		if err := gormTx.Commit().Error; err != nil {
+			return nil, i18n.NewI18nError("300106", lang, err.Error()) // 数据库事务失败
+		}
+	}
+
+	// 返回新创建的授权码信息
+	response := &models.AuthorizationCodeShareResponse{
+		NewAuthorizationCode: models.AuthorizationCodeShareResponseItem{
+			ID:             newAuthCode.ID,
+			Code:           newAuthCode.Code,
+			StartDate:      newAuthCode.StartDate.Format(time.RFC3339),
+			EndDate:        newAuthCode.EndDate.Format(time.RFC3339),
+			MaxActivations: newAuthCode.MaxActivations,
+		},
+	}
+
+	return response, nil
 }

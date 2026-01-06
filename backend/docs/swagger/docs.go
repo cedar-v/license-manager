@@ -25,6 +25,100 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/cu/authorization-codes/{codeId}/share": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "用户可以将自己的授权码分享给其他用户",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户端授权码管理"
+                ],
+                "summary": "用户分享授权码",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "授权码ID",
+                        "name": "codeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "分享请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.AuthorizationCodeShareRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "分享成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.AuthorizationCodeShareResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "授权码已被锁定",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "授权码不存在或目标用户不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "不能分享给自己或分享数量超过可用激活数",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/cu/devices": {
             "get": {
                 "security": [
@@ -3852,6 +3946,62 @@ const docTemplate = `{
                     "description": "变更原因（记录到变更历史）",
                     "type": "string",
                     "maxLength": 500
+                }
+            }
+        },
+        "models.AuthorizationCodeShareRequest": {
+            "type": "object",
+            "required": [
+                "share_count",
+                "target_user_id"
+            ],
+            "properties": {
+                "share_count": {
+                    "description": "分享激活次数",
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "target_user_id": {
+                    "description": "受赠用户ID",
+                    "type": "string"
+                }
+            }
+        },
+        "models.AuthorizationCodeShareResponse": {
+            "type": "object",
+            "properties": {
+                "new_authorization_code": {
+                    "description": "新生成的授权码信息",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.AuthorizationCodeShareResponseItem"
+                        }
+                    ]
+                }
+            }
+        },
+        "models.AuthorizationCodeShareResponseItem": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "授权码",
+                    "type": "string"
+                },
+                "end_date": {
+                    "description": "结束时间",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "授权码ID",
+                    "type": "string"
+                },
+                "max_activations": {
+                    "description": "最大激活次数",
+                    "type": "integer"
+                },
+                "start_date": {
+                    "description": "开始时间",
+                    "type": "string"
                 }
             }
         },

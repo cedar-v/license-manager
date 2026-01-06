@@ -44,6 +44,9 @@ type AuthorizationCodeService interface {
 	DeleteAuthorizationCode(ctx context.Context, id string) error
 	GetAuthorizationChangeList(ctx context.Context, authCodeID string, req *models.AuthorizationChangeListRequest) (*models.AuthorizationChangeListResponse, error)
 	GenerateAuthorizationFile(ctx context.Context, id string) ([]byte, string, string, error)
+
+	// 用户端分享功能
+	ShareAuthorizationCode(ctx context.Context, authCodeID, userID string, req *models.AuthorizationCodeShareRequest) (*models.AuthorizationCodeShareResponse, error)
 }
 
 // LicenseService 许可证服务接口

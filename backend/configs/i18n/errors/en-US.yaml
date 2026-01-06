@@ -36,6 +36,12 @@ errors:
     "300008": "Hardware fingerprint mismatch"
     "300009": "Failed to generate license file"
     "300010": "Invalid configuration parameters"
+    "300101": "Authorization code not found"
+    "300102": "Authorization code is locked"
+    "300103": "Share count exceeds available activations"
+    "300104": "Target user not found"
+    "300105": "Cannot share with yourself"
+    "300106": "Database transaction failed"
   
   # Dashboard module (40xxxx)
   dashboard:

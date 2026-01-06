@@ -322,6 +322,44 @@ definitions:
         maxLength: 500
         type: string
     type: object
+  models.AuthorizationCodeShareRequest:
+    properties:
+      share_count:
+        description: 分享激活次数
+        minimum: 1
+        type: integer
+      target_user_id:
+        description: 受赠用户ID
+        type: string
+    required:
+    - share_count
+    - target_user_id
+    type: object
+  models.AuthorizationCodeShareResponse:
+    properties:
+      new_authorization_code:
+        allOf:
+        - $ref: '#/definitions/models.AuthorizationCodeShareResponseItem'
+        description: 新生成的授权码信息
+    type: object
+  models.AuthorizationCodeShareResponseItem:
+    properties:
+      code:
+        description: 授权码
+        type: string
+      end_date:
+        description: 结束时间
+        type: string
+      id:
+        description: 授权码ID
+        type: string
+      max_activations:
+        description: 最大激活次数
+        type: integer
+      start_date:
+        description: 开始时间
+        type: string
+    type: object
   models.AuthorizationCodeUpdateRequest:
     properties:
       change_type:
@@ -1413,6 +1451,64 @@ info:
   title: License Manager API
   version: "1.0"
 paths:
+  /api/cu/authorization-codes/{codeId}/share:
+    post:
+      consumes:
+      - application/json
+      description: 用户可以将自己的授权码分享给其他用户
+      parameters:
+      - description: 授权码ID
+        in: path
+        name: codeId
+        required: true
+        type: string
+      - description: 分享请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.AuthorizationCodeShareRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分享成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.AuthorizationCodeShareResponse'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 授权码已被锁定
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 授权码不存在或目标用户不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: 不能分享给自己或分享数量超过可用激活数
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 用户分享授权码
+      tags:
+      - 用户端授权码管理
   /api/cu/devices:
     get:
       consumes:

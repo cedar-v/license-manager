@@ -82,6 +82,16 @@ type AuthorizationCodeRepository interface {
 
 	// RecordAuthorizationChange 记录授权变更历史
 	RecordAuthorizationChange(ctx context.Context, change *models.AuthorizationChange) error
+
+	// 事务相关方法
+	// BeginTransaction 开始事务
+	BeginTransaction(ctx context.Context) interface{}
+
+	// CreateAuthorizationCodeWithTx 在事务中创建授权码
+	CreateAuthorizationCodeWithTx(ctx context.Context, tx interface{}, authCode *models.AuthorizationCode) error
+
+	// UpdateMaxActivationsWithTx 在事务中更新授权码的最大激活次数
+	UpdateMaxActivationsWithTx(ctx context.Context, tx interface{}, authCodeID string, newMaxActivations int) error
 }
 
 // LicenseRepository 许可证数据访问接口

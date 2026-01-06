@@ -52,7 +52,7 @@ func SetupRouter() *gin.Engine {
 	systemService := service.NewSystemService()
 	customerService := service.NewCustomerService(customerRepo)
 	cuUserService := service.NewCuUserService(cuUserRepo, customerRepo, db)
-	authCodeService := service.NewAuthorizationCodeService(authCodeRepo, customerRepo, licenseRepo)
+	authCodeService := service.NewAuthorizationCodeService(authCodeRepo, customerRepo, cuUserRepo, licenseRepo)
 	cuOrderService := service.NewCuOrderService(cuOrderRepo, cuUserRepo, authCodeRepo, db)
 	cuDeviceService := service.NewCuDeviceService(licenseRepo)
 	enumService := service.NewEnumService()
@@ -67,6 +67,7 @@ func SetupRouter() *gin.Engine {
 	cuProfileHandler := handlers.NewCuProfileHandler(cuUserService)
 	cuOrderHandler := handlers.NewCuOrderHandler(cuOrderService)
 	cuDeviceHandler := handlers.NewCuDeviceHandler(cuDeviceService)
+	cuAuthorizationHandler := handlers.NewCuAuthorizationHandler(authCodeService)
 	enumHandler := handlers.NewEnumHandler(enumService)
 	authCodeHandler := handlers.NewAuthorizationCodeHandler(authCodeService)
 	licenseHandler := handlers.NewLicenseHandler(licenseService)
@@ -172,6 +173,9 @@ func SetupRouter() *gin.Engine {
 			cuAuth.POST("/orders", cuOrderHandler.CreateOrder)
 			cuAuth.GET("/orders/:order_id", cuOrderHandler.GetOrder)
 			cuAuth.GET("/orders", cuOrderHandler.GetUserOrders)
+
+			// 授权码管理
+			cuAuth.POST("/authorization-codes/:codeId/share", cuAuthorizationHandler.ShareAuthorizationCode)
 
 			// 设备管理
 			cuAuth.GET("/devices", cuDeviceHandler.GetDevices)

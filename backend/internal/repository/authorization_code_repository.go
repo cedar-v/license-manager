@@ -297,3 +297,24 @@ func (r *authorizationCodeRepository) GetAuthorizationChangeList(ctx context.Con
 func (r *authorizationCodeRepository) RecordAuthorizationChange(ctx context.Context, change *models.AuthorizationChange) error {
 	return r.db.WithContext(ctx).Create(change).Error
 }
+
+// BeginTransaction 开始事务
+func (r *authorizationCodeRepository) BeginTransaction(ctx context.Context) interface{} {
+	return r.db.WithContext(ctx).Begin()
+}
+
+// CreateAuthorizationCodeWithTx 在事务中创建授权码
+func (r *authorizationCodeRepository) CreateAuthorizationCodeWithTx(ctx context.Context, tx interface{}, authCode *models.AuthorizationCode) error {
+	if gormTx, ok := tx.(*gorm.DB); ok {
+		return gormTx.WithContext(ctx).Create(authCode).Error
+	}
+	return ErrInvalidTransaction
+}
+
+// UpdateMaxActivationsWithTx 在事务中更新授权码的最大激活次数
+func (r *authorizationCodeRepository) UpdateMaxActivationsWithTx(ctx context.Context, tx interface{}, authCodeID string, newMaxActivations int) error {
+	if gormTx, ok := tx.(*gorm.DB); ok {
+		return gormTx.WithContext(ctx).Model(&models.AuthorizationCode{}).Where("id = ?", authCodeID).Update("max_activations", newMaxActivations).Error
+	}
+	return ErrInvalidTransaction
+}
