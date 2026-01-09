@@ -469,6 +469,9 @@ definitions:
         type: integer
       package_id:
         type: string
+      payment_method:
+        description: 可选：支付方式，不传则为免费订单
+        type: string
     required:
     - license_count
     - package_id
@@ -1319,6 +1322,78 @@ definitions:
         description: 响应消息
         type: string
     type: object
+  models.PaymentBusinessOrder:
+    properties:
+      authorization_code:
+        type: string
+      order_no:
+        type: string
+      status:
+        type: string
+    type: object
+  models.PaymentListResponse:
+    properties:
+      page:
+        type: integer
+      page_size:
+        type: integer
+      payments:
+        items:
+          $ref: '#/definitions/models.PaymentResponse'
+        type: array
+      total_count:
+        type: integer
+    type: object
+  models.PaymentResponse:
+    properties:
+      amount:
+        type: number
+      business_id:
+        type: string
+      business_type:
+        type: string
+      created_at:
+        type: string
+      currency:
+        type: string
+      expire_time:
+        type: string
+      id:
+        type: integer
+      payment_method:
+        type: string
+      payment_no:
+        type: string
+      payment_provider:
+        type: string
+      payment_time:
+        type: string
+      payment_url:
+        type: string
+      status:
+        type: string
+      trade_no:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  models.PaymentStatusResponse:
+    properties:
+      amount:
+        type: number
+      business_order:
+        $ref: '#/definitions/models.PaymentBusinessOrder'
+      payment_no:
+        type: string
+      payment_time:
+        type: string
+      status:
+        type: string
+      trade_no:
+        type: string
+    type: object
   models.RecentAuthorization:
     properties:
       code:
@@ -1736,7 +1811,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: 创建新的产品套餐订单
+      description: 创建新的产品套餐订单，支持免费和付费模式
       parameters:
       - description: 订单创建信息
         in: body
@@ -1748,18 +1823,22 @@ paths:
       - application/json
       responses:
         "200":
-          description: 成功
+          description: 付费订单成功
           schema:
             allOf:
             - $ref: '#/definitions/models.APIResponse'
             - properties:
                 data:
                   properties:
-                    authorization_code:
+                    expire_time:
                       type: string
                     id:
                       type: string
                     order_no:
+                      type: string
+                    payment_no:
+                      type: string
+                    payment_url:
                       type: string
                     total_amount:
                       type: number
@@ -2557,6 +2636,104 @@ paths:
       summary: 获取指定类型的枚举值
       tags:
       - 枚举管理
+  /api/payment/{payment_no}/status:
+    get:
+      consumes:
+      - application/json
+      description: 根据支付单号获取支付状态
+      parameters:
+      - description: 支付单号
+        in: path
+        name: payment_no
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.PaymentStatusResponse'
+              type: object
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 支付单不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取支付状态
+      tags:
+      - 支付管理
+  /api/payment/alipay/callback:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: 处理支付宝支付回调
+      parameters:
+      - description: 支付宝回调参数
+        in: body
+        name: notification
+        schema:
+          type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: success
+          schema:
+            type: string
+        "400":
+          description: failure
+          schema:
+            type: string
+      summary: 支付宝回调
+      tags:
+      - 支付管理
+  /api/payment/history:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前用户的支付记录列表
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.PaymentListResponse'
+              type: object
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取用户支付历史
+      tags:
+      - 支付管理
   /api/v1/activate:
     post:
       consumes:

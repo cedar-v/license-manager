@@ -82,3 +82,4 @@ type CuDeviceService interface {
 	// 解绑设备
 	UnbindDevice(ctx context.Context, customerID, licenseID string) error
 }
+

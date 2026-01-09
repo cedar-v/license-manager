@@ -48,7 +48,39 @@ license:
     private_key_path: "../configs/rsa_private_key.pem" # RSA私钥文件路径（服务器端使用，必须保密）
     public_key_path: "../configs/rsa_public_key.pem"   # RSA公钥文件路径（客户端使用，可以公开）
     key_size: 2048                                   # 密钥大小：2048或4096，默认2048
-  
+
   heartbeat_timeout: 300 # 心跳超时时间(秒) - 5分钟内为在线
   offline_timeout: 1440 # 离线超时时间(分钟) - 24小时后为异常
   expiring_days: 30 # 即将过期天数 - 30天内到期算即将过期
+
+payment:
+  # 默认支付方式
+  default_method: alipay
+
+  # 支付提供商配置
+  providers:
+    alipay:
+      enabled: true
+      app_id: "your_alipay_app_id"
+      private_key: "your_alipay_private_key"
+      public_key: "alipay_public_key"
+      gateway_url: "https://openapi.alipay.com/gateway.do"
+      notify_url: "https://your-domain.com/api/payment/alipay/callback"
+      return_url: "https://your-domain.com/payment/success"
+      sign_type: "RSA2"
+      charset: "utf-8"
+      format: "json"
+
+    wechat:
+      enabled: false  # 可动态开启
+      app_id: "your_wechat_app_id"
+      mch_id: "your_wechat_mch_id"
+      private_key: "your_wechat_private_key"
+      gateway_url: "https://api.mch.weixin.qq.com/pay/unifiedorder"
+      notify_url: "https://your-domain.com/api/payment/wechat/callback"
+      # ... 其他微信支付配置
+
+  # 通用支付配置
+  expire_minutes: 30  # 支付过期时间（分钟）
+  retry_times: 3      # 支付重试次数
+  enable_log: true    # 启用支付日志

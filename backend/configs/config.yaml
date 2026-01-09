@@ -51,3 +51,26 @@ license:
   heartbeat_timeout: 300 # 心跳超时时间(秒) - 5分钟内未上报心跳视为离线
   offline_timeout: 1440 # 离线超时时间(分钟) - 24小时后为异常
   expiring_days: 30 # 即将过期天数 - 30天内到期算即将过期
+
+payment:
+  # 默认支付方式
+  default_method: alipay
+
+  # 支付提供商配置 - 支付宝沙箱环境
+  providers:
+    alipay:
+      enabled: true
+      app_id: "9021000159611786"
+      private_key: "-----BEGIN PRIVATE KEY-----\nMIIEogIBAAKCAQEAhxBHcY3BLmA0glH1v1e9VnLFEc72ZyI5xNF77SMA5hGutz30\nSmzczjYvGJNYTeyWfIjIqtP0IA49XA61kpUPiTyBy2sxjDfu6ew+Yu2waynpI+Nbk\npIz8TWT1g7rqgZMsUexufmvFEpvn1AmboVKN8iZVflwc4lq5pQ/GS7uTlDK3fY32j\nEk6jxEHy8yZvkf467X0WK9AdrJ0IxUTOLBROdZySqg7mc2Iyo61xdDOuVCJjZSWFH\nt+s4UWx2VPFSbL2z4m82abGicAgj696J2PU9iLhQG2HA/EwrH8zsVyJPHTMgPFwng\nN9sxmT4U3OH8ugCnw/amEsD8VZR3PG3ypQIDAQABAoIBAFSs2Q2Q4H7xo5ncRmQ6Xq\nKW+4Ppq8MGyw7ggoAuBL84cL/C4KfUTi4d/DK9FYxs+f+DRcMLdK6wHrnbIuyN9Rq\nFy527S2nsGyWejZI6D/NvaBGu1Vczv8rGWzPFUOvcXTJ7jynYJnJjJE3N0vpRKDGG\n2tLyuhRFH7cFU/W23YJM7TflTUUh1SG0Ec+jUa+ek5nK/vsqGE7A5p/D+mW4WLfS4\nsGhfe1XzNKjuCznTYajG79YXHXBKljqq4SKoEdh0SQHoEy7H0BXqArjSbh4KdHYoW/\nKkvA/c5QpbaTuWdK3iuvq7bZ1I0SEckL/rzufj+OcgoKcnwxZG2/Eq1Nb8tUCgYEAw\ncuyQW1AZEVl4dbk9Y4JXFeWh82LZ9pmyvr9tmqwQP4Ywlb9zUlXy+Zbv1wa9acfRWu9\ndYGm3SByFk8c3UGb/s3+eY4MribqkNVkjdotC/+wfymyf3gdLypGEXjBGwNJregGFeF\nmUhWnS+YWOiCiH401uDTU1pRtW37DZgdD5ZMCgYEAsmqIRL4U+3bkIb8u26lgS3k2W\nImen8+i91jVc8wWD7/aWGNmjodimyOv9AJRt34y5apzzfcWuzr9qdNQrzGubtKjaVM6\ns6NNVGzUJkLjF4WpyFDmX/ZLZkTW0gQLMYAjmiEJkPlbpHQ81vSMCT7W76RB31vL8p\ndRJMGBz/dN6ecCgYATzaXsi6Z92J2do2EIOrh4KDcor3dkaGwCp/1PK73RFmYfTdZnq\nOwA2QxdFKNooOhQJr9Yh6Quioc+Al2XuoGfWxt6/moLTczAeh3pZPcfd8RoajFkVzjc\nPfylAmrxQLfBvqkIiVz0XGQZHGz/CaCnir2HklaBiu9V3zFGds2YYwKBgFuaNryUm1F\nAiYCKGBTPsZEOesiaX8bNZG56PZ1mey0642/eGRm0iPv+JqixSCNdt+QSz8I/ynv2naZ\nDyHkqmNRtcVjyUoFIprth5MqALPg2uCUQ5DcAzVWEoobRbK3NjHnl3HOCk3qr81Cp3f\nwhN1lyjB+RkfTLm+2zLGMKJgahAoGAGUigAVlCnUo6zj8PVOeUPJWV3tZf8ZkTtCXT\njdp9tPwZqf0ZlmVZCoQB3nclF/6PgxgH7W596DlUt8TIrdmgg28HM8C2rpY/AoCw1H3\ncMkha8gCUN308cx0I2duea3tvDUb8thfvR34d7bxCI2hTOsplfE/MVv+sjzprGwtH/84=\n-----END PRIVATE KEY-----"
+      public_key: "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjkjXfe1fXjelyi6HIzFp\n5l9PGPxDBTi/TyIsRrF5NaYRCGqqSSJj1sc440eJ7InKRb4q/7cpdjlroC6DDO1O\nHKipld1pWSqoezc2lLVxvRWGt7Tl9mDfrul1/4ywx9OnIPBx3iJvzY15XDVWlZFY\nWVJFQv5EriLn+3xy+3gaazzJYCp/PumDqMTUgp0Kjk+HuHJ5/PKtFt3AtN2GB8gl\nQEybl2Wf0qNZU9SzmEm+9I7CNvB/zUC3csRxJHTvbOtkjhCC/TrS20Xm8IFjygu9\nlBf9qzacXyfHjG6fLMU8aDn4kPAXL+wbqE2UzFmVvMNCLpEaIS3r7I8S2TGQLPDD\n6QIDAQAB\n-----END PUBLIC KEY-----"
+      gateway_url: "https://openapi-sandbox.dl.alipaydev.com/gateway.do"
+      notify_url: "http://localhost:18888/api/payment/alipay/callback"
+      return_url: "http://localhost:18888/payment/success"
+      sign_type: "RSA2"
+      charset: "utf-8"
+      format: "json"
+
+  # 通用支付配置
+  expire_minutes: 30  # 支付过期时间（分钟）
+  retry_times: 3      # 支付重试次数
+  enable_log: true    # 启用支付日志

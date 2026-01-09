@@ -14,6 +14,7 @@ type Config struct {
 	Log      LogConfig      `mapstructure:"log"`
 	I18n     I18nConfig     `mapstructure:"i18n"`
 	License  LicenseConfig  `mapstructure:"license"`
+	Payment  PaymentConfig  `mapstructure:"payment"`
 }
 
 type ServerConfig struct {
@@ -86,6 +87,27 @@ type RSAConfig struct {
 	PrivateKeyPath string `mapstructure:"private_key_path"` // RSA私钥文件路径
 	PublicKeyPath  string `mapstructure:"public_key_path"`  // RSA公钥文件路径
 	KeySize        int    `mapstructure:"key_size"`         // 密钥大小（2048或4096），默认2048
+}
+
+type PaymentConfig struct {
+	DefaultMethod string                    `mapstructure:"default_method"` // 默认支付方式
+	Providers     map[string]*PaymentProvider `mapstructure:"providers"`    // 支付提供商配置
+	ExpireMinutes int                       `mapstructure:"expire_minutes"` // 支付过期时间（分钟）
+	RetryTimes    int                       `mapstructure:"retry_times"`    // 支付重试次数
+	EnableLog     bool                      `mapstructure:"enable_log"`     // 启用支付日志
+}
+
+type PaymentProvider struct {
+	AppID      string `mapstructure:"app_id"`
+	PrivateKey string `mapstructure:"private_key"`
+	PublicKey  string `mapstructure:"public_key"`
+	GatewayURL string `mapstructure:"gateway_url"`
+	NotifyURL  string `mapstructure:"notify_url"`
+	ReturnURL  string `mapstructure:"return_url"`
+	SignType   string `mapstructure:"sign_type"`
+	Charset    string `mapstructure:"charset"`
+	Format     string `mapstructure:"format"`
+	Enabled    bool   `mapstructure:"enabled"`
 }
 
 var AppConfig *Config
@@ -172,6 +194,12 @@ func setDefaults() {
 	viper.SetDefault("license.heartbeat_timeout", 300)
 	viper.SetDefault("license.offline_timeout", 1440)
 	viper.SetDefault("license.expiring_days", 30)
+
+	// Payment defaults
+	viper.SetDefault("payment.default_method", "alipay")
+	viper.SetDefault("payment.expire_minutes", 30)
+	viper.SetDefault("payment.retry_times", 3)
+	viper.SetDefault("payment.enable_log", true)
 }
 
 func GetConfig() *Config {

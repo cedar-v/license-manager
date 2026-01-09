@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"fmt"
 	_ "license-manager/docs/swagger" // swagger docs
 	"license-manager/internal/api/handlers"
 	"license-manager/internal/api/middleware"
@@ -43,6 +44,7 @@ func SetupRouter() *gin.Engine {
 	authCodeRepo := repository.NewAuthorizationCodeRepository(db)
 	licenseRepo := repository.NewLicenseRepository(db)
 	dashboardRepo := repository.NewDashboardRepository(db)
+	paymentRepo := repository.NewPaymentRepository(db)
 
 	// 获取logger实例
 	log := logger.GetLogger()
@@ -55,6 +57,7 @@ func SetupRouter() *gin.Engine {
 	authCodeService := service.NewAuthorizationCodeService(authCodeRepo, customerRepo, cuUserRepo, licenseRepo)
 	cuOrderService := service.NewCuOrderService(cuOrderRepo, cuUserRepo, authCodeRepo, db)
 	cuDeviceService := service.NewCuDeviceService(licenseRepo)
+	paymentService := service.NewPaymentService(paymentRepo, cuOrderRepo, convertPaymentConfig(cfg.Payment))
 	enumService := service.NewEnumService()
 	licenseService := service.NewLicenseService(licenseRepo, db, log)
 	dashboardService := service.NewDashboardService(dashboardRepo)
@@ -65,8 +68,9 @@ func SetupRouter() *gin.Engine {
 	customerHandler := handlers.NewCustomerHandler(customerService)
 	cuAuthHandler := handlers.NewCuAuthHandler(cuUserService)
 	cuProfileHandler := handlers.NewCuProfileHandler(cuUserService)
-	cuOrderHandler := handlers.NewCuOrderHandler(cuOrderService)
+	cuOrderHandler := handlers.NewCuOrderHandler(cuOrderService, paymentService)
 	cuDeviceHandler := handlers.NewCuDeviceHandler(cuDeviceService)
+	paymentHandler := handlers.NewPaymentHandler(paymentService)
 	cuAuthorizationHandler := handlers.NewCuAuthorizationHandler(authCodeService)
 	enumHandler := handlers.NewEnumHandler(enumService)
 	authCodeHandler := handlers.NewAuthorizationCodeHandler(authCodeService)
@@ -90,6 +94,9 @@ func SetupRouter() *gin.Engine {
 			// 许可证激活接口（客户端软件使用）
 			public.POST("/v1/activate", licenseHandler.ActivateLicense)
 			public.POST("/v1/heartbeat", licenseHandler.Heartbeat)
+
+			// 支付回调接口
+			public.POST("/payment/alipay/callback", paymentHandler.AlipayCallback)
 		}
 
 		// 需要认证的接口
@@ -174,6 +181,10 @@ func SetupRouter() *gin.Engine {
 			cuAuth.GET("/orders/:order_id", cuOrderHandler.GetOrder)
 			cuAuth.GET("/orders", cuOrderHandler.GetUserOrders)
 
+			// 支付管理
+			cuAuth.GET("/payment/:payment_no/status", paymentHandler.GetPaymentStatus)
+			cuAuth.GET("/payment/history", paymentHandler.GetUserPayments)
+
 			// 授权码管理
 			cuAuth.POST("/authorization-codes/:codeId/share", cuAuthorizationHandler.ShareAuthorizationCode)
 
@@ -184,4 +195,47 @@ func SetupRouter() *gin.Engine {
 	}
 
 	return router
+}
+
+// convertPaymentConfig 转换支付配置
+func convertPaymentConfig(cfg config.PaymentConfig) *service.PaymentConfig {
+	fmt.Printf("convertPaymentConfig: cfg.DefaultMethod=%s, cfg.Providers is nil: %v\n", cfg.DefaultMethod, cfg.Providers == nil)
+	if cfg.Providers != nil {
+		fmt.Printf("convertPaymentConfig: Found %d providers\n", len(cfg.Providers))
+		for name, provider := range cfg.Providers {
+			fmt.Printf("convertPaymentConfig: Provider %s, Enabled=%v\n", name, provider.Enabled)
+		}
+	}
+
+	config := &service.PaymentConfig{
+		DefaultMethod: cfg.DefaultMethod,
+		ExpireMinutes: cfg.ExpireMinutes,
+	}
+
+	if cfg.Providers != nil {
+		config.Providers = make(map[string]*service.AlipayProviderConfig)
+		for name, provider := range cfg.Providers {
+			if provider.Enabled {
+				config.Providers[name] = &service.AlipayProviderConfig{
+					Enabled:    provider.Enabled,
+					AppID:      provider.AppID,
+					PrivateKey: provider.PrivateKey,
+					PublicKey:  provider.PublicKey,
+					GatewayURL: provider.GatewayURL,
+					NotifyURL:  provider.NotifyURL,
+					ReturnURL:  provider.ReturnURL,
+					SignType:   provider.SignType,
+					Charset:    provider.Charset,
+					Format:     provider.Format,
+				}
+			}
+		}
+	}
+
+	fmt.Printf("convertPaymentConfig: Final config.Providers is nil: %v\n", config.Providers == nil)
+	if config.Providers != nil {
+		fmt.Printf("convertPaymentConfig: Final config has %d providers\n", len(config.Providers))
+	}
+
+	return config
 }

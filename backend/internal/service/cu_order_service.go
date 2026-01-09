@@ -17,9 +17,11 @@ import (
 
 type CuOrderService interface {
 	CreateOrder(ctx context.Context, cuUserID, customerID string, req *models.CuOrderCreateRequest) (*models.CuOrder, error)
+	CreatePendingOrder(ctx context.Context, cuUserID, customerID string, req *models.CuOrderCreateRequest) (*models.CuOrder, error)
 	GetOrder(ctx context.Context, orderID, cuUserID string) (*models.CuOrder, error)
 	GetUserOrders(ctx context.Context, cuUserID string, offset, limit int) ([]*models.CuOrder, int64, error)
 	CalculatePrice(ctx context.Context, packageID string, licenseCount int) (*PriceCalculationResult, error)
+	UpdateOrderStatus(ctx context.Context, orderID string, status string) error
 }
 
 type PriceCalculationResult struct {
@@ -83,6 +85,62 @@ func NewCuOrderService(repo repository.CuOrderRepository, cuUserRepo repository.
 		authCodeRepo: authCodeRepo,
 		db:           db,
 	}
+}
+
+func (s *cuOrderService) CreatePendingOrder(ctx context.Context, cuUserID, customerID string, req *models.CuOrderCreateRequest) (*models.CuOrder, error) {
+	// 计算价格
+	priceResult, err := s.CalculatePrice(ctx, req.PackageID, req.LicenseCount)
+	if err != nil {
+		return nil, err
+	}
+
+	// 生成订单号
+	orderNo := s.generateOrderNo()
+
+	// 获取套餐配置
+	packageConfig, exists := packageConfigs[req.PackageID]
+	if !exists {
+		return nil, i18n.NewI18nError("600001", "套餐不存在")
+	}
+
+	// 创建订单（pending状态）
+	order := &models.CuOrder{
+		OrderNo:      orderNo,
+		CustomerID:   customerID,
+		CuUserID:     cuUserID,
+		PackageID:    req.PackageID,
+		PackageName:  packageConfig.Name,
+		LicenseCount: req.LicenseCount,
+		UnitPrice:    priceResult.UnitPrice,
+		DiscountRate: priceResult.DiscountRate,
+		TotalAmount:  priceResult.TotalAmount,
+		Status:       "pending", // 待支付状态
+	}
+
+	// 对于试用版，设置过期时间
+	if req.PackageID == "trial" {
+		expiredAt := s.getTrialExpiryTime()
+		order.ExpiredAt = &expiredAt
+	}
+
+	// 保存订单
+	if err := s.repo.Create(order); err != nil {
+		return nil, i18n.NewI18nError("601001", "订单创建失败: "+err.Error())
+	}
+
+	return order, nil
+}
+
+func (s *cuOrderService) UpdateOrderStatus(ctx context.Context, orderID string, status string) error {
+	// 这里需要实现更新订单状态的逻辑
+	// 暂时先返回nil，后面再实现
+	return nil
+}
+
+// getTrialExpiryTime 获取试用版过期时间（当月25日23:59:59）
+func (s *cuOrderService) getTrialExpiryTime() time.Time {
+	now := time.Now()
+	return time.Date(now.Year(), now.Month(), 25, 23, 59, 59, 0, now.Location())
 }
 
 func (s *cuOrderService) CreateOrder(ctx context.Context, cuUserID, customerID string, req *models.CuOrderCreateRequest) (*models.CuOrder, error) {

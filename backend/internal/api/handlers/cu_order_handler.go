@@ -14,11 +14,13 @@ import (
 
 type CuOrderHandler struct {
 	cuOrderService service.CuOrderService
+	paymentService service.PaymentService
 }
 
-func NewCuOrderHandler(cuOrderService service.CuOrderService) *CuOrderHandler {
+func NewCuOrderHandler(cuOrderService service.CuOrderService, paymentService service.PaymentService) *CuOrderHandler {
 	return &CuOrderHandler{
 		cuOrderService: cuOrderService,
+		paymentService: paymentService,
 	}
 }
 
@@ -53,7 +55,8 @@ func (h *CuOrderHandler) getPackageList() []map[string]interface{} {
 			"type":        "trial",
 			"price":       0,
 			"max_devices": 1,
-			"description": "免费试用，有效期至本月25日",
+			"description": "免费体验全部功能",
+			"details":     "包含全部功能|试用期限制|1个许可等",
 		},
 		{
 			"id":          "basic",
@@ -61,7 +64,8 @@ func (h *CuOrderHandler) getPackageList() []map[string]interface{} {
 			"type":        "basic",
 			"price":       300,
 			"max_devices": 1000,
-			"description": "基础功能，支持批量许可购买",
+			"description": "小型企业最佳选择",
+			"details":     "包含基础功能|批量许可购买|折扣优惠等",
 		},
 		{
 			"id":          "professional",
@@ -69,7 +73,8 @@ func (h *CuOrderHandler) getPackageList() []map[string]interface{} {
 			"type":        "professional",
 			"price":       2000,
 			"max_devices": 1000,
-			"description": "全部功能，支持批量许可购买",
+			"description": "企业级完整解决方案",
+			"details":     "包含高级功能|技术支持|数据分析等",
 		},
 	}
 }
@@ -138,15 +143,16 @@ func (h *CuOrderHandler) CalculatePrice(c *gin.Context) {
 	})
 }
 
-// CreateOrder 创建订单
+// CreateOrder 创建订单（支持支付）
 // @Summary 创建订单
-// @Description 创建新的产品套餐订单
+// @Description 创建新的产品套餐订单，支持免费和付费模式
 // @Tags 客户订单管理
 // @Accept json
 // @Produce json
 // @Security BearerAuth
 // @Param order body models.CuOrderCreateRequest true "订单创建信息"
-// @Success 200 {object} models.APIResponse{data=object{id=string,order_no=string,total_amount=number,authorization_code=string}} "成功"
+// @Success 200 {object} models.APIResponse{data=object{id=string,order_no=string,total_amount=number,authorization_code=string}} "免费订单成功"
+// @Success 200 {object} models.APIResponse{data=object{id=string,order_no=string,payment_no=string,total_amount=number,payment_url=string,expire_time=string}} "付费订单成功"
 // @Failure 401 {object} models.ErrorResponse "未认证"
 // @Failure 400 {object} models.ErrorResponse "请求参数无效"
 // @Failure 404 {object} models.ErrorResponse "套餐不存在"
@@ -190,12 +196,23 @@ func (h *CuOrderHandler) CreateOrder(c *gin.Context) {
 		return
 	}
 
-	// 创建订单
-	order, err := h.cuOrderService.CreateOrder(c.Request.Context(), cuUserID.(string), customerID.(string), &req)
+	// 根据是否有支付方式决定处理逻辑
+	if req.PaymentMethod == "" {
+		// 免费订单：直接创建订单
+		h.createFreeOrder(c, cuUserID.(string), customerID.(string), &req)
+	} else {
+		// 付费订单：创建订单和支付单
+		h.createPaidOrder(c, cuUserID.(string), customerID.(string), &req)
+	}
+}
+
+// createFreeOrder 创建免费订单
+func (h *CuOrderHandler) createFreeOrder(c *gin.Context, cuUserID, customerID string, req *models.CuOrderCreateRequest) {
+	order, err := h.cuOrderService.CreateOrder(c.Request.Context(), cuUserID, customerID, req)
 	if err != nil {
 		c.JSON(err.(*i18n.I18nError).HttpCode, models.ErrorResponse{
 			Code:      err.(*i18n.I18nError).Code,
-			Message:   err.(*i18n.I18nError).Message, // 直接使用错误对象中的消息
+			Message:   err.(*i18n.I18nError).Message,
 			Timestamp: getCurrentTimestamp(),
 		})
 		return
@@ -211,6 +228,73 @@ func (h *CuOrderHandler) CreateOrder(c *gin.Context) {
 			"order_no":           order.OrderNo,
 			"total_amount":       order.TotalAmount,
 			"authorization_code": order.AuthorizationCode,
+		},
+		Timestamp: getCurrentTimestamp(),
+	})
+}
+
+// createPaidOrder 创建付费订单
+func (h *CuOrderHandler) createPaidOrder(c *gin.Context, cuUserID, customerID string, req *models.CuOrderCreateRequest) {
+	// 客户用户创建订单，不需要额外的管理员权限检查
+	// cuUserID 和 customerID 已经在上层方法中验证过了
+
+	// 计算价格
+	priceResult, err := h.cuOrderService.CalculatePrice(c.Request.Context(), req.PackageID, req.LicenseCount)
+	if err != nil {
+		c.JSON(err.(*i18n.I18nError).HttpCode, models.ErrorResponse{
+			Code:      err.(*i18n.I18nError).Code,
+			Message:   err.(*i18n.I18nError).Message,
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	// 创建业务订单（pending状态）
+	order, err := h.cuOrderService.CreatePendingOrder(c.Request.Context(), cuUserID, customerID, req)
+	if err != nil {
+		c.JSON(err.(*i18n.I18nError).HttpCode, models.ErrorResponse{
+			Code:      err.(*i18n.I18nError).Code,
+			Message:   err.(*i18n.I18nError).Message,
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	// 创建支付单
+	paymentReq := &models.PaymentCreateRequest{
+		BusinessType:  models.BusinessTypePackageOrder,
+		BusinessID:    &order.ID,
+		CustomerID:    customerID,
+		CuUserID:      cuUserID,
+		Amount:        priceResult.TotalAmount,
+		Currency:      "CNY",
+		PaymentMethod: req.PaymentMethod,
+	}
+
+	payment, err := h.paymentService.CreatePayment(c.Request.Context(), paymentReq)
+	if err != nil {
+		// 如果支付单创建失败，需要回滚业务订单
+		// 这里应该有事务处理，暂时先返回错误
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Code:      "602001",
+			Message:   "支付单创建失败",
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	lang := middleware.GetLanguage(c)
+	successMsg := i18n.GetI18nErrorMessage("000000", lang)
+	c.JSON(http.StatusOK, models.APIResponse{
+		Code:    "000000",
+		Message: successMsg,
+		Data: gin.H{
+			"id":           order.ID,
+			"order_no":     order.OrderNo,
+			"payment_no":   payment.PaymentNo,
+			"total_amount": priceResult.TotalAmount,
+			"payment_url":  payment.PaymentURL,
+			"expire_time":  payment.ExpireTime.Format("2006-01-02T15:04:05Z"),
 		},
 		Timestamp: getCurrentTimestamp(),
 	})

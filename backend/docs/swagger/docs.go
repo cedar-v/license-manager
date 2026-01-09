@@ -484,7 +484,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "创建新的产品套餐订单",
+                "description": "创建新的产品套餐订单，支持免费和付费模式",
                 "consumes": [
                     "application/json"
                 ],
@@ -508,7 +508,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "成功",
+                        "description": "付费订单成功",
                         "schema": {
                             "allOf": [
                                 {
@@ -520,13 +520,19 @@ const docTemplate = `{
                                         "data": {
                                             "type": "object",
                                             "properties": {
-                                                "authorization_code": {
+                                                "expire_time": {
                                                     "type": "string"
                                                 },
                                                 "id": {
                                                     "type": "string"
                                                 },
                                                 "order_no": {
+                                                    "type": "string"
+                                                },
+                                                "payment_no": {
+                                                    "type": "string"
+                                                },
+                                                "payment_url": {
                                                     "type": "string"
                                                 },
                                                 "total_amount": {
@@ -1802,6 +1808,168 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/payment/alipay/callback": {
+            "post": {
+                "description": "处理支付宝支付回调",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "支付管理"
+                ],
+                "summary": "支付宝回调",
+                "parameters": [
+                    {
+                        "description": "支付宝回调参数",
+                        "name": "notification",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "failure",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/payment/history": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "获取当前用户的支付记录列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "支付管理"
+                ],
+                "summary": "获取用户支付历史",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "每页数量",
+                        "name": "page_size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.PaymentListResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/payment/{payment_no}/status": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "根据支付单号获取支付状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "支付管理"
+                ],
+                "summary": "获取支付状态",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "支付单号",
+                        "name": "payment_no",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.PaymentStatusResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "支付单不存在",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -4155,6 +4323,10 @@ const docTemplate = `{
                 },
                 "package_id": {
                     "type": "string"
+                },
+                "payment_method": {
+                    "description": "可选：支付方式，不传则为免费订单",
+                    "type": "string"
                 }
             }
         },
@@ -5362,6 +5534,116 @@ const docTemplate = `{
                 },
                 "message": {
                     "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "models.PaymentBusinessOrder": {
+            "type": "object",
+            "properties": {
+                "authorization_code": {
+                    "type": "string"
+                },
+                "order_no": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.PaymentListResponse": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "payments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.PaymentResponse"
+                    }
+                },
+                "total_count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.PaymentResponse": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "business_id": {
+                    "type": "string"
+                },
+                "business_type": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "expire_time": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "payment_method": {
+                    "type": "string"
+                },
+                "payment_no": {
+                    "type": "string"
+                },
+                "payment_provider": {
+                    "type": "string"
+                },
+                "payment_time": {
+                    "type": "string"
+                },
+                "payment_url": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "trade_no": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.PaymentStatusResponse": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "business_order": {
+                    "$ref": "#/definitions/models.PaymentBusinessOrder"
+                },
+                "payment_no": {
+                    "type": "string"
+                },
+                "payment_time": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "trade_no": {
                     "type": "string"
                 }
             }

@@ -141,3 +141,33 @@ type DashboardRepository interface {
 	// GetRecentAuthorizations 获取最近授权列表
 	GetRecentAuthorizations(ctx context.Context, req *models.DashboardRecentAuthorizationsRequest) (*models.DashboardRecentAuthorizationsResponse, error)
 }
+
+// PaymentRepository 支付数据访问接口
+type PaymentRepository interface {
+	// Create 创建支付订单
+	Create(ctx context.Context, payment *models.Payment) error
+
+	// GetByID 根据ID获取支付订单
+	GetByID(ctx context.Context, id int) (*models.Payment, error)
+
+	// GetByPaymentNo 根据支付单号获取支付订单
+	GetByPaymentNo(ctx context.Context, paymentNo string) (*models.Payment, error)
+
+	// GetByBusinessID 根据业务ID获取支付订单
+	GetByBusinessID(ctx context.Context, businessType, businessID string) (*models.Payment, error)
+
+	// GetByCustomerAndCuUserID 根据客户ID和客户用户ID获取支付订单列表
+	GetByCustomerAndCuUserID(ctx context.Context, customerID, cuUserID string, offset, limit int) ([]*models.Payment, int64, error)
+
+	// Update 更新支付订单
+	Update(ctx context.Context, payment *models.Payment) error
+
+	// UpdateStatus 更新支付状态
+	UpdateStatus(ctx context.Context, paymentNo, status string, tradeNo *string, paymentTime *string) error
+
+	// Delete 删除支付订单
+	Delete(ctx context.Context, id int) error
+
+	// GetExpiredPayments 获取过期的支付订单
+	GetExpiredPayments(ctx context.Context) ([]*models.Payment, error)
+}

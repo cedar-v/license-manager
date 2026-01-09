@@ -25,6 +25,7 @@ func AutoMigrate() error {
 		&models.User{},
 		&models.CuUser{},
 		&models.CuOrder{},
+		&models.Payment{},
 		&models.AuthorizationCode{},
 		&models.License{},
 		&models.AuthorizationChange{},
