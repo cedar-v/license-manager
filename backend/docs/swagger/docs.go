@@ -1180,6 +1180,64 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/cu/send-register-sms": {
+            "post": {
+                "description": "注册前发送短信验证码到手机",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "客户用户管理"
+                ],
+                "summary": "注册发送验证码",
+                "parameters": [
+                    {
+                        "description": "注册发送验证码请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CuUserSendRegisterSmsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "验证码发送成功",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "手机号已被注册",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "429": {
+                        "description": "请求过于频繁",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "短信发送失败",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/customers": {
             "get": {
                 "security": [
@@ -4325,7 +4383,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "payment_method": {
-                    "description": "可选：支付方式，不传则为免费订单",
+                    "description": "可选：支付方式，不传则为免费订单 支持：alipay，wechat",
                     "type": "string"
                 }
             }
@@ -4638,6 +4696,23 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user_role": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CuUserSendRegisterSmsRequest": {
+            "type": "object",
+            "required": [
+                "phone"
+            ],
+            "properties": {
+                "phone": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 7
+                },
+                "phone_country_code": {
+                    "description": "可选，默认+86",
                     "type": "string"
                 }
             }
@@ -5587,7 +5662,13 @@ const docTemplate = `{
                 "created_at": {
                     "type": "string"
                 },
+                "cu_user_id": {
+                    "type": "string"
+                },
                 "currency": {
+                    "type": "string"
+                },
+                "customer_id": {
                     "type": "string"
                 },
                 "expire_time": {
@@ -5619,9 +5700,6 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
-                },
-                "user_id": {
-                    "type": "integer"
                 }
             }
         },

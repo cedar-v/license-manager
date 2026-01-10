@@ -112,6 +112,12 @@ type CuUserPhoneUpdateRequest struct {
 	NewSmsCode          string `json:"new_sms_code" binding:"required,len=6"`     // 新手机号验证码
 }
 
+// CuUserSendRegisterSmsRequest 注册发送验证码请求结构
+type CuUserSendRegisterSmsRequest struct {
+	Phone            string `json:"phone" binding:"required,min=7,max=20"`
+	PhoneCountryCode string `json:"phone_country_code" binding:"omitempty"` // 可选，默认+86
+}
+
 // CuUserForgotPasswordRequest 忘记密码请求结构（发送重置验证码）
 type CuUserForgotPasswordRequest struct {
 	Phone            string `json:"phone" binding:"required,min=7,max=20"`

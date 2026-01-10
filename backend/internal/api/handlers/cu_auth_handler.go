@@ -235,6 +235,64 @@ func (h *CuAuthHandler) CuUserForgotPassword(c *gin.Context) {
 	})
 }
 
+// CuUserSendRegisterSms 注册发送验证码
+// @Summary 注册发送验证码
+// @Description 注册前发送短信验证码到手机
+// @Tags 客户用户管理
+// @Accept json
+// @Produce json
+// @Param request body models.CuUserSendRegisterSmsRequest true "注册发送验证码请求"
+// @Success 200 {object} models.APIResponse "验证码发送成功"
+// @Failure 400 {object} models.ErrorResponse "请求参数无效"
+// @Failure 409 {object} models.ErrorResponse "手机号已被注册"
+// @Failure 429 {object} models.ErrorResponse "请求过于频繁"
+// @Failure 500 {object} models.ErrorResponse "短信发送失败"
+// @Router /api/cu/send-register-sms [post]
+func (h *CuAuthHandler) CuUserSendRegisterSms(c *gin.Context) {
+	var req models.CuUserSendRegisterSmsRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message + ": " + err.Error(),
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	err := h.cuUserService.SendRegisterSms(c.Request.Context(), &req)
+	if err != nil {
+		// err已经是i18n.I18nError，直接使用
+		i18nErr, ok := err.(*i18n.I18nError)
+		if ok {
+			c.JSON(i18nErr.HttpCode, models.ErrorResponse{
+				Code:      i18nErr.Code,
+				Message:   i18nErr.Message,
+				Timestamp: getCurrentTimestamp(),
+			})
+			return
+		}
+		// 如果不是i18n错误，使用通用错误
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang, err.Error())
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	lang := middleware.GetLanguage(c)
+	successMessage := i18n.GetErrorMessage("000000", lang)
+	c.JSON(http.StatusOK, models.APIResponse{
+		Code:    "000000",
+		Message: successMessage,
+		Data:    nil,
+	})
+}
+
 // CuUserResetPassword 重置密码
 // @Summary 重置密码
 // @Description 通过验证码重置密码

@@ -22,6 +22,7 @@ type CuUserService interface {
 	UpdateProfile(ctx context.Context, userID string, req *models.CuUserProfileUpdateRequest) error
 	UpdatePhone(ctx context.Context, userID string, req *models.CuUserPhoneUpdateRequest) error
 	ChangePassword(ctx context.Context, userID, oldPassword, newPassword string) error
+	SendRegisterSms(ctx context.Context, req *models.CuUserSendRegisterSmsRequest) error
 	ForgotPassword(ctx context.Context, req *models.CuUserForgotPasswordRequest) error
 	ResetPassword(ctx context.Context, req *models.CuUserResetPasswordRequest) error
 	GetUsersByCustomer(ctx context.Context, customerID string, offset, limit int) ([]*models.CuUser, int64, error)
@@ -350,6 +351,48 @@ func (s *cuUserService) ChangePassword(ctx context.Context, userID, oldPassword,
 		return i18n.NewI18nError("900004", lang, err.Error())
 	}
 
+	return nil
+}
+
+func (s *cuUserService) SendRegisterSms(ctx context.Context, req *models.CuUserSendRegisterSmsRequest) error {
+	lang := pkgcontext.GetLanguageFromContext(ctx)
+
+	// 业务逻辑：参数验证
+	if req == nil {
+		return i18n.NewI18nError("900001", lang)
+	}
+
+	// 设置默认国家代码
+	phoneCountryCode := req.PhoneCountryCode
+	if phoneCountryCode == "" {
+		phoneCountryCode = "+86" // 默认中国
+	}
+
+	// 检查手机号是否已被注册
+	exists, err := s.repo.CheckPhoneExists(req.Phone, phoneCountryCode, "")
+	if err != nil {
+		return i18n.NewI18nError("900004", lang, err.Error())
+	}
+	if exists {
+		return i18n.NewI18nError("200002", lang) // 客户已存在
+	}
+
+	// TODO: 实现频率限制检查
+	// 这里应该检查Redis中该手机号的发送频率
+	// 例如：1分钟内最多发送1次，1小时内最多发送5次
+	// 如果超出限制，返回错误码 200003
+
+	// TODO: 生成6位随机验证码并发送短信
+	// 1. 生成随机验证码
+	// 2. 调用短信服务发送验证码
+	// 3. 将验证码存储到Redis中，设置过期时间（5分钟）
+	// 例如:
+	// verificationCode := generateRandomCode(6)
+	// smsService.SendSms(phoneCountryCode + req.Phone, fmt.Sprintf("您的注册验证码是：%s", verificationCode))
+	// redis.Set(fmt.Sprintf("register_sms:%s:%s", phoneCountryCode, req.Phone), verificationCode, 5*time.Minute)
+	// 如果发送失败，返回错误码 200004
+
+	// 暂时返回成功，等待短信服务实现
 	return nil
 }
 

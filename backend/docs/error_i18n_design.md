@@ -59,10 +59,12 @@ errors:
     "100004": "缺少认证信息"
     "100005": "权限不足"
   
-  # 客户模块 (20xxxx) - 预留
+  # 客户模块 (20xxxx)
   customer:
     "200001": "客户不存在"
     "200002": "客户已存在"
+    "200003": "请求过于频繁，请稍后再试"
+    "200004": "短信发送失败"
   
   # 授权模块 (30xxxx) - 预留
   license:
@@ -99,6 +101,8 @@ errors:
   customer:
     "200001": "Customer not found"
     "200002": "Customer already exists"
+    "200003": "Request too frequent, please try again later"
+    "200004": "SMS sending failed"
   
   license:
     "300001": "Invalid license key"

@@ -18,11 +18,13 @@ errors:
   customer:
     "200001": "Customer not found"
     "200002": "Customer already exists"
-    "200003": "Customer name is required"
-    "200004": "Invalid customer information format"
-    "200005": "Failed to query customer list"
-    "200006": "Customer has authorization codes, cannot delete. Please delete authorizations first"
-    "200007": "Customer is disabled, cannot create authorization"
+    "200003": "Request too frequent, please try again later"
+    "200004": "SMS sending failed"
+    "200005": "Customer name is required"
+    "200006": "Invalid customer information format"
+    "200007": "Failed to query customer list"
+    "200008": "Customer has authorization codes, cannot delete. Please delete authorizations first"
+    "200009": "Customer is disabled, cannot create authorization"
   
   # Authorization module (30xxxx)
   authorization:

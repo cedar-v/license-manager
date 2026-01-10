@@ -160,6 +160,7 @@ func SetupRouter() *gin.Engine {
 		{
 			cuPublic.POST("/register", cuAuthHandler.CuUserRegister)
 			cuPublic.POST("/login", cuAuthHandler.CuUserLogin)
+			cuPublic.POST("/send-register-sms", cuAuthHandler.CuUserSendRegisterSms)
 			cuPublic.POST("/forgot-password", cuAuthHandler.CuUserForgotPassword)
 			cuPublic.POST("/reset-password", cuAuthHandler.CuUserResetPassword)
 			cuPublic.GET("/packages", cuOrderHandler.GetPackages)

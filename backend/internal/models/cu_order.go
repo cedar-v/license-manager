@@ -61,7 +61,7 @@ func (o *CuOrder) BeforeUpdate(tx *gorm.DB) error {
 type CuOrderCreateRequest struct {
 	PackageID     string `json:"package_id" binding:"required"`
 	LicenseCount  int    `json:"license_count" binding:"required,min=1,max=1000"`
-	PaymentMethod string `json:"payment_method,omitempty"` // 可选：支付方式，不传则为免费订单
+	PaymentMethod string `json:"payment_method,omitempty"` // 可选：支付方式，不传则为免费订单 支持：alipay，wechat
 }
 
 // CuOrderResponse 订单响应结构
