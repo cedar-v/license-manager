@@ -47,7 +47,45 @@ func (h *CuAuthHandler) CuUserRegister(c *gin.Context) {
 		return
 	}
 
-	// 验证短信验证码（暂时跳过，后面实现短信服务时补上）
+	// 验证短信验证码
+	phoneCountryCode := req.PhoneCountryCode
+	if phoneCountryCode == "" {
+		phoneCountryCode = "+86"
+	}
+
+	valid, err := h.cuUserService.VerifyRegisterSmsCode(c.Request.Context(), req.Phone, phoneCountryCode, req.SmsCode)
+	if err != nil {
+		// err已经是i18n.I18nError，直接使用
+		i18nErr, ok := err.(*i18n.I18nError)
+		if ok {
+			c.JSON(i18nErr.HttpCode, models.ErrorResponse{
+				Code:      i18nErr.Code,
+				Message:   i18nErr.Message,
+				Timestamp: getCurrentTimestamp(),
+			})
+			return
+		}
+		// 如果不是i18n错误，使用通用错误
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang, err.Error())
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	if !valid {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("500012", lang) // 验证码错误或已过期
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
 
 	user, err := h.cuUserService.Register(c.Request.Context(), &req)
 	if err != nil {
@@ -201,8 +239,6 @@ func (h *CuAuthHandler) CuUserForgotPassword(c *gin.Context) {
 		return
 	}
 
-	// TODO: 实现短信验证码发送逻辑（在服务层处理）
-
 	err := h.cuUserService.ForgotPassword(c.Request.Context(), &req)
 	if err != nil {
 		// err已经是i18n.I18nError，直接使用
@@ -317,8 +353,6 @@ func (h *CuAuthHandler) CuUserResetPassword(c *gin.Context) {
 		})
 		return
 	}
-
-	// 验证短信验证码（暂时跳过）
 
 	err := h.cuUserService.ResetPassword(c.Request.Context(), &req)
 	if err != nil {

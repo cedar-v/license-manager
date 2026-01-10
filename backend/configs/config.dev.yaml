@@ -75,4 +75,20 @@ payment:
   retry_times: 3      # 支付重试次数
   enable_log: true    # 启用支付日志
 
+sms:
+  enabled: false  # 开发环境默认禁用，需要配置阿里云AccessKey
+  access_key_id: ""        # 请配置阿里云AccessKey ID
+  access_key_secret: ""    # 请配置阿里云AccessKey Secret
+  sign_name: "xxxx智能科技"
+  region_id: "cn-hangzhou"
+  endpoint: "dysmsapi.aliyuncs.com"
+
+  # 模板配置（可选，不配置则使用默认值）
+  templates:
+    register: "SMS_330275014"      # 注册验证码模板
+    reset_pwd: "SMS_330275015"     # 重置密码验证码模板
+    login: "SMS_330275016"         # 登录验证码模板
+    current_phone: "SMS_330275017" # 当前手机号验证码模板
+    new_phone: "SMS_330275018"     # 新手机号验证码模板
+
 

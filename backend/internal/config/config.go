@@ -15,6 +15,7 @@ type Config struct {
 	I18n     I18nConfig     `mapstructure:"i18n"`
 	License  LicenseConfig  `mapstructure:"license"`
 	Payment  PaymentConfig  `mapstructure:"payment"`
+	SMS      SMSConfig      `mapstructure:"sms"`
 }
 
 type ServerConfig struct {
@@ -90,11 +91,11 @@ type RSAConfig struct {
 }
 
 type PaymentConfig struct {
-	DefaultMethod string                    `mapstructure:"default_method"` // 默认支付方式
-	Providers     map[string]*PaymentProvider `mapstructure:"providers"`    // 支付提供商配置
-	ExpireMinutes int                       `mapstructure:"expire_minutes"` // 支付过期时间（分钟）
-	RetryTimes    int                       `mapstructure:"retry_times"`    // 支付重试次数
-	EnableLog     bool                      `mapstructure:"enable_log"`     // 启用支付日志
+	DefaultMethod string                      `mapstructure:"default_method"` // 默认支付方式
+	Providers     map[string]*PaymentProvider `mapstructure:"providers"`      // 支付提供商配置
+	ExpireMinutes int                         `mapstructure:"expire_minutes"` // 支付过期时间（分钟）
+	RetryTimes    int                         `mapstructure:"retry_times"`    // 支付重试次数
+	EnableLog     bool                        `mapstructure:"enable_log"`     // 启用支付日志
 }
 
 type PaymentProvider struct {
@@ -108,6 +109,24 @@ type PaymentProvider struct {
 	Charset    string `mapstructure:"charset"`
 	Format     string `mapstructure:"format"`
 	Enabled    bool   `mapstructure:"enabled"`
+}
+
+type SMSConfig struct {
+	Enabled         bool         `mapstructure:"enabled"`           // 是否启用短信服务
+	AccessKeyID     string       `mapstructure:"access_key_id"`     // 阿里云AccessKey ID
+	AccessKeySecret string       `mapstructure:"access_key_secret"` // 阿里云AccessKey Secret
+	SignName        string       `mapstructure:"sign_name"`         // 短信签名
+	RegionID        string       `mapstructure:"region_id"`         // 地域ID，默认cn-hangzhou
+	Endpoint        string       `mapstructure:"endpoint"`          // 服务端点
+	Templates       SMSTemplates `mapstructure:"templates"`         // 模板配置
+}
+
+type SMSTemplates struct {
+	Register     string `mapstructure:"register"`      // 注册模板
+	ResetPwd     string `mapstructure:"reset_pwd"`     // 重置密码模板
+	Login        string `mapstructure:"login"`         // 登录模板
+	CurrentPhone string `mapstructure:"current_phone"` // 当前手机号模板
+	NewPhone     string `mapstructure:"new_phone"`     // 新手机号模板
 }
 
 var AppConfig *Config
@@ -200,6 +219,12 @@ func setDefaults() {
 	viper.SetDefault("payment.expire_minutes", 30)
 	viper.SetDefault("payment.retry_times", 3)
 	viper.SetDefault("payment.enable_log", true)
+
+	// SMS defaults
+	viper.SetDefault("sms.enabled", false)
+	viper.SetDefault("sms.sign_name", "惠州顺视智能科技")
+	viper.SetDefault("sms.region_id", "cn-hangzhou")
+	viper.SetDefault("sms.endpoint", "dysmsapi.aliyuncs.com")
 }
 
 func GetConfig() *Config {

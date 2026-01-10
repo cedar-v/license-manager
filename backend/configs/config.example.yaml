@@ -84,3 +84,19 @@ payment:
   expire_minutes: 30  # 支付过期时间（分钟）
   retry_times: 3      # 支付重试次数
   enable_log: true    # 启用支付日志
+
+sms:
+  enabled: false  # 是否启用短信服务
+  access_key_id: "your-access-key-id"        # 阿里云AccessKey ID
+  access_key_secret: "your-access-key-secret" # 阿里云AccessKey Secret
+  sign_name: "惠州顺视智能科技"                 # 短信签名
+  region_id: "cn-hangzhou"                   # 地域ID
+  endpoint: "dysmsapi.aliyuncs.com"          # 服务端点
+
+  # 模板配置（可选，不配置则使用默认值）
+  templates:
+    register: "SMS_330275014"      # 注册验证码模板
+    reset_pwd: "SMS_330275015"     # 重置密码验证码模板
+    login: "SMS_330275016"         # 登录验证码模板
+    current_phone: "SMS_330275017" # 当前手机号验证码模板
+    new_phone: "SMS_330275018"     # 新手机号验证码模板

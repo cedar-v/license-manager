@@ -52,4 +52,40 @@ license:
   offline_timeout: 1440 # 离线超时时间(分钟) - 24小时后为异常
   expiring_days: 30 # 即将过期天数 - 30天内到期算即将过期
 
+payment:
+  # 默认支付方式
+  default_method: alipay
+
+  # 支付提供商配置 - 生产环境支付宝配置
+  providers:
+    alipay:
+      enabled: true
+      app_id: "your-prod-app-id"
+      private_key: "your-prod-private-key"
+      public_key: "your-prod-public-key"
+      gateway_url: "https://openapi.alipay.com/gateway.do"
+      notify_url: "https://your-domain.com/api/payment/alipay/callback"
+      return_url: "https://your-domain.com/payment/success"
+      sign_type: "RSA2"
+      charset: "utf-8"
+      format: "json"
+
+  # 通用支付配置
+  expire_minutes: 30  # 支付过期时间（分钟）
+  retry_times: 3      # 支付重试次数
+  enable_log: true    # 启用支付日志
+
+sms:
+  enabled: false  # 生产环境默认禁用，需要配置阿里云AccessKey
+  access_key_id: ""        # 请配置生产环境阿里云AccessKey ID
+  access_key_secret: ""    # 请配置生产环境阿里云AccessKey Secret
+  sign_name: "惠州顺视智能科技"
+  region_id: "cn-hangzhou"
+  endpoint: "dysmsapi.aliyuncs.com"
+
+  # 模板配置（可选，不配置则使用默认值）
+  templates:
+    register: ""   # 生产环境注册验证码模板
+    reset_pwd: ""  # 生产环境重置密码验证码模板
+    login: ""      # 生产环境登录验证码模板
 

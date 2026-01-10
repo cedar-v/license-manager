@@ -118,6 +118,17 @@ type CuUserSendRegisterSmsRequest struct {
 	PhoneCountryCode string `json:"phone_country_code" binding:"omitempty"` // 可选，默认+86
 }
 
+// CuUserSendCurrentPhoneSmsRequest 发送当前手机号验证码请求结构
+type CuUserSendCurrentPhoneSmsRequest struct {
+	// 无需额外参数，从JWT token中获取当前用户手机号
+}
+
+// CuUserSendNewPhoneSmsRequest 发送新手机号验证码请求结构
+type CuUserSendNewPhoneSmsRequest struct {
+	NewPhone            string `json:"new_phone" binding:"required,min=7,max=20"`
+	NewPhoneCountryCode string `json:"new_phone_country_code" binding:"omitempty"` // 可选，默认+86
+}
+
 // CuUserForgotPasswordRequest 忘记密码请求结构（发送重置验证码）
 type CuUserForgotPasswordRequest struct {
 	Phone            string `json:"phone" binding:"required,min=7,max=20"`

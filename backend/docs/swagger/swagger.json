@@ -1029,6 +1029,121 @@
                 }
             }
         },
+        "/api/cu/profile/send-current-phone-sms": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "发送当前手机号验证码，用于手机号更新时的身份验证",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "客户用户管理"
+                ],
+                "summary": "发送当前手机号验证码",
+                "responses": {
+                    "200": {
+                        "description": "验证码发送成功",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未授权",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "用户不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cu/profile/send-new-phone-sms": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "发送新手机号验证码，用于手机号更新时的可用性验证",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "客户用户管理"
+                ],
+                "summary": "发送新手机号验证码",
+                "parameters": [
+                    {
+                        "description": "新手机号信息",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CuUserSendNewPhoneSmsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "验证码发送成功",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未授权",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "手机号已被注册",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/cu/register": {
             "post": {
                 "description": "通过手机号注册客户用户账号",
@@ -4692,6 +4807,23 @@
                     "type": "string"
                 },
                 "user_role": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CuUserSendNewPhoneSmsRequest": {
+            "type": "object",
+            "required": [
+                "new_phone"
+            ],
+            "properties": {
+                "new_phone": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 7
+                },
+                "new_phone_country_code": {
+                    "description": "可选，默认+86",
                     "type": "string"
                 }
             }

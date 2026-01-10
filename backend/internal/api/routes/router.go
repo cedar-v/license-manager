@@ -10,6 +10,7 @@ import (
 	"license-manager/internal/repository"
 	"license-manager/internal/service"
 	"license-manager/pkg/logger"
+	"license-manager/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -49,11 +50,17 @@ func SetupRouter() *gin.Engine {
 	// 获取logger实例
 	log := logger.GetLogger()
 
+	// 初始化SMS服务
+	smsService, err := utils.NewSMSService(&cfg.SMS, log)
+	if err != nil {
+		log.Fatalf("Failed to initialize SMS service: %v", err)
+	}
+
 	// 初始化服务层
 	authService := service.NewAuthService(userRepo)
 	systemService := service.NewSystemService()
 	customerService := service.NewCustomerService(customerRepo)
-	cuUserService := service.NewCuUserService(cuUserRepo, customerRepo, db)
+	cuUserService := service.NewCuUserService(cuUserRepo, customerRepo, smsService, db)
 	authCodeService := service.NewAuthorizationCodeService(authCodeRepo, customerRepo, cuUserRepo, licenseRepo)
 	cuOrderService := service.NewCuOrderService(cuOrderRepo, cuUserRepo, authCodeRepo, db)
 	cuDeviceService := service.NewCuDeviceService(licenseRepo)
@@ -173,6 +180,8 @@ func SetupRouter() *gin.Engine {
 			// 用户个人资料
 			cuAuth.GET("/profile", cuProfileHandler.GetCuUserProfile)
 			cuAuth.PUT("/profile", cuProfileHandler.UpdateCuUserProfile)
+			cuAuth.POST("/profile/send-current-phone-sms", cuProfileHandler.CuUserSendCurrentPhoneSms)
+			cuAuth.POST("/profile/send-new-phone-sms", cuProfileHandler.CuUserSendNewPhoneSms)
 			cuAuth.PUT("/profile/phone", cuProfileHandler.UpdateCuUserPhone)
 			cuAuth.PUT("/profile/password", cuProfileHandler.ChangeCuUserPassword)
 

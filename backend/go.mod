@@ -3,9 +3,14 @@ module license-manager
 go 1.23
 
 require (
+	github.com/alibabacloud-go/darabonba-openapi/v2 v2.0.10
+	github.com/alibabacloud-go/dysmsapi-20170525/v5 v5.0.0
+	github.com/alibabacloud-go/tea-utils/v2 v2.0.4
+	github.com/alibabacloud-go/tea/tea v1.2.1
 	github.com/gin-gonic/gin v1.10.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/uuid v1.4.0
+	github.com/redis/go-redis/v9 v9.5.1
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/viper v1.19.0

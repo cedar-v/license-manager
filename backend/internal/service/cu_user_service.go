@@ -23,6 +23,10 @@ type CuUserService interface {
 	UpdatePhone(ctx context.Context, userID string, req *models.CuUserPhoneUpdateRequest) error
 	ChangePassword(ctx context.Context, userID, oldPassword, newPassword string) error
 	SendRegisterSms(ctx context.Context, req *models.CuUserSendRegisterSmsRequest) error
+	SendCurrentPhoneSms(ctx context.Context, userID string) error
+	SendNewPhoneSms(ctx context.Context, req *models.CuUserSendNewPhoneSmsRequest) error
+	VerifyRegisterSmsCode(ctx context.Context, phone, phoneCountryCode, code string) (bool, error)
+	VerifyPhoneCode(ctx context.Context, phone, phoneCountryCode, code, templateType string) (bool, error)
 	ForgotPassword(ctx context.Context, req *models.CuUserForgotPasswordRequest) error
 	ResetPassword(ctx context.Context, req *models.CuUserResetPasswordRequest) error
 	GetUsersByCustomer(ctx context.Context, customerID string, offset, limit int) ([]*models.CuUser, int64, error)
@@ -33,13 +37,15 @@ type CuUserService interface {
 type cuUserService struct {
 	repo         repository.CuUserRepository
 	customerRepo repository.CustomerRepository
+	smsService   utils.SMSService
 	db           *gorm.DB
 }
 
-func NewCuUserService(repo repository.CuUserRepository, customerRepo repository.CustomerRepository, db *gorm.DB) CuUserService {
+func NewCuUserService(repo repository.CuUserRepository, customerRepo repository.CustomerRepository, smsService utils.SMSService, db *gorm.DB) CuUserService {
 	return &cuUserService{
 		repo:         repo,
 		customerRepo: customerRepo,
+		smsService:   smsService,
 		db:           db,
 	}
 }
@@ -290,7 +296,7 @@ func (s *cuUserService) UpdatePhone(ctx context.Context, userID string, req *mod
 		return i18n.NewI18nError("500007", lang) // 新手机号已被其他用户使用
 	}
 
-	// 验证新手机号（这里需要调用短信验证服务，暂时跳过）
+	// 验证当前手机号和新手机号的验证码
 
 	// 更新手机号
 	user, err := s.repo.GetByID(userID)
@@ -354,64 +360,79 @@ func (s *cuUserService) ChangePassword(ctx context.Context, userID, oldPassword,
 	return nil
 }
 
-func (s *cuUserService) SendRegisterSms(ctx context.Context, req *models.CuUserSendRegisterSmsRequest) error {
+// sendSmsCode 通用短信验证码发送逻辑
+func (s *cuUserService) sendSmsCode(ctx context.Context, phone, phoneCountryCode, templateType string, checkUserExists bool) error {
 	lang := pkgcontext.GetLanguageFromContext(ctx)
 
-	// 业务逻辑：参数验证
-	if req == nil {
-		return i18n.NewI18nError("900001", lang)
-	}
-
 	// 设置默认国家代码
-	phoneCountryCode := req.PhoneCountryCode
 	if phoneCountryCode == "" {
-		phoneCountryCode = "+86" // 默认中国
+		phoneCountryCode = "+86"
 	}
 
-	// 检查手机号是否已被注册
-	exists, err := s.repo.CheckPhoneExists(req.Phone, phoneCountryCode, "")
+	// 检查用户状态
+	exists, err := s.repo.CheckPhoneExists(phone, phoneCountryCode, "")
 	if err != nil {
 		return i18n.NewI18nError("900004", lang, err.Error())
 	}
-	if exists {
+
+	if checkUserExists && !exists {
+		// 忘记密码：用户必须存在
+		return i18n.NewI18nError("500009", lang) // 用户不存在
+	} else if !checkUserExists && exists {
+		// 注册：用户不能存在
 		return i18n.NewI18nError("200002", lang) // 客户已存在
 	}
 
-	// TODO: 实现频率限制检查
-	// 这里应该检查Redis中该手机号的发送频率
-	// 例如：1分钟内最多发送1次，1小时内最多发送5次
-	// 如果超出限制，返回错误码 200003
+	// 如果用户存在，检查账号状态（仅对忘记密码场景）
+	if checkUserExists && exists {
+		user, err := s.repo.GetByPhone(phone, phoneCountryCode)
+		if err != nil {
+			return i18n.NewI18nError("900004", lang, err.Error())
+		}
+		if user.Status != "active" {
+			return i18n.NewI18nError("500004", lang) // 账号已被禁用
+		}
+	}
 
-	// TODO: 生成6位随机验证码并发送短信
-	// 1. 生成随机验证码
-	// 2. 调用短信服务发送验证码
-	// 3. 将验证码存储到Redis中，设置过期时间（5分钟）
-	// 例如:
-	// verificationCode := generateRandomCode(6)
-	// smsService.SendSms(phoneCountryCode + req.Phone, fmt.Sprintf("您的注册验证码是：%s", verificationCode))
-	// redis.Set(fmt.Sprintf("register_sms:%s:%s", phoneCountryCode, req.Phone), verificationCode, 5*time.Minute)
-	// 如果发送失败，返回错误码 200004
+	// 发送验证码
+	var sendErr error
+	switch templateType {
+	case "register":
+		sendErr = s.smsService.SendRegisterCode(ctx, phone, phoneCountryCode)
+	case "reset_pwd":
+		sendErr = s.smsService.SendResetPwdCode(ctx, phone, phoneCountryCode)
+	default:
+		return i18n.NewI18nError("900001", lang, "无效的模板类型")
+	}
 
-	// 暂时返回成功，等待短信服务实现
+	if sendErr != nil {
+		return i18n.NewI18nError("200004", lang) // 短信发送失败
+	}
+
 	return nil
 }
 
-func (s *cuUserService) ForgotPassword(ctx context.Context, req *models.CuUserForgotPasswordRequest) error {
+func (s *cuUserService) SendRegisterSms(ctx context.Context, req *models.CuUserSendRegisterSmsRequest) error {
 	lang := pkgcontext.GetLanguageFromContext(ctx)
 
-	// 业务逻辑：参数验证
+	// 参数验证
 	if req == nil {
 		return i18n.NewI18nError("900001", lang)
 	}
 
-	// 设置默认国家代码
-	phoneCountryCode := req.PhoneCountryCode
-	if phoneCountryCode == "" {
-		phoneCountryCode = "+86" // 默认中国
+	return s.sendSmsCode(ctx, req.Phone, req.PhoneCountryCode, "register", false)
+}
+
+func (s *cuUserService) SendCurrentPhoneSms(ctx context.Context, userID string) error {
+	lang := pkgcontext.GetLanguageFromContext(ctx)
+
+	// 参数验证
+	if userID == "" {
+		return i18n.NewI18nError("900001", lang)
 	}
 
-	// 查找用户
-	user, err := s.repo.GetByPhone(req.Phone, phoneCountryCode)
+	// 获取用户信息
+	user, err := s.repo.GetByID(userID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return i18n.NewI18nError("500009", lang) // 用户不存在
@@ -424,17 +445,64 @@ func (s *cuUserService) ForgotPassword(ctx context.Context, req *models.CuUserFo
 		return i18n.NewI18nError("500004", lang) // 账号已被禁用
 	}
 
-	// TODO: 实现短信验证码发送逻辑
-	// 1. 生成6位随机验证码
-	// 2. 调用短信服务发送验证码
-	// 3. 将验证码存储到Redis中，设置过期时间（5分钟）
-	// 例如:
-	// verificationCode := generateRandomCode(6)
-	// smsService.SendSms(user.Phone, fmt.Sprintf("您的密码重置验证码是：%s", verificationCode))
-	// redis.Set(fmt.Sprintf("reset_pwd:%s", user.Phone), verificationCode, 5*time.Minute)
-	// 暂时返回成功，等待短信服务实现
+	// 发送当前手机号验证码
+	err = s.smsService.SendCurrentPhoneCode(ctx, user.Phone, user.PhoneCountryCode)
+	if err != nil {
+		return i18n.NewI18nError("200004", lang) // 短信发送失败
+	}
 
 	return nil
+}
+
+func (s *cuUserService) SendNewPhoneSms(ctx context.Context, req *models.CuUserSendNewPhoneSmsRequest) error {
+	lang := pkgcontext.GetLanguageFromContext(ctx)
+
+	// 参数验证
+	if req == nil {
+		return i18n.NewI18nError("900001", lang)
+	}
+
+	// 设置默认国家代码
+	phoneCountryCode := req.NewPhoneCountryCode
+	if phoneCountryCode == "" {
+		phoneCountryCode = "+86"
+	}
+
+	// 检查新手机号是否已被注册
+	exists, err := s.repo.CheckPhoneExists(req.NewPhone, phoneCountryCode, "")
+	if err != nil {
+		return i18n.NewI18nError("900004", lang, err.Error())
+	}
+	if exists {
+		return i18n.NewI18nError("200002", lang) // 客户已存在
+	}
+
+	// 发送新手机号验证码
+	err = s.smsService.SendNewPhoneCode(ctx, req.NewPhone, phoneCountryCode)
+	if err != nil {
+		return i18n.NewI18nError("200004", lang) // 短信发送失败
+	}
+
+	return nil
+}
+
+func (s *cuUserService) VerifyRegisterSmsCode(ctx context.Context, phone, phoneCountryCode, code string) (bool, error) {
+	return s.smsService.VerifyCode(ctx, phone, phoneCountryCode, code)
+}
+
+func (s *cuUserService) VerifyPhoneCode(ctx context.Context, phone, phoneCountryCode, code, templateType string) (bool, error) {
+	return s.smsService.VerifyCode(ctx, phone, phoneCountryCode, code)
+}
+
+func (s *cuUserService) ForgotPassword(ctx context.Context, req *models.CuUserForgotPasswordRequest) error {
+	lang := pkgcontext.GetLanguageFromContext(ctx)
+
+	// 参数验证
+	if req == nil {
+		return i18n.NewI18nError("900001", lang)
+	}
+
+	return s.sendSmsCode(ctx, req.Phone, req.PhoneCountryCode, "reset_pwd", true)
 }
 
 func (s *cuUserService) ResetPassword(ctx context.Context, req *models.CuUserResetPasswordRequest) error {
@@ -465,14 +533,14 @@ func (s *cuUserService) ResetPassword(ctx context.Context, req *models.CuUserRes
 		return i18n.NewI18nError("500005", lang) // 账号已被禁用
 	}
 
-	// TODO: 实现短信验证码验证逻辑
-	// 这里应该验证用户提交的验证码是否正确且未过期
-	// 例如:
-	// storedCode := redis.Get(fmt.Sprintf("reset_pwd:%s", user.Phone))
-	// if storedCode == "" { return i18n.NewI18nError("500021", lang) } // 验证码不存在
-	// if storedCode != req.SmsCode { return i18n.NewI18nError("500012", lang) } // 验证码错误
-	// redis.Del(fmt.Sprintf("reset_pwd:%s", user.Phone)) // 验证成功后删除验证码
-	// 暂时跳过验证码验证，等待短信服务实现
+	// 验证短信验证码
+	valid, err := s.smsService.VerifyCode(ctx, req.Phone, phoneCountryCode, req.SmsCode)
+	if err != nil {
+		return i18n.NewI18nError("900004", lang, err.Error())
+	}
+	if !valid {
+		return i18n.NewI18nError("500012", lang) // 验证码错误或已过期
+	}
 
 	// 生成新密码哈希
 	salt := utils.GenerateSalt()

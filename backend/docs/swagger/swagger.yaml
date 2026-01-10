@@ -693,6 +693,18 @@ definitions:
       user_role:
         type: string
     type: object
+  models.CuUserSendNewPhoneSmsRequest:
+    properties:
+      new_phone:
+        maxLength: 20
+        minLength: 7
+        type: string
+      new_phone_country_code:
+        description: 可选，默认+86
+        type: string
+    required:
+    - new_phone
+    type: object
   models.CuUserSendRegisterSmsRequest:
     properties:
       phone:
@@ -2160,6 +2172,79 @@ paths:
       security:
       - BearerAuth: []
       summary: 更新用户手机号
+      tags:
+      - 客户用户管理
+  /api/cu/profile/send-current-phone-sms:
+    post:
+      consumes:
+      - application/json
+      description: 发送当前手机号验证码，用于手机号更新时的身份验证
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 验证码发送成功
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 用户不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 发送当前手机号验证码
+      tags:
+      - 客户用户管理
+  /api/cu/profile/send-new-phone-sms:
+    post:
+      consumes:
+      - application/json
+      description: 发送新手机号验证码，用于手机号更新时的可用性验证
+      parameters:
+      - description: 新手机号信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CuUserSendNewPhoneSmsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 验证码发送成功
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: 手机号已被注册
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 发送新手机号验证码
       tags:
       - 客户用户管理
   /api/cu/register:
