@@ -548,7 +548,14 @@ definitions:
     type: object
   models.CuUserLoginRequest:
     properties:
+      login_type:
+        description: 登录类型：password 或 sms
+        enum:
+        - password
+        - sms
+        type: string
       password:
+        description: 密码登录时必填
         type: string
       phone:
         maxLength: 20
@@ -557,8 +564,11 @@ definitions:
       phone_country_code:
         description: 可选，默认+86
         type: string
+      sms_code:
+        description: 验证码登录时必填
+        type: string
     required:
-    - password
+    - login_type
     - phone
     type: object
   models.CuUserPhoneUpdateRequest:
@@ -692,6 +702,18 @@ definitions:
         type: string
       user_role:
         type: string
+    type: object
+  models.CuUserSendLoginSmsRequest:
+    properties:
+      phone:
+        maxLength: 20
+        minLength: 7
+        type: string
+      phone_country_code:
+        description: 可选，默认+86
+        type: string
+    required:
+    - phone
     type: object
   models.CuUserSendNewPhoneSmsRequest:
     properties:
@@ -1742,7 +1764,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: 通过手机号和密码登录客户用户账号
+      description: 通过手机号和密码或短信验证码登录客户用户账号
       parameters:
       - description: 登录信息
         in: body
@@ -1787,7 +1809,7 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "401":
-          description: 手机号或密码错误
+          description: 手机号、密码或验证码错误
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "500":
@@ -2338,6 +2360,44 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       summary: 重置密码
+      tags:
+      - 客户用户管理
+  /api/cu/send-login-sms:
+    post:
+      consumes:
+      - application/json
+      description: 登录前发送短信验证码到手机
+      parameters:
+      - description: 登录发送验证码请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CuUserSendLoginSmsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 验证码发送成功
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 用户不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "429":
+          description: 请求过于频繁
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 短信发送失败
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 登录发送验证码
       tags:
       - 客户用户管理
   /api/cu/send-register-sms:

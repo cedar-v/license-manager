@@ -324,7 +324,7 @@ const docTemplate = `{
         },
         "/api/cu/login": {
             "post": {
-                "description": "通过手机号和密码登录客户用户账号",
+                "description": "通过手机号和密码或短信验证码登录客户用户账号",
                 "consumes": [
                     "application/json"
                 ],
@@ -403,7 +403,7 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "手机号或密码错误",
+                        "description": "手机号、密码或验证码错误",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -1288,6 +1288,64 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cu/send-login-sms": {
+            "post": {
+                "description": "登录前发送短信验证码到手机",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "客户用户管理"
+                ],
+                "summary": "登录发送验证码",
+                "parameters": [
+                    {
+                        "description": "登录发送验证码请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CuUserSendLoginSmsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "验证码发送成功",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "用户不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "429": {
+                        "description": "请求过于频繁",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "短信发送失败",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -4610,11 +4668,20 @@ const docTemplate = `{
         "models.CuUserLoginRequest": {
             "type": "object",
             "required": [
-                "password",
+                "login_type",
                 "phone"
             ],
             "properties": {
+                "login_type": {
+                    "description": "登录类型：password 或 sms",
+                    "type": "string",
+                    "enum": [
+                        "password",
+                        "sms"
+                    ]
+                },
                 "password": {
+                    "description": "密码登录时必填",
                     "type": "string"
                 },
                 "phone": {
@@ -4624,6 +4691,10 @@ const docTemplate = `{
                 },
                 "phone_country_code": {
                     "description": "可选，默认+86",
+                    "type": "string"
+                },
+                "sms_code": {
+                    "description": "验证码登录时必填",
                     "type": "string"
                 }
             }
@@ -4811,6 +4882,23 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user_role": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CuUserSendLoginSmsRequest": {
+            "type": "object",
+            "required": [
+                "phone"
+            ],
+            "properties": {
+                "phone": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 7
+                },
+                "phone_country_code": {
+                    "description": "可选，默认+86",
                     "type": "string"
                 }
             }

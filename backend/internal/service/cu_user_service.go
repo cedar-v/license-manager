@@ -23,6 +23,7 @@ type CuUserService interface {
 	UpdatePhone(ctx context.Context, userID string, req *models.CuUserPhoneUpdateRequest) error
 	ChangePassword(ctx context.Context, userID, oldPassword, newPassword string) error
 	SendRegisterSms(ctx context.Context, req *models.CuUserSendRegisterSmsRequest) error
+	SendLoginSms(ctx context.Context, req *models.CuUserSendLoginSmsRequest) error
 	SendCurrentPhoneSms(ctx context.Context, userID string) error
 	SendNewPhoneSms(ctx context.Context, req *models.CuUserSendNewPhoneSmsRequest) error
 	VerifyRegisterSmsCode(ctx context.Context, phone, phoneCountryCode, code string) (bool, error)
@@ -158,36 +159,59 @@ func (s *cuUserService) Login(ctx context.Context, req *models.CuUserLoginReques
 		return nil, "", i18n.NewI18nError("500003", lang) // 账号已被禁用
 	}
 
-	// 检查是否被锁定
-	if user.IsAccountLocked() {
-		return nil, "", i18n.NewI18nError("500003", lang) // 账号已被锁定
-	}
-
-	// 验证密码
-	if user.Password == nil {
-		return nil, "", i18n.NewI18nError("500003", lang) // 请先设置密码
-	}
-
-	if !utils.CheckPassword(req.Password, *user.Password, *user.Salt) {
-		// 增加登录失败次数
-		if err := s.repo.IncrementLoginAttempts(user.ID); err != nil {
-			// 记录错误但不影响登录流程
+	// 根据登录类型进行不同的验证
+	if req.LoginType == "sms" {
+		// 短信验证码登录
+		if req.SmsCode == "" {
+			return nil, "", i18n.NewI18nError("900001", lang) // 短信验证码不能为空
 		}
 
-		// 检查是否需要锁定账号
-		cfg := config.GetConfig()
-		if cfg != nil && user.LoginAttempts+1 >= cfg.Auth.Security.MaxLoginAttempts {
-			lockUntil := time.Now().Add(time.Duration(cfg.Auth.Security.LockoutDurationMinutes) * time.Minute)
-			if err := s.repo.LockAccount(user.ID, lockUntil); err != nil {
-				// 记录错误但不影响登录流程
-			}
+		// 验证短信验证码
+		valid, err := s.smsService.VerifyCode(ctx, req.Phone, phoneCountryCode, req.SmsCode)
+		if err != nil {
+			return nil, "", i18n.NewI18nError("900004", lang, err.Error())
+		}
+		if !valid {
+			return nil, "", i18n.NewI18nError("500003", lang) // 验证码错误
+		}
+	} else {
+		// 密码登录（默认行为）
+		// 检查是否被锁定
+		if user.IsAccountLocked() {
 			return nil, "", i18n.NewI18nError("500003", lang) // 账号已被锁定
 		}
 
-		return nil, "", i18n.NewI18nError("500003", lang) // 手机号或密码错误
+		// 验证密码
+		if req.Password == "" {
+			return nil, "", i18n.NewI18nError("900001", lang) // 密码不能为空
+		}
+
+		if user.Password == nil {
+			return nil, "", i18n.NewI18nError("500003", lang) // 请先设置密码
+		}
+
+		if !utils.CheckPassword(req.Password, *user.Password, *user.Salt) {
+			// 增加登录失败次数
+			if err := s.repo.IncrementLoginAttempts(user.ID); err != nil {
+				// 记录错误但不影响登录流程
+			}
+
+			// 检查是否需要锁定账号
+			cfg := config.GetConfig()
+			if cfg != nil && user.LoginAttempts+1 >= cfg.Auth.Security.MaxLoginAttempts {
+				lockUntil := time.Now().Add(time.Duration(cfg.Auth.Security.LockoutDurationMinutes) * time.Minute)
+				if err := s.repo.LockAccount(user.ID, lockUntil); err != nil {
+					// 记录错误但不影响登录流程
+				}
+				return nil, "", i18n.NewI18nError("500003", lang) // 账号已被锁定
+			}
+
+			return nil, "", i18n.NewI18nError("500003", lang) // 手机号或密码错误
+		}
 	}
 
 	// 登录成功，重置登录失败次数并更新登录信息
+	// 注意：短信登录也需要重置失败次数，避免被锁定
 	if err := s.repo.ResetLoginAttempts(user.ID); err != nil {
 		// 记录错误但不影响登录流程
 	}
@@ -401,6 +425,8 @@ func (s *cuUserService) sendSmsCode(ctx context.Context, phone, phoneCountryCode
 		sendErr = s.smsService.SendRegisterCode(ctx, phone, phoneCountryCode)
 	case "reset_pwd":
 		sendErr = s.smsService.SendResetPwdCode(ctx, phone, phoneCountryCode)
+	case "login":
+		sendErr = s.smsService.SendLoginCode(ctx, phone, phoneCountryCode)
 	default:
 		return i18n.NewI18nError("900001", lang, "无效的模板类型")
 	}
@@ -421,6 +447,11 @@ func (s *cuUserService) SendRegisterSms(ctx context.Context, req *models.CuUserS
 	}
 
 	return s.sendSmsCode(ctx, req.Phone, req.PhoneCountryCode, "register", false)
+}
+
+// SendLoginSms 发送登录验证码
+func (s *cuUserService) SendLoginSms(ctx context.Context, req *models.CuUserSendLoginSmsRequest) error {
+	return s.sendSmsCode(ctx, req.Phone, req.PhoneCountryCode, "login", true)
 }
 
 func (s *cuUserService) SendCurrentPhoneSms(ctx context.Context, userID string) error {

@@ -145,14 +145,14 @@ func (h *CuAuthHandler) CuUserRegister(c *gin.Context) {
 
 // CuUserLogin 客户用户登录
 // @Summary 客户用户登录
-// @Description 通过手机号和密码登录客户用户账号
+// @Description 通过手机号和密码或短信验证码登录客户用户账号
 // @Tags 客户用户管理
 // @Accept json
 // @Produce json
 // @Param user body models.CuUserLoginRequest true "登录信息"
 // @Success 200 {object} models.APIResponse{data=object{user=object{id=string,customer_id=string,phone=string,real_name=string,email=string,user_role=string,status=string},token=string}} "成功"
 // @Failure 400 {object} models.ErrorResponse "请求参数无效"
-// @Failure 401 {object} models.ErrorResponse "手机号或密码错误"
+// @Failure 401 {object} models.ErrorResponse "手机号、密码或验证码错误"
 // @Failure 500 {object} models.ErrorResponse "服务器内部错误"
 // @Router /api/cu/login [post]
 func (h *CuAuthHandler) CuUserLogin(c *gin.Context) {
@@ -252,6 +252,62 @@ func (h *CuAuthHandler) CuUserForgotPassword(c *gin.Context) {
 			return
 		}
 		// 如果不是i18n错误，使用通用错误
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang, err.Error())
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	lang := middleware.GetLanguage(c)
+	successMessage := i18n.GetErrorMessage("000000", lang)
+	c.JSON(http.StatusOK, models.APIResponse{
+		Code:    "000000",
+		Message: successMessage,
+		Data:    nil,
+	})
+}
+
+// CuUserSendLoginSms 登录发送验证码
+// @Summary 登录发送验证码
+// @Description 登录前发送短信验证码到手机
+// @Tags 客户用户管理
+// @Accept json
+// @Produce json
+// @Param request body models.CuUserSendLoginSmsRequest true "登录发送验证码请求"
+// @Success 200 {object} models.APIResponse "验证码发送成功"
+// @Failure 400 {object} models.ErrorResponse "请求参数无效"
+// @Failure 404 {object} models.ErrorResponse "用户不存在"
+// @Failure 429 {object} models.ErrorResponse "请求过于频繁"
+// @Failure 500 {object} models.ErrorResponse "短信发送失败"
+// @Router /api/cu/send-login-sms [post]
+func (h *CuAuthHandler) CuUserSendLoginSms(c *gin.Context) {
+	var req models.CuUserSendLoginSmsRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message + ": " + err.Error(),
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	err := h.cuUserService.SendLoginSms(c.Request.Context(), &req)
+	if err != nil {
+		i18nErr, ok := err.(*i18n.I18nError)
+		if ok {
+			c.JSON(i18nErr.HttpCode, models.ErrorResponse{
+				Code:      i18nErr.Code,
+				Message:   i18nErr.Message,
+				Timestamp: getCurrentTimestamp(),
+			})
+			return
+		}
 		lang := middleware.GetLanguage(c)
 		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang, err.Error())
 		c.JSON(status, models.ErrorResponse{

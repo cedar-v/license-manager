@@ -7,6 +7,12 @@ import (
 	"time"
 
 	"license-manager/internal/config"
+	"license-manager/pkg/cache"
+
+	openapi "github.com/alibabacloud-go/darabonba-openapi/v2/client"
+	dysmsapi20170525 "github.com/alibabacloud-go/dysmsapi-20170525/v5/client"
+	util "github.com/alibabacloud-go/tea-utils/v2/service"
+	"github.com/alibabacloud-go/tea/tea"
 )
 
 // 默认短信模板常量
@@ -43,14 +49,12 @@ type SMSService interface {
 type smsService struct {
 	config    *config.SMSConfig
 	templates *config.SMSTemplates
+	cache     cache.Cache
 	logger    interface{} // 支持不同类型的logger
-	// TODO: 添加Redis客户端和阿里云SMS客户端
-	// redis     *redis.Client
-	// client    *dysmsapi20170525.Client
 }
 
 // NewSMSService 创建SMS服务实例
-func NewSMSService(cfg *config.SMSConfig, logger interface{}) (SMSService, error) {
+func NewSMSService(cfg *config.SMSConfig, cache cache.Cache, logger interface{}) (SMSService, error) {
 	if !cfg.Enabled {
 		return &disabledSMSService{}, nil
 	}
@@ -67,6 +71,7 @@ func NewSMSService(cfg *config.SMSConfig, logger interface{}) (SMSService, error
 	return &smsService{
 		config:    cfg,
 		templates: &cfg.Templates,
+		cache:     cache,
 		logger:    logger,
 	}, nil
 }
@@ -140,12 +145,12 @@ func (s *smsService) SendVerificationCode(ctx context.Context, phone, phoneCount
 		return fmt.Errorf("failed to send SMS: %w", err)
 	}
 
-	// TODO: 缓存验证码 - 需要Redis客户端
-	// cacheKey := fmt.Sprintf("%s:%s:%s", SMSCodeKeyPrefix, phoneCountryCode, phone)
-	// err = s.redis.Set(ctx, cacheKey, code, SMSCodeExpireTime).Err()
-	// if err != nil {
-	//     fmt.Printf("Failed to cache verification code: %v", err)
-	// }
+	// 缓存验证码
+	cacheKey := fmt.Sprintf("%s:%s:%s", SMSCodeKeyPrefix, phoneCountryCode, phone)
+	err = s.cache.Set(ctx, cacheKey, code, SMSCodeExpireTime)
+	if err != nil {
+		fmt.Printf("Failed to cache verification code: %v", err)
+	}
 
 	// 记录发送日志
 	fmt.Printf("SMS sent successfully to %s with template %s, code: %s", fullPhone, templateCode, code)
@@ -155,23 +160,116 @@ func (s *smsService) SendVerificationCode(ctx context.Context, phone, phoneCount
 
 // sendSMS 调用阿里云API发送短信
 func (s *smsService) sendSMS(phone, templateCode, code string) error {
-	// TODO: 实现阿里云SMS发送，需要添加相关依赖
-	// 暂时返回错误，提示未实现
-	return fmt.Errorf("阿里云SMS服务未实现，请添加相关依赖并配置有效的AccessKey")
+	// 创建阿里云SMS客户端
+	client, err := s.createSMSClient()
+	if err != nil {
+		return fmt.Errorf("failed to create SMS client: %w", err)
+	}
+
+	// 构建发送短信请求
+	sendSmsRequest := &dysmsapi20170525.SendSmsRequest{
+		SignName:      tea.String(s.config.SignName),
+		TemplateCode:  tea.String(templateCode),
+		PhoneNumbers:  tea.String(phone),
+		TemplateParam: tea.String(fmt.Sprintf(`{"code":"%s"}`, code)),
+	}
+
+	// 创建运行时选项
+	runtime := &util.RuntimeOptions{}
+
+	// 发送短信
+	resp, err := client.SendSmsWithOptions(sendSmsRequest, runtime)
+	if err != nil {
+		return fmt.Errorf("failed to send SMS: %w", err)
+	}
+
+	// 检查响应结果
+	if resp.Body == nil {
+		return fmt.Errorf("SMS response body is nil")
+	}
+
+	// 检查返回码
+	if tea.StringValue(resp.Body.Code) != "OK" {
+		return fmt.Errorf("SMS send failed, code: %s, message: %s",
+			tea.StringValue(resp.Body.Code),
+			tea.StringValue(resp.Body.Message))
+	}
+
+	// 记录成功发送的日志
+	fmt.Printf("SMS sent successfully, BizId: %s, Code: %s\n",
+		tea.StringValue(resp.Body.BizId),
+		tea.StringValue(resp.Body.Code))
+
+	return nil
+}
+
+// createSMSClient 创建阿里云SMS客户端
+func (s *smsService) createSMSClient() (*dysmsapi20170525.Client, error) {
+	config := &openapi.Config{
+		AccessKeyId:     tea.String(s.config.AccessKeyID),
+		AccessKeySecret: tea.String(s.config.AccessKeySecret),
+	}
+
+	// 设置地域和端点
+	if s.config.RegionID != "" {
+		config.RegionId = tea.String(s.config.RegionID)
+	} else {
+		config.RegionId = tea.String("cn-hangzhou")
+	}
+
+	if s.config.Endpoint != "" {
+		config.Endpoint = tea.String(s.config.Endpoint)
+	} else {
+		config.Endpoint = tea.String("dysmsapi.aliyuncs.com")
+	}
+
+	client, err := dysmsapi20170525.NewClient(config)
+	if err != nil {
+		return nil, err
+	}
+
+	return client, nil
 }
 
 // VerifyCode 验证验证码
 func (s *smsService) VerifyCode(ctx context.Context, phone, phoneCountryCode, code string) (bool, error) {
-	// TODO: 实现验证码验证，需要Redis客户端
-	// 暂时返回验证失败，需要实现Redis缓存
-	return false, fmt.Errorf("验证码验证服务未实现，需要配置Redis")
+	cacheKey := fmt.Sprintf("%s:%s:%s", SMSCodeKeyPrefix, phoneCountryCode, phone)
+
+	storedCode, err := s.cache.Get(ctx, cacheKey)
+	if err != nil {
+		if err == cache.ErrCacheMiss {
+			return false, fmt.Errorf("验证码不存在或已过期")
+		}
+		return false, err
+	}
+
+	// 验证成功后删除验证码（一次性使用）
+	if storedCode == code {
+		s.cache.Del(ctx, cacheKey)
+		return true, nil
+	}
+
+	return false, nil
 }
 
 // IsRateLimited 检查是否被频率限制
 func (s *smsService) IsRateLimited(ctx context.Context, phone, phoneCountryCode string) bool {
-	// TODO: 实现频率限制检查，需要Redis客户端
-	// 暂时允许所有请求通过，需要实现Redis缓存
-	return false
+	limitKey := fmt.Sprintf("%s:%s:%s", SMSLimitKeyPrefix, phoneCountryCode, phone)
+
+	// 使用Incr实现简单的频率限制
+	count, err := s.cache.Incr(ctx, limitKey)
+	if err != nil {
+		// 缓存错误时允许请求通过（降级策略）
+		return false
+	}
+
+	// 首次发送，设置过期时间
+	if count == 1 {
+		s.cache.Expire(ctx, limitKey, SMSLimitTimeWindow)
+	}
+
+	// 每小时最多5次
+	return count > SMSLimitMaxCount
 }
 
 // generateVerificationCode 生成6位随机验证码
@@ -200,10 +298,14 @@ func (s *smsService) GetTemplateCode(templateType string) string {
 		}
 		return DefaultTemplateLogin
 	case "current_phone":
-		// 当前手机号模板暂不支持配置，使用默认值
+		if s.templates.CurrentPhone != "" {
+			return s.templates.CurrentPhone
+		}
 		return DefaultTemplateCurrentPhone
 	case "new_phone":
-		// 新手机号模板暂不支持配置，使用默认值
+		if s.templates.NewPhone != "" {
+			return s.templates.NewPhone
+		}
 		return DefaultTemplateNewPhone
 	default:
 		return ""

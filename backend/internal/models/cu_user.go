@@ -89,8 +89,10 @@ type CuUserRegisterRequest struct {
 // CuUserLoginRequest 客户用户登录请求结构
 type CuUserLoginRequest struct {
 	Phone            string `json:"phone" binding:"required,min=7,max=20"`
-	PhoneCountryCode string `json:"phone_country_code" binding:"omitempty"` // 可选，默认+86
-	Password         string `json:"password" binding:"required"`
+	PhoneCountryCode string `json:"phone_country_code" binding:"omitempty"`           // 可选，默认+86
+	Password         string `json:"password"`                                         // 密码登录时必填
+	SmsCode          string `json:"sms_code"`                                         // 验证码登录时必填
+	LoginType        string `json:"login_type" binding:"required,oneof=password sms"` // 登录类型：password 或 sms
 }
 
 // CuUserProfileUpdateRequest 客户用户资料更新请求结构
@@ -114,6 +116,12 @@ type CuUserPhoneUpdateRequest struct {
 
 // CuUserSendRegisterSmsRequest 注册发送验证码请求结构
 type CuUserSendRegisterSmsRequest struct {
+	Phone            string `json:"phone" binding:"required,min=7,max=20"`
+	PhoneCountryCode string `json:"phone_country_code" binding:"omitempty"` // 可选，默认+86
+}
+
+// CuUserSendLoginSmsRequest 发送登录验证码请求结构
+type CuUserSendLoginSmsRequest struct {
 	Phone            string `json:"phone" binding:"required,min=7,max=20"`
 	PhoneCountryCode string `json:"phone_country_code" binding:"omitempty"` // 可选，默认+86
 }

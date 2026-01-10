@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -16,6 +17,7 @@ type Config struct {
 	License  LicenseConfig  `mapstructure:"license"`
 	Payment  PaymentConfig  `mapstructure:"payment"`
 	SMS      SMSConfig      `mapstructure:"sms"`
+	Cache    CacheConfig    `mapstructure:"cache"`
 }
 
 type ServerConfig struct {
@@ -109,6 +111,32 @@ type PaymentProvider struct {
 	Charset    string `mapstructure:"charset"`
 	Format     string `mapstructure:"format"`
 	Enabled    bool   `mapstructure:"enabled"`
+}
+
+type CacheConfig struct {
+	Type    string        `mapstructure:"type"`    // 缓存类型: memory, redis
+	TTL     time.Duration `mapstructure:"ttl"`     // 默认TTL
+	Enabled bool          `mapstructure:"enabled"` // 是否启用缓存
+	Redis   RedisConfig   `mapstructure:"redis"`   // Redis配置
+	Memory  MemoryConfig  `mapstructure:"memory"`  // 内存配置
+}
+
+type RedisConfig struct {
+	Host            string        `mapstructure:"host"`
+	Port            int           `mapstructure:"port"`
+	Password        string        `mapstructure:"password"`
+	DB              int           `mapstructure:"db"`
+	PoolSize        int           `mapstructure:"pool_size"`
+	MinIdleConns    int           `mapstructure:"min_idle_conns"`
+	ConnMaxIdleTime time.Duration `mapstructure:"conn_max_idle_time"`
+	DialTimeout     time.Duration `mapstructure:"dial_timeout"`
+	ReadTimeout     time.Duration `mapstructure:"read_timeout"`
+	WriteTimeout    time.Duration `mapstructure:"write_timeout"`
+}
+
+type MemoryConfig struct {
+	MaxSize         int           `mapstructure:"max_size"`         // 最大缓存条目数
+	CleanupInterval time.Duration `mapstructure:"cleanup_interval"` // 清理间隔
 }
 
 type SMSConfig struct {
@@ -225,6 +253,26 @@ func setDefaults() {
 	viper.SetDefault("sms.sign_name", "惠州顺视智能科技")
 	viper.SetDefault("sms.region_id", "cn-hangzhou")
 	viper.SetDefault("sms.endpoint", "dysmsapi.aliyuncs.com")
+
+	// Cache defaults
+	viper.SetDefault("cache.enabled", true)
+	viper.SetDefault("cache.type", "memory")
+	viper.SetDefault("cache.ttl", "30m")
+
+	// Redis cache defaults
+	viper.SetDefault("cache.redis.host", "localhost")
+	viper.SetDefault("cache.redis.port", 6379)
+	viper.SetDefault("cache.redis.db", 0)
+	viper.SetDefault("cache.redis.pool_size", 10)
+	viper.SetDefault("cache.redis.min_idle_conns", 5)
+	viper.SetDefault("cache.redis.conn_max_idle_time", "30m")
+	viper.SetDefault("cache.redis.dial_timeout", "5s")
+	viper.SetDefault("cache.redis.read_timeout", "3s")
+	viper.SetDefault("cache.redis.write_timeout", "3s")
+
+	// Memory cache defaults
+	viper.SetDefault("cache.memory.max_size", 10000)
+	viper.SetDefault("cache.memory.cleanup_interval", "10m")
 }
 
 func GetConfig() *Config {

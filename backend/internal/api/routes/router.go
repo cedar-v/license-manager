@@ -9,6 +9,7 @@ import (
 	"license-manager/internal/database"
 	"license-manager/internal/repository"
 	"license-manager/internal/service"
+	"license-manager/pkg/cache"
 	"license-manager/pkg/logger"
 	"license-manager/pkg/utils"
 
@@ -50,8 +51,33 @@ func SetupRouter() *gin.Engine {
 	// 获取logger实例
 	log := logger.GetLogger()
 
+	// 初始化缓存
+	cacheInstance, err := cache.NewCache(cache.CacheConfig{
+		Type:    cfg.Cache.Type,
+		TTL:     cfg.Cache.TTL,
+		Enabled: cfg.Cache.Enabled,
+		Redis: cache.RedisConfig{
+			Host:            cfg.Cache.Redis.Host,
+			Port:            cfg.Cache.Redis.Port,
+			Password:        cfg.Cache.Redis.Password,
+			DB:              cfg.Cache.Redis.DB,
+			PoolSize:        cfg.Cache.Redis.PoolSize,
+			MinIdleConns:    cfg.Cache.Redis.MinIdleConns,
+			ConnMaxIdleTime: cfg.Cache.Redis.ConnMaxIdleTime,
+			DialTimeout:     cfg.Cache.Redis.DialTimeout,
+			ReadTimeout:     cfg.Cache.Redis.ReadTimeout,
+			WriteTimeout:    cfg.Cache.Redis.WriteTimeout,
+		},
+		Memory: cache.MemoryConfig{
+			MaxSize: cfg.Cache.Memory.MaxSize,
+		},
+	})
+	if err != nil {
+		log.Fatalf("Failed to initialize cache: %v", err)
+	}
+
 	// 初始化SMS服务
-	smsService, err := utils.NewSMSService(&cfg.SMS, log)
+	smsService, err := utils.NewSMSService(&cfg.SMS, cacheInstance, log)
 	if err != nil {
 		log.Fatalf("Failed to initialize SMS service: %v", err)
 	}
@@ -167,6 +193,7 @@ func SetupRouter() *gin.Engine {
 		{
 			cuPublic.POST("/register", cuAuthHandler.CuUserRegister)
 			cuPublic.POST("/login", cuAuthHandler.CuUserLogin)
+			cuPublic.POST("/send-login-sms", cuAuthHandler.CuUserSendLoginSms)
 			cuPublic.POST("/send-register-sms", cuAuthHandler.CuUserSendRegisterSms)
 			cuPublic.POST("/forgot-password", cuAuthHandler.CuUserForgotPassword)
 			cuPublic.POST("/reset-password", cuAuthHandler.CuUserResetPassword)
