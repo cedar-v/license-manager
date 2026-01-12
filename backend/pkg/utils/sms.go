@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math/rand"
 	"time"
@@ -13,6 +14,15 @@ import (
 	dysmsapi20170525 "github.com/alibabacloud-go/dysmsapi-20170525/v5/client"
 	util "github.com/alibabacloud-go/tea-utils/v2/service"
 	"github.com/alibabacloud-go/tea/tea"
+)
+
+// 短信相关错误定义
+var (
+	ErrSMSCodeNotExist  = errors.New("sms_code_not_exist")
+	ErrSMSCodeExpired   = errors.New("sms_code_expired")
+	ErrSMSRateLimited   = errors.New("sms_rate_limited")
+	ErrSMSSendFailed    = errors.New("sms_send_failed")
+	ErrSMSCodeIncorrect = errors.New("sms_code_incorrect")
 )
 
 // 默认短信模板常量
@@ -126,7 +136,7 @@ func createSMSClient(accessKeyID, accessKeySecret, regionID, endpoint string) (i
 func (s *smsService) SendVerificationCode(ctx context.Context, phone, phoneCountryCode, templateCode string) error {
 	// 检查频率限制
 	if s.IsRateLimited(ctx, phone, phoneCountryCode) {
-		return fmt.Errorf("request too frequent")
+		return ErrSMSRateLimited
 	}
 
 	// 生成6位随机验证码
@@ -142,7 +152,7 @@ func (s *smsService) SendVerificationCode(ctx context.Context, phone, phoneCount
 	err := s.sendSMS(fullPhone, templateCode, code)
 	if err != nil {
 		fmt.Printf("Failed to send SMS to %s: %v", fullPhone, err)
-		return fmt.Errorf("failed to send SMS: %w", err)
+		return ErrSMSSendFailed
 	}
 
 	// 缓存验证码
@@ -238,7 +248,7 @@ func (s *smsService) VerifyCode(ctx context.Context, phone, phoneCountryCode, co
 	storedCode, err := s.cache.Get(ctx, cacheKey)
 	if err != nil {
 		if err == cache.ErrCacheMiss {
-			return false, fmt.Errorf("验证码不存在或已过期")
+			return false, ErrSMSCodeNotExist
 		}
 		return false, err
 	}
@@ -249,7 +259,7 @@ func (s *smsService) VerifyCode(ctx context.Context, phone, phoneCountryCode, co
 		return true, nil
 	}
 
-	return false, nil
+	return false, ErrSMSCodeIncorrect
 }
 
 // IsRateLimited 检查是否被频率限制

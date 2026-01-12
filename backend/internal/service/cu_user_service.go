@@ -169,10 +169,17 @@ func (s *cuUserService) Login(ctx context.Context, req *models.CuUserLoginReques
 		// 验证短信验证码
 		valid, err := s.smsService.VerifyCode(ctx, req.Phone, phoneCountryCode, req.SmsCode)
 		if err != nil {
-			return nil, "", i18n.NewI18nError("900004", lang, err.Error())
+			switch err {
+			case utils.ErrSMSCodeNotExist:
+				return nil, "", i18n.NewI18nError("500015", lang) // 验证码不存在
+			case utils.ErrSMSCodeIncorrect:
+				return nil, "", i18n.NewI18nError("500014", lang) // 验证码错误或已过期
+			default:
+				return nil, "", i18n.NewI18nError("900004", lang, err.Error())
+			}
 		}
 		if !valid {
-			return nil, "", i18n.NewI18nError("500003", lang) // 验证码错误
+			return nil, "", i18n.NewI18nError("500014", lang) // 验证码错误或已过期
 		}
 	} else {
 		// 密码登录（默认行为）
@@ -432,7 +439,14 @@ func (s *cuUserService) sendSmsCode(ctx context.Context, phone, phoneCountryCode
 	}
 
 	if sendErr != nil {
-		return i18n.NewI18nError("200004", lang) // 短信发送失败
+		switch sendErr {
+		case utils.ErrSMSRateLimited:
+			return i18n.NewI18nError("500016", lang) // 短信发送过于频繁，请稍后再试
+		case utils.ErrSMSSendFailed:
+			return i18n.NewI18nError("500017", lang) // 短信发送失败
+		default:
+			return i18n.NewI18nError("200004", lang) // 短信发送失败
+		}
 	}
 
 	return nil
@@ -479,7 +493,14 @@ func (s *cuUserService) SendCurrentPhoneSms(ctx context.Context, userID string) 
 	// 发送当前手机号验证码
 	err = s.smsService.SendCurrentPhoneCode(ctx, user.Phone, user.PhoneCountryCode)
 	if err != nil {
-		return i18n.NewI18nError("200004", lang) // 短信发送失败
+		switch err {
+		case utils.ErrSMSRateLimited:
+			return i18n.NewI18nError("500016", lang) // 短信发送过于频繁，请稍后再试
+		case utils.ErrSMSSendFailed:
+			return i18n.NewI18nError("500017", lang) // 短信发送失败
+		default:
+			return i18n.NewI18nError("200004", lang) // 短信发送失败
+		}
 	}
 
 	return nil
@@ -511,18 +532,49 @@ func (s *cuUserService) SendNewPhoneSms(ctx context.Context, req *models.CuUserS
 	// 发送新手机号验证码
 	err = s.smsService.SendNewPhoneCode(ctx, req.NewPhone, phoneCountryCode)
 	if err != nil {
-		return i18n.NewI18nError("200004", lang) // 短信发送失败
+		switch err {
+		case utils.ErrSMSRateLimited:
+			return i18n.NewI18nError("500016", lang) // 短信发送过于频繁，请稍后再试
+		case utils.ErrSMSSendFailed:
+			return i18n.NewI18nError("500017", lang) // 短信发送失败
+		default:
+			return i18n.NewI18nError("200004", lang) // 短信发送失败
+		}
 	}
 
 	return nil
 }
 
 func (s *cuUserService) VerifyRegisterSmsCode(ctx context.Context, phone, phoneCountryCode, code string) (bool, error) {
-	return s.smsService.VerifyCode(ctx, phone, phoneCountryCode, code)
+	valid, err := s.smsService.VerifyCode(ctx, phone, phoneCountryCode, code)
+	if err != nil {
+		lang := pkgcontext.GetLanguageFromContext(ctx)
+		switch err {
+		case utils.ErrSMSCodeNotExist:
+			return false, i18n.NewI18nError("500015", lang) // 验证码不存在
+		case utils.ErrSMSCodeIncorrect:
+			return false, i18n.NewI18nError("500014", lang) // 验证码错误或已过期
+		default:
+			return false, i18n.NewI18nError("900004", lang, err.Error())
+		}
+	}
+	return valid, nil
 }
 
 func (s *cuUserService) VerifyPhoneCode(ctx context.Context, phone, phoneCountryCode, code, templateType string) (bool, error) {
-	return s.smsService.VerifyCode(ctx, phone, phoneCountryCode, code)
+	valid, err := s.smsService.VerifyCode(ctx, phone, phoneCountryCode, code)
+	if err != nil {
+		lang := pkgcontext.GetLanguageFromContext(ctx)
+		switch err {
+		case utils.ErrSMSCodeNotExist:
+			return false, i18n.NewI18nError("500015", lang) // 验证码不存在
+		case utils.ErrSMSCodeIncorrect:
+			return false, i18n.NewI18nError("500014", lang) // 验证码错误或已过期
+		default:
+			return false, i18n.NewI18nError("900004", lang, err.Error())
+		}
+	}
+	return valid, nil
 }
 
 func (s *cuUserService) ForgotPassword(ctx context.Context, req *models.CuUserForgotPasswordRequest) error {
@@ -567,10 +619,17 @@ func (s *cuUserService) ResetPassword(ctx context.Context, req *models.CuUserRes
 	// 验证短信验证码
 	valid, err := s.smsService.VerifyCode(ctx, req.Phone, phoneCountryCode, req.SmsCode)
 	if err != nil {
-		return i18n.NewI18nError("900004", lang, err.Error())
+		switch err {
+		case utils.ErrSMSCodeNotExist:
+			return i18n.NewI18nError("500015", lang) // 验证码不存在
+		case utils.ErrSMSCodeIncorrect:
+			return i18n.NewI18nError("500014", lang) // 验证码错误或已过期
+		default:
+			return i18n.NewI18nError("900004", lang, err.Error())
+		}
 	}
 	if !valid {
-		return i18n.NewI18nError("500012", lang) // 验证码错误或已过期
+		return i18n.NewI18nError("500014", lang) // 验证码错误或已过期
 	}
 
 	// 生成新密码哈希

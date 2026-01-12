@@ -69,6 +69,10 @@ errors:
     "500011": "Invalid authentication token"
     "500012": "Authentication token expired"
     "500013": "Failed to generate token"
+    "500014": "Verification code incorrect or expired"
+    "500015": "Verification code does not exist"
+    "500016": "SMS sending too frequent, please try again later"
+    "500017": "SMS sending failed"
 
   # Package order module (60xxxx)
   cu_package:
