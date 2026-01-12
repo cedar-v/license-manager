@@ -442,10 +442,9 @@ func (s *cuUserService) sendSmsCode(ctx context.Context, phone, phoneCountryCode
 		switch sendErr {
 		case utils.ErrSMSRateLimited:
 			return i18n.NewI18nError("500016", lang) // 短信发送过于频繁，请稍后再试
-		case utils.ErrSMSSendFailed:
-			return i18n.NewI18nError("500017", lang) // 短信发送失败
 		default:
-			return i18n.NewI18nError("200004", lang) // 短信发送失败
+			// 对于短信发送失败，结合本地化消息和具体错误信息，便于调试
+			return i18n.NewI18nError("500017", lang, sendErr.Error())
 		}
 	}
 
@@ -496,10 +495,9 @@ func (s *cuUserService) SendCurrentPhoneSms(ctx context.Context, userID string) 
 		switch err {
 		case utils.ErrSMSRateLimited:
 			return i18n.NewI18nError("500016", lang) // 短信发送过于频繁，请稍后再试
-		case utils.ErrSMSSendFailed:
-			return i18n.NewI18nError("500017", lang) // 短信发送失败
 		default:
-			return i18n.NewI18nError("200004", lang) // 短信发送失败
+			// 对于短信发送失败，结合本地化消息和具体错误信息，便于调试
+			return i18n.NewI18nError("500017", lang, err.Error())
 		}
 	}
 
@@ -535,10 +533,9 @@ func (s *cuUserService) SendNewPhoneSms(ctx context.Context, req *models.CuUserS
 		switch err {
 		case utils.ErrSMSRateLimited:
 			return i18n.NewI18nError("500016", lang) // 短信发送过于频繁，请稍后再试
-		case utils.ErrSMSSendFailed:
-			return i18n.NewI18nError("500017", lang) // 短信发送失败
 		default:
-			return i18n.NewI18nError("200004", lang) // 短信发送失败
+			// 对于短信发送失败，结合本地化消息和具体错误信息，便于调试
+			return i18n.NewI18nError("500017", lang, err.Error())
 		}
 	}
 

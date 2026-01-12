@@ -152,7 +152,8 @@ func (s *smsService) SendVerificationCode(ctx context.Context, phone, phoneCount
 	err := s.sendSMS(fullPhone, templateCode, code)
 	if err != nil {
 		fmt.Printf("Failed to send SMS to %s: %v", fullPhone, err)
-		return ErrSMSSendFailed
+		// 返回包含详细错误信息的错误，这样上层可以获取具体错误原因
+		return fmt.Errorf("SMS send failed: %w", err)
 	}
 
 	// 缓存验证码
