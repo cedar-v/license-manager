@@ -218,3 +218,10 @@ type DeviceListResponse struct {
 	Page     int              `json:"page"`      // 当前页码
 	PageSize int              `json:"page_size"` // 每页数量
 }
+
+// DeviceSummaryResponse 设备汇总响应结构
+type DeviceSummaryResponse struct {
+	TotalDevices   int64 `json:"total_devices"`   // 设备总数
+	OnlineDevices  int64 `json:"online_devices"`  // 在线设备数
+	OfflineDevices int64 `json:"offline_devices"` // 离线设备数
+}

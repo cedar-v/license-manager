@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"license-manager/internal/models"
 
 	"gorm.io/gorm"
@@ -12,6 +13,7 @@ type CuOrderRepository interface {
 	GetByOrderNo(orderNo string) (*models.CuOrder, error)
 	GetByCuUserID(cuUserID string, offset, limit int) ([]*models.CuOrder, int64, error)
 	GetByCustomerID(customerID string, offset, limit int) ([]*models.CuOrder, int64, error)
+	GetCustomerOrderSummary(ctx context.Context, customerID string) (*models.OrderSummaryResponse, error)
 	Update(order *models.CuOrder) error
 	Delete(id string) error
 	CheckTrialOrderExists(cuUserID string, currentMonth string) (bool, error)
@@ -110,4 +112,40 @@ func (r *cuOrderRepository) CheckTrialOrderExists(cuUserID string, currentMonth 
 		Count(&count).Error
 
 	return count > 0, err
+}
+
+// GetCustomerOrderSummary 获取客户订单汇总统计
+func (r *cuOrderRepository) GetCustomerOrderSummary(ctx context.Context, customerID string) (*models.OrderSummaryResponse, error) {
+	// 查询订单总数
+	var totalOrders int64
+	err := r.db.Model(&models.CuOrder{}).
+		Where("customer_id = ?", customerID).
+		Count(&totalOrders).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// 查询待支付订单数
+	var pendingOrders int64
+	err = r.db.Model(&models.CuOrder{}).
+		Where("customer_id = ? AND status = ?", customerID, "pending").
+		Count(&pendingOrders).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// 查询已支付订单数
+	var paidOrders int64
+	err = r.db.Model(&models.CuOrder{}).
+		Where("customer_id = ? AND status = ?", customerID, "paid").
+		Count(&paidOrders).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.OrderSummaryResponse{
+		TotalOrders:   totalOrders,
+		PendingOrders: pendingOrders,
+		PaidOrders:    paidOrders,
+	}, nil
 }

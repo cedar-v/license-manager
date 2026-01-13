@@ -152,3 +152,51 @@ func (h *CuDeviceHandler) UnbindDevice(c *gin.Context) {
 		Data:    nil,
 	})
 }
+
+// GetDeviceSummary 获取设备汇总统计
+// @Summary 获取设备汇总统计
+// @Description 获取当前登录用户的设备汇总统计信息（总数、在线数、离线数）
+// @Tags 客户设备管理
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} models.APIResponse{data=models.DeviceSummaryResponse} "获取成功"
+// @Failure 401 {object} models.ErrorResponse "未认证"
+// @Failure 500 {object} models.ErrorResponse "服务器内部错误"
+// @Router /api/cu/devices/summary [get]
+func (h *CuDeviceHandler) GetDeviceSummary(c *gin.Context) {
+	// 从JWT Token中获取用户ID和客户ID
+	claims := c.MustGet("cu_user").(*utils.CuClaims)
+
+	// 调用服务层
+	result, err := h.cuDeviceService.GetDeviceSummary(c.Request.Context(), claims.CustomerID)
+	if err != nil {
+		// err已经是i18n.I18nError，直接使用
+		i18nErr, ok := err.(*i18n.I18nError)
+		if ok {
+			c.JSON(i18nErr.HttpCode, models.ErrorResponse{
+				Code:      i18nErr.Code,
+				Message:   i18nErr.Message,
+				Timestamp: getCurrentTimestamp(),
+			})
+			return
+		}
+		// 如果不是i18n错误，使用通用错误
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang, err.Error())
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message + ": " + err.Error(),
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	lang := middleware.GetLanguage(c)
+	successMessage := i18n.GetI18nErrorMessage("000000", lang)
+	c.JSON(http.StatusOK, models.APIResponse{
+		Code:    "000000",
+		Message: successMessage,
+		Data:    result,
+	})
+}

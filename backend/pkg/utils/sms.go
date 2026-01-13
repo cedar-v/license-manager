@@ -40,7 +40,7 @@ const (
 	SMSLimitKeyPrefix  = "sms:limit"
 	SMSCodeExpireTime  = 5 * time.Minute
 	SMSLimitTimeWindow = time.Hour
-	SMSLimitMaxCount   = 25
+	SMSLimitMaxCount   = 5
 )
 
 // SMSService 短信服务接口

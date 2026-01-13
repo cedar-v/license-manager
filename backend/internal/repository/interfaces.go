@@ -126,6 +126,9 @@ type LicenseRepository interface {
 	// GetCustomerDeviceList 查询客户设备列表（关联授权码信息）
 	GetCustomerDeviceList(ctx context.Context, customerID string, req *models.DeviceListRequest) (*models.DeviceListResponse, error)
 
+	// GetCustomerDeviceSummary 获取客户设备汇总统计
+	GetCustomerDeviceSummary(ctx context.Context, customerID string) (*models.DeviceSummaryResponse, error)
+
 	// DeleteLicenseByID 根据ID删除许可证（物理删除，用于设备解绑）
 	DeleteLicenseByID(ctx context.Context, id string) error
 

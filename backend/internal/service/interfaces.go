@@ -79,7 +79,9 @@ type CuDeviceService interface {
 	// 获取设备列表
 	GetDeviceList(ctx context.Context, customerID string, req *models.DeviceListRequest) (*models.DeviceListResponse, error)
 
+	// 获取设备汇总统计
+	GetDeviceSummary(ctx context.Context, customerID string) (*models.DeviceSummaryResponse, error)
+
 	// 解绑设备
 	UnbindDevice(ctx context.Context, customerID, licenseID string) error
 }
-

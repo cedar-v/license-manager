@@ -111,3 +111,10 @@ type CuOrderListResponse struct {
 	Page       int                `json:"page"`
 	PageSize   int                `json:"page_size"`
 }
+
+// OrderSummaryResponse 订单汇总响应结构
+type OrderSummaryResponse struct {
+	TotalOrders   int64 `json:"total_orders"`    // 订单总数
+	PendingOrders int64 `json:"pending_orders"`  // 待支付订单数
+	PaidOrders    int64 `json:"paid_orders"`     // 已支付订单数
+}

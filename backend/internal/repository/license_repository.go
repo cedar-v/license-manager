@@ -387,6 +387,44 @@ func (r *licenseRepository) DeleteLicenseByID(ctx context.Context, id string) er
 	return r.db.Unscoped().Delete(&models.License{}, "id = ?", id).Error
 }
 
+// GetCustomerDeviceSummary 获取客户设备汇总统计
+func (r *licenseRepository) GetCustomerDeviceSummary(ctx context.Context, customerID string) (*models.DeviceSummaryResponse, error) {
+	// 获取心跳超时配置（秒）
+	cfg := config.GetConfig()
+	heartbeatTimeoutSeconds := cfg.License.HeartbeatTimeout
+	if heartbeatTimeoutSeconds <= 0 {
+		heartbeatTimeoutSeconds = 300 // 默认5分钟
+	}
+
+	// 查询设备总数
+	var totalDevices int64
+	err := r.db.Model(&models.License{}).
+		Where("customer_id = ? AND status = ? AND deleted_at IS NULL", customerID, "active").
+		Count(&totalDevices).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// 查询在线设备数
+	var onlineDevices int64
+	err = r.db.Model(&models.License{}).
+		Where("customer_id = ? AND status = ? AND deleted_at IS NULL AND last_heartbeat > ?",
+			customerID, "active", time.Now().Add(-time.Duration(heartbeatTimeoutSeconds)*time.Second)).
+		Count(&onlineDevices).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// 计算离线设备数
+	offlineDevices := totalDevices - onlineDevices
+
+	return &models.DeviceSummaryResponse{
+		TotalDevices:   totalDevices,
+		OnlineDevices:  onlineDevices,
+		OfflineDevices: offlineDevices,
+	}, nil
+}
+
 // CheckLicenseBelongsToCustomer 检查许可证是否属于指定客户
 func (r *licenseRepository) CheckLicenseBelongsToCustomer(ctx context.Context, licenseID, customerID string) (bool, error) {
 	var count int64

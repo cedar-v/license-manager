@@ -217,6 +217,7 @@ func SetupRouter() *gin.Engine {
 			cuAuth.POST("/orders", cuOrderHandler.CreateOrder)
 			cuAuth.GET("/orders/:order_id", cuOrderHandler.GetOrder)
 			cuAuth.GET("/orders", cuOrderHandler.GetUserOrders)
+			cuAuth.GET("/orders/summary", cuOrderHandler.GetOrderSummary)
 
 			// 支付管理
 			cuAuth.GET("/payment/:payment_no/status", paymentHandler.GetPaymentStatus)
@@ -227,6 +228,7 @@ func SetupRouter() *gin.Engine {
 
 			// 设备管理
 			cuAuth.GET("/devices", cuDeviceHandler.GetDevices)
+			cuAuth.GET("/devices/summary", cuDeviceHandler.GetDeviceSummary)
 			cuAuth.DELETE("/devices/:id", cuDeviceHandler.UnbindDevice)
 		}
 	}

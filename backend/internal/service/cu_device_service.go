@@ -36,6 +36,19 @@ func (s *cuDeviceService) GetDeviceList(ctx context.Context, customerID string, 
 	return s.licenseRepo.GetCustomerDeviceList(ctx, customerID, req)
 }
 
+// GetDeviceSummary 获取设备汇总统计
+func (s *cuDeviceService) GetDeviceSummary(ctx context.Context, customerID string) (*models.DeviceSummaryResponse, error) {
+	lang := pkgcontext.GetLanguageFromContext(ctx)
+
+	// 参数验证
+	if customerID == "" {
+		return nil, i18n.NewI18nError("900001", lang) // 业务错误，不覆盖多语言message
+	}
+
+	// 委托给Repository层进行数据访问
+	return s.licenseRepo.GetCustomerDeviceSummary(ctx, customerID)
+}
+
 // UnbindDevice 解绑设备
 func (s *cuDeviceService) UnbindDevice(ctx context.Context, customerID, licenseID string) error {
 	lang := pkgcontext.GetLanguageFromContext(ctx)

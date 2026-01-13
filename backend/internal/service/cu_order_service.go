@@ -20,6 +20,7 @@ type CuOrderService interface {
 	CreatePendingOrder(ctx context.Context, cuUserID, customerID string, req *models.CuOrderCreateRequest) (*models.CuOrder, error)
 	GetOrder(ctx context.Context, orderID, cuUserID string) (*models.CuOrder, error)
 	GetUserOrders(ctx context.Context, cuUserID string, offset, limit int) ([]*models.CuOrder, int64, error)
+	GetOrderSummary(ctx context.Context, customerID string) (*models.OrderSummaryResponse, error)
 	CalculatePrice(ctx context.Context, packageID string, licenseCount int) (*PriceCalculationResult, error)
 	UpdateOrderStatus(ctx context.Context, orderID string, status string) error
 }
@@ -354,6 +355,19 @@ func (s *cuOrderService) GetUserOrders(ctx context.Context, cuUserID string, off
 	}
 
 	return orders, total, nil
+}
+
+// GetOrderSummary 获取订单汇总统计
+func (s *cuOrderService) GetOrderSummary(ctx context.Context, customerID string) (*models.OrderSummaryResponse, error) {
+	lang := pkgcontext.GetLanguageFromContext(ctx)
+
+	// 参数验证
+	if customerID == "" {
+		return nil, i18n.NewI18nError("900001", lang) // 业务错误，不覆盖多语言message
+	}
+
+	// 委托给Repository层进行数据访问
+	return s.repo.GetCustomerOrderSummary(ctx, customerID)
 }
 
 func (s *cuOrderService) CalculatePrice(ctx context.Context, packageID string, licenseCount int) (*PriceCalculationResult, error) {
