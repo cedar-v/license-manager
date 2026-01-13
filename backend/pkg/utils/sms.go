@@ -40,7 +40,7 @@ const (
 	SMSLimitKeyPrefix  = "sms:limit"
 	SMSCodeExpireTime  = 5 * time.Minute
 	SMSLimitTimeWindow = time.Hour
-	SMSLimitMaxCount   = 5
+	SMSLimitMaxCount   = 25
 )
 
 // SMSService 短信服务接口
@@ -148,7 +148,7 @@ func (s *smsService) SendVerificationCode(ctx context.Context, phone, phoneCount
 		fullPhone = "+86" + phone
 	}
 
-	// TODO: 发送短信 - 需要阿里云SMS SDK
+	// 送短信 - 需要阿里云SMS SDK
 	err := s.sendSMS(fullPhone, templateCode, code)
 	if err != nil {
 		fmt.Printf("Failed to send SMS to %s: %v", fullPhone, err)
