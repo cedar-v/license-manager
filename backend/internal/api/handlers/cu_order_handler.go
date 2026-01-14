@@ -76,6 +76,14 @@ func (h *CuOrderHandler) getPackageList() []map[string]interface{} {
 			"max_devices": 1000,
 			"description": "企业级完整解决方案",
 			"details":     "包含高级功能|技术支持|数据分析等",
+		}, {
+			"id":          "custom",
+			"name":        "企业定制版",
+			"type":        "custom",
+			"price":       0,
+			"max_devices": 0,
+			"description": "按需定制",
+			"details":     "包含高级功能|技术支持|数据分析等",
 		},
 	}
 }
