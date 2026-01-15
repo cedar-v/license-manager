@@ -80,7 +80,7 @@ func (h *CuOrderHandler) getPackageList() []map[string]interface{} {
 			"id":          "custom",
 			"name":        "企业定制版",
 			"type":        "custom",
-			"price":       0,
+			"price":       "定制报价",
 			"max_devices": 0,
 			"description": "按需定制",
 			"details":     "包含高级功能|技术支持|数据分析等",
