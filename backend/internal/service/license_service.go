@@ -378,64 +378,6 @@ func (s *licenseService) generateLicenseKey() (string, error) {
 	return fmt.Sprintf("LIC-DEVICE-%s", hex), nil
 }
 
-// validateAuthorizationCodeFormat 验证授权码格式和校验和
-// 格式: LIC-{4位客户代码}-{8或12位随机}-{4位校验码}
-// 兼容旧格式（8位随机，36字符集）和新格式（12位随机，62字符集）
-func validateAuthorizationCodeFormat(code string) bool {
-	// 解析格式
-	parts := strings.Split(code, "-")
-	if len(parts) != 4 || parts[0] != "LIC" {
-		return false
-	}
-
-	// 验证各部分长度（兼容旧格式8位和新格式12位）
-	customerCodeLen := len(parts[1])
-	randomLen := len(parts[2])
-	checksumLen := len(parts[3])
-
-	// 客户代码必须为4位，校验和必须为4位
-	if customerCodeLen != 4 || checksumLen != 4 {
-		return false
-	}
-
-	// 随机部分：兼容8位（旧格式）和12位（新格式）
-	if randomLen != 8 && randomLen != 12 {
-		return false
-	}
-
-	// 根据随机部分长度选择字符集验证校验和
-	// 8位：使用36字符集（旧格式）
-	// 12位：使用62字符集（新格式）
-	expectedChecksum := generateChecksumForCode(parts[1]+parts[2], randomLen == 12)
-	return expectedChecksum == parts[3]
-}
-
-// generateChecksumForCode 生成校验码（用于验证）
-// 基于输入字符串的ASCII值计算
-// useExtendedCharset: true使用62字符集（新格式），false使用36字符集（旧格式）
-func generateChecksumForCode(input string, useExtendedCharset bool) string {
-	sum := 0
-	for _, char := range input {
-		sum += int(char)
-	}
-
-	var chars string
-	if useExtendedCharset {
-		// 使用62字符集（A-Z, a-z, 0-9）用于新格式
-		chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-	} else {
-		// 使用36字符集（A-Z, 0-9）用于旧格式
-		chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	}
-
-	checksum := ""
-	for i := 0; i < 4; i++ {
-		checksum += string(chars[sum%len(chars)])
-		sum = sum / len(chars)
-	}
-	return checksum
-}
-
 // ActivateLicense 激活许可证
 func (s *licenseService) ActivateLicense(ctx context.Context, req *models.ActivateRequest, clientIP string) (*models.ActivateResponse, error) {
 	lang := pkgcontext.GetLanguageFromContext(ctx)
@@ -445,9 +387,15 @@ func (s *licenseService) ActivateLicense(ctx context.Context, req *models.Activa
 		return nil, i18n.NewI18nError("900001", lang)
 	}
 
-	// 验证授权码格式（在查询数据库前先验证格式，避免无效查询）
-	if !validateAuthorizationCodeFormat(req.AuthorizationCode) {
-		return nil, i18n.NewI18nError("300001", lang) // 授权码格式无效
+	// 兼容“产品激活码”形式：{授权码}&{payload}
+	// 激活流程只需要授权码本体，不依赖payload。
+	req.AuthorizationCode = strings.TrimSpace(req.AuthorizationCode)
+	if idx := strings.Index(req.AuthorizationCode, "&"); idx > 0 {
+		req.AuthorizationCode = strings.TrimSpace(req.AuthorizationCode[:idx])
+	}
+
+	if req.AuthorizationCode == "" {
+		return nil, i18n.NewI18nError("900001", lang)
 	}
 
 	// 获取授权码信息

@@ -107,7 +107,7 @@ backend/
 │   │   ├── crypto.go            # 加密工具
 │   │   ├── cu_jwt.go            # C端用户JWT工具
 │   │   ├── jwt.go               # JWT工具
-│   │   └── license_codec.go     # 授权码编解码
+│   │   └── authorization_code.go # 授权码生成
 │   └── logger/                  # 日志封装
 │       └── logger.go
 ├── configs/

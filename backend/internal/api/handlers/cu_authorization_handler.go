@@ -101,3 +101,67 @@ func (h *CuAuthorizationHandler) ShareAuthorizationCode(c *gin.Context) {
 		Data:    data,
 	})
 }
+
+// GetProductActivationCode 获取产品激活码
+// @Summary 获取产品激活码
+// @Description 获取产品激活码：{授权码}&{payload}（payload 为 RSA-PSS-SHA256 签名封装串）
+// @Tags 用户端授权码管理
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body models.ProductActivationCodeRequest true "获取产品激活码请求"
+// @Success 200 {object} models.APIResponse{data=models.ProductActivationCodeResponse} "获取成功"
+// @Failure 400 {object} models.ErrorResponse "请求参数无效"
+// @Failure 401 {object} models.ErrorResponse "未认证"
+// @Failure 403 {object} models.ErrorResponse "授权码已被锁定"
+// @Failure 404 {object} models.ErrorResponse "授权码不存在或已过期"
+// @Failure 500 {object} models.ErrorResponse "服务器内部错误"
+// @Router /api/cu/authorization-codes/product-activation-code [post]
+func (h *CuAuthorizationHandler) GetProductActivationCode(c *gin.Context) {
+	claims := c.MustGet("cu_user").(*utils.CuClaims)
+	customerID := claims.CustomerID
+
+	var req models.ProductActivationCodeRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message + ": " + err.Error(),
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	ctx := middleware.WithLanguage(c.Request.Context(), c)
+	data, err := h.authCodeService.GetProductActivationCode(ctx, customerID, &req)
+	if err != nil {
+		// err已经是i18n.I18nError，直接使用
+		i18nErr, ok := err.(*i18n.I18nError)
+		if ok {
+			c.JSON(i18nErr.HttpCode, models.ErrorResponse{
+				Code:      i18nErr.Code,
+				Message:   i18nErr.Message,
+				Timestamp: getCurrentTimestamp(),
+			})
+			return
+		}
+		// 如果不是i18n错误，使用通用错误
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang, err.Error())
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	lang := middleware.GetLanguage(c)
+	successMessage := i18n.GetErrorMessage("000000", lang)
+	c.JSON(http.StatusOK, models.APIResponse{
+		Code:    "000000",
+		Message: successMessage,
+		Data:    data,
+	})
+}

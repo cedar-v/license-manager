@@ -280,3 +280,13 @@ type AuthorizationCodeShareResponseItem struct {
 	EndDate        string `json:"end_date"`        // 结束时间
 	MaxActivations int    `json:"max_activations"` // 最大激活次数
 }
+
+// ProductActivationCodeRequest 获取产品激活码请求结构
+type ProductActivationCodeRequest struct {
+	AuthorizationCode string `json:"authorization_code" binding:"required"` // 授权码（旧规则格式）
+}
+
+// ProductActivationCodeResponse 获取产品激活码响应结构
+type ProductActivationCodeResponse struct {
+	ProductActivationCode string `json:"product_activation_code"` // 产品激活码：{授权码}&{payload}
+}

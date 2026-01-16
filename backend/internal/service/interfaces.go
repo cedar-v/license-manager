@@ -47,6 +47,9 @@ type AuthorizationCodeService interface {
 
 	// 用户端分享功能
 	ShareAuthorizationCode(ctx context.Context, authCodeID, userID string, req *models.AuthorizationCodeShareRequest) (*models.AuthorizationCodeShareResponse, error)
+
+	// 用户端获取产品激活码
+	GetProductActivationCode(ctx context.Context, customerID string, req *models.ProductActivationCodeRequest) (*models.ProductActivationCodeResponse, error)
 }
 
 // LicenseService 许可证服务接口

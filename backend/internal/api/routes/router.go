@@ -225,6 +225,7 @@ func SetupRouter() *gin.Engine {
 
 			// 授权码管理
 			cuAuth.POST("/authorization-codes/:codeId/share", cuAuthorizationHandler.ShareAuthorizationCode)
+			cuAuth.POST("/authorization-codes/product-activation-code", cuAuthorizationHandler.GetProductActivationCode)
 
 			// 设备管理
 			cuAuth.GET("/devices", cuDeviceHandler.GetDevices)

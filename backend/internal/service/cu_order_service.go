@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"license-manager/internal/config"
 	"license-manager/internal/models"
 	"license-manager/internal/repository"
 	pkgcontext "license-manager/pkg/context"
@@ -250,7 +250,7 @@ func (s *cuOrderService) CreateOrder(ctx context.Context, cuUserID, customerID s
 		expiredAt = nil
 	}
 
-	// 生成自包含授权码
+	// 构建授权配置（用于后续生成产品激活码 payload）
 	var featureConfigMap, usageLimitsMap map[string]interface{}
 
 	// 根据套餐类型设置配置信息
@@ -260,20 +260,14 @@ func (s *cuOrderService) CreateOrder(ctx context.Context, cuUserID, customerID s
 		}
 	}
 
-	licenseConfig := &utils.LicenseConfig{
-		EndDate:       endDate,
-		FeatureConfig: featureConfigMap,
-		UsageLimits:   usageLimitsMap,
-		CustomParameters: map[string]interface{}{
-			"package_id":    req.PackageID,
-			"package_name":  pkg.Name,
-			"license_count": req.LicenseCount,
-		},
+	customParametersMap := map[string]interface{}{
+		"package_id":    req.PackageID,
+		"package_name":  pkg.Name,
+		"license_count": req.LicenseCount,
 	}
 
-	// 从配置获取RSA私钥路径
-	privateKeyPath := config.GetConfig().License.RSA.PrivateKeyPath
-	authCode, err := utils.EncodeLicenseData(licenseConfig, privateKeyPath)
+	// 授权码生成规则回退/统一为旧规则（不再自包含配置）
+	authCode, err := utils.GenerateLegacyAuthorizationCode(customerID)
 	if err != nil {
 		tx.Rollback()
 		return nil, i18n.NewI18nError("900004", lang, err.Error())
@@ -281,6 +275,33 @@ func (s *cuOrderService) CreateOrder(ctx context.Context, cuUserID, customerID s
 
 	// 构建订单描述
 	description := fmt.Sprintf("%s - %d个许可", pkg.Name, req.LicenseCount)
+
+	// 处理JSON字段（用于数据库存储与后续生成产品激活码 payload）
+	var featureConfig, usageLimits, customParameters models.JSON
+	if featureConfigMap != nil {
+		b, err := json.Marshal(featureConfigMap)
+		if err != nil {
+			tx.Rollback()
+			return nil, i18n.NewI18nError("900004", lang, err.Error())
+		}
+		featureConfig = models.JSON(b)
+	}
+	if usageLimitsMap != nil {
+		b, err := json.Marshal(usageLimitsMap)
+		if err != nil {
+			tx.Rollback()
+			return nil, i18n.NewI18nError("900004", lang, err.Error())
+		}
+		usageLimits = models.JSON(b)
+	}
+	if customParametersMap != nil {
+		b, err := json.Marshal(customParametersMap)
+		if err != nil {
+			tx.Rollback()
+			return nil, i18n.NewI18nError("900004", lang, err.Error())
+		}
+		customParameters = models.JSON(b)
+	}
 
 	// 构建授权码实体（使用生成的授权码）
 	authCodeEntity := &models.AuthorizationCode{
@@ -295,7 +316,9 @@ func (s *cuOrderService) CreateOrder(ctx context.Context, cuUserID, customerID s
 		EncryptionType: &[]string{"standard"}[0],
 		MaxActivations: req.LicenseCount,
 		IsLocked:       false,
-		// FeatureConfig 和 UsageLimits 已在授权码字符串中，无需重复存储
+		FeatureConfig:    featureConfig,
+		UsageLimits:      usageLimits,
+		CustomParameters: customParameters,
 	}
 
 	// 创建授权码

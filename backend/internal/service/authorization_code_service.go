@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"crypto/rand"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -77,35 +77,8 @@ func (s *authorizationCodeService) CreateAuthorizationCode(ctx context.Context, 
 		return nil, i18n.NewI18nError("100004", lang) // 缺少认证信息
 	}
 
-	// 生成自包含授权码
-	var featureConfigMap, usageLimitsMap, customParametersMap map[string]interface{}
-
-	if req.FeatureConfig != nil {
-		if fc, ok := req.FeatureConfig.(map[string]interface{}); ok {
-			featureConfigMap = fc
-		}
-	}
-	if req.UsageLimits != nil {
-		if ul, ok := req.UsageLimits.(map[string]interface{}); ok {
-			usageLimitsMap = ul
-		}
-	}
-	if req.CustomParameters != nil {
-		if cp, ok := req.CustomParameters.(map[string]interface{}); ok {
-			customParametersMap = cp
-		}
-	}
-
-	licenseConfig := &utils.LicenseConfig{
-		EndDate:          endDate,
-		FeatureConfig:    featureConfigMap,
-		UsageLimits:      usageLimitsMap,
-		CustomParameters: customParametersMap,
-	}
-
-	// 从配置获取RSA私钥路径
-	privateKeyPath := config.GetConfig().License.RSA.PrivateKeyPath
-	authCode, err := utils.EncodeLicenseData(licenseConfig, privateKeyPath)
+	// 授权码生成规则回退/统一为旧规则（不再自包含配置）
+	authCode, err := s.generateAuthorizationCode(req.CustomerID)
 	if err != nil {
 		return nil, i18n.NewI18nError("900004", lang, err.Error())
 	}
@@ -290,6 +263,102 @@ func (s *authorizationCodeService) GenerateAuthorizationFile(ctx context.Context
 
 	fileName := fmt.Sprintf("authorization_%s.txt", authCode.Code)
 	return []byte(authCode.Code), fileName, authCode.Code, nil
+}
+
+// GetProductActivationCode 获取产品激活码：{授权码}&{payload}
+func (s *authorizationCodeService) GetProductActivationCode(ctx context.Context, customerID string, req *models.ProductActivationCodeRequest) (*models.ProductActivationCodeResponse, error) {
+	lang := pkgcontext.GetLanguageFromContext(ctx)
+
+	if customerID == "" || req == nil || strings.TrimSpace(req.AuthorizationCode) == "" {
+		return nil, i18n.NewI18nError("900001", lang)
+	}
+
+	code := strings.TrimSpace(req.AuthorizationCode)
+	if idx := strings.Index(code, "&"); idx > 0 {
+		code = strings.TrimSpace(code[:idx])
+	}
+	if code == "" {
+		return nil, i18n.NewI18nError("900001", lang)
+	}
+
+	authCode, err := s.licenseRepo.GetAuthorizationCodeByCode(ctx, code)
+	if err != nil {
+		if errors.Is(err, repository.ErrAuthorizationCodeNotFound) {
+			return nil, i18n.NewI18nError("300001", lang) // 授权码不存在
+		}
+		return nil, i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	// 校验归属
+	if authCode.CustomerID != customerID {
+		return nil, i18n.NewI18nError("100005", lang) // 权限不足
+	}
+
+	// 校验状态与有效期
+	now := time.Now()
+	if authCode.IsLocked {
+		return nil, i18n.NewI18nError("300003", lang) // 授权码已被锁定
+	}
+	if now.Before(authCode.StartDate) || now.After(authCode.EndDate) {
+		return nil, i18n.NewI18nError("300001", lang) // 授权码未生效或已过期
+	}
+
+	// 构造配置 JSON（客户端离线解析/自校验）
+	payloadData := map[string]interface{}{
+		"ver":                1,
+		"authorization_code": authCode.Code,
+		"start_date":         authCode.StartDate,
+		"end_date":           authCode.EndDate,
+		"deployment_type":    authCode.DeploymentType,
+		"max_activations":    authCode.MaxActivations,
+		"generated_at":       time.Now().Format(time.RFC3339),
+	}
+
+	if featureConfig := parseJSONField(authCode.FeatureConfig); len(featureConfig) > 0 {
+		payloadData["feature_config"] = featureConfig
+	}
+	if usageLimits := parseJSONField(authCode.UsageLimits); len(usageLimits) > 0 {
+		payloadData["usage_limits"] = usageLimits
+	}
+	if customParameters := parseJSONField(authCode.CustomParameters); len(customParameters) > 0 {
+		payloadData["custom_parameters"] = customParameters
+	}
+
+	payloadDataBytes, err := json.Marshal(payloadData)
+	if err != nil {
+		return nil, i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	// RSA 私钥签名封装（与 license_service.signLicenseFile 相同结构）
+	cfg := config.GetConfig()
+	if cfg == nil || cfg.License.RSA.PrivateKeyPath == "" {
+		return nil, i18n.NewI18nError("900004", lang, "RSA private key path not configured")
+	}
+
+	privateKey, err := utils.LoadRSAPrivateKeyFromFile(cfg.License.RSA.PrivateKeyPath)
+	if err != nil {
+		return nil, i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	signature, err := privateKey.SignData(payloadDataBytes)
+	if err != nil {
+		return nil, i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	signedPayload := map[string]interface{}{
+		"data":      string(payloadDataBytes),
+		"signature": signature,
+		"algorithm": "RSA-PSS-SHA256",
+	}
+
+	signedPayloadBytes, err := json.Marshal(signedPayload)
+	if err != nil {
+		return nil, i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	payload := base64.StdEncoding.EncodeToString(signedPayloadBytes)
+	productActivationCode := fmt.Sprintf("%s&%s", authCode.Code, payload)
+	return &models.ProductActivationCodeResponse{ProductActivationCode: productActivationCode}, nil
 }
 
 // fillAuthorizationCodeDisplayFields 填充完整授权码模型的多语言显示字段
@@ -638,112 +707,7 @@ func (s *authorizationCodeService) fillAuthCodeDisplayFields(item *models.Author
 // 格式: LIC-{4位客户代码}-{12位随机}-{4位校验码}
 // 安全性：12位随机字符（62字符集）提供约 3.23 × 10^21 种可能组合
 func (s *authorizationCodeService) generateAuthorizationCode(customerID string) (string, error) {
-	// 获取客户编码的前4位作为前缀
-	customerCode := "COMP" // 默认前缀
-	if len(customerID) >= 4 {
-		customerCode = strings.ToUpper(customerID[:4])
-	}
-
-	// 生成12位随机字符串（从8位增加到12位以提升安全性）
-	randomStr, err := s.generateRandomString(12)
-	if err != nil {
-		return "", err
-	}
-
-	// 生成4位校验码
-	checksum := s.generateChecksum(customerCode + randomStr)
-
-	// 格式: LIC-{customer_code}-{random}-{checksum}
-	return fmt.Sprintf("LIC-%s-%s-%s", customerCode, randomStr, checksum), nil
-}
-
-// generateRandomString 生成随机字符串
-// 使用62字符集（A-Z, a-z, 0-9）提供更高的熵值
-func (s *authorizationCodeService) generateRandomString(length int) (string, error) {
-	// 扩展字符集到62字符（A-Z, a-z, 0-9）以提升安全性
-	const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-	bytes := make([]byte, length)
-	if _, err := rand.Read(bytes); err != nil {
-		return "", err
-	}
-	for i, b := range bytes {
-		bytes[i] = chars[b%byte(len(chars))]
-	}
-	return string(bytes), nil
-}
-
-// generateChecksum 生成校验码
-// 基于输入字符串的ASCII值计算，用于格式验证
-func (s *authorizationCodeService) generateChecksum(input string) string {
-	sum := 0
-	for _, char := range input {
-		sum += int(char)
-	}
-	// 使用与随机字符串相同的62字符集以保持一致性
-	const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-	checksum := ""
-	for i := 0; i < 4; i++ {
-		checksum += string(chars[sum%len(chars)])
-		sum = sum / len(chars)
-	}
-	return checksum
-}
-
-// ValidateAuthorizationCodeFormat 验证授权码格式和校验和
-// 格式: LIC-{4位客户代码}-{8或12位随机}-{4位校验码}
-// 兼容旧格式（8位随机，36字符集）和新格式（12位随机，62字符集）
-func (s *authorizationCodeService) ValidateAuthorizationCodeFormat(code string) bool {
-	// 解析格式
-	parts := strings.Split(code, "-")
-	if len(parts) != 4 || parts[0] != "LIC" {
-		return false
-	}
-
-	// 验证各部分长度（兼容旧格式8位和新格式12位）
-	customerCodeLen := len(parts[1])
-	randomLen := len(parts[2])
-	checksumLen := len(parts[3])
-
-	// 客户代码必须为4位，校验和必须为4位
-	if customerCodeLen != 4 || checksumLen != 4 {
-		return false
-	}
-
-	// 随机部分：兼容8位（旧格式）和12位（新格式）
-	if randomLen != 8 && randomLen != 12 {
-		return false
-	}
-
-	// 根据随机部分长度选择字符集验证校验和
-	// 8位：使用36字符集（旧格式）
-	// 12位：使用62字符集（新格式）
-	expectedChecksum := s.generateChecksumWithCharset(parts[1]+parts[2], randomLen == 12)
-	return expectedChecksum == parts[3]
-}
-
-// generateChecksumWithCharset 生成校验码（支持指定字符集）
-// useExtendedCharset: true使用62字符集（新格式），false使用36字符集（旧格式）
-func (s *authorizationCodeService) generateChecksumWithCharset(input string, useExtendedCharset bool) string {
-	sum := 0
-	for _, char := range input {
-		sum += int(char)
-	}
-
-	var chars string
-	if useExtendedCharset {
-		// 使用62字符集（A-Z, a-z, 0-9）用于新格式
-		chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-	} else {
-		// 使用36字符集（A-Z, 0-9）用于旧格式
-		chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	}
-
-	checksum := ""
-	for i := 0; i < 4; i++ {
-		checksum += string(chars[sum%len(chars)])
-		sum = sum / len(chars)
-	}
-	return checksum
+	return utils.GenerateLegacyAuthorizationCode(customerID)
 }
 
 // GetAuthorizationChangeList 查询授权变更历史列表
