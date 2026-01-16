@@ -278,44 +278,43 @@ func (s *cuOrderService) CreateOrder(ctx context.Context, cuUserID, customerID s
 
 	// 处理JSON字段（用于数据库存储与后续生成产品激活码 payload）
 	var featureConfig, usageLimits, customParameters models.JSON
-	if featureConfigMap != nil {
-		b, err := json.Marshal(featureConfigMap)
-		if err != nil {
-			tx.Rollback()
-			return nil, i18n.NewI18nError("900004", lang, err.Error())
-		}
-		featureConfig = models.JSON(b)
+
+	b, err := json.Marshal(featureConfigMap)
+	if err != nil {
+		tx.Rollback()
+		return nil, i18n.NewI18nError("900004", lang, err.Error())
 	}
+	featureConfig = models.JSON(b)
+
 	if usageLimitsMap != nil {
-		b, err := json.Marshal(usageLimitsMap)
+		d, err := json.Marshal(usageLimitsMap)
 		if err != nil {
 			tx.Rollback()
 			return nil, i18n.NewI18nError("900004", lang, err.Error())
 		}
-		usageLimits = models.JSON(b)
+		usageLimits = models.JSON(d)
 	}
-	if customParametersMap != nil {
-		b, err := json.Marshal(customParametersMap)
-		if err != nil {
-			tx.Rollback()
-			return nil, i18n.NewI18nError("900004", lang, err.Error())
-		}
-		customParameters = models.JSON(b)
+
+	c, err := json.Marshal(customParametersMap)
+	if err != nil {
+		tx.Rollback()
+		return nil, i18n.NewI18nError("900004", lang, err.Error())
 	}
+	customParameters = models.JSON(c)
 
 	// 构建授权码实体（使用生成的授权码）
 	authCodeEntity := &models.AuthorizationCode{
-		ID:             uuid.New().String(), // 生成新的UUID作为主键
-		Code:           authCode,
-		CustomerID:     customerID,
-		CreatedBy:      cuUserID,
-		Description:    &description,
-		StartDate:      startDate,
-		EndDate:        endDate,
-		DeploymentType: "cloud",
-		EncryptionType: &[]string{"standard"}[0],
-		MaxActivations: req.LicenseCount,
-		IsLocked:       false,
+		ID:               uuid.New().String(), // 生成新的UUID作为主键
+		Code:             authCode,
+		CustomerID:       customerID,
+		CreatedBy:        cuUserID,
+		Description:      &description,
+		StartDate:        startDate,
+		EndDate:          endDate,
+		DeploymentType:   "cloud",
+		EncryptionType:   &[]string{"standard"}[0],
+		MaxActivations:   req.LicenseCount,
+		IsLocked:         false,
 		FeatureConfig:    featureConfig,
 		UsageLimits:      usageLimits,
 		CustomParameters: customParameters,

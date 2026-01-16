@@ -160,7 +160,7 @@ func (h *PaymentHandler) AlipayCallback(c *gin.Context) {
 	}
 
 	values := c.Request.PostForm
-	if values == nil || len(values) == 0 {
+	if len(values) == 0 {
 		values = c.Request.Form
 	}
 

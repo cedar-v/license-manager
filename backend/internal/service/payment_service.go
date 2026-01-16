@@ -212,7 +212,7 @@ func (s *paymentService) ProcessAlipayCallback(ctx context.Context, values url.V
 	if s.db == nil {
 		return errors.New("db not initialized")
 	}
-	if values == nil || len(values) == 0 {
+	if len(values) == 0 {
 		return errors.New("empty callback values")
 	}
 
@@ -334,19 +334,18 @@ func (s *paymentService) ProcessAlipayCallback(ctx context.Context, values url.V
 			}
 		}
 		var featureConfig, usageLimits models.JSON
-		if featureConfigMap != nil {
-			b, err := json.Marshal(featureConfigMap)
-			if err != nil {
-				return err
-			}
-			featureConfig = models.JSON(b)
+
+		b, err := json.Marshal(featureConfigMap)
+		if err != nil {
+			return err
 		}
+		featureConfig = models.JSON(b)
 		if usageLimitsMap != nil {
-			b, err := json.Marshal(usageLimitsMap)
+			c, err := json.Marshal(usageLimitsMap)
 			if err != nil {
 				return err
 			}
-			usageLimits = models.JSON(b)
+			usageLimits = models.JSON(c)
 		}
 
 		description := fmt.Sprintf("%s - %d个授权", order.PackageName, order.LicenseCount)
