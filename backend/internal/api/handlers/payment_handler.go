@@ -154,5 +154,20 @@ func (h *PaymentHandler) AlipayCallback(c *gin.Context) {
 
 	// 暂时使用简化的处理方式
 	// 实际项目中应该使用service中的client来验证和处理
+	if err := c.Request.ParseForm(); err != nil {
+		utils.SendNotificationResponse(c.Writer, false)
+		return
+	}
+
+	values := c.Request.PostForm
+	if values == nil || len(values) == 0 {
+		values = c.Request.Form
+	}
+
+	if err := h.paymentService.ProcessAlipayCallback(c.Request.Context(), values); err != nil {
+		utils.SendNotificationResponse(c.Writer, false)
+		return
+	}
+
 	utils.SendNotificationResponse(c.Writer, true)
 }

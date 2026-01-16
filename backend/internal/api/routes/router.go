@@ -90,7 +90,7 @@ func SetupRouter() *gin.Engine {
 	authCodeService := service.NewAuthorizationCodeService(authCodeRepo, customerRepo, cuUserRepo, licenseRepo)
 	cuOrderService := service.NewCuOrderService(cuOrderRepo, cuUserRepo, authCodeRepo, db)
 	cuDeviceService := service.NewCuDeviceService(licenseRepo)
-	paymentService := service.NewPaymentService(paymentRepo, cuOrderRepo, convertPaymentConfig(cfg.Payment))
+	paymentService := service.NewPaymentService(paymentRepo, cuOrderRepo, convertPaymentConfig(cfg.Payment), db)
 	enumService := service.NewEnumService()
 	licenseService := service.NewLicenseService(licenseRepo, db, log)
 	dashboardService := service.NewDashboardService(dashboardRepo)
@@ -130,6 +130,7 @@ func SetupRouter() *gin.Engine {
 
 			// 支付回调接口
 			public.POST("/payment/alipay/callback", paymentHandler.AlipayCallback)
+			public.POST("/v1/payment/alipay/callback", paymentHandler.AlipayCallback)
 		}
 
 		// 需要认证的接口
