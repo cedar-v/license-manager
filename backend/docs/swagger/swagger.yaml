@@ -1046,6 +1046,18 @@ definitions:
         description: 总数量
         type: integer
     type: object
+  models.DeviceSummaryResponse:
+    properties:
+      offline_devices:
+        description: 离线设备数
+        type: integer
+      online_devices:
+        description: 在线设备数
+        type: integer
+      total_devices:
+        description: 设备总数
+        type: integer
+    type: object
   models.EnumItem:
     properties:
       display:
@@ -1368,6 +1380,18 @@ definitions:
         description: 响应消息
         type: string
     type: object
+  models.OrderSummaryResponse:
+    properties:
+      paid_orders:
+        description: 已支付订单数
+        type: integer
+      pending_orders:
+        description: 待支付订单数
+        type: integer
+      total_orders:
+        description: 订单总数
+        type: integer
+    type: object
   models.PaymentBusinessOrder:
     properties:
       authorization_code:
@@ -1440,6 +1464,20 @@ definitions:
       status:
         type: string
       trade_no:
+        type: string
+    type: object
+  models.ProductActivationCodeRequest:
+    properties:
+      authorization_code:
+        description: 授权码（旧规则格式）
+        type: string
+    required:
+    - authorization_code
+    type: object
+  models.ProductActivationCodeResponse:
+    properties:
+      product_activation_code:
+        description: 产品激活码：{授权码}&{payload}
         type: string
     type: object
   models.RecentAuthorization:
@@ -1632,6 +1670,55 @@ paths:
       summary: 用户分享授权码
       tags:
       - 用户端授权码管理
+  /api/cu/authorization-codes/product-activation-code:
+    post:
+      consumes:
+      - application/json
+      description: 获取产品激活码：{授权码}&{payload}（payload 为 RSA-PSS-SHA256 签名封装串）
+      parameters:
+      - description: 获取产品激活码请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductActivationCodeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.ProductActivationCodeResponse'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 授权码已被锁定
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 授权码不存在或已过期
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取产品激活码
+      tags:
+      - 用户端授权码管理
   /api/cu/devices:
     get:
       consumes:
@@ -1654,6 +1741,10 @@ paths:
         in: query
         name: authorization_code_id
         type: string
+      - description: 是否在线筛选：true在线，false离线
+        in: query
+        name: is_online
+        type: boolean
       produces:
       - application/json
       responses:
@@ -1724,6 +1815,36 @@ paths:
       security:
       - BearerAuth: []
       summary: 解绑设备
+      tags:
+      - 客户设备管理
+  /api/cu/devices/summary:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前登录用户的设备汇总统计信息（总数、在线数、离线数）
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.DeviceSummaryResponse'
+              type: object
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取设备汇总统计
       tags:
       - 客户设备管理
   /api/cu/forgot-password:
@@ -2008,6 +2129,36 @@ paths:
       security:
       - BearerAuth: []
       summary: 计算订单价格
+      tags:
+      - 客户订单管理
+  /api/cu/orders/summary:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前登录用户的订单汇总统计信息（总数、待支付数、已支付数）
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.OrderSummaryResponse'
+              type: object
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取订单汇总统计
       tags:
       - 客户订单管理
   /api/cu/packages:

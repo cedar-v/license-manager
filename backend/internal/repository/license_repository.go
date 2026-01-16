@@ -278,6 +278,16 @@ func (r *licenseRepository) GetCustomerDeviceList(ctx context.Context, customerI
 		Where("licenses.customer_id = ? AND licenses.status = ? AND licenses.deleted_at IS NULL",
 			customerID, "active")
 
+	// 获取心跳超时配置（秒）
+	cfg := config.GetConfig()
+	heartbeatTimeoutSeconds := cfg.License.HeartbeatTimeout
+	if heartbeatTimeoutSeconds <= 0 {
+		heartbeatTimeoutSeconds = 300 // 默认5分钟
+	}
+
+	now := time.Now()
+	onlineThreshold := now.Add(-time.Duration(heartbeatTimeoutSeconds) * time.Second)
+
 	// 按授权码ID筛选
 	if req.AuthorizationCodeID != "" {
 		query = query.Where("licenses.authorization_code_id = ?", req.AuthorizationCodeID)
@@ -286,6 +296,15 @@ func (r *licenseRepository) GetCustomerDeviceList(ctx context.Context, customerI
 	// 设备名称模糊搜索
 	if req.DeviceName != "" {
 		query = query.Where("JSON_EXTRACT(licenses.device_info, '$.name') LIKE ?", "%"+req.DeviceName+"%")
+	}
+
+	// 在线状态筛选
+	if req.IsOnline != nil {
+		if *req.IsOnline {
+			query = query.Where("licenses.last_heartbeat > ?", onlineThreshold)
+		} else {
+			query = query.Where("(licenses.last_heartbeat <= ? OR licenses.last_heartbeat IS NULL)", onlineThreshold)
+		}
 	}
 
 	// 获取总数
@@ -317,14 +336,6 @@ func (r *licenseRepository) GetCustomerDeviceList(ctx context.Context, customerI
 		return nil, err
 	}
 
-	// 获取心跳超时配置（秒）
-	cfg := config.GetConfig()
-	heartbeatTimeoutSeconds := cfg.License.HeartbeatTimeout
-	if heartbeatTimeoutSeconds <= 0 {
-		heartbeatTimeoutSeconds = 300 // 默认5分钟
-	}
-
-	now := time.Now()
 	devices := make([]models.DeviceListItem, len(scanResults))
 
 	for i, result := range scanResults {
@@ -337,7 +348,7 @@ func (r *licenseRepository) GetCustomerDeviceList(ctx context.Context, customerI
 
 		// 计算在线状态（使用心跳超时配置）
 		isOnline := false
-		if result.LastHeartbeat != nil && result.LastHeartbeat.After(now.Add(-time.Duration(heartbeatTimeoutSeconds)*time.Second)) {
+		if result.LastHeartbeat != nil && result.LastHeartbeat.After(onlineThreshold) {
 			isOnline = true
 		}
 

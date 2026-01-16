@@ -33,6 +33,7 @@ func NewCuDeviceHandler(cuDeviceService service.CuDeviceService) *CuDeviceHandle
 // @Param page_size query int false "每页数量，默认20，最大100"
 // @Param device_name query string false "设备名称模糊搜索"
 // @Param authorization_code_id query string false "按授权码ID筛选设备"
+// @Param is_online query bool false "是否在线筛选：true在线，false离线"
 // @Success 200 {object} models.APIResponse{data=models.DeviceListResponse} "获取成功"
 // @Failure 400 {object} models.ErrorResponse "请求参数无效"
 // @Failure 401 {object} models.ErrorResponse "未认证"

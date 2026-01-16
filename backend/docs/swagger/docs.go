@@ -25,6 +25,87 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/cu/authorization-codes/product-activation-code": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "获取产品激活码：{授权码}\u0026{payload}（payload 为 RSA-PSS-SHA256 签名封装串）",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户端授权码管理"
+                ],
+                "summary": "获取产品激活码",
+                "parameters": [
+                    {
+                        "description": "获取产品激活码请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ProductActivationCodeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "获取成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.ProductActivationCodeResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "授权码已被锁定",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "授权码不存在或已过期",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/cu/authorization-codes/{codeId}/share": {
             "post": {
                 "security": [
@@ -161,6 +242,12 @@ const docTemplate = `{
                         "description": "按授权码ID筛选设备",
                         "name": "authorization_code_id",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "是否在线筛选：true在线，false离线",
+                        "name": "is_online",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -186,6 +273,58 @@ const docTemplate = `{
                         "description": "请求参数无效",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cu/devices/summary": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "获取当前登录用户的设备汇总统计信息（总数、在线数、离线数）",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "客户设备管理"
+                ],
+                "summary": "获取设备汇总统计",
+                "responses": {
+                    "200": {
+                        "description": "获取成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.DeviceSummaryResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -659,6 +798,58 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "套餐不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cu/orders/summary": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "获取当前登录用户的订单汇总统计信息（总数、待支付数、已支付数）",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "客户订单管理"
+                ],
+                "summary": "获取订单汇总统计",
+                "responses": {
+                    "200": {
+                        "description": "获取成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.OrderSummaryResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -5375,6 +5566,23 @@ const docTemplate = `{
                 }
             }
         },
+        "models.DeviceSummaryResponse": {
+            "type": "object",
+            "properties": {
+                "offline_devices": {
+                    "description": "离线设备数",
+                    "type": "integer"
+                },
+                "online_devices": {
+                    "description": "在线设备数",
+                    "type": "integer"
+                },
+                "total_devices": {
+                    "description": "设备总数",
+                    "type": "integer"
+                }
+            }
+        },
         "models.EnumItem": {
             "type": "object",
             "properties": {
@@ -5833,6 +6041,23 @@ const docTemplate = `{
                 }
             }
         },
+        "models.OrderSummaryResponse": {
+            "type": "object",
+            "properties": {
+                "paid_orders": {
+                    "description": "已支付订单数",
+                    "type": "integer"
+                },
+                "pending_orders": {
+                    "description": "待支付订单数",
+                    "type": "integer"
+                },
+                "total_orders": {
+                    "description": "订单总数",
+                    "type": "integer"
+                }
+            }
+        },
         "models.PaymentBusinessOrder": {
             "type": "object",
             "properties": {
@@ -5942,6 +6167,27 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "trade_no": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ProductActivationCodeRequest": {
+            "type": "object",
+            "required": [
+                "authorization_code"
+            ],
+            "properties": {
+                "authorization_code": {
+                    "description": "授权码（旧规则格式）",
+                    "type": "string"
+                }
+            }
+        },
+        "models.ProductActivationCodeResponse": {
+            "type": "object",
+            "properties": {
+                "product_activation_code": {
+                    "description": "产品激活码：{授权码}\u0026{payload}",
                     "type": "string"
                 }
             }

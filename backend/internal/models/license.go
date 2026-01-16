@@ -190,6 +190,7 @@ type DeviceListRequest struct {
 	PageSize            int    `form:"page_size" binding:"omitempty,min=1,max=100"`      // 每页数量，默认20，最大100
 	DeviceName          string `form:"device_name" binding:"omitempty,max=100"`          // 设备名称模糊搜索（匹配device_info.name）
 	AuthorizationCodeID string `form:"authorization_code_id" binding:"omitempty,len=36"` // 按授权码ID筛选设备
+	IsOnline            *bool  `form:"is_online" binding:"omitempty"`                    // 是否在线筛选（true在线，false离线；不传不过滤）
 }
 
 // DeviceListItem 设备列表项结构（客户用户接口）
