@@ -315,18 +315,25 @@ func (s *paymentService) ProcessAlipayCallback(ctx context.Context, values url.V
 		}
 
 		var featureConfigMap, usageLimitsMap map[string]interface{}
-		if order.PackageID == "basic" {
+		switch order.PackageID {
+		case "basic":
 			usageLimitsMap = map[string]interface{}{
-				"type": "standard",
+				"type": "basic",
+			}
+		case "professional":
+			usageLimitsMap = map[string]interface{}{
+				"type": "professional",
+			}
+		case "trial":
+			usageLimitsMap = map[string]interface{}{
+				"type": "trial",
+			}
+		default:
+			usageLimitsMap = map[string]interface{}{
+				"type": "default",
 			}
 		}
-		customParametersMap := map[string]interface{}{
-			"package_id":    order.PackageID,
-			"package_name":  order.PackageName,
-			"license_count": order.LicenseCount,
-		}
-
-		var featureConfig, usageLimits, customParameters models.JSON
+		var featureConfig, usageLimits models.JSON
 		if featureConfigMap != nil {
 			b, err := json.Marshal(featureConfigMap)
 			if err != nil {
@@ -341,28 +348,22 @@ func (s *paymentService) ProcessAlipayCallback(ctx context.Context, values url.V
 			}
 			usageLimits = models.JSON(b)
 		}
-		b, err := json.Marshal(customParametersMap)
-		if err != nil {
-			return err
-		}
-		customParameters = models.JSON(b)
 
 		description := fmt.Sprintf("%s - %d个授权", order.PackageName, order.LicenseCount)
 		encryptionType := "standard"
 		authCodeEntity := &models.AuthorizationCode{
-			Code:             authCode,
-			CustomerID:       order.CustomerID,
-			CreatedBy:        order.CuUserID,
-			Description:      &description,
-			StartDate:        startDate,
-			EndDate:          endDate,
-			DeploymentType:   "cloud",
-			EncryptionType:   &encryptionType,
-			MaxActivations:   order.LicenseCount,
-			IsLocked:         false,
-			FeatureConfig:    featureConfig,
-			UsageLimits:      usageLimits,
-			CustomParameters: customParameters,
+			Code:           authCode,
+			CustomerID:     order.CustomerID,
+			CreatedBy:      order.CuUserID,
+			Description:    &description,
+			StartDate:      startDate,
+			EndDate:        endDate,
+			DeploymentType: "cloud",
+			EncryptionType: &encryptionType,
+			MaxActivations: order.LicenseCount,
+			IsLocked:       false,
+			FeatureConfig:  featureConfig,
+			UsageLimits:    usageLimits,
 		}
 		if err := tx.Create(authCodeEntity).Error; err != nil {
 			return err
