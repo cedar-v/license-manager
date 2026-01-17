@@ -24,7 +24,7 @@
 
 ## Overview
 
-License Manager is an independent software licensing platform that provides license code generation, distribution, validation, and management services for IoT platforms and other software systems. It offers both online and offline licensing modes with hardware-based binding for enhanced security.
+License Manager is a comprehensive software commercialization solution that integrates software licensing management, self-service user portals, and commercial operation capabilities. It supports dual-track operations for both B2B enterprise customers and B2C individual users, providing full-process digital services from registration and purchase to license activation. It employs a hybrid online/offline licensing model combined with hardware binding and RSA digital signatures to ensure security.
 
 ✨It enables **any programming language** and **any type of software product** to **quickly integrate licensing capabilities** via standardized **HTTP APIs** and **cross-platform client SDKs**.
 
@@ -71,6 +71,28 @@ Client SDK repository: [https://github.com/cedar-v/license-manager-sdk](https://
 
 The customer management module provides comprehensive customer information management features, including CRUD operations for customer data, status management, and authorization associations.
 
+## Self-Service User Portal
+
+The platform provides comprehensive self-service user portals supporting **dual-track operations for B2B+B2C**:
+
+### B2B Enterprise Customer Services
+- **Enterprise User Registration**: Mobile phone registration with enterprise admin managing member accounts
+- **Product Package Purchase**: Three package types (Trial, Basic, Professional) with bulk license purchasing
+- **License Code Management**: Online license purchase with offline activation and license sharing
+- **Device Management**: Enterprise users can view and manage all activated devices with device unbinding
+- **Order Management**: Complete order history queries and status tracking
+
+### B2C Individual Customer Services
+- **Individual User Registration**: Quick mobile phone registration with simplified personal account management
+- **Flexible Purchasing**: Support for single or small quantity license purchases meeting individual user needs
+- **Convenient Activation**: Support for both online activation and offline activation modes
+- **Device Monitoring**: Individual users can monitor device status and usage in real-time
+
+### Unified Payment Experience
+- **Alipay Integration**: Support for Alipay QR code payment with secure and reliable payment experience
+- **Payment Status Tracking**: Real-time payment status queries and callback notifications
+- **Multi-environment Support**: Sandbox environment testing and production environment switching
+
 ## Key Features
 
 - 🔧 **Customer Management**: Complete customer information management with status control
@@ -80,6 +102,7 @@ The customer management module provides comprehensive customer information manag
 - 🌐 **API Services**: RESTful APIs for validation, activation, and heartbeat monitoring
 - ⚙️ **System Management**: Admin authentication and monitoring dashboard
 - 🛠️ **Cross-platform Tools**: Hardware information extraction tools for multiple platforms
+- 👥 **Self-Service User Portal**: Dual-track B2B+B2C operations supporting enterprise customers and individual users with self-service operations
 
 ## Technical Stack
 
