@@ -64,6 +64,15 @@ type CuOrderCreateRequest struct {
 	PaymentMethod string `json:"payment_method,omitempty"` // 可选：支付方式，不传则为免费订单 支持：alipay，wechat
 }
 
+// CuOrderListRequest 订单列表查询请求结构
+type CuOrderListRequest struct {
+	Page     int    `form:"page" binding:"omitempty,min=1"`              // 页码，默认1
+	PageSize int    `form:"page_size" binding:"omitempty,min=1,max=100"` // 每页条数，默认10，最大100
+	Search   string `form:"search" binding:"omitempty"`                  // 订单号或授权码模糊匹配
+	Status   string `form:"status" binding:"omitempty"`                  // 订单状态筛选
+	Time     string `form:"time" binding:"omitempty"`                    // 时间筛选：today/week/month/three_months 或 今天/本周/本月/近三个月
+}
+
 // CuOrderResponse 订单响应结构
 type CuOrderResponse struct {
 	ID                string     `json:"id"`
@@ -114,7 +123,7 @@ type CuOrderListResponse struct {
 
 // OrderSummaryResponse 订单汇总响应结构
 type OrderSummaryResponse struct {
-	TotalOrders   int64 `json:"total_orders"`    // 订单总数
-	PendingOrders int64 `json:"pending_orders"`  // 待支付订单数
-	PaidOrders    int64 `json:"paid_orders"`     // 已支付订单数
+	TotalOrders   int64 `json:"total_orders"`   // 订单总数
+	PendingOrders int64 `json:"pending_orders"` // 待支付订单数
+	PaidOrders    int64 `json:"paid_orders"`    // 已支付订单数
 }

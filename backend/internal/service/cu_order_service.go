@@ -19,7 +19,7 @@ type CuOrderService interface {
 	CreateOrder(ctx context.Context, cuUserID, customerID string, req *models.CuOrderCreateRequest) (*models.CuOrder, error)
 	CreatePendingOrder(ctx context.Context, cuUserID, customerID string, req *models.CuOrderCreateRequest) (*models.CuOrder, error)
 	GetOrder(ctx context.Context, orderID, cuUserID string) (*models.CuOrder, error)
-	GetUserOrders(ctx context.Context, cuUserID string, offset, limit int) ([]*models.CuOrder, int64, error)
+	GetUserOrders(ctx context.Context, cuUserID string, req *models.CuOrderListRequest) ([]*models.CuOrder, int64, error)
 	GetOrderSummary(ctx context.Context, customerID string) (*models.OrderSummaryResponse, error)
 	CalculatePrice(ctx context.Context, packageID string, licenseCount int) (*PriceCalculationResult, error)
 	UpdateOrderStatus(ctx context.Context, orderID string, status string) error
@@ -363,7 +363,7 @@ func (s *cuOrderService) GetOrder(ctx context.Context, orderID, cuUserID string)
 	return order, nil
 }
 
-func (s *cuOrderService) GetUserOrders(ctx context.Context, cuUserID string, offset, limit int) ([]*models.CuOrder, int64, error) {
+func (s *cuOrderService) GetUserOrders(ctx context.Context, cuUserID string, req *models.CuOrderListRequest) ([]*models.CuOrder, int64, error) {
 	lang := pkgcontext.GetLanguageFromContext(ctx)
 
 	// 参数验证
@@ -371,7 +371,25 @@ func (s *cuOrderService) GetUserOrders(ctx context.Context, cuUserID string, off
 		return nil, 0, i18n.NewI18nError("900001", lang)
 	}
 
-	orders, total, err := s.repo.GetByCuUserID(cuUserID, offset, limit)
+	if req == nil {
+		req = &models.CuOrderListRequest{}
+	}
+	if req.Page <= 0 {
+		req.Page = 1
+	}
+	if req.PageSize <= 0 {
+		req.PageSize = 10
+	}
+	if req.PageSize > 100 {
+		req.PageSize = 100
+	}
+
+	createdAtStart, createdAtEnd, err := parseCuOrderTimeRange(req.Time, time.Now())
+	if err != nil {
+		return nil, 0, i18n.NewI18nError("900001", lang, err.Error())
+	}
+
+	orders, total, err := s.repo.GetByCuUserID(ctx, cuUserID, req, createdAtStart, createdAtEnd)
 	if err != nil {
 		return nil, 0, i18n.NewI18nError("900004", lang, err.Error())
 	}

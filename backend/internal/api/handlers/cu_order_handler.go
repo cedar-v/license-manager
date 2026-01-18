@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
 
 	"license-manager/internal/api/middleware"
 	"license-manager/internal/models"
@@ -378,22 +377,25 @@ func (h *CuOrderHandler) GetOrder(c *gin.Context) {
 // @Security BearerAuth
 // @Param page query integer false "页码" default(1)
 // @Param page_size query integer false "每页数量" default(10)
+// @Param search query string false "订单号或授权码模糊匹配"
+// @Param status query string false "订单状态筛选" Enums(pending, paid, cancelled)
+// @Param time query string false "时间筛选" Enums(today, week, month, three_months)
 // @Success 200 {object} models.APIResponse{data=models.CuOrderListResponse} "成功"
+// @Failure 400 {object} models.ErrorResponse "请求参数无效"
 // @Failure 401 {object} models.ErrorResponse "未认证"
 // @Router /api/cu/orders [get]
 func (h *CuOrderHandler) GetUserOrders(c *gin.Context) {
-	// 解析分页参数
-	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
-
-	if page < 1 {
-		page = 1
+	var req models.CuOrderListRequest
+	if err := c.ShouldBindQuery(&req); err != nil {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message + ": " + err.Error(),
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
 	}
-	if pageSize < 1 || pageSize > 100 {
-		pageSize = 10
-	}
-
-	offset := (page - 1) * pageSize
 
 	// 获取用户ID
 	cuUserID, exists := c.Get("cu_user_id")
@@ -409,7 +411,8 @@ func (h *CuOrderHandler) GetUserOrders(c *gin.Context) {
 	}
 
 	// 获取订单列表
-	orders, total, err := h.cuOrderService.GetUserOrders(c.Request.Context(), cuUserID.(string), offset, pageSize)
+	ctx := middleware.WithLanguage(c.Request.Context(), c)
+	orders, total, err := h.cuOrderService.GetUserOrders(ctx, cuUserID.(string), &req)
 	if err != nil {
 		c.JSON(err.(*i18n.I18nError).HttpCode, models.ErrorResponse{
 			Code:      err.(*i18n.I18nError).Code,
@@ -433,8 +436,8 @@ func (h *CuOrderHandler) GetUserOrders(c *gin.Context) {
 		Data: &models.CuOrderListResponse{
 			Orders:     orderResponses,
 			TotalCount: total,
-			Page:       page,
-			PageSize:   pageSize,
+			Page:       req.Page,
+			PageSize:   req.PageSize,
 		},
 		Timestamp: getCurrentTimestamp(),
 	})

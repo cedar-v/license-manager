@@ -588,6 +588,35 @@ const docTemplate = `{
                         "description": "每页数量",
                         "name": "page_size",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "订单号或授权码模糊匹配",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "pending",
+                            "paid",
+                            "cancelled"
+                        ],
+                        "type": "string",
+                        "description": "订单状态筛选",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "today",
+                            "week",
+                            "month",
+                            "three_months"
+                        ],
+                        "type": "string",
+                        "description": "时间筛选",
+                        "name": "time",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -607,6 +636,12 @@ const docTemplate = `{
                                     }
                                 }
                             ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     },
                     "401": {

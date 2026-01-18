@@ -1956,6 +1956,27 @@ paths:
         in: query
         name: page_size
         type: integer
+      - description: 订单号或授权码模糊匹配
+        in: query
+        name: search
+        type: string
+      - description: 订单状态筛选
+        enum:
+        - pending
+        - paid
+        - cancelled
+        in: query
+        name: status
+        type: string
+      - description: 时间筛选
+        enum:
+        - today
+        - week
+        - month
+        - three_months
+        in: query
+        name: time
+        type: string
       produces:
       - application/json
       responses:
@@ -1968,6 +1989,10 @@ paths:
                 data:
                   $ref: '#/definitions/models.CuOrderListResponse'
               type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
         "401":
           description: 未认证
           schema:
