@@ -126,6 +126,18 @@ func getHTTPStatusByCode(code string) int {
 				return StatusOK
 			case "30": // 授权模块错误，默认200（业务错误通过响应体区分）
 				return StatusOK
+			case "40": // 仪表盘模块错误，默认200（业务错误通过响应体区分）
+				return StatusOK
+			case "50": // 客户用户模块错误，默认200（业务错误通过响应体区分）
+				return StatusOK
+			case "60": // 套餐订单模块错误，默认200（业务错误通过响应体区分）
+				return StatusOK
+			case "61": // 订单模块错误，默认200（业务错误通过响应体区分）
+				return StatusOK
+			case "62": // 设备模块错误，默认200（业务错误通过响应体区分）
+				return StatusOK
+			case "70": // 发票模块错误，默认200（业务错误通过响应体区分）
+				return StatusOK
 			case "90": // 系统错误，默认500
 				return StatusInternalServerError
 			}

@@ -22,6 +22,7 @@ type CuOrderService interface {
 	GetUserOrders(ctx context.Context, cuUserID string, req *models.CuOrderListRequest) ([]*models.CuOrder, int64, error)
 	GetOrderSummary(ctx context.Context, customerID string) (*models.OrderSummaryResponse, error)
 	CalculatePrice(ctx context.Context, packageID string, licenseCount int) (*PriceCalculationResult, error)
+	CancelOrder(ctx context.Context, orderID, cuUserID string) (*models.CuOrder, error)
 	UpdateOrderStatus(ctx context.Context, orderID string, status string) error
 }
 
@@ -361,6 +362,44 @@ func (s *cuOrderService) GetOrder(ctx context.Context, orderID, cuUserID string)
 	}
 
 	return order, nil
+}
+
+func (s *cuOrderService) CancelOrder(ctx context.Context, orderID, cuUserID string) (*models.CuOrder, error) {
+	lang := pkgcontext.GetLanguageFromContext(ctx)
+
+	if orderID == "" || cuUserID == "" {
+		return nil, i18n.NewI18nError("900001", lang)
+	}
+
+	order, err := s.repo.GetByID(orderID)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, i18n.NewI18nError("601001", lang) // 订单不存在
+		}
+		return nil, i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	// 检查权限：只能取消自己的订单
+	if order.CuUserID != cuUserID {
+		return nil, i18n.NewI18nError("100005", lang) // 权限不足
+	}
+
+	switch order.Status {
+	case "cancelled":
+		// 幂等：已取消直接返回成功
+		return order, nil
+	case "paid":
+		return nil, i18n.NewI18nError("601006", lang) // 订单已支付，无法取消
+	case "pending":
+		order.Status = "cancelled"
+		if err := s.repo.Update(order); err != nil {
+			return nil, i18n.NewI18nError("900004", lang, err.Error())
+		}
+		return order, nil
+	default:
+		// 兜底：未知状态按不可取消处理
+		return nil, i18n.NewI18nError("601006", lang)
+	}
 }
 
 func (s *cuOrderService) GetUserOrders(ctx context.Context, cuUserID string, req *models.CuOrderListRequest) ([]*models.CuOrder, int64, error) {

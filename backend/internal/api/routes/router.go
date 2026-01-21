@@ -217,6 +217,7 @@ func SetupRouter() *gin.Engine {
 			cuAuth.POST("/orders/calculate", cuOrderHandler.CalculatePrice)
 			cuAuth.POST("/orders", cuOrderHandler.CreateOrder)
 			cuAuth.GET("/orders/:order_id", cuOrderHandler.GetOrder)
+			cuAuth.PUT("/orders/:order_id/cancel", cuOrderHandler.CancelOrder)
 			cuAuth.GET("/orders", cuOrderHandler.GetUserOrders)
 			cuAuth.GET("/orders/summary", cuOrderHandler.GetOrderSummary)
 
@@ -227,6 +228,8 @@ func SetupRouter() *gin.Engine {
 			// 授权码管理
 			cuAuth.POST("/authorization-codes/:codeId/share", cuAuthorizationHandler.ShareAuthorizationCode)
 			cuAuth.POST("/authorization-codes/product-activation-code", cuAuthorizationHandler.GetProductActivationCode)
+			cuAuth.GET("/authorization-codes", cuAuthorizationHandler.GetCuAuthorizationCodes)
+			cuAuth.GET("/authorization-codes/summary", cuAuthorizationHandler.GetCuAuthorizationCodeSummary)
 
 			// 设备管理
 			cuAuth.GET("/devices", cuDeviceHandler.GetDevices)

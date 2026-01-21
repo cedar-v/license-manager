@@ -368,6 +368,67 @@ func (h *CuOrderHandler) GetOrder(c *gin.Context) {
 	})
 }
 
+// CancelOrder 取消订单
+// @Summary 取消订单
+// @Description 取消当前用户的未支付订单（pending）；已支付订单不允许取消
+// @Tags 客户订单管理
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param order_id path string true "订单ID"
+// @Success 200 {object} models.APIResponse{data=models.CuOrderResponse} "成功"
+// @Failure 400
+// @Failure 401
+// @Failure 403
+// @Failure 404
+// @Failure 409
+// @Router /api/cu/orders/{order_id}/cancel [put]
+func (h *CuOrderHandler) CancelOrder(c *gin.Context) {
+	orderID := c.Param("order_id")
+	if orderID == "" {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	cuUserID, exists := c.Get("cu_user_id")
+	if !exists {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("100004", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	ctx := middleware.WithLanguage(c.Request.Context(), c)
+	order, err := h.cuOrderService.CancelOrder(ctx, orderID, cuUserID.(string))
+	if err != nil {
+		c.JSON(err.(*i18n.I18nError).HttpCode, models.ErrorResponse{
+			Code:      err.(*i18n.I18nError).Code,
+			Message:   err.(*i18n.I18nError).Message,
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	lang := middleware.GetLanguage(c)
+	successMsg := i18n.GetI18nErrorMessage("000000", lang)
+	c.JSON(http.StatusOK, models.APIResponse{
+		Code:      "000000",
+		Message:   successMsg,
+		Data:      order.ToResponse(),
+		Timestamp: getCurrentTimestamp(),
+	})
+}
+
 // GetUserOrders 获取用户订单列表
 // @Summary 获取用户订单列表
 // @Description 获取当前用户的订单列表，支持分页

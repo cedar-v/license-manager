@@ -92,6 +92,12 @@ type AuthorizationCodeRepository interface {
 
 	// UpdateMaxActivationsWithTx 在事务中更新授权码的最大激活次数
 	UpdateMaxActivationsWithTx(ctx context.Context, tx interface{}, authCodeID string, newMaxActivations int) error
+
+	// 用户端：查询用户授权码列表
+	GetCuAuthorizationCodeList(ctx context.Context, cuUserID string, req *models.CuAuthorizationCodeListRequest) (*models.CuAuthorizationCodeListResponse, error)
+
+	// 用户端：授权信息统计
+	GetCuAuthorizationCodeSummary(ctx context.Context, cuUserID string) (*models.CuAuthorizationCodeSummaryResponse, error)
 }
 
 // LicenseRepository 许可证数据访问接口

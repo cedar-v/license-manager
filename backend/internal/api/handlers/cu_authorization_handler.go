@@ -165,3 +165,114 @@ func (h *CuAuthorizationHandler) GetProductActivationCode(c *gin.Context) {
 		Data:    data,
 	})
 }
+
+// GetCuAuthorizationCodes 获取用户授权码列表
+// @Summary 获取用户授权码列表
+// @Description 获取当前登录用户的授权码列表，支持分页、状态筛选与授权码模糊搜索
+// @Tags 用户端授权码管理
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param page query int false "页码" default(1)
+// @Param page_size query int false "每页数量" default(10)
+// @Param status query string false "状态筛选" Enums(normal, locked, expired)
+// @Param search query string false "授权码模糊匹配"
+// @Success 200 {object} models.APIResponse{data=models.CuAuthorizationCodeListResponse} "成功"
+// @Failure 400 {object} models.ErrorResponse "请求参数无效"
+// @Failure 401 {object} models.ErrorResponse "未认证"
+// @Failure 500 {object} models.ErrorResponse "服务器内部错误"
+// @Router /api/cu/authorization-codes [get]
+func (h *CuAuthorizationHandler) GetCuAuthorizationCodes(c *gin.Context) {
+	claims := c.MustGet("cu_user").(*utils.CuClaims)
+
+	var req models.CuAuthorizationCodeListRequest
+	if err := c.ShouldBindQuery(&req); err != nil {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message + ": " + err.Error(),
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	ctx := middleware.WithLanguage(c.Request.Context(), c)
+	data, err := h.authCodeService.GetCuAuthorizationCodeList(ctx, claims.UserID, &req)
+	if err != nil {
+		i18nErr, ok := err.(*i18n.I18nError)
+		if ok {
+			c.JSON(i18nErr.HttpCode, models.ErrorResponse{
+				Code:      i18nErr.Code,
+				Message:   i18nErr.Message,
+				Timestamp: getCurrentTimestamp(),
+			})
+			return
+		}
+
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang, err.Error())
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	lang := middleware.GetLanguage(c)
+	successMessage := i18n.GetErrorMessage("000000", lang)
+	c.JSON(http.StatusOK, models.APIResponse{
+		Code:      "000000",
+		Message:   successMessage,
+		Data:      data,
+		Timestamp: getCurrentTimestamp(),
+	})
+}
+
+// GetCuAuthorizationCodeSummary 获取用户授权信息统计
+// @Summary 获取用户授权信息统计
+// @Description 获取当前登录用户的授权码统计信息
+// @Tags 用户端授权码管理
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} models.APIResponse{data=models.CuAuthorizationCodeSummaryResponse} "成功"
+// @Failure 401 {object} models.ErrorResponse "未认证"
+// @Failure 500 {object} models.ErrorResponse "服务器内部错误"
+// @Router /api/cu/authorization-codes/summary [get]
+func (h *CuAuthorizationHandler) GetCuAuthorizationCodeSummary(c *gin.Context) {
+	claims := c.MustGet("cu_user").(*utils.CuClaims)
+
+	ctx := middleware.WithLanguage(c.Request.Context(), c)
+	data, err := h.authCodeService.GetCuAuthorizationCodeSummary(ctx, claims.UserID)
+	if err != nil {
+		i18nErr, ok := err.(*i18n.I18nError)
+		if ok {
+			c.JSON(i18nErr.HttpCode, models.ErrorResponse{
+				Code:      i18nErr.Code,
+				Message:   i18nErr.Message,
+				Timestamp: getCurrentTimestamp(),
+			})
+			return
+		}
+
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900004", lang, err.Error())
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	lang := middleware.GetLanguage(c)
+	successMessage := i18n.GetErrorMessage("000000", lang)
+	c.JSON(http.StatusOK, models.APIResponse{
+		Code:      "000000",
+		Message:   successMessage,
+		Data:      data,
+		Timestamp: getCurrentTimestamp(),
+	})
+}

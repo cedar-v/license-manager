@@ -86,6 +86,7 @@ errors:
   cu_order:
       "601001": "Order does not exist"
       "601005": "License quantity exceeds limit"
+      "601006": "Order has been paid and cannot be cancelled"
 
   # System general (90xxxx)
   system:

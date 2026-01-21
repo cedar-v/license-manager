@@ -461,6 +461,53 @@ definitions:
         description: 总许可证数量
         type: integer
     type: object
+  models.CuAuthorizationCodeListItem:
+    properties:
+      code:
+        type: string
+      created_at:
+        type: string
+      current_activations:
+        type: integer
+      end_date:
+        type: string
+      id:
+        type: string
+      max_activations:
+        type: integer
+      remaining_activations:
+        type: integer
+      status:
+        type: string
+      status_display:
+        type: string
+    type: object
+  models.CuAuthorizationCodeListResponse:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/models.CuAuthorizationCodeListItem'
+        type: array
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  models.CuAuthorizationCodeSummaryResponse:
+    properties:
+      expired_count:
+        type: integer
+      total_count:
+        type: integer
+      valid_count:
+        type: integer
+      valid_max_activations_sum:
+        type: integer
+    type: object
   models.CuOrderCreateRequest:
     properties:
       license_count:
@@ -1612,6 +1659,63 @@ info:
   title: License Manager API
   version: "1.0"
 paths:
+  /api/cu/authorization-codes:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前登录用户的授权码列表，支持分页、状态筛选与授权码模糊搜索
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      - description: 状态筛选
+        enum:
+        - normal
+        - locked
+        - expired
+        in: query
+        name: status
+        type: string
+      - description: 授权码模糊匹配
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.CuAuthorizationCodeListResponse'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取用户授权码列表
+      tags:
+      - 用户端授权码管理
   /api/cu/authorization-codes/{codeId}/share:
     post:
       consumes:
@@ -1717,6 +1821,36 @@ paths:
       security:
       - BearerAuth: []
       summary: 获取产品激活码
+      tags:
+      - 用户端授权码管理
+  /api/cu/authorization-codes/summary:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前登录用户的授权码统计信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.CuAuthorizationCodeSummaryResponse'
+              type: object
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取用户授权信息统计
       tags:
       - 用户端授权码管理
   /api/cu/devices:
@@ -2097,6 +2231,44 @@ paths:
       security:
       - BearerAuth: []
       summary: 获取订单详情
+      tags:
+      - 客户订单管理
+  /api/cu/orders/{order_id}/cancel:
+    put:
+      consumes:
+      - application/json
+      description: 取消当前用户的未支付订单（pending）；已支付订单不允许取消
+      parameters:
+      - description: 订单ID
+        in: path
+        name: order_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.CuOrderResponse'
+              type: object
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+        "409":
+          description: Conflict
+      security:
+      - BearerAuth: []
+      summary: 取消订单
       tags:
       - 客户订单管理
   /api/cu/orders/calculate:
