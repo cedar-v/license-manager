@@ -47,6 +47,8 @@ func SetupRouter() *gin.Engine {
 	licenseRepo := repository.NewLicenseRepository(db)
 	dashboardRepo := repository.NewDashboardRepository(db)
 	paymentRepo := repository.NewPaymentRepository(db)
+	cuInvoiceRepo := repository.NewCuInvoiceRepository(db)
+	adminInvoiceRepo := repository.NewAdminInvoiceRepository(db)
 
 	// 获取logger实例
 	log := logger.GetLogger()
@@ -105,10 +107,14 @@ func SetupRouter() *gin.Engine {
 	cuDeviceHandler := handlers.NewCuDeviceHandler(cuDeviceService)
 	paymentHandler := handlers.NewPaymentHandler(paymentService)
 	cuAuthorizationHandler := handlers.NewCuAuthorizationHandler(authCodeService)
+	cuInvoiceService := service.NewCuInvoiceService(cuInvoiceRepo, cuOrderRepo, db)
+	cuInvoiceHandler := handlers.NewCuInvoiceHandler(cuInvoiceService)
 	enumHandler := handlers.NewEnumHandler(enumService)
 	authCodeHandler := handlers.NewAuthorizationCodeHandler(authCodeService)
 	licenseHandler := handlers.NewLicenseHandler(licenseService)
 	dashboardHandler := handlers.NewDashboardHandler(dashboardService)
+	adminInvoiceService := service.NewAdminInvoiceService(adminInvoiceRepo, cuOrderRepo, userRepo, cuUserRepo, db)
+	adminInvoiceHandler := handlers.NewAdminInvoiceHandler(adminInvoiceService)
 
 	// 健康检测接口（无需认证）
 	router.GET("/health", systemHandler.HealthCheck)
@@ -131,6 +137,9 @@ func SetupRouter() *gin.Engine {
 			// 支付回调接口
 			public.POST("/payment/alipay/callback", paymentHandler.AlipayCallback)
 			public.POST("/v1/payment/alipay/callback", paymentHandler.AlipayCallback)
+
+			// 公共发票下载接口
+			public.GET("/public/invoices/download", adminInvoiceHandler.DownloadByToken)
 		}
 
 		// 需要认证的接口
@@ -176,6 +185,14 @@ func SetupRouter() *gin.Engine {
 			// 仪表盘接口
 			auth.GET("/v1/dashboard/authorization-trend", dashboardHandler.GetAuthorizationTrend)
 			auth.GET("/v1/dashboard/recent-authorizations", dashboardHandler.GetRecentAuthorizations)
+
+			// 发票管理（管理员）
+			auth.GET("/v1/invoices", adminInvoiceHandler.GetAdminInvoices)
+			auth.GET("/v1/invoices/:id", adminInvoiceHandler.GetAdminInvoiceDetail)
+			auth.GET("/v1/invoices/summary", adminInvoiceHandler.GetAdminInvoiceSummary)
+			auth.POST("/v1/invoices/:id/reject", adminInvoiceHandler.RejectInvoice)
+			auth.POST("/v1/invoices/:id/issue", adminInvoiceHandler.IssueInvoice)
+			auth.POST("/v1/invoices/upload", adminInvoiceHandler.UploadInvoiceFile)
 		}
 
 		// 管理员接口
@@ -235,6 +252,13 @@ func SetupRouter() *gin.Engine {
 			cuAuth.GET("/devices", cuDeviceHandler.GetDevices)
 			cuAuth.GET("/devices/summary", cuDeviceHandler.GetDeviceSummary)
 			cuAuth.DELETE("/devices/:id", cuDeviceHandler.UnbindDevice)
+
+			// 发票管理
+			cuAuth.POST("/invoices", cuInvoiceHandler.CreateInvoice)
+			cuAuth.GET("/invoices", cuInvoiceHandler.GetUserInvoices)
+			cuAuth.GET("/invoices/:id", cuInvoiceHandler.GetUserInvoiceDetail)
+			cuAuth.GET("/invoices/summary", cuInvoiceHandler.GetUserInvoiceSummary)
+			cuAuth.GET("/invoices/:id/download", cuInvoiceHandler.DownloadInvoice)
 		}
 	}
 

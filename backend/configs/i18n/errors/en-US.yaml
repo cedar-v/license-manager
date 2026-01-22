@@ -95,6 +95,14 @@ errors:
     "900003": "Resource conflict"
     "900004": "Internal server error"
 
+  # Invoice module (70xxxx)
+  invoice:
+    "700001": "Invoice not found"
+    "700002": "Order not found or access denied"
+    "700003": "Invoice already exists for this order"
+    "700004": "Invoice status does not allow this operation"
+    "700005": "Invoice file not found"
+
 # Common text
 common:
   success: "Success"
@@ -159,6 +167,16 @@ enums:
     "lock": "Lock"
     "unlock": "Unlock"
     "other": "Other"
+
+  invoice_status:
+    "pending": "Pending"
+    "issued": "Issued"
+    "rejected": "Rejected"
+
+  invoice_type:
+    "personal": "Personal"
+    "enterprise": "Enterprise"
+    "vat_special": "VAT Special Invoice"
 
 # Default error message
 default_error: "Unknown error"

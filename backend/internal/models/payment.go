@@ -109,27 +109,27 @@ func (p *Payment) ToResponse() *PaymentResponse {
 
 // PaymentStatusResponse 支付状态响应结构
 type PaymentStatusResponse struct {
-	PaymentNo     string                `json:"payment_no"`
-	Status        string                `json:"status"`
-	Amount        float64               `json:"amount"`
-	PaymentTime   *time.Time            `json:"payment_time"`
-	TradeNo       *string               `json:"trade_no"`
-	BusinessOrder *PaymentBusinessOrder `json:"business_order,omitempty"`
+	PaymentNo     string                `json:"payment_no"`              // 支付单号
+	Status        string                `json:"status"`                  // 支付状态，pending-待支付/paid-已支付/cancelled-已取消/expired-已过期/failed-支付失败
+	Amount        float64               `json:"amount"`                  // 支付金额，单位元
+	PaymentTime   *time.Time            `json:"payment_time"`            // 支付完成时间
+	TradeNo       *string               `json:"trade_no"`                // 第三方交易号
+	BusinessOrder *PaymentBusinessOrder `json:"business_order,omitempty"` // 关联的业务订单信息
 }
 
 // PaymentBusinessOrder 支付关联的业务订单信息
 type PaymentBusinessOrder struct {
-	OrderNo           string  `json:"order_no"`
-	AuthorizationCode *string `json:"authorization_code"`
-	Status            string  `json:"status"`
+	OrderNo           string  `json:"order_no"`            // 订单号
+	AuthorizationCode *string `json:"authorization_code"` // 生成的授权码
+	Status            string  `json:"status"`              // 订单状态
 }
 
 // PaymentListResponse 支付列表响应结构
 type PaymentListResponse struct {
-	Payments   []*PaymentResponse `json:"payments"`
-	TotalCount int64              `json:"total_count"`
-	Page       int                `json:"page"`
-	PageSize   int                `json:"page_size"`
+	Payments   []*PaymentResponse `json:"payments"`     // 支付记录列表
+	TotalCount int64              `json:"total_count"`  // 总记录数
+	Page       int                `json:"page"`         // 当前页码
+	PageSize   int                `json:"page_size"`    // 每页条数
 }
 
 // 业务类型常量

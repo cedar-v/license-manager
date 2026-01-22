@@ -539,43 +539,60 @@ definitions:
   models.CuOrderResponse:
     properties:
       authorization_code:
+        description: 授权码，已支付订单生成
         type: string
       created_at:
+        description: 创建时间
         type: string
       cu_user_id:
+        description: 客户用户ID
         type: string
       customer_id:
+        description: 客户ID
         type: string
       discount_rate:
+        description: 折扣率，0.0-1.0之间
         type: number
       expired_at:
+        description: 订单过期时间
         type: string
       id:
+        description: 订单ID
         type: string
       license_count:
+        description: 许可数量
         type: integer
       order_no:
+        description: 订单号，格式如ORD202601210123456789
         type: string
       package_id:
+        description: 套餐ID
         type: string
       package_name:
+        description: 套餐名称
         type: string
       status:
+        description: 订单状态，pending-待支付/paid-已支付
         type: string
       total_amount:
+        description: 订单总金额，单位元
         type: number
       unit_price:
+        description: 单价，单位元
         type: number
       updated_at:
+        description: 更新时间
         type: string
     type: object
   models.CuUserChangePasswordRequest:
     properties:
       new_password:
+        description: 新密码，必填，8-50位
         maxLength: 50
         minLength: 8
         type: string
       old_password:
+        description: 旧密码，必填
         type: string
     required:
     - new_password
@@ -584,11 +601,12 @@ definitions:
   models.CuUserForgotPasswordRequest:
     properties:
       phone:
+        description: 手机号，必填，7-20位
         maxLength: 20
         minLength: 7
         type: string
       phone_country_code:
-        description: 可选，默认+86
+        description: 国家区号，可选，默认+86
         type: string
     required:
     - phone
@@ -596,23 +614,24 @@ definitions:
   models.CuUserLoginRequest:
     properties:
       login_type:
-        description: 登录类型：password 或 sms
+        description: 登录类型，必填，password-密码登录/sms-验证码登录
         enum:
         - password
         - sms
         type: string
       password:
-        description: 密码登录时必填
+        description: 密码，密码登录时必填
         type: string
       phone:
+        description: 手机号，必填，7-20位
         maxLength: 20
         minLength: 7
         type: string
       phone_country_code:
-        description: 可选，默认+86
+        description: 国家区号，可选，默认+86
         type: string
       sms_code:
-        description: 验证码登录时必填
+        description: 短信验证码，验证码登录时必填
         type: string
     required:
     - login_type
@@ -621,14 +640,16 @@ definitions:
   models.CuUserPhoneUpdateRequest:
     properties:
       current_sms_code:
-        description: 当前手机号验证码
+        description: 当前手机号验证码，必填，6位数字
         type: string
       new_phone:
+        description: 新手机号，必填，11位手机号
         type: string
       new_phone_country_code:
+        description: 新手机号国家区号，必填
         type: string
       new_sms_code:
-        description: 新手机号验证码
+        description: 新手机号验证码，必填，6位数字
         type: string
     required:
     - current_sms_code
@@ -639,50 +660,62 @@ definitions:
   models.CuUserProfileUpdateRequest:
     properties:
       additional_info:
+        description: 附加信息，可选，JSON格式
         type: string
       avatar_url:
+        description: 头像URL，可选，最大500字符
         maxLength: 500
         type: string
       email:
+        description: 邮箱，可选，格式为邮箱地址
         maxLength: 255
         type: string
       language:
+        description: 语言偏好，可选，zh-CN-中文/en-US-英文/ja-JP-日文
         enum:
         - zh-CN
         - en-US
         - ja-JP
         type: string
       real_name:
+        description: 真实姓名，可选，最大100字符
         maxLength: 100
         type: string
       remark:
+        description: 备注，可选，最大1000字符
         maxLength: 1000
         type: string
       timezone:
+        description: 时区，可选，最大50字符
         maxLength: 50
         type: string
     type: object
   models.CuUserRegisterRequest:
     properties:
       customer_id:
-        description: 可选，不提供则自动创建客户
+        description: 客户ID，可选，不提供则自动创建客户
         type: string
       email:
+        description: 邮箱，可选，格式为邮箱地址
         maxLength: 255
         type: string
       password:
+        description: 密码，必填，8-50位
         maxLength: 50
         minLength: 8
         type: string
       phone:
+        description: 手机号，必填，11位手机号
         type: string
       phone_country_code:
-        description: 可选，默认+86
+        description: 国家区号，可选，默认+86
         type: string
       real_name:
+        description: 真实姓名，可选，最大100字符
         maxLength: 100
         type: string
       sms_code:
+        description: 短信验证码，必填，6位数字
         type: string
     required:
     - password
@@ -692,17 +725,20 @@ definitions:
   models.CuUserResetPasswordRequest:
     properties:
       new_password:
+        description: 新密码，必填，8-50位
         maxLength: 50
         minLength: 8
         type: string
       phone:
+        description: 手机号，必填，7-20位
         maxLength: 20
         minLength: 7
         type: string
       phone_country_code:
-        description: 可选，默认+86
+        description: 国家区号，可选，默认+86
         type: string
       sms_code:
+        description: 短信验证码，必填，6位数字
         type: string
     required:
     - new_password
@@ -712,52 +748,72 @@ definitions:
   models.CuUserResponse:
     properties:
       additional_info:
+        description: 附加信息，JSON格式
         type: string
       avatar_url:
+        description: 头像URL
         type: string
       created_at:
+        description: 创建时间
         type: string
       customer_id:
+        description: 客户ID
         type: string
       email:
+        description: 邮箱
         type: string
       email_verified:
+        description: 邮箱是否已验证
         type: boolean
       id:
+        description: 用户ID
         type: string
       language:
+        description: 语言偏好
         type: string
       last_login_at:
+        description: 最后登录时间
         type: string
       last_login_ip:
+        description: 最后登录IP
         type: string
       phone:
+        description: 手机号
         type: string
       phone_country_code:
+        description: 国家区号
         type: string
       phone_verified:
+        description: 手机号是否已验证
         type: boolean
       real_name:
+        description: 真实姓名
         type: string
       remark:
+        description: 备注
         type: string
       status:
+        description: 账户状态，active-激活/disabled-禁用
         type: string
       timezone:
+        description: 时区
         type: string
       updated_at:
+        description: 更新时间
         type: string
       user_role:
+        description: 用户角色，admin-管理员/member-成员
         type: string
     type: object
   models.CuUserSendLoginSmsRequest:
     properties:
       phone:
+        description: 手机号，必填，7-20位
         maxLength: 20
         minLength: 7
         type: string
       phone_country_code:
-        description: 可选，默认+86
+        description: 国家区号，可选，默认+86
         type: string
     required:
     - phone
@@ -765,11 +821,12 @@ definitions:
   models.CuUserSendNewPhoneSmsRequest:
     properties:
       new_phone:
+        description: 新手机号，必填，7-20位
         maxLength: 20
         minLength: 7
         type: string
       new_phone_country_code:
-        description: 可选，默认+86
+        description: 新手机号国家区号，可选，默认+86
         type: string
     required:
     - new_phone
@@ -777,11 +834,12 @@ definitions:
   models.CuUserSendRegisterSmsRequest:
     properties:
       phone:
+        description: 手机号，必填，7-20位
         maxLength: 20
         minLength: 7
         type: string
       phone_country_code:
-        description: 可选，默认+86
+        description: 国家区号，可选，默认+86
         type: string
     required:
     - phone
@@ -1208,6 +1266,290 @@ definitions:
         description: 许可证状态
         type: string
     type: object
+  models.InvoiceCreateRequest:
+    properties:
+      content:
+        description: 开票内容，必填，最大200字符
+        maxLength: 200
+        type: string
+      invoice_type:
+        description: 发票类型，必填，personal-个人/enterprise-企业普票/vat_special-增值税专用发票
+        enum:
+        - personal
+        - enterprise
+        - vat_special
+        type: string
+      order_id:
+        description: 订单ID，必填
+        type: string
+      receiver_email:
+        description: 收票邮箱，必填，格式为邮箱地址
+        type: string
+      remark:
+        description: 备注，可选
+        type: string
+      taxpayer_id:
+        description: 纳税人识别号，企业发票必填，个人发票可为空
+        type: string
+      title:
+        description: 发票抬头，必填，最大200字符
+        maxLength: 200
+        type: string
+    required:
+    - content
+    - invoice_type
+    - order_id
+    - receiver_email
+    - title
+    type: object
+  models.InvoiceDetailResponse:
+    properties:
+      amount:
+        description: 发票金额，单位元，保留2位小数
+        type: number
+      applicant_name:
+        description: 发票申请人真实姓名
+        type: string
+      applicant_phone:
+        description: 发票申请人电话号码
+        type: string
+      content:
+        description: 开票内容
+        type: string
+      created_at:
+        description: 创建时间
+        type: string
+      cu_user_id:
+        description: 申请人客户用户ID
+        type: string
+      customer_id:
+        description: 客户ID
+        type: string
+      download_token:
+        description: 下载令牌，用于邮件链接下载
+        type: string
+      id:
+        description: 发票ID
+        type: string
+      invoice_file_url:
+        description: 发票文件下载URL，已开票后填写
+        type: string
+      invoice_no:
+        description: 发票申请号，格式如INV202601210123456789
+        type: string
+      invoice_type:
+        description: 发票类型，personal-个人/enterprise-企业普票/vat_special-增值税专用发票
+        type: string
+      invoice_type_display:
+        description: 发票类型显示文本，根据当前语言显示
+        type: string
+      issued_at:
+        description: 发票开票完成时间
+        type: string
+      order_id:
+        description: 关联的订单ID
+        type: string
+      order_no:
+        description: 关联的订单号
+        type: string
+      order_package_name:
+        description: 关联订单的套餐名称
+        type: string
+      receiver_email:
+        description: 收票邮箱
+        type: string
+      reject_reason:
+        description: 驳回原因，已驳回时填写
+        type: string
+      rejected_at:
+        description: 驳回时间
+        type: string
+      rejected_by:
+        description: 驳回人ID（管理员）
+        type: string
+      rejecter_name:
+        description: 发票驳回人姓名（管理员）
+        type: string
+      remark:
+        description: 备注信息
+        type: string
+      status:
+        description: 发票状态，pending-待处理/issued-已开票/rejected-已驳回
+        type: string
+      status_display:
+        description: 发票状态显示文本，根据当前语言显示
+        type: string
+      suggestion:
+        description: 修改建议，已驳回时填写
+        type: string
+      taxpayer_id:
+        description: 纳税人识别号，企业发票填写
+        type: string
+      title:
+        description: 发票抬头
+        type: string
+      updated_at:
+        description: 更新时间
+        type: string
+      uploaded_at:
+        description: 发票文件上传时间
+        type: string
+      uploaded_by:
+        description: 发票文件上传人ID（管理员）
+        type: string
+      uploader_name:
+        description: 发票文件上传人姓名（管理员）
+        type: string
+    type: object
+  models.InvoiceIssueRequest:
+    properties:
+      invoice_file_url:
+        description: 发票文件URL，必填，最大500字符
+        maxLength: 500
+        type: string
+      issued_at:
+        description: 开票时间，必填，ISO 8601格式时间字符串
+        type: string
+    required:
+    - invoice_file_url
+    - issued_at
+    type: object
+  models.InvoiceListResponse:
+    properties:
+      invoices:
+        description: 发票列表
+        items:
+          $ref: '#/definitions/models.InvoiceResponse'
+        type: array
+      page:
+        description: 当前页码
+        type: integer
+      page_size:
+        description: 每页条数
+        type: integer
+      total_count:
+        description: 总记录数
+        type: integer
+    type: object
+  models.InvoiceRejectRequest:
+    properties:
+      reject_reason:
+        description: 驳回原因，必填，最大500字符
+        maxLength: 500
+        type: string
+      suggestion:
+        description: 修改建议，必填，最大500字符
+        maxLength: 500
+        type: string
+    required:
+    - reject_reason
+    - suggestion
+    type: object
+  models.InvoiceResponse:
+    properties:
+      amount:
+        description: 发票金额，单位元，保留2位小数
+        type: number
+      content:
+        description: 开票内容
+        type: string
+      created_at:
+        description: 创建时间
+        type: string
+      cu_user_id:
+        description: 申请人客户用户ID
+        type: string
+      customer_id:
+        description: 客户ID
+        type: string
+      download_token:
+        description: 下载令牌，用于邮件链接下载
+        type: string
+      id:
+        description: 发票ID
+        type: string
+      invoice_file_url:
+        description: 发票文件下载URL，已开票后填写
+        type: string
+      invoice_no:
+        description: 发票申请号，格式如INV202601210123456789
+        type: string
+      invoice_type:
+        description: 发票类型，personal-个人/enterprise-企业普票/vat_special-增值税专用发票
+        type: string
+      invoice_type_display:
+        description: 发票类型显示文本，根据当前语言显示
+        type: string
+      issued_at:
+        description: 发票开票完成时间
+        type: string
+      order_id:
+        description: 关联的订单ID
+        type: string
+      order_no:
+        description: 关联的订单号
+        type: string
+      receiver_email:
+        description: 收票邮箱
+        type: string
+      reject_reason:
+        description: 驳回原因，已驳回时填写
+        type: string
+      rejected_at:
+        description: 驳回时间
+        type: string
+      rejected_by:
+        description: 驳回人ID（管理员）
+        type: string
+      remark:
+        description: 备注信息
+        type: string
+      status:
+        description: 发票状态，pending-待处理/issued-已开票/rejected-已驳回
+        type: string
+      status_display:
+        description: 发票状态显示文本，根据当前语言显示
+        type: string
+      suggestion:
+        description: 修改建议，已驳回时填写
+        type: string
+      taxpayer_id:
+        description: 纳税人识别号，企业发票填写
+        type: string
+      title:
+        description: 发票抬头
+        type: string
+      updated_at:
+        description: 更新时间
+        type: string
+      uploaded_at:
+        description: 发票文件上传时间
+        type: string
+      uploaded_by:
+        description: 发票文件上传人ID（管理员）
+        type: string
+    type: object
+  models.InvoiceSummaryResponse:
+    properties:
+      issued_count:
+        description: 已开票发票数量
+        type: integer
+      pending_count:
+        description: 待处理发票数量
+        type: integer
+      rejected_count:
+        description: 已驳回发票数量
+        type: integer
+      total_count:
+        description: 发票总数
+        type: integer
+    type: object
+  models.InvoiceUploadResponse:
+    properties:
+      file_url:
+        description: 上传后的文件URL
+        type: string
+    type: object
   models.License:
     properties:
       activated_at:
@@ -1442,23 +1784,30 @@ definitions:
   models.PaymentBusinessOrder:
     properties:
       authorization_code:
+        description: 生成的授权码
         type: string
       order_no:
+        description: 订单号
         type: string
       status:
+        description: 订单状态
         type: string
     type: object
   models.PaymentListResponse:
     properties:
       page:
+        description: 当前页码
         type: integer
       page_size:
+        description: 每页条数
         type: integer
       payments:
+        description: 支付记录列表
         items:
           $ref: '#/definitions/models.PaymentResponse'
         type: array
       total_count:
+        description: 总记录数
         type: integer
     type: object
   models.PaymentResponse:
@@ -1501,16 +1850,23 @@ definitions:
   models.PaymentStatusResponse:
     properties:
       amount:
+        description: 支付金额，单位元
         type: number
       business_order:
-        $ref: '#/definitions/models.PaymentBusinessOrder'
+        allOf:
+        - $ref: '#/definitions/models.PaymentBusinessOrder'
+        description: 关联的业务订单信息
       payment_no:
+        description: 支付单号
         type: string
       payment_time:
+        description: 支付完成时间
         type: string
       status:
+        description: 支付状态，pending-待支付/paid-已支付/cancelled-已取消/expired-已过期/failed-支付失败
         type: string
       trade_no:
+        description: 第三方交易号
         type: string
     type: object
   models.ProductActivationCodeRequest:
@@ -2015,6 +2371,214 @@ paths:
       summary: 忘记密码 - 发送验证码
       tags:
       - 客户用户管理
+  /api/cu/invoices:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前客户的发票列表
+      parameters:
+      - description: 页码，默认1
+        in: query
+        minimum: 1
+        name: page
+        type: integer
+      - description: 每页条数，默认10，最大100
+        in: query
+        maximum: 100
+        minimum: 1
+        name: page_size
+        type: integer
+      - description: 状态筛选，pending-待处理/issued-已开票/rejected-已驳回
+        in: query
+        name: status
+        type: string
+      - description: 搜索关键词，支持发票号或订单号模糊匹配
+        in: query
+        name: search
+        type: string
+      - description: 申请日期筛选，格式YYYY-MM-DD
+        in: query
+        name: apply_date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.InvoiceListResponse'
+              type: object
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 客户发票列表
+      tags:
+      - 发票管理
+    post:
+      consumes:
+      - application/json
+      description: 客户为已支付的订单申请发票
+      parameters:
+      - description: 发票申请请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.InvoiceCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  properties:
+                    id:
+                      type: string
+                    invoice_no:
+                      type: string
+                    status:
+                      type: string
+                  type: object
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 客户申请发票
+      tags:
+      - 发票管理
+  /api/cu/invoices/{id}:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定发票的详细信息
+      parameters:
+      - description: 发票ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.InvoiceResponse'
+              type: object
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 发票不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 客户发票详情
+      tags:
+      - 发票管理
+  /api/cu/invoices/{id}/download:
+    get:
+      consumes:
+      - application/json
+      description: 下载指定发票的文件
+      parameters:
+      - description: 发票ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/pdf
+      responses:
+        "200":
+          description: 发票文件
+          schema:
+            type: file
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 发票不存在或文件不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 客户发票下载
+      tags:
+      - 发票管理
+  /api/cu/invoices/summary:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前客户的发票统计汇总信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.InvoiceSummaryResponse'
+              type: object
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 客户发票汇总信息
+      tags:
+      - 发票管理
   /api/cu/login:
     post:
       consumes:
@@ -2237,7 +2801,7 @@ paths:
     put:
       consumes:
       - application/json
-      description: 取消当前用户的未支付订单（pending）；已支付订单不允许取消
+      description: 删除当前用户的订单记录
       parameters:
       - description: 订单ID
         in: path
@@ -2250,12 +2814,7 @@ paths:
         "200":
           description: 成功
           schema:
-            allOf:
-            - $ref: '#/definitions/models.APIResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/models.CuOrderResponse'
-              type: object
+            $ref: '#/definitions/models.APIResponse'
         "400":
           description: Bad Request
         "401":
@@ -2268,7 +2827,7 @@ paths:
           description: Conflict
       security:
       - BearerAuth: []
-      summary: 取消订单
+      summary: 删除订单
       tags:
       - 客户订单管理
   /api/cu/orders/calculate:
@@ -3279,6 +3838,39 @@ paths:
       summary: 获取用户支付历史
       tags:
       - 支付管理
+  /api/public/invoices/download:
+    get:
+      consumes:
+      - application/json
+      description: 通过下载token下载发票文件，无需登录验证
+      parameters:
+      - description: 下载token
+        in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/pdf
+      responses:
+        "200":
+          description: 发票文件
+          schema:
+            type: file
+        "400":
+          description: token无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 文件不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 公共发票下载
+      tags:
+      - 发票管理
   /api/v1/activate:
     post:
       consumes:
@@ -3972,6 +4564,291 @@ paths:
       summary: 心跳检测
       tags:
       - 许可证激活
+  /api/v1/invoices:
+    get:
+      consumes:
+      - application/json
+      description: 管理员查看所有发票列表，支持按客户筛选
+      parameters:
+      - description: 页码，默认1
+        in: query
+        minimum: 1
+        name: page
+        type: integer
+      - description: 每页条数，默认10，最大100
+        in: query
+        maximum: 100
+        minimum: 1
+        name: page_size
+        type: integer
+      - description: 状态筛选，pending-待处理/issued-已开票/rejected-已驳回
+        in: query
+        name: status
+        type: string
+      - description: 搜索关键词，支持发票号或订单号模糊匹配
+        in: query
+        name: search
+        type: string
+      - description: 申请日期筛选，格式YYYY-MM-DD
+        in: query
+        name: apply_date
+        type: string
+      - description: 客户ID筛选
+        in: query
+        name: customer_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.InvoiceListResponse'
+              type: object
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 管理员发票列表
+      tags:
+      - 发票管理
+  /api/v1/invoices/{id}:
+    get:
+      consumes:
+      - application/json
+      description: 管理员查看发票详细信息，包含关联信息
+      parameters:
+      - description: 发票ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.InvoiceDetailResponse'
+              type: object
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 发票不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 管理员发票详情
+      tags:
+      - 发票管理
+  /api/v1/invoices/{id}/issue:
+    post:
+      consumes:
+      - application/json
+      description: 管理员为发票开票，上传发票文件并设置开票时间
+      parameters:
+      - description: 发票ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 开票请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.InvoiceIssueRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.InvoiceResponse'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 发票不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 管理员发票开票
+      tags:
+      - 发票管理
+  /api/v1/invoices/{id}/reject:
+    post:
+      consumes:
+      - application/json
+      description: 管理员驳回发票申请，需要填写驳回原因和修改建议
+      parameters:
+      - description: 发票ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 驳回请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.InvoiceRejectRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.InvoiceResponse'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 发票不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 管理员发票驳回
+      tags:
+      - 发票管理
+  /api/v1/invoices/summary:
+    get:
+      consumes:
+      - application/json
+      description: 管理员查看全平台的发票统计汇总信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.InvoiceSummaryResponse'
+              type: object
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 管理员发票汇总信息
+      tags:
+      - 发票管理
+  /api/v1/invoices/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 管理员上传发票PDF文件
+      parameters:
+      - description: 发票申请号
+        in: formData
+        name: invoice_no
+        required: true
+        type: string
+      - description: 发票PDF文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.InvoiceUploadResponse'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 管理端发票文件上传
+      tags:
+      - 发票管理
   /api/v1/licenses:
     get:
       consumes:

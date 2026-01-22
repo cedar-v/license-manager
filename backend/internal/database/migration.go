@@ -29,6 +29,7 @@ func AutoMigrate() error {
 		&models.AuthorizationCode{},
 		&models.License{},
 		&models.AuthorizationChange{},
+		&models.Invoice{}, // 发票表
 	)
 	if err != nil {
 		return fmt.Errorf("failed to migrate database: %w", err)

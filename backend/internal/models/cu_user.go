@@ -76,54 +76,55 @@ func (u *CuUser) IsAccountLocked() bool {
 }
 
 // CuUserRegisterRequest 客户用户注册请求结构
+// CuUserRegisterRequest 客户用户注册请求结构
 type CuUserRegisterRequest struct {
-	Phone            string  `json:"phone" binding:"required,len=11"`
-	PhoneCountryCode string  `json:"phone_country_code" binding:"omitempty"` // 可选，默认+86
-	SmsCode          string  `json:"sms_code" binding:"required,len=6"`
-	CustomerID       string  `json:"customer_id" binding:"omitempty"` // 可选，不提供则自动创建客户
-	Password         string  `json:"password" binding:"required,min=8,max=50"`
-	RealName         *string `json:"real_name" binding:"omitempty,max=100"`
-	Email            *string `json:"email" binding:"omitempty,email,max=255"`
+	Phone            string  `json:"phone" binding:"required,len=11"`        // 手机号，必填，11位手机号
+	PhoneCountryCode string  `json:"phone_country_code" binding:"omitempty"` // 国家区号，可选，默认+86
+	SmsCode          string  `json:"sms_code" binding:"required,len=6"`      // 短信验证码，必填，6位数字
+	CustomerID       string  `json:"customer_id" binding:"omitempty"`        // 客户ID，可选，不提供则自动创建客户
+	Password         string  `json:"password" binding:"required,min=8,max=50"` // 密码，必填，8-50位
+	RealName         *string `json:"real_name" binding:"omitempty,max=100"`  // 真实姓名，可选，最大100字符
+	Email            *string `json:"email" binding:"omitempty,email,max=255"` // 邮箱，可选，格式为邮箱地址
 }
 
 // CuUserLoginRequest 客户用户登录请求结构
 type CuUserLoginRequest struct {
-	Phone            string `json:"phone" binding:"required,min=7,max=20"`
-	PhoneCountryCode string `json:"phone_country_code" binding:"omitempty"`           // 可选，默认+86
-	Password         string `json:"password"`                                         // 密码登录时必填
-	SmsCode          string `json:"sms_code"`                                         // 验证码登录时必填
-	LoginType        string `json:"login_type" binding:"required,oneof=password sms"` // 登录类型：password 或 sms
+	Phone            string `json:"phone" binding:"required,min=7,max=20"`           // 手机号，必填，7-20位
+	PhoneCountryCode string `json:"phone_country_code" binding:"omitempty"`          // 国家区号，可选，默认+86
+	Password         string `json:"password"`                                        // 密码，密码登录时必填
+	SmsCode          string `json:"sms_code"`                                        // 短信验证码，验证码登录时必填
+	LoginType        string `json:"login_type" binding:"required,oneof=password sms"` // 登录类型，必填，password-密码登录/sms-验证码登录
 }
 
 // CuUserProfileUpdateRequest 客户用户资料更新请求结构
 type CuUserProfileUpdateRequest struct {
-	RealName       *string `json:"real_name" binding:"omitempty,max=100"`
-	Email          *string `json:"email" binding:"omitempty,email,max=255"`
-	AvatarURL      *string `json:"avatar_url" binding:"omitempty,max=500"`
-	Language       *string `json:"language" binding:"omitempty,oneof=zh-CN en-US ja-JP"`
-	Timezone       *string `json:"timezone" binding:"omitempty,max=50"`
-	AdditionalInfo *string `json:"additional_info" binding:"omitempty"`
-	Remark         *string `json:"remark" binding:"omitempty,max=1000"`
+	RealName       *string `json:"real_name" binding:"omitempty,max=100"`              // 真实姓名，可选，最大100字符
+	Email          *string `json:"email" binding:"omitempty,email,max=255"`           // 邮箱，可选，格式为邮箱地址
+	AvatarURL      *string `json:"avatar_url" binding:"omitempty,max=500"`            // 头像URL，可选，最大500字符
+	Language       *string `json:"language" binding:"omitempty,oneof=zh-CN en-US ja-JP"` // 语言偏好，可选，zh-CN-中文/en-US-英文/ja-JP-日文
+	Timezone       *string `json:"timezone" binding:"omitempty,max=50"`               // 时区，可选，最大50字符
+	AdditionalInfo *string `json:"additional_info" binding:"omitempty"`                // 附加信息，可选，JSON格式
+	Remark         *string `json:"remark" binding:"omitempty,max=1000"`                // 备注，可选，最大1000字符
 }
 
 // CuUserPhoneUpdateRequest 客户用户手机号更新请求结构
 type CuUserPhoneUpdateRequest struct {
-	NewPhone            string `json:"new_phone" binding:"required,len=11"`
-	NewPhoneCountryCode string `json:"new_phone_country_code" binding:"required"`
-	CurrentSmsCode      string `json:"current_sms_code" binding:"required,len=6"` // 当前手机号验证码
-	NewSmsCode          string `json:"new_sms_code" binding:"required,len=6"`     // 新手机号验证码
+	NewPhone            string `json:"new_phone" binding:"required,len=11"`        // 新手机号，必填，11位手机号
+	NewPhoneCountryCode string `json:"new_phone_country_code" binding:"required"`  // 新手机号国家区号，必填
+	CurrentSmsCode      string `json:"current_sms_code" binding:"required,len=6"` // 当前手机号验证码，必填，6位数字
+	NewSmsCode          string `json:"new_sms_code" binding:"required,len=6"`     // 新手机号验证码，必填，6位数字
 }
 
 // CuUserSendRegisterSmsRequest 注册发送验证码请求结构
 type CuUserSendRegisterSmsRequest struct {
-	Phone            string `json:"phone" binding:"required,min=7,max=20"`
-	PhoneCountryCode string `json:"phone_country_code" binding:"omitempty"` // 可选，默认+86
+	Phone            string `json:"phone" binding:"required,min=7,max=20"`      // 手机号，必填，7-20位
+	PhoneCountryCode string `json:"phone_country_code" binding:"omitempty"`     // 国家区号，可选，默认+86
 }
 
 // CuUserSendLoginSmsRequest 发送登录验证码请求结构
 type CuUserSendLoginSmsRequest struct {
-	Phone            string `json:"phone" binding:"required,min=7,max=20"`
-	PhoneCountryCode string `json:"phone_country_code" binding:"omitempty"` // 可选，默认+86
+	Phone            string `json:"phone" binding:"required,min=7,max=20"`      // 手机号，必填，7-20位
+	PhoneCountryCode string `json:"phone_country_code" binding:"omitempty"`     // 国家区号，可选，默认+86
 }
 
 // CuUserSendCurrentPhoneSmsRequest 发送当前手机号验证码请求结构
@@ -133,51 +134,51 @@ type CuUserSendCurrentPhoneSmsRequest struct {
 
 // CuUserSendNewPhoneSmsRequest 发送新手机号验证码请求结构
 type CuUserSendNewPhoneSmsRequest struct {
-	NewPhone            string `json:"new_phone" binding:"required,min=7,max=20"`
-	NewPhoneCountryCode string `json:"new_phone_country_code" binding:"omitempty"` // 可选，默认+86
+	NewPhone            string `json:"new_phone" binding:"required,min=7,max=20"` // 新手机号，必填，7-20位
+	NewPhoneCountryCode string `json:"new_phone_country_code" binding:"omitempty"`  // 新手机号国家区号，可选，默认+86
 }
 
 // CuUserForgotPasswordRequest 忘记密码请求结构（发送重置验证码）
 type CuUserForgotPasswordRequest struct {
-	Phone            string `json:"phone" binding:"required,min=7,max=20"`
-	PhoneCountryCode string `json:"phone_country_code" binding:"omitempty"` // 可选，默认+86
+	Phone            string `json:"phone" binding:"required,min=7,max=20"`      // 手机号，必填，7-20位
+	PhoneCountryCode string `json:"phone_country_code" binding:"omitempty"`     // 国家区号，可选，默认+86
 }
 
 // CuUserResetPasswordRequest 重置密码请求结构
 type CuUserResetPasswordRequest struct {
-	Phone            string `json:"phone" binding:"required,min=7,max=20"`
-	PhoneCountryCode string `json:"phone_country_code" binding:"omitempty"` // 可选，默认+86
-	SmsCode          string `json:"sms_code" binding:"required,len=6"`
-	NewPassword      string `json:"new_password" binding:"required,min=8,max=50"`
+	Phone            string `json:"phone" binding:"required,min=7,max=20"`      // 手机号，必填，7-20位
+	PhoneCountryCode string `json:"phone_country_code" binding:"omitempty"`     // 国家区号，可选，默认+86
+	SmsCode          string `json:"sms_code" binding:"required,len=6"`          // 短信验证码，必填，6位数字
+	NewPassword      string `json:"new_password" binding:"required,min=8,max=50"` // 新密码，必填，8-50位
 }
 
 // CuUserChangePasswordRequest 修改密码请求结构
 type CuUserChangePasswordRequest struct {
-	OldPassword string `json:"old_password" binding:"required"`
-	NewPassword string `json:"new_password" binding:"required,min=8,max=50"`
+	OldPassword string `json:"old_password" binding:"required"`                 // 旧密码，必填
+	NewPassword string `json:"new_password" binding:"required,min=8,max=50"`     // 新密码，必填，8-50位
 }
 
 // CuUserResponse 用户信息响应结构（用于API，避免暴露敏感字段）
 type CuUserResponse struct {
-	ID               string  `json:"id"`
-	CustomerID       string  `json:"customer_id"`
-	Phone            string  `json:"phone"`
-	PhoneCountryCode string  `json:"phone_country_code"`
-	UserRole         string  `json:"user_role"`
-	RealName         *string `json:"real_name"`
-	Email            *string `json:"email"`
-	Status           string  `json:"status"`
-	PhoneVerified    bool    `json:"phone_verified"`
-	EmailVerified    bool    `json:"email_verified"`
-	LastLoginAt      *string `json:"last_login_at,omitempty"`
-	LastLoginIP      *string `json:"last_login_ip,omitempty"`
-	AvatarURL        *string `json:"avatar_url"`
-	Language         string  `json:"language"`
-	Timezone         string  `json:"timezone"`
-	AdditionalInfo   *string `json:"additional_info"`
-	Remark           *string `json:"remark"`
-	CreatedAt        string  `json:"created_at"`
-	UpdatedAt        string  `json:"updated_at"`
+	ID               string  `json:"id"`                              // 用户ID
+	CustomerID       string  `json:"customer_id"`                    // 客户ID
+	Phone            string  `json:"phone"`                          // 手机号
+	PhoneCountryCode string  `json:"phone_country_code"`             // 国家区号
+	UserRole         string  `json:"user_role"`                      // 用户角色，admin-管理员/member-成员
+	RealName         *string `json:"real_name"`                      // 真实姓名
+	Email            *string `json:"email"`                          // 邮箱
+	Status           string  `json:"status"`                         // 账户状态，active-激活/disabled-禁用
+	PhoneVerified    bool    `json:"phone_verified"`                // 手机号是否已验证
+	EmailVerified    bool    `json:"email_verified"`                // 邮箱是否已验证
+	LastLoginAt      *string `json:"last_login_at,omitempty"`        // 最后登录时间
+	LastLoginIP      *string `json:"last_login_ip,omitempty"`        // 最后登录IP
+	AvatarURL        *string `json:"avatar_url"`                    // 头像URL
+	Language         string  `json:"language"`                      // 语言偏好
+	Timezone         string  `json:"timezone"`                      // 时区
+	AdditionalInfo   *string `json:"additional_info"`               // 附加信息，JSON格式
+	Remark           *string `json:"remark"`                         // 备注
+	CreatedAt        string  `json:"created_at"`                    // 创建时间
+	UpdatedAt        string  `json:"updated_at"`                    // 更新时间
 }
 
 // ToResponse 转换为响应结构

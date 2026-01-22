@@ -75,21 +75,21 @@ type CuOrderListRequest struct {
 
 // CuOrderResponse 订单响应结构
 type CuOrderResponse struct {
-	ID                string     `json:"id"`
-	OrderNo           string     `json:"order_no"`
-	CustomerID        string     `json:"customer_id"`
-	CuUserID          string     `json:"cu_user_id"`
-	PackageID         string     `json:"package_id"`
-	PackageName       string     `json:"package_name"`
-	LicenseCount      int        `json:"license_count"`
-	UnitPrice         float64    `json:"unit_price"`
-	DiscountRate      float64    `json:"discount_rate"`
-	TotalAmount       float64    `json:"total_amount"`
-	Status            string     `json:"status"`
-	AuthorizationCode *string    `json:"authorization_code"`
-	ExpiredAt         *time.Time `json:"expired_at"`
-	CreatedAt         time.Time  `json:"created_at"`
-	UpdatedAt         time.Time  `json:"updated_at"`
+	ID                string     `json:"id"`                 // 订单ID
+	OrderNo           string     `json:"order_no"`           // 订单号，格式如ORD202601210123456789
+	CustomerID        string     `json:"customer_id"`        // 客户ID
+	CuUserID          string     `json:"cu_user_id"`         // 客户用户ID
+	PackageID         string     `json:"package_id"`         // 套餐ID
+	PackageName       string     `json:"package_name"`       // 套餐名称
+	LicenseCount      int        `json:"license_count"`      // 许可数量
+	UnitPrice         float64    `json:"unit_price"`         // 单价，单位元
+	DiscountRate      float64    `json:"discount_rate"`      // 折扣率，0.0-1.0之间
+	TotalAmount       float64    `json:"total_amount"`       // 订单总金额，单位元
+	Status            string     `json:"status"`             // 订单状态，pending-待支付/paid-已支付
+	AuthorizationCode *string    `json:"authorization_code"` // 授权码，已支付订单生成
+	ExpiredAt         *time.Time `json:"expired_at"`         // 订单过期时间
+	CreatedAt         time.Time  `json:"created_at"`         // 创建时间
+	UpdatedAt         time.Time  `json:"updated_at"`         // 更新时间
 }
 
 // ToResponse 转换为响应结构

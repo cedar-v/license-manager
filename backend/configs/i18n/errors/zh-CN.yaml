@@ -92,6 +92,14 @@ errors:
   cu_device:
     "620001": "设备不存在或无权限访问"
 
+  # 发票模块 (70xxxx)
+  invoice:
+    "700001": "发票不存在"
+    "700002": "订单不存在或无权限访问"
+    "700003": "该订单已存在发票申请"
+    "700004": "发票状态不允许操作"
+    "700005": "发票文件不存在"
+
   # 系统通用 (90xxxx)
   system:
     "900001": "请求参数无效"
@@ -163,6 +171,16 @@ enums:
     "lock": "锁定"
     "unlock": "解锁"
     "other": "其他"
+
+  invoice_status:
+    "pending": "待处理"
+    "issued": "已开票"
+    "rejected": "已驳回"
+
+  invoice_type:
+    "personal": "个人"
+    "enterprise": "企业普票"
+    "vat_special": "增值税专用发票"
 
 # 默认错误信息
 default_error: "未知错误"

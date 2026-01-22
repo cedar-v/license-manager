@@ -600,6 +600,338 @@
                 }
             }
         },
+        "/api/cu/invoices": {
+            "get": {
+                "description": "获取当前客户的发票列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "发票管理"
+                ],
+                "summary": "客户发票列表",
+                "parameters": [
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "页码，默认1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "每页条数，默认10，最大100",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "状态筛选，pending-待处理/issued-已开票/rejected-已驳回",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "搜索关键词，支持发票号或订单号模糊匹配",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "申请日期筛选，格式YYYY-MM-DD",
+                        "name": "apply_date",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.InvoiceListResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "客户为已支付的订单申请发票",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "发票管理"
+                ],
+                "summary": "客户申请发票",
+                "parameters": [
+                    {
+                        "description": "发票申请请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.InvoiceCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "invoice_no": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "权限不足",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cu/invoices/summary": {
+            "get": {
+                "description": "获取当前客户的发票统计汇总信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "发票管理"
+                ],
+                "summary": "客户发票汇总信息",
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.InvoiceSummaryResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cu/invoices/{id}": {
+            "get": {
+                "description": "获取指定发票的详细信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "发票管理"
+                ],
+                "summary": "客户发票详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "发票ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.InvoiceResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "权限不足",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "发票不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cu/invoices/{id}/download": {
+            "get": {
+                "description": "下载指定发票的文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/pdf"
+                ],
+                "tags": [
+                    "发票管理"
+                ],
+                "summary": "客户发票下载",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "发票ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "发票文件",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "权限不足",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "发票不存在或文件不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/cu/login": {
             "post": {
                 "description": "通过手机号和密码或短信验证码登录客户用户账号",
@@ -1105,7 +1437,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "取消当前用户的未支付订单（pending）；已支付订单不允许取消",
+                "description": "删除当前用户的订单记录",
                 "consumes": [
                     "application/json"
                 ],
@@ -1115,7 +1447,7 @@
                 "tags": [
                     "客户订单管理"
                 ],
-                "summary": "取消订单",
+                "summary": "删除订单",
                 "parameters": [
                     {
                         "type": "string",
@@ -1129,19 +1461,7 @@
                     "200": {
                         "description": "成功",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.APIResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/models.CuOrderResponse"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.APIResponse"
                         }
                     },
                     "400": {
@@ -2637,6 +2957,56 @@
                 }
             }
         },
+        "/api/public/invoices/download": {
+            "get": {
+                "description": "通过下载token下载发票文件，无需登录验证",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/pdf"
+                ],
+                "tags": [
+                    "发票管理"
+                ],
+                "summary": "公共发票下载",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "下载token",
+                        "name": "token",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "发票文件",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "400": {
+                        "description": "token无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "文件不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/activate": {
             "post": {
                 "description": "客户端使用授权码激活软件，获取许可证文件",
@@ -3732,6 +4102,462 @@
                     },
                     "409": {
                         "description": "许可证已被撤销",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/invoices": {
+            "get": {
+                "description": "管理员查看所有发票列表，支持按客户筛选",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "发票管理"
+                ],
+                "summary": "管理员发票列表",
+                "parameters": [
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "页码，默认1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "每页条数，默认10，最大100",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "状态筛选，pending-待处理/issued-已开票/rejected-已驳回",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "搜索关键词，支持发票号或订单号模糊匹配",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "申请日期筛选，格式YYYY-MM-DD",
+                        "name": "apply_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "客户ID筛选",
+                        "name": "customer_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.InvoiceListResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "权限不足",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/invoices/summary": {
+            "get": {
+                "description": "管理员查看全平台的发票统计汇总信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "发票管理"
+                ],
+                "summary": "管理员发票汇总信息",
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.InvoiceSummaryResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "权限不足",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/invoices/upload": {
+            "post": {
+                "description": "管理员上传发票PDF文件",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "发票管理"
+                ],
+                "summary": "管理端发票文件上传",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "发票申请号",
+                        "name": "invoice_no",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "发票PDF文件",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.InvoiceUploadResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "权限不足",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/invoices/{id}": {
+            "get": {
+                "description": "管理员查看发票详细信息，包含关联信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "发票管理"
+                ],
+                "summary": "管理员发票详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "发票ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.InvoiceDetailResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "权限不足",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "发票不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/invoices/{id}/issue": {
+            "post": {
+                "description": "管理员为发票开票，上传发票文件并设置开票时间",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "发票管理"
+                ],
+                "summary": "管理员发票开票",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "发票ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "开票请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.InvoiceIssueRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.InvoiceResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "权限不足",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "发票不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/invoices/{id}/reject": {
+            "post": {
+                "description": "管理员驳回发票申请，需要填写驳回原因和修改建议",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "发票管理"
+                ],
+                "summary": "管理员发票驳回",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "发票ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "驳回请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.InvoiceRejectRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.InvoiceResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "权限不足",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "发票不存在",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -5086,48 +5912,63 @@
             "type": "object",
             "properties": {
                 "authorization_code": {
+                    "description": "授权码，已支付订单生成",
                     "type": "string"
                 },
                 "created_at": {
+                    "description": "创建时间",
                     "type": "string"
                 },
                 "cu_user_id": {
+                    "description": "客户用户ID",
                     "type": "string"
                 },
                 "customer_id": {
+                    "description": "客户ID",
                     "type": "string"
                 },
                 "discount_rate": {
+                    "description": "折扣率，0.0-1.0之间",
                     "type": "number"
                 },
                 "expired_at": {
+                    "description": "订单过期时间",
                     "type": "string"
                 },
                 "id": {
+                    "description": "订单ID",
                     "type": "string"
                 },
                 "license_count": {
+                    "description": "许可数量",
                     "type": "integer"
                 },
                 "order_no": {
+                    "description": "订单号，格式如ORD202601210123456789",
                     "type": "string"
                 },
                 "package_id": {
+                    "description": "套餐ID",
                     "type": "string"
                 },
                 "package_name": {
+                    "description": "套餐名称",
                     "type": "string"
                 },
                 "status": {
+                    "description": "订单状态，pending-待支付/paid-已支付",
                     "type": "string"
                 },
                 "total_amount": {
+                    "description": "订单总金额，单位元",
                     "type": "number"
                 },
                 "unit_price": {
+                    "description": "单价，单位元",
                     "type": "number"
                 },
                 "updated_at": {
+                    "description": "更新时间",
                     "type": "string"
                 }
             }
@@ -5140,11 +5981,13 @@
             ],
             "properties": {
                 "new_password": {
+                    "description": "新密码，必填，8-50位",
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 8
                 },
                 "old_password": {
+                    "description": "旧密码，必填",
                     "type": "string"
                 }
             }
@@ -5156,12 +5999,13 @@
             ],
             "properties": {
                 "phone": {
+                    "description": "手机号，必填，7-20位",
                     "type": "string",
                     "maxLength": 20,
                     "minLength": 7
                 },
                 "phone_country_code": {
-                    "description": "可选，默认+86",
+                    "description": "国家区号，可选，默认+86",
                     "type": "string"
                 }
             }
@@ -5174,7 +6018,7 @@
             ],
             "properties": {
                 "login_type": {
-                    "description": "登录类型：password 或 sms",
+                    "description": "登录类型，必填，password-密码登录/sms-验证码登录",
                     "type": "string",
                     "enum": [
                         "password",
@@ -5182,20 +6026,21 @@
                     ]
                 },
                 "password": {
-                    "description": "密码登录时必填",
+                    "description": "密码，密码登录时必填",
                     "type": "string"
                 },
                 "phone": {
+                    "description": "手机号，必填，7-20位",
                     "type": "string",
                     "maxLength": 20,
                     "minLength": 7
                 },
                 "phone_country_code": {
-                    "description": "可选，默认+86",
+                    "description": "国家区号，可选，默认+86",
                     "type": "string"
                 },
                 "sms_code": {
-                    "description": "验证码登录时必填",
+                    "description": "短信验证码，验证码登录时必填",
                     "type": "string"
                 }
             }
@@ -5210,17 +6055,19 @@
             ],
             "properties": {
                 "current_sms_code": {
-                    "description": "当前手机号验证码",
+                    "description": "当前手机号验证码，必填，6位数字",
                     "type": "string"
                 },
                 "new_phone": {
+                    "description": "新手机号，必填，11位手机号",
                     "type": "string"
                 },
                 "new_phone_country_code": {
+                    "description": "新手机号国家区号，必填",
                     "type": "string"
                 },
                 "new_sms_code": {
-                    "description": "新手机号验证码",
+                    "description": "新手机号验证码，必填，6位数字",
                     "type": "string"
                 }
             }
@@ -5229,17 +6076,21 @@
             "type": "object",
             "properties": {
                 "additional_info": {
+                    "description": "附加信息，可选，JSON格式",
                     "type": "string"
                 },
                 "avatar_url": {
+                    "description": "头像URL，可选，最大500字符",
                     "type": "string",
                     "maxLength": 500
                 },
                 "email": {
+                    "description": "邮箱，可选，格式为邮箱地址",
                     "type": "string",
                     "maxLength": 255
                 },
                 "language": {
+                    "description": "语言偏好，可选，zh-CN-中文/en-US-英文/ja-JP-日文",
                     "type": "string",
                     "enum": [
                         "zh-CN",
@@ -5248,14 +6099,17 @@
                     ]
                 },
                 "real_name": {
+                    "description": "真实姓名，可选，最大100字符",
                     "type": "string",
                     "maxLength": 100
                 },
                 "remark": {
+                    "description": "备注，可选，最大1000字符",
                     "type": "string",
                     "maxLength": 1000
                 },
                 "timezone": {
+                    "description": "时区，可选，最大50字符",
                     "type": "string",
                     "maxLength": 50
                 }
@@ -5270,30 +6124,35 @@
             ],
             "properties": {
                 "customer_id": {
-                    "description": "可选，不提供则自动创建客户",
+                    "description": "客户ID，可选，不提供则自动创建客户",
                     "type": "string"
                 },
                 "email": {
+                    "description": "邮箱，可选，格式为邮箱地址",
                     "type": "string",
                     "maxLength": 255
                 },
                 "password": {
+                    "description": "密码，必填，8-50位",
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 8
                 },
                 "phone": {
+                    "description": "手机号，必填，11位手机号",
                     "type": "string"
                 },
                 "phone_country_code": {
-                    "description": "可选，默认+86",
+                    "description": "国家区号，可选，默认+86",
                     "type": "string"
                 },
                 "real_name": {
+                    "description": "真实姓名，可选，最大100字符",
                     "type": "string",
                     "maxLength": 100
                 },
                 "sms_code": {
+                    "description": "短信验证码，必填，6位数字",
                     "type": "string"
                 }
             }
@@ -5307,20 +6166,23 @@
             ],
             "properties": {
                 "new_password": {
+                    "description": "新密码，必填，8-50位",
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 8
                 },
                 "phone": {
+                    "description": "手机号，必填，7-20位",
                     "type": "string",
                     "maxLength": 20,
                     "minLength": 7
                 },
                 "phone_country_code": {
-                    "description": "可选，默认+86",
+                    "description": "国家区号，可选，默认+86",
                     "type": "string"
                 },
                 "sms_code": {
+                    "description": "短信验证码，必填，6位数字",
                     "type": "string"
                 }
             }
@@ -5329,60 +6191,79 @@
             "type": "object",
             "properties": {
                 "additional_info": {
+                    "description": "附加信息，JSON格式",
                     "type": "string"
                 },
                 "avatar_url": {
+                    "description": "头像URL",
                     "type": "string"
                 },
                 "created_at": {
+                    "description": "创建时间",
                     "type": "string"
                 },
                 "customer_id": {
+                    "description": "客户ID",
                     "type": "string"
                 },
                 "email": {
+                    "description": "邮箱",
                     "type": "string"
                 },
                 "email_verified": {
+                    "description": "邮箱是否已验证",
                     "type": "boolean"
                 },
                 "id": {
+                    "description": "用户ID",
                     "type": "string"
                 },
                 "language": {
+                    "description": "语言偏好",
                     "type": "string"
                 },
                 "last_login_at": {
+                    "description": "最后登录时间",
                     "type": "string"
                 },
                 "last_login_ip": {
+                    "description": "最后登录IP",
                     "type": "string"
                 },
                 "phone": {
+                    "description": "手机号",
                     "type": "string"
                 },
                 "phone_country_code": {
+                    "description": "国家区号",
                     "type": "string"
                 },
                 "phone_verified": {
+                    "description": "手机号是否已验证",
                     "type": "boolean"
                 },
                 "real_name": {
+                    "description": "真实姓名",
                     "type": "string"
                 },
                 "remark": {
+                    "description": "备注",
                     "type": "string"
                 },
                 "status": {
+                    "description": "账户状态，active-激活/disabled-禁用",
                     "type": "string"
                 },
                 "timezone": {
+                    "description": "时区",
                     "type": "string"
                 },
                 "updated_at": {
+                    "description": "更新时间",
                     "type": "string"
                 },
                 "user_role": {
+                    "description": "用户角色，admin-管理员/member-成员",
                     "type": "string"
                 }
             }
@@ -5394,12 +6275,13 @@
             ],
             "properties": {
                 "phone": {
+                    "description": "手机号，必填，7-20位",
                     "type": "string",
                     "maxLength": 20,
                     "minLength": 7
                 },
                 "phone_country_code": {
-                    "description": "可选，默认+86",
+                    "description": "国家区号，可选，默认+86",
                     "type": "string"
                 }
             }
@@ -5411,12 +6293,13 @@
             ],
             "properties": {
                 "new_phone": {
+                    "description": "新手机号，必填，7-20位",
                     "type": "string",
                     "maxLength": 20,
                     "minLength": 7
                 },
                 "new_phone_country_code": {
-                    "description": "可选，默认+86",
+                    "description": "新手机号国家区号，可选，默认+86",
                     "type": "string"
                 }
             }
@@ -5428,12 +6311,13 @@
             ],
             "properties": {
                 "phone": {
+                    "description": "手机号，必填，7-20位",
                     "type": "string",
                     "maxLength": 20,
                     "minLength": 7
                 },
                 "phone_country_code": {
-                    "description": "可选，默认+86",
+                    "description": "国家区号，可选，默认+86",
                     "type": "string"
                 }
             }
@@ -6041,6 +6925,390 @@
                 }
             }
         },
+        "models.InvoiceCreateRequest": {
+            "type": "object",
+            "required": [
+                "content",
+                "invoice_type",
+                "order_id",
+                "receiver_email",
+                "title"
+            ],
+            "properties": {
+                "content": {
+                    "description": "开票内容，必填，最大200字符",
+                    "type": "string",
+                    "maxLength": 200
+                },
+                "invoice_type": {
+                    "description": "发票类型，必填，personal-个人/enterprise-企业普票/vat_special-增值税专用发票",
+                    "type": "string",
+                    "enum": [
+                        "personal",
+                        "enterprise",
+                        "vat_special"
+                    ]
+                },
+                "order_id": {
+                    "description": "订单ID，必填",
+                    "type": "string"
+                },
+                "receiver_email": {
+                    "description": "收票邮箱，必填，格式为邮箱地址",
+                    "type": "string"
+                },
+                "remark": {
+                    "description": "备注，可选",
+                    "type": "string"
+                },
+                "taxpayer_id": {
+                    "description": "纳税人识别号，企业发票必填，个人发票可为空",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "发票抬头，必填，最大200字符",
+                    "type": "string",
+                    "maxLength": 200
+                }
+            }
+        },
+        "models.InvoiceDetailResponse": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "description": "发票金额，单位元，保留2位小数",
+                    "type": "number"
+                },
+                "applicant_name": {
+                    "description": "发票申请人真实姓名",
+                    "type": "string"
+                },
+                "applicant_phone": {
+                    "description": "发票申请人电话号码",
+                    "type": "string"
+                },
+                "content": {
+                    "description": "开票内容",
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
+                "cu_user_id": {
+                    "description": "申请人客户用户ID",
+                    "type": "string"
+                },
+                "customer_id": {
+                    "description": "客户ID",
+                    "type": "string"
+                },
+                "download_token": {
+                    "description": "下载令牌，用于邮件链接下载",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "发票ID",
+                    "type": "string"
+                },
+                "invoice_file_url": {
+                    "description": "发票文件下载URL，已开票后填写",
+                    "type": "string"
+                },
+                "invoice_no": {
+                    "description": "发票申请号，格式如INV202601210123456789",
+                    "type": "string"
+                },
+                "invoice_type": {
+                    "description": "发票类型，personal-个人/enterprise-企业普票/vat_special-增值税专用发票",
+                    "type": "string"
+                },
+                "invoice_type_display": {
+                    "description": "发票类型显示文本，根据当前语言显示",
+                    "type": "string"
+                },
+                "issued_at": {
+                    "description": "发票开票完成时间",
+                    "type": "string"
+                },
+                "order_id": {
+                    "description": "关联的订单ID",
+                    "type": "string"
+                },
+                "order_no": {
+                    "description": "关联的订单号",
+                    "type": "string"
+                },
+                "order_package_name": {
+                    "description": "关联订单的套餐名称",
+                    "type": "string"
+                },
+                "receiver_email": {
+                    "description": "收票邮箱",
+                    "type": "string"
+                },
+                "reject_reason": {
+                    "description": "驳回原因，已驳回时填写",
+                    "type": "string"
+                },
+                "rejected_at": {
+                    "description": "驳回时间",
+                    "type": "string"
+                },
+                "rejected_by": {
+                    "description": "驳回人ID（管理员）",
+                    "type": "string"
+                },
+                "rejecter_name": {
+                    "description": "发票驳回人姓名（管理员）",
+                    "type": "string"
+                },
+                "remark": {
+                    "description": "备注信息",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "发票状态，pending-待处理/issued-已开票/rejected-已驳回",
+                    "type": "string"
+                },
+                "status_display": {
+                    "description": "发票状态显示文本，根据当前语言显示",
+                    "type": "string"
+                },
+                "suggestion": {
+                    "description": "修改建议，已驳回时填写",
+                    "type": "string"
+                },
+                "taxpayer_id": {
+                    "description": "纳税人识别号，企业发票填写",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "发票抬头",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "更新时间",
+                    "type": "string"
+                },
+                "uploaded_at": {
+                    "description": "发票文件上传时间",
+                    "type": "string"
+                },
+                "uploaded_by": {
+                    "description": "发票文件上传人ID（管理员）",
+                    "type": "string"
+                },
+                "uploader_name": {
+                    "description": "发票文件上传人姓名（管理员）",
+                    "type": "string"
+                }
+            }
+        },
+        "models.InvoiceIssueRequest": {
+            "type": "object",
+            "required": [
+                "invoice_file_url",
+                "issued_at"
+            ],
+            "properties": {
+                "invoice_file_url": {
+                    "description": "发票文件URL，必填，最大500字符",
+                    "type": "string",
+                    "maxLength": 500
+                },
+                "issued_at": {
+                    "description": "开票时间，必填，ISO 8601格式时间字符串",
+                    "type": "string"
+                }
+            }
+        },
+        "models.InvoiceListResponse": {
+            "type": "object",
+            "properties": {
+                "invoices": {
+                    "description": "发票列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.InvoiceResponse"
+                    }
+                },
+                "page": {
+                    "description": "当前页码",
+                    "type": "integer"
+                },
+                "page_size": {
+                    "description": "每页条数",
+                    "type": "integer"
+                },
+                "total_count": {
+                    "description": "总记录数",
+                    "type": "integer"
+                }
+            }
+        },
+        "models.InvoiceRejectRequest": {
+            "type": "object",
+            "required": [
+                "reject_reason",
+                "suggestion"
+            ],
+            "properties": {
+                "reject_reason": {
+                    "description": "驳回原因，必填，最大500字符",
+                    "type": "string",
+                    "maxLength": 500
+                },
+                "suggestion": {
+                    "description": "修改建议，必填，最大500字符",
+                    "type": "string",
+                    "maxLength": 500
+                }
+            }
+        },
+        "models.InvoiceResponse": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "description": "发票金额，单位元，保留2位小数",
+                    "type": "number"
+                },
+                "content": {
+                    "description": "开票内容",
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
+                "cu_user_id": {
+                    "description": "申请人客户用户ID",
+                    "type": "string"
+                },
+                "customer_id": {
+                    "description": "客户ID",
+                    "type": "string"
+                },
+                "download_token": {
+                    "description": "下载令牌，用于邮件链接下载",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "发票ID",
+                    "type": "string"
+                },
+                "invoice_file_url": {
+                    "description": "发票文件下载URL，已开票后填写",
+                    "type": "string"
+                },
+                "invoice_no": {
+                    "description": "发票申请号，格式如INV202601210123456789",
+                    "type": "string"
+                },
+                "invoice_type": {
+                    "description": "发票类型，personal-个人/enterprise-企业普票/vat_special-增值税专用发票",
+                    "type": "string"
+                },
+                "invoice_type_display": {
+                    "description": "发票类型显示文本，根据当前语言显示",
+                    "type": "string"
+                },
+                "issued_at": {
+                    "description": "发票开票完成时间",
+                    "type": "string"
+                },
+                "order_id": {
+                    "description": "关联的订单ID",
+                    "type": "string"
+                },
+                "order_no": {
+                    "description": "关联的订单号",
+                    "type": "string"
+                },
+                "receiver_email": {
+                    "description": "收票邮箱",
+                    "type": "string"
+                },
+                "reject_reason": {
+                    "description": "驳回原因，已驳回时填写",
+                    "type": "string"
+                },
+                "rejected_at": {
+                    "description": "驳回时间",
+                    "type": "string"
+                },
+                "rejected_by": {
+                    "description": "驳回人ID（管理员）",
+                    "type": "string"
+                },
+                "remark": {
+                    "description": "备注信息",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "发票状态，pending-待处理/issued-已开票/rejected-已驳回",
+                    "type": "string"
+                },
+                "status_display": {
+                    "description": "发票状态显示文本，根据当前语言显示",
+                    "type": "string"
+                },
+                "suggestion": {
+                    "description": "修改建议，已驳回时填写",
+                    "type": "string"
+                },
+                "taxpayer_id": {
+                    "description": "纳税人识别号，企业发票填写",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "发票抬头",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "更新时间",
+                    "type": "string"
+                },
+                "uploaded_at": {
+                    "description": "发票文件上传时间",
+                    "type": "string"
+                },
+                "uploaded_by": {
+                    "description": "发票文件上传人ID（管理员）",
+                    "type": "string"
+                }
+            }
+        },
+        "models.InvoiceSummaryResponse": {
+            "type": "object",
+            "properties": {
+                "issued_count": {
+                    "description": "已开票发票数量",
+                    "type": "integer"
+                },
+                "pending_count": {
+                    "description": "待处理发票数量",
+                    "type": "integer"
+                },
+                "rejected_count": {
+                    "description": "已驳回发票数量",
+                    "type": "integer"
+                },
+                "total_count": {
+                    "description": "发票总数",
+                    "type": "integer"
+                }
+            }
+        },
+        "models.InvoiceUploadResponse": {
+            "type": "object",
+            "properties": {
+                "file_url": {
+                    "description": "上传后的文件URL",
+                    "type": "string"
+                }
+            }
+        },
         "models.License": {
             "type": "object",
             "properties": {
@@ -6372,12 +7640,15 @@
             "type": "object",
             "properties": {
                 "authorization_code": {
+                    "description": "生成的授权码",
                     "type": "string"
                 },
                 "order_no": {
+                    "description": "订单号",
                     "type": "string"
                 },
                 "status": {
+                    "description": "订单状态",
                     "type": "string"
                 }
             }
@@ -6386,18 +7657,22 @@
             "type": "object",
             "properties": {
                 "page": {
+                    "description": "当前页码",
                     "type": "integer"
                 },
                 "page_size": {
+                    "description": "每页条数",
                     "type": "integer"
                 },
                 "payments": {
+                    "description": "支付记录列表",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/models.PaymentResponse"
                     }
                 },
                 "total_count": {
+                    "description": "总记录数",
                     "type": "integer"
                 }
             }
@@ -6462,21 +7737,31 @@
             "type": "object",
             "properties": {
                 "amount": {
+                    "description": "支付金额，单位元",
                     "type": "number"
                 },
                 "business_order": {
-                    "$ref": "#/definitions/models.PaymentBusinessOrder"
+                    "description": "关联的业务订单信息",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.PaymentBusinessOrder"
+                        }
+                    ]
                 },
                 "payment_no": {
+                    "description": "支付单号",
                     "type": "string"
                 },
                 "payment_time": {
+                    "description": "支付完成时间",
                     "type": "string"
                 },
                 "status": {
+                    "description": "支付状态，pending-待支付/paid-已支付/cancelled-已取消/expired-已过期/failed-支付失败",
                     "type": "string"
                 },
                 "trade_no": {
+                    "description": "第三方交易号",
                     "type": "string"
                 }
             }
