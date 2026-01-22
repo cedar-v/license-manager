@@ -23,6 +23,7 @@ type CuOrderService interface {
 	GetOrderSummary(ctx context.Context, customerID string) (*models.OrderSummaryResponse, error)
 	CalculatePrice(ctx context.Context, packageID string, licenseCount int) (*PriceCalculationResult, error)
 	CancelOrder(ctx context.Context, orderID, cuUserID string) (*models.CuOrder, error)
+	DeleteOrder(ctx context.Context, orderID, cuUserID string) error
 	UpdateOrderStatus(ctx context.Context, orderID string, status string) error
 }
 
@@ -400,6 +401,34 @@ func (s *cuOrderService) CancelOrder(ctx context.Context, orderID, cuUserID stri
 		// 兜底：未知状态按不可取消处理
 		return nil, i18n.NewI18nError("601006", lang)
 	}
+}
+
+func (s *cuOrderService) DeleteOrder(ctx context.Context, orderID, cuUserID string) error {
+	lang := pkgcontext.GetLanguageFromContext(ctx)
+
+	if orderID == "" || cuUserID == "" {
+		return i18n.NewI18nError("900001", lang)
+	}
+
+	order, err := s.repo.GetByID(orderID)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return i18n.NewI18nError("601001", lang) // 订单不存在
+		}
+		return i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	// 检查权限：只能删除自己的订单
+	if order.CuUserID != cuUserID {
+		return i18n.NewI18nError("100005", lang) // 权限不足
+	}
+
+	// 可以删除所有状态的订单（pending, paid, cancelled）
+	if err := s.repo.Delete(orderID); err != nil {
+		return i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	return nil
 }
 
 func (s *cuOrderService) GetUserOrders(ctx context.Context, cuUserID string, req *models.CuOrderListRequest) ([]*models.CuOrder, int64, error) {

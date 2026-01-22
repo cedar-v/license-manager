@@ -368,15 +368,15 @@ func (h *CuOrderHandler) GetOrder(c *gin.Context) {
 	})
 }
 
-// CancelOrder 取消订单
-// @Summary 取消订单
-// @Description 取消当前用户的未支付订单（pending）；已支付订单不允许取消
+// CancelOrder 删除订单
+// @Summary 删除订单
+// @Description 删除当前用户的订单记录
 // @Tags 客户订单管理
 // @Accept json
 // @Produce json
 // @Security BearerAuth
 // @Param order_id path string true "订单ID"
-// @Success 200 {object} models.APIResponse{data=models.CuOrderResponse} "成功"
+// @Success 200 {object} models.APIResponse{} "成功"
 // @Failure 400
 // @Failure 401
 // @Failure 403
@@ -409,7 +409,7 @@ func (h *CuOrderHandler) CancelOrder(c *gin.Context) {
 	}
 
 	ctx := middleware.WithLanguage(c.Request.Context(), c)
-	order, err := h.cuOrderService.CancelOrder(ctx, orderID, cuUserID.(string))
+	err := h.cuOrderService.DeleteOrder(ctx, orderID, cuUserID.(string))
 	if err != nil {
 		c.JSON(err.(*i18n.I18nError).HttpCode, models.ErrorResponse{
 			Code:      err.(*i18n.I18nError).Code,
@@ -424,7 +424,7 @@ func (h *CuOrderHandler) CancelOrder(c *gin.Context) {
 	c.JSON(http.StatusOK, models.APIResponse{
 		Code:      "000000",
 		Message:   successMsg,
-		Data:      order.ToResponse(),
+		Data:      nil,
 		Timestamp: getCurrentTimestamp(),
 	})
 }
