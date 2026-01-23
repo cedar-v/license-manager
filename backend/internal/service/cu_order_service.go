@@ -423,8 +423,28 @@ func (s *cuOrderService) DeleteOrder(ctx context.Context, orderID, cuUserID stri
 		return i18n.NewI18nError("100005", lang) // 权限不足
 	}
 
-	// 可以删除所有状态的订单（pending, paid, cancelled）
-	if err := s.repo.Delete(orderID); err != nil {
+	// 开启事务，确保订单和相关支付记录一起删除
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// 删除相关的支付记录
+	if err := tx.Unscoped().Where("business_type = ? AND business_id = ?", models.BusinessTypePackageOrder, orderID).Delete(&models.Payment{}).Error; err != nil {
+		tx.Rollback()
+		return i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	// 删除订单记录（物理删除）
+	if err := tx.Unscoped().Where("id = ?", orderID).Delete(&models.CuOrder{}).Error; err != nil {
+		tx.Rollback()
+		return i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	// 提交事务
+	if err := tx.Commit().Error; err != nil {
 		return i18n.NewI18nError("900004", lang, err.Error())
 	}
 

@@ -129,7 +129,8 @@ func (r *cuOrderRepository) Update(order *models.CuOrder) error {
 }
 
 func (r *cuOrderRepository) Delete(id string) error {
-	return r.db.Where("id = ?", id).Delete(&models.CuOrder{}).Error
+	// 使用 Unscoped() 进行物理删除而不是软删除
+	return r.db.Unscoped().Where("id = ?", id).Delete(&models.CuOrder{}).Error
 }
 
 // GetPendingOrders 移除：不再有pending状态的订单
