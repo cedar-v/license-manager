@@ -902,9 +902,9 @@ func (s *authorizationCodeService) findUserByContact(contact string) (*models.Cu
 		// 邮箱
 		return s.cuUserRepo.GetByEmail(contact)
 	} else {
-		// 手机号：如果没有国家代码，默认使用 +68
+		// 手机号：如果没有国家代码，默认使用 +86
 		phone := contact
-		countryCode := "+68" // 默认国家代码
+		countryCode := "+86" // 默认国家代码
 
 		// 检查是否已经包含国家代码
 		if strings.HasPrefix(contact, "+") {
