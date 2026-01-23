@@ -760,18 +760,18 @@ func (s *authorizationCodeService) ShareAuthorizationCode(ctx context.Context, a
 		return nil, i18n.NewI18nError("900001", lang)
 	}
 
-	// 验证不能分享给自己
-	if req.TargetUserID == userID {
-		return nil, i18n.NewI18nError("300105", lang) // 不能分享给自己
-	}
-
-	// 验证目标用户是否存在
-	targetUser, err := s.cuUserRepo.GetByID(req.TargetUserID)
+	// 根据联系方式查找目标用户
+	targetUser, err := s.findUserByContact(req.TargetContact)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, i18n.NewI18nError("300104", lang) // 目标用户不存在
 		}
 		return nil, i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	// 验证不能分享给自己
+	if targetUser.ID == userID {
+		return nil, i18n.NewI18nError("300105", lang) // 不能分享给自己
 	}
 
 	// 验证目标用户状态
@@ -844,7 +844,7 @@ func (s *authorizationCodeService) ShareAuthorizationCode(ctx context.Context, a
 		newAuthCode = &models.AuthorizationCode{
 			Code:             code,
 			CustomerID:       targetUser.CustomerID, // 使用目标用户的客户ID
-			CreatedBy:        req.TargetUserID,      // 记录为目标用户创建的
+			CreatedBy:        targetUser.ID,         // 记录为目标用户创建的
 			SoftwareID:       authCode.SoftwareID,
 			Description:      authCode.Description,
 			StartDate:        now,              // 从分享时刻开始
@@ -893,6 +893,42 @@ func (s *authorizationCodeService) ShareAuthorizationCode(ctx context.Context, a
 	}
 
 	return response, nil
+}
+
+// findUserByContact 根据联系方式查找用户（手机号或邮箱）
+func (s *authorizationCodeService) findUserByContact(contact string) (*models.CuUser, error) {
+	// 判断是手机号还是邮箱
+	if strings.Contains(contact, "@") {
+		// 邮箱
+		return s.cuUserRepo.GetByEmail(contact)
+	} else {
+		// 手机号：如果没有国家代码，默认使用 +68
+		phone := contact
+		countryCode := "+68" // 默认国家代码
+
+		// 检查是否已经包含国家代码
+		if strings.HasPrefix(contact, "+") {
+			// 如果以 + 开头，分离国家代码和手机号
+			parts := strings.SplitN(contact, " ", 2)
+			if len(parts) == 2 {
+				countryCode = parts[0]
+				phone = parts[1]
+			} else {
+				// 可能是直接的格式如 +8613800000000，需要分离
+				// 简单处理：假设国家代码是 + 开头的1-4位数字
+				for i := 1; i <= 4 && i < len(contact); i++ {
+					if contact[i] >= '0' && contact[i] <= '9' {
+						continue
+					}
+					countryCode = contact[:i]
+					phone = contact[i:]
+					break
+				}
+			}
+		}
+
+		return s.cuUserRepo.GetByPhone(phone, countryCode)
+	}
 }
 
 // GetCuAuthorizationCodeList 用户端：获取当前用户授权码列表

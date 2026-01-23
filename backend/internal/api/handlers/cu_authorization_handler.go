@@ -24,7 +24,7 @@ func NewCuAuthorizationHandler(authCodeService service.AuthorizationCodeService)
 
 // ShareAuthorizationCode 用户分享授权码
 // @Summary 用户分享授权码
-// @Description 用户可以将自己的授权码分享给其他用户
+// @Description 用户可以将自己的授权码分享给其他用户（通过手机号或邮箱）
 // @Tags 用户端授权码管理
 // @Accept json
 // @Produce json

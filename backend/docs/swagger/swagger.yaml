@@ -328,12 +328,12 @@ definitions:
         description: 分享激活次数
         minimum: 1
         type: integer
-      target_user_id:
-        description: 受赠用户ID
+      target_contact:
+        description: 受赠用户联系方式（手机号或邮箱）
         type: string
     required:
     - share_count
-    - target_user_id
+    - target_contact
     type: object
   models.AuthorizationCodeShareResponse:
     properties:
@@ -2076,7 +2076,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: 用户可以将自己的授权码分享给其他用户
+      description: 用户可以将自己的授权码分享给其他用户（通过手机号或邮箱）
       parameters:
       - description: 授权码ID
         in: path

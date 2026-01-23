@@ -263,8 +263,8 @@ type AuthorizationChangeListResponse struct {
 
 // AuthorizationCodeShareRequest 授权码分享请求结构
 type AuthorizationCodeShareRequest struct {
-	TargetUserID string `json:"target_user_id" binding:"required"`    // 受赠用户ID
-	ShareCount   int    `json:"share_count" binding:"required,min=1"` // 分享激活次数
+	TargetContact string `json:"target_contact" binding:"required"`    // 受赠用户联系方式（手机号或邮箱）
+	ShareCount    int    `json:"share_count" binding:"required,min=1"` // 分享激活次数
 }
 
 // AuthorizationCodeShareResponse 授权码分享响应结构

@@ -256,7 +256,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "用户可以将自己的授权码分享给其他用户",
+                "description": "用户可以将自己的授权码分享给其他用户（通过手机号或邮箱）",
                 "consumes": [
                     "application/json"
                 ],
@@ -5611,7 +5611,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "share_count",
-                "target_user_id"
+                "target_contact"
             ],
             "properties": {
                 "share_count": {
@@ -5619,8 +5619,8 @@ const docTemplate = `{
                     "type": "integer",
                     "minimum": 1
                 },
-                "target_user_id": {
-                    "description": "受赠用户ID",
+                "target_contact": {
+                    "description": "受赠用户联系方式（手机号或邮箱）",
                     "type": "string"
                 }
             }
