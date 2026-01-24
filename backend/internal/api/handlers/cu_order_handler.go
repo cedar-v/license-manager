@@ -204,8 +204,11 @@ func (h *CuOrderHandler) CreateOrder(c *gin.Context) {
 		return
 	}
 
-	// 根据是否有支付方式决定处理逻辑
-	if req.PaymentMethod == "" {
+	// 根据套餐类型和支付方式决定处理逻辑
+	if req.PackageID == "trial" {
+		// 试用版订单：直接生成授权码（每月1-25日内）
+		h.createFreeOrder(c, cuUserID.(string), customerID.(string), &req)
+	} else if req.PaymentMethod == "" {
 		// 免费订单：直接创建订单
 		h.createFreeOrder(c, cuUserID.(string), customerID.(string), &req)
 	} else {
