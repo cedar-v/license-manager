@@ -198,7 +198,7 @@ func (h *CuAuthorizationHandler) GetCuAuthorizationCodes(c *gin.Context) {
 	}
 
 	ctx := middleware.WithLanguage(c.Request.Context(), c)
-	data, err := h.authCodeService.GetCuAuthorizationCodeList(ctx, claims.UserID, &req)
+	data, err := h.authCodeService.GetCuAuthorizationCodeList(ctx, claims.CustomerID, &req)
 	if err != nil {
 		i18nErr, ok := err.(*i18n.I18nError)
 		if ok {
@@ -245,7 +245,7 @@ func (h *CuAuthorizationHandler) GetCuAuthorizationCodeSummary(c *gin.Context) {
 	claims := c.MustGet("cu_user").(*utils.CuClaims)
 
 	ctx := middleware.WithLanguage(c.Request.Context(), c)
-	data, err := h.authCodeService.GetCuAuthorizationCodeSummary(ctx, claims.UserID)
+	data, err := h.authCodeService.GetCuAuthorizationCodeSummary(ctx, claims.CustomerID)
 	if err != nil {
 		i18nErr, ok := err.(*i18n.I18nError)
 		if ok {

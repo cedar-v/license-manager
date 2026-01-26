@@ -932,14 +932,14 @@ func (s *authorizationCodeService) findUserByContact(contact string) (*models.Cu
 }
 
 // GetCuAuthorizationCodeList 用户端：获取当前用户授权码列表
-func (s *authorizationCodeService) GetCuAuthorizationCodeList(ctx context.Context, cuUserID string, req *models.CuAuthorizationCodeListRequest) (*models.CuAuthorizationCodeListResponse, error) {
+func (s *authorizationCodeService) GetCuAuthorizationCodeList(ctx context.Context, customerID string, req *models.CuAuthorizationCodeListRequest) (*models.CuAuthorizationCodeListResponse, error) {
 	lang := pkgcontext.GetLanguageFromContext(ctx)
 
-	if cuUserID == "" {
+	if customerID == "" {
 		return nil, i18n.NewI18nError("100004", lang)
 	}
 
-	result, err := s.authCodeRepo.GetCuAuthorizationCodeList(ctx, cuUserID, req)
+	result, err := s.authCodeRepo.GetCuAuthorizationCodeList(ctx, customerID, req)
 	if err != nil {
 		return nil, i18n.NewI18nError("900004", lang, err.Error())
 	}
@@ -952,14 +952,14 @@ func (s *authorizationCodeService) GetCuAuthorizationCodeList(ctx context.Contex
 }
 
 // GetCuAuthorizationCodeSummary 用户端：授权信息统计
-func (s *authorizationCodeService) GetCuAuthorizationCodeSummary(ctx context.Context, cuUserID string) (*models.CuAuthorizationCodeSummaryResponse, error) {
+func (s *authorizationCodeService) GetCuAuthorizationCodeSummary(ctx context.Context, customerID string) (*models.CuAuthorizationCodeSummaryResponse, error) {
 	lang := pkgcontext.GetLanguageFromContext(ctx)
 
-	if cuUserID == "" {
+	if customerID == "" {
 		return nil, i18n.NewI18nError("100004", lang)
 	}
 
-	result, err := s.authCodeRepo.GetCuAuthorizationCodeSummary(ctx, cuUserID)
+	result, err := s.authCodeRepo.GetCuAuthorizationCodeSummary(ctx, customerID)
 	if err != nil {
 		return nil, i18n.NewI18nError("900004", lang, err.Error())
 	}

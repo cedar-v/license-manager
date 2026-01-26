@@ -168,7 +168,7 @@ func (r *authorizationCodeRepository) GetAuthorizationCodeList(ctx context.Conte
 }
 
 // GetCuAuthorizationCodeList 用户端：查询用户授权码列表
-func (r *authorizationCodeRepository) GetCuAuthorizationCodeList(ctx context.Context, cuUserID string, req *models.CuAuthorizationCodeListRequest) (*models.CuAuthorizationCodeListResponse, error) {
+func (r *authorizationCodeRepository) GetCuAuthorizationCodeList(ctx context.Context, customerID string, req *models.CuAuthorizationCodeListRequest) (*models.CuAuthorizationCodeListResponse, error) {
 	page := 1
 	pageSize := 10
 	status := ""
@@ -202,7 +202,7 @@ func (r *authorizationCodeRepository) GetCuAuthorizationCodeList(ctx context.Con
 			WHERE status = 'active' AND deleted_at IS NULL
 			GROUP BY authorization_code_id
 		) l ON ac.id = l.authorization_code_id`).
-		Where("ac.created_by = ?", cuUserID)
+		Where("ac.customer_id = ?", customerID)
 
 	if status != "" {
 		switch status {
@@ -269,7 +269,7 @@ func (r *authorizationCodeRepository) GetCuAuthorizationCodeList(ctx context.Con
 }
 
 // GetCuAuthorizationCodeSummary 用户端：授权信息统计
-func (r *authorizationCodeRepository) GetCuAuthorizationCodeSummary(ctx context.Context, cuUserID string) (*models.CuAuthorizationCodeSummaryResponse, error) {
+func (r *authorizationCodeRepository) GetCuAuthorizationCodeSummary(ctx context.Context, customerID string) (*models.CuAuthorizationCodeSummaryResponse, error) {
 	var result struct {
 		TotalCount             int64 `gorm:"column:total_count"`
 		ExpiredCount           int64 `gorm:"column:expired_count"`
@@ -277,14 +277,17 @@ func (r *authorizationCodeRepository) GetCuAuthorizationCodeSummary(ctx context.
 		ValidMaxActivationsSum int64 `gorm:"column:valid_max_activations_sum"`
 	}
 
+	// 计算授权码统计信息
 	err := r.db.WithContext(ctx).Table("authorization_codes ac").
 		Select(`
 			COUNT(*) AS total_count,
-			SUM(CASE WHEN ac.end_date < NOW() THEN 1 ELSE 0 END) AS expired_count,
-			SUM(CASE WHEN ac.end_date >= NOW() THEN 1 ELSE 0 END) AS valid_count,
-			SUM(CASE WHEN ac.end_date >= NOW() THEN ac.max_activations ELSE 0 END) AS valid_max_activations_sum
+			SUM(CASE WHEN (ac.end_date < NOW() OR ac.is_locked = true) THEN 1 ELSE 0 END) AS expired_count,
+			SUM(CASE WHEN (ac.end_date >= NOW() AND ac.is_locked = false) THEN 1 ELSE 0 END) AS valid_count,
+			SUM(CASE WHEN (ac.end_date >= NOW() AND ac.is_locked = false)
+				THEN ac.max_activations
+				ELSE 0 END) AS valid_max_activations_sum
 		`).
-		Where("ac.created_by = ?", cuUserID).
+		Where("ac.customer_id = ?", customerID).
 		Scan(&result).Error
 	if err != nil {
 		return nil, err

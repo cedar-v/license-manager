@@ -52,8 +52,8 @@ type AuthorizationCodeService interface {
 	GetProductActivationCode(ctx context.Context, customerID string, req *models.ProductActivationCodeRequest) (*models.ProductActivationCodeResponse, error)
 
 	// 用户端授权码列表与统计
-	GetCuAuthorizationCodeList(ctx context.Context, cuUserID string, req *models.CuAuthorizationCodeListRequest) (*models.CuAuthorizationCodeListResponse, error)
-	GetCuAuthorizationCodeSummary(ctx context.Context, cuUserID string) (*models.CuAuthorizationCodeSummaryResponse, error)
+	GetCuAuthorizationCodeList(ctx context.Context, customerID string, req *models.CuAuthorizationCodeListRequest) (*models.CuAuthorizationCodeListResponse, error)
+	GetCuAuthorizationCodeSummary(ctx context.Context, customerID string) (*models.CuAuthorizationCodeSummaryResponse, error)
 }
 
 // LicenseService 许可证服务接口
