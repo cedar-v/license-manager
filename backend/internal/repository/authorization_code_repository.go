@@ -64,10 +64,10 @@ func (r *authorizationCodeRepository) GetAuthorizationCodeList(ctx context.Conte
 				ac.start_date, ac.end_date, ac.max_activations, 
 				COALESCE(l.active_count, 0) AS current_activations,
 				ac.deployment_type, ac.is_locked, ac.description, ac.created_at,
-				CASE 
+				CASE
 					WHEN ac.is_locked = true THEN 'locked'
 					WHEN ac.end_date < NOW() THEN 'expired'
-					WHEN ac.start_date <= NOW() AND ac.end_date >= NOW() THEN 'normal'
+					WHEN ac.end_date >= NOW() THEN 'normal'
 					ELSE 'expired'
 				END AS status`).
 		Joins("LEFT JOIN customers c ON ac.customer_id = c.id AND c.deleted_at IS NULL").
@@ -91,7 +91,7 @@ func (r *authorizationCodeRepository) GetAuthorizationCodeList(ctx context.Conte
 		case "expired":
 			query = query.Where("ac.is_locked = false AND ac.end_date < NOW()")
 		case "normal":
-			query = query.Where("ac.is_locked = false AND ac.start_date <= NOW() AND ac.end_date >= NOW()")
+			query = query.Where("ac.is_locked = false AND ac.end_date >= NOW()")
 		}
 	}
 
@@ -191,9 +191,9 @@ func (r *authorizationCodeRepository) GetCuAuthorizationCodeList(ctx context.Con
 		Select(`ac.id, ac.code, ac.created_at, ac.end_date, ac.max_activations,
 				COALESCE(l.active_count, 0) AS current_activations,
 				CASE
-					WHEN ac.end_date < NOW() THEN 'expired'
 					WHEN ac.is_locked = true THEN 'locked'
-					WHEN ac.start_date <= NOW() AND ac.end_date >= NOW() THEN 'normal'
+					WHEN ac.end_date < NOW() THEN 'expired'
+					WHEN ac.end_date >= NOW() THEN 'normal'
 					ELSE 'expired'
 				END AS status`).
 		Joins(`LEFT JOIN (
