@@ -16,7 +16,7 @@ const (
 	CuUserPayloadKey        = "cu_user"
 )
 
-// AuthMiddleware 认证中间件
+// AuthMiddleware 认证中间件（支持自动延长）
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authorizationHeader := c.GetHeader(AuthorizationHeaderKey)
@@ -79,6 +79,17 @@ func AuthMiddleware() gin.HandlerFunc {
 			})
 			c.Abort()
 			return
+		}
+
+		// 检查是否需要自动延长token（单令牌延长机制）
+		if newToken, err := utils.RefreshTokenIfNeeded(accessToken); err == nil && newToken != accessToken {
+			// 自动延长token有效期，后端直接使用新token，客户端无需感知
+			accessToken = newToken
+			// 重新解析claims
+			newClaims, parseErr := utils.ParseToken(newToken)
+			if parseErr == nil {
+				claims = newClaims
+			}
 		}
 
 		// 将用户信息存储到上下文
@@ -156,7 +167,7 @@ func AdminOnlyMiddleware() gin.HandlerFunc {
 	}
 }
 
-// CustomerAuth 客户用户认证中间件
+// CustomerAuth 客户用户认证中间件（支持自动延长）
 func CustomerAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authorizationHeader := c.GetHeader(AuthorizationHeaderKey)
@@ -215,6 +226,17 @@ func CustomerAuth() gin.HandlerFunc {
 			})
 			c.Abort()
 			return
+		}
+
+		// 检查是否需要自动延长token（单令牌延长机制）
+		if newToken, err := utils.RefreshCuTokenIfNeeded(accessToken); err == nil && newToken != accessToken {
+			// 自动延长token有效期，后端直接使用新token，客户端无需感知
+			accessToken = newToken
+			// 重新解析claims
+			newClaims, parseErr := utils.ParseCuToken(newToken)
+			if parseErr == nil {
+				claims = newClaims
+			}
 		}
 
 		// 将客户用户信息存储到上下文
