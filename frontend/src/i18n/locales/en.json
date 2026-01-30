@@ -72,21 +72,23 @@
       "docs": "Docs",
       "github": "GitHub"
     },
-      "breadcrumb": {
-        "dashboard": "Dashboard",
-        "customers": "Customer Management",
+    "breadcrumb": {
+      "dashboard": "Dashboard",
+      "customers": "Customer Management",
         "licenses": "License Management",
+        "invoices": "Invoice Management",
+        "invoiceDetail": "Invoice Detail",
         "licenseList": "License List",
-        "createLicense": "Create License",
-        "viewLicense": "View License",
-        "roles": "Roles & Permissions",
-        "users": "System Users",
-        "login": "Login",
-        "settings": "Settings",
-        "profile": "Profile",
-        "workspace": "Workspace",
-        "unknown": "Unknown Page"
-      }
+      "createLicense": "Create License",
+      "viewLicense": "View License",
+      "roles": "Roles & Permissions",
+      "users": "System Users",
+      "login": "Login",
+      "settings": "Settings",
+      "profile": "Profile",
+      "workspace": "Workspace",
+      "unknown": "Unknown Page"
+    }
   },
   "common": {
     "cancel": "Cancel",

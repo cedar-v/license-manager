@@ -55,6 +55,7 @@
       "dashboard": "仪表盘",
       "customers": "客户管理",
       "licenses": "授权管理",
+      "invoices": "发票管理",
       "roles": "角色权限",
       "users": "系统用户"
     },
@@ -72,21 +73,23 @@
       "docs": "文档",
       "github": "GitHub"
     },
-      "breadcrumb": {
-        "dashboard": "仪表盘",
-        "customers": "客户管理",
+    "breadcrumb": {
+      "dashboard": "仪表盘",
+      "customers": "客户管理",
         "licenses": "授权管理",
+        "invoices": "发票管理",
+        "invoiceDetail": "发票申请详情",
         "licenseList": "授权列表",
-        "createLicense": "创建授权",
-        "viewLicense": "查看授权",
-        "roles": "角色权限",
-        "users": "系统用户",
-        "login": "登录",
-        "settings": "设置",
-        "profile": "个人资料",
-        "workspace": "工作台",
-        "unknown": "未知页面"
-      }
+      "createLicense": "创建授权",
+      "viewLicense": "查看授权",
+      "roles": "角色权限",
+      "users": "系统用户",
+      "login": "登录",
+      "settings": "设置",
+      "profile": "个人资料",
+      "workspace": "工作台",
+      "unknown": "未知页面"
+    }
   },
   "common": {
     "cancel": "取消",
@@ -712,31 +715,31 @@
       "phoneFormat": "请输入正确的手机号码",
       "websiteFormat": "请输入正确的网址格式"
     },
-      "view": {
-        "back": "返 回",
-        "statusInfo": "状态信息",
-        "licenseStats": "授权统计",
-        "creator": "创建人",
-        "createTime": "创建时间",
-        "updater": "更新人",
-        "updateTime": "更新时间",
-        "totalLicenses": "总授权数",
-        "activeLicenses": "已过期授权",
-        "recentLicense": "30日内即将到期授权码数量 ",
-        "expiringSoon": "总许可证数量",
-        "expiringSoonTime": "已激活许可证数量",
-        "expiredLicenses": "已过期许可证数量",
-        "expiredTime": "未激活许可证数量",
-        "noData": "--",
-        "onlineLicense": "在线授权",
-        "customerNotExist": "客户数据不存在"
-      },
-      "basicInfo": {
-        "customerCode": "客户编码",
-        "customerName": "客户名称",
-        "activatedDevices": "已激活设备数量",
-        "creationTime": "创建时间",
-        "expiryTime": "到期时间",
+    "view": {
+      "back": "返 回",
+      "statusInfo": "状态信息",
+      "licenseStats": "授权统计",
+      "creator": "创建人",
+      "createTime": "创建时间",
+      "updater": "更新人",
+      "updateTime": "更新时间",
+      "totalLicenses": "总授权数",
+      "activeLicenses": "已过期授权",
+      "recentLicense": "30日内即将到期授权码数量 ",
+      "expiringSoon": "总许可证数量",
+      "expiringSoonTime": "已激活许可证数量",
+      "expiredLicenses": "已过期许可证数量",
+      "expiredTime": "未激活许可证数量",
+      "noData": "--",
+      "onlineLicense": "在线授权",
+      "customerNotExist": "客户数据不存在"
+    },
+    "basicInfo": {
+      "customerCode": "客户编码",
+      "customerName": "客户名称",
+      "activatedDevices": "已激活设备数量",
+      "creationTime": "创建时间",
+      "expiryTime": "到期时间",
       "remainingDays": "剩余时间",
       "remainingTime": {
         "permanent": "永久",
@@ -744,6 +747,6 @@
         "yearMonth": "{years}年{months}个月",
         "days": "{days}天"
       }
-      }
+    }
   }
 }

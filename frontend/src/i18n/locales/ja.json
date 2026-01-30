@@ -76,6 +76,8 @@
       "dashboard": "ダッシュボード",
       "customers": "顧客管理",
       "licenses": "ライセンス管理",
+      "invoices": "発票管理",
+      "invoiceDetail": "発票申請の詳細",
       "licenseList": "ライセンス一覧",
       "createLicense": "ライセンス作成",
       "viewLicense": "ライセンス表示",
