@@ -95,6 +95,7 @@ type InvoiceResponse struct {
 	OrderNo            string     `json:"order_no"`             // 关联的订单号
 	CustomerID         string     `json:"customer_id"`          // 客户ID
 	CuUserID           string     `json:"cu_user_id"`           // 申请人客户用户ID
+	CuUserPhone        string     `json:"cu_user_phone"`        // 申请人客户用户手机号
 	Amount             float64    `json:"amount"`               // 发票金额，单位元，保留2位小数
 	Status             string     `json:"status"`               // 发票状态，pending-待处理/issued-已开票/rejected-已驳回
 	StatusDisplay      string     `json:"status_display"`       // 发票状态显示文本，根据当前语言显示

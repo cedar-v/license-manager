@@ -27,6 +27,7 @@ func NewCuInvoiceHandler(invoiceService service.CuInvoiceService) *CuInvoiceHand
 // @Tags 发票管理
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param request body models.InvoiceCreateRequest true "发票申请请求"
 // @Success 200 {object} models.APIResponse{data=object{id=string,invoice_no=string,status=string}} "成功"
 // @Failure 400 {object} models.ErrorResponse "请求参数无效"
@@ -75,6 +76,7 @@ func (h *CuInvoiceHandler) CreateInvoice(c *gin.Context) {
 // @Tags 发票管理
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param page query int false "页码，默认1" minimum(1)
 // @Param page_size query int false "每页条数，默认10，最大100" minimum(1) maximum(100)
 // @Param status query string false "状态筛选，pending-待处理/issued-已开票/rejected-已驳回"
@@ -117,6 +119,7 @@ func (h *CuInvoiceHandler) GetUserInvoices(c *gin.Context) {
 // @Tags 发票管理
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param id path string true "发票ID"
 // @Success 200 {object} models.APIResponse{data=models.InvoiceResponse} "成功"
 // @Failure 401 {object} models.ErrorResponse "未认证"
@@ -148,6 +151,7 @@ func (h *CuInvoiceHandler) GetUserInvoiceDetail(c *gin.Context) {
 // @Tags 发票管理
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Success 200 {object} models.APIResponse{data=models.InvoiceSummaryResponse} "成功"
 // @Failure 401 {object} models.ErrorResponse "未认证"
 // @Failure 500 {object} models.ErrorResponse "服务器内部错误"
@@ -175,6 +179,7 @@ func (h *CuInvoiceHandler) GetUserInvoiceSummary(c *gin.Context) {
 // @Tags 发票管理
 // @Accept json
 // @Produce application/pdf
+// @Security BearerAuth
 // @Param id path string true "发票ID"
 // @Success 200 {file} binary "发票文件"
 // @Failure 401 {object} models.ErrorResponse "未认证"

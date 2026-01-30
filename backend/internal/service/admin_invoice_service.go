@@ -138,11 +138,17 @@ func (s *adminInvoiceService) GetAdminInvoices(ctx context.Context, req *models.
 		return nil, i18n.NewI18nError("900004", lang, err.Error())
 	}
 
-	// 转换为响应结构并填充多语言显示字段
+	// 转换为响应结构并填充多语言显示字段和用户手机号
 	invoiceResponses := make([]*models.InvoiceResponse, len(invoices))
 	for i, invoice := range invoices {
 		invoiceResponses[i] = invoice.ToResponse()
 		s.fillDisplayFields(invoiceResponses[i], lang)
+
+		// 填充申请人手机号
+		cuUser, err := s.cuUserRepo.GetByID(invoice.CuUserID)
+		if err == nil {
+			invoiceResponses[i].CuUserPhone = cuUser.Phone
+		}
 	}
 
 	return &models.InvoiceListResponse{

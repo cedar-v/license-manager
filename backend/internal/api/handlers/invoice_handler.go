@@ -30,6 +30,7 @@ func NewAdminInvoiceHandler(invoiceService service.AdminInvoiceService) *AdminIn
 // @Tags 发票管理
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param page query int false "页码，默认1" minimum(1)
 // @Param page_size query int false "每页条数，默认10，最大100" minimum(1) maximum(100)
 // @Param status query string false "状态筛选，pending-待处理/issued-已开票/rejected-已驳回"
@@ -74,6 +75,7 @@ func (h *AdminInvoiceHandler) GetAdminInvoices(c *gin.Context) {
 // @Tags 发票管理
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param id path string true "发票ID"
 // @Success 200 {object} models.APIResponse{data=models.InvoiceDetailResponse} "成功"
 // @Failure 401 {object} models.ErrorResponse "未认证"
@@ -106,6 +108,7 @@ func (h *AdminInvoiceHandler) GetAdminInvoiceDetail(c *gin.Context) {
 // @Tags 发票管理
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Success 200 {object} models.APIResponse{data=models.InvoiceSummaryResponse} "成功"
 // @Failure 401 {object} models.ErrorResponse "未认证"
 // @Failure 403 {object} models.ErrorResponse "权限不足"
@@ -134,6 +137,7 @@ func (h *AdminInvoiceHandler) GetAdminInvoiceSummary(c *gin.Context) {
 // @Tags 发票管理
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param id path string true "发票ID"
 // @Param request body models.InvoiceRejectRequest true "驳回请求"
 // @Success 200 {object} models.APIResponse{data=models.InvoiceResponse} "成功"
@@ -178,6 +182,7 @@ func (h *AdminInvoiceHandler) RejectInvoice(c *gin.Context) {
 // @Tags 发票管理
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param id path string true "发票ID"
 // @Param request body models.InvoiceIssueRequest true "开票请求"
 // @Success 200 {object} models.APIResponse{data=models.InvoiceResponse} "成功"
@@ -222,6 +227,7 @@ func (h *AdminInvoiceHandler) IssueInvoice(c *gin.Context) {
 // @Tags 发票管理
 // @Accept multipart/form-data
 // @Produce json
+// @Security BearerAuth
 // @Param invoice_no formData string true "发票申请号"
 // @Param file formData file true "发票PDF文件"
 // @Success 200 {object} models.APIResponse{data=models.InvoiceUploadResponse} "成功"

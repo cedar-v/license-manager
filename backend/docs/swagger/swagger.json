@@ -4264,6 +4264,11 @@
         },
         "/api/v1/invoices/upload": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "管理员上传发票PDF文件",
                 "consumes": [
                     "multipart/form-data"
@@ -5799,30 +5804,39 @@
             "type": "object",
             "properties": {
                 "code": {
+                    "description": "授权码",
                     "type": "string"
                 },
                 "created_at": {
+                    "description": "创建时间",
                     "type": "string"
                 },
                 "current_activations": {
+                    "description": "当前激活数量",
                     "type": "integer"
                 },
                 "end_date": {
+                    "description": "到期时间",
                     "type": "string"
                 },
                 "id": {
+                    "description": "授权码ID",
                     "type": "string"
                 },
                 "max_activations": {
+                    "description": "最大激活数量",
                     "type": "integer"
                 },
                 "remaining_activations": {
+                    "description": "剩余激活数量",
                     "type": "integer"
                 },
                 "status": {
+                    "description": "状态",
                     "type": "string"
                 },
                 "status_display": {
+                    "description": "状态显示",
                     "type": "string"
                 }
             }
@@ -5854,15 +5868,19 @@
             "type": "object",
             "properties": {
                 "expired_count": {
+                    "description": "已过期授权码数量",
                     "type": "integer"
                 },
                 "total_count": {
+                    "description": "总授权码数量",
                     "type": "integer"
                 },
                 "valid_count": {
+                    "description": "有效授权码数量",
                     "type": "integer"
                 },
                 "valid_max_activations_sum": {
+                    "description": "有效授权码的 `max_activations` 之和",
                     "type": "integer"
                 }
             }
