@@ -33,10 +33,9 @@
           </el-form-item>
           <div class="filter-right">
             <div class="selected-count">
-              <span class="count-badge">{{ totalCount }}</span>
+              <!-- <span class="count-badge">{{ totalCount }}</span> -->
             </div>
             <el-form-item label="申请时间:">
-
               <el-date-picker
                 v-model="filterForm.dateRange"
                 type="daterange"
@@ -59,9 +58,24 @@
         <div class="table-header-title">
           <span class="title-line"></span>
           <h3>发票申请列表</h3>
-          <el-button type="primary" class="btn-create" @click="handleCreate" style="margin-left: auto">新增发票申请</el-button>
+          <!-- <el-button
+            type="primary"
+            class="btn-create"
+            @click="handleCreate"
+            style="margin-left: auto"
+            >新增发票申请</el-button
+          > -->
         </div>
-        <el-table :data="tableData" stripe style="width: 100%" :header-cell-style="{ background: '#E6F7FF', color: '#000', borderRight: '1px solid #BAE7FF' }">
+        <el-table
+          :data="tableData"
+          stripe
+          style="width: 100%"
+          :header-cell-style="{
+            background: '#E6F7FF',
+            color: '#000',
+            borderRight: '1px solid #BAE7FF'
+          }"
+        >
           <el-table-column prop="invoiceNo" label="发票申请号" min-width="150" />
           <el-table-column label="用户" min-width="120">
             <template #default="{ row }">
@@ -85,10 +99,16 @@
           </el-table-column>
           <el-table-column label="操作" width="180" fixed="right">
             <template #default="{ row }">
-              <el-button link type="primary" style="color: #019C7C" @click="handleView(row)">查看</el-button>
+              <el-button link type="primary" style="color: #019c7c" @click="handleView(row)"
+                >查看</el-button
+              >
               <template v-if="row.status === 'pending'">
-                <el-button link type="success" style="color: #52C41A" @click="handleUpload(row)">上传</el-button>
-                <el-button link type="danger" style="color: #F5222D" @click="handleReject(row)">驳回</el-button>
+                <el-button link type="success" style="color: #52c41a" @click="handleUpload(row)"
+                  >上传</el-button
+                >
+                <el-button link type="danger" style="color: #f5222d" @click="handleReject(row)"
+                  >驳回</el-button
+                >
               </template>
             </template>
           </el-table-column>
@@ -130,7 +150,12 @@
             <el-input v-model="createForm.orderNo" placeholder="请输入订单号" />
           </el-form-item>
           <el-form-item label="开票金额">
-            <el-input-number v-model="createForm.amount" :precision="2" :step="100" style="width: 100%" />
+            <el-input-number
+              v-model="createForm.amount"
+              :precision="2"
+              :step="100"
+              style="width: 100%"
+            />
           </el-form-item>
           <el-form-item label="抬头类型">
             <el-radio-group v-model="createForm.userType">
@@ -207,7 +232,7 @@ const fetchData = async () => {
       page: currentPage.value,
       page_size: pageSize.value,
       keyword: filterForm.keyword,
-      status: filterForm.status,
+      status: filterForm.status
     }
     if (filterForm.dateRange && filterForm.dateRange.length === 2) {
       params.start_date = filterForm.dateRange[0]
@@ -230,7 +255,6 @@ onMounted(() => {
   fetchData()
   fetchSummary()
 })
-
 
 const createForm = reactive({
   orderNo: '',
@@ -286,7 +310,6 @@ const handleRejectSubmit = (data: any) => {
   fetchSummary()
 }
 
-
 const handleSizeChange = (val: number) => {
   pageSize.value = val
   fetchData()
@@ -301,7 +324,7 @@ const handleCurrentChange = (val: number) => {
 <style lang="scss" scoped>
 .invoice-container {
   padding: 24px;
-  background-color: #F0F2F5;
+  background-color: #f0f2f5;
   min-height: calc(100vh - 80px);
 }
 
@@ -323,18 +346,16 @@ const handleCurrentChange = (val: number) => {
   border: 1px solid transparent;
   height: 96px;
 
-  &.all { border: 2px solid #1890FF; }
-
   .stat-label {
     font-size: 14px;
-    color: #8C8C8C;
+    color: #8c8c8c;
     margin-bottom: 8px;
   }
 
   .stat-value {
     font-size: 28px;
     font-weight: 600;
-    color: #019C7C;
+    color: #019c7c;
     line-height: 1.2;
   }
 
@@ -348,10 +369,22 @@ const handleCurrentChange = (val: number) => {
     font-size: 24px;
   }
 
-  &.all .stat-icon-wrapper { background: #E6F7FF; color: #1890FF; }
-  &.pending .stat-icon-wrapper { background: #FFF7E6; color: #FAAD14; }
-  &.success .stat-icon-wrapper { background: #F6FFED; color: #52C41A; }
-  &.rejected .stat-icon-wrapper { background: #F9F0FF; color: #722ED1; }
+  &.all .stat-icon-wrapper {
+    background: #e6f7ff;
+    color: #1890ff;
+  }
+  &.pending .stat-icon-wrapper {
+    background: #fff7e6;
+    color: #faad14;
+  }
+  &.success .stat-icon-wrapper {
+    background: #f6ffed;
+    color: #52c41a;
+  }
+  &.rejected .stat-icon-wrapper {
+    background: #f9f0ff;
+    color: #722ed1;
+  }
 }
 
 .filter-section {
@@ -361,7 +394,7 @@ const handleCurrentChange = (val: number) => {
   margin-bottom: 24px;
   display: flex;
   align-items: center;
-  border: 1px solid #F0F0F0;
+  border: 1px solid #f0f0f0;
 
   .filter-form {
     width: 100%;
@@ -372,7 +405,7 @@ const handleCurrentChange = (val: number) => {
     :deep(.el-form-item) {
       margin-bottom: 0;
       margin-right: 24px;
-      
+
       .el-form-item__label {
         font-weight: 500;
         color: #262626;
@@ -384,7 +417,7 @@ const handleCurrentChange = (val: number) => {
     display: flex;
     align-items: center;
     margin-left: auto;
-    
+
     :deep(.el-form-item) {
       margin-right: 12px;
       &:last-child {
@@ -397,7 +430,7 @@ const handleCurrentChange = (val: number) => {
 .selected-count {
   margin-right: 24px;
   .count-badge {
-    background: #FF4D4F;
+    background: #ff4d4f;
     color: #fff;
     padding: 0 12px;
     border-radius: 4px;
@@ -410,8 +443,8 @@ const handleCurrentChange = (val: number) => {
 }
 
 .btn-filter {
-  background-color: #019C7C;
-  border-color: #019C7C;
+  background-color: #019c7c;
+  border-color: #019c7c;
   padding: 8px 24px;
   &:hover {
     background-color: #017c63;
@@ -423,7 +456,7 @@ const handleCurrentChange = (val: number) => {
   background: #fff;
   padding: 24px;
   border-radius: 4px;
-  border: 1px solid #F0F0F0;
+  border: 1px solid #f0f0f0;
 }
 
 .table-header-title {
@@ -434,7 +467,7 @@ const handleCurrentChange = (val: number) => {
   .title-line {
     width: 4px;
     height: 16px;
-    background: #019C7C;
+    background: #019c7c;
     margin-right: 12px;
   }
 
@@ -461,38 +494,50 @@ const handleCurrentChange = (val: number) => {
     border-radius: 2px;
     height: 20px;
     line-height: 20px;
-    &.personal { background: #E6F7FF; color: #1890FF; }
-    &.enterprise { background: #F6FFED; color: #52C41A; }
+    &.personal {
+      background: #e6f7ff;
+      color: #1890ff;
+    }
+    &.enterprise {
+      background: #f6ffed;
+      color: #52c41a;
+    }
   }
 }
 
 .status-text {
-  &.success { color: #1890FF; }
-  &.pending { color: #FAAD14; }
-  &.rejected { color: #BFBFBF; }
+  &.success {
+    color: #1890ff;
+  }
+  &.pending {
+    color: #faad14;
+  }
+  &.rejected {
+    color: #bfbfbf;
+  }
 }
 
 .pagination-container {
   margin-top: 24px;
   display: flex;
   justify-content: flex-end;
-  
+
   :deep(.el-pagination) {
     .el-pager li.is-active {
-      background-color: #019C7C;
+      background-color: #019c7c;
       color: #fff;
     }
   }
 }
 
 :deep(.el-table) {
-  --el-table-header-bg-color: #E6F7FF;
-  border: 1px solid #BAE7FF;
-  
+  --el-table-header-bg-color: #e6f7ff;
+  border: 1px solid #bae7ff;
+
   .el-table__header th {
     color: #262626;
     height: 54px;
-    border-right: 1px solid #BAE7FF;
+    border-right: 1px solid #bae7ff;
     &:last-child {
       border-right: none;
     }
@@ -504,7 +549,7 @@ const handleCurrentChange = (val: number) => {
   }
 
   .el-table__row--striped {
-    background-color: #FAFAFA;
+    background-color: #fafafa;
   }
 }
 
@@ -514,7 +559,9 @@ const handleCurrentChange = (val: number) => {
   }
   .stat-card {
     padding: 16px;
-    .stat-value { font-size: 24px; }
+    .stat-value {
+      font-size: 24px;
+    }
   }
 }
 
