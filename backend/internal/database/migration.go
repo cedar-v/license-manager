@@ -30,6 +30,7 @@ func AutoMigrate() error {
 		&models.License{},
 		&models.AuthorizationChange{},
 		&models.Invoice{}, // 发票表
+		&models.Package{}, // 套餐表
 	)
 	if err != nil {
 		return fmt.Errorf("failed to migrate database: %w", err)
@@ -48,6 +49,11 @@ func AutoMigrate() error {
 	// 初始化默认管理员用户
 	if err := initDefaultAdminUser(); err != nil {
 		return fmt.Errorf("failed to initialize default admin user: %w", err)
+	}
+
+	// 初始化默认套餐数据
+	if err := initDefaultPackages(); err != nil {
+		return fmt.Errorf("failed to initialize default packages: %w", err)
 	}
 
 	log.Println("Database auto migration completed successfully")
@@ -138,5 +144,76 @@ func initDefaultAdminUser() error {
 		log.Println("Default admin user already exists")
 	}
 
+	return nil
+}
+
+// initDefaultPackages 初始化默认套餐数据
+func initDefaultPackages() error {
+	var count int64
+	if err := DB.Model(&models.Package{}).Where("deleted_at IS NULL").Count(&count).Error; err != nil {
+		return fmt.Errorf("failed to count packages: %w", err)
+	}
+
+	if count > 0 {
+		log.Println("Packages already initialized, skipping")
+		return nil
+	}
+
+	// 默认套餐数据
+	packages := []models.Package{
+		{
+			Name:                "试用版",
+			Type:                "trial",
+			Price:               0,
+			PriceDescription:    "免费",
+			DurationDescription: "当月25日到期",
+			Description:         "免费体验全部功能",
+			Features:            `["全部功能", "1个许可"]`,
+			Status:              1,
+			SortOrder:           1,
+		},
+		{
+			Name:                "基础版",
+			Type:                "basic",
+			Price:               300,
+			PriceDescription:    "300元/许可",
+			DurationDescription: "永久有效",
+			Description:         "小型企业最佳选择",
+			Features:            `["基础功能", "批量许可购买", "折扣优惠"]`,
+			Status:              1,
+			SortOrder:           2,
+		},
+		{
+			Name:                "专业版",
+			Type:                "professional",
+			Price:               2000,
+			PriceDescription:    "2000元/许可",
+			DurationDescription: "永久有效",
+			Description:         "企业级完整解决方案",
+			Features:            `["全部功能", "技术支持", "数据分析"]`,
+			Status:              1,
+			SortOrder:           3,
+		},
+		{
+			Name:                "企业定制版",
+			Type:                "custom",
+			Price:               0,
+			PriceDescription:    "定制报价",
+			DurationDescription: "按需定制",
+			Description:         "按需定制解决方案",
+			Features:            `["按需定制", "专属服务"]`,
+			Status:              1,
+			SortOrder:           4,
+		},
+	}
+
+	for _, pkg := range packages {
+		if err := DB.Create(&pkg).Error; err != nil {
+			return fmt.Errorf("failed to create package %s: %w", pkg.Name, err)
+		}
+		log.Printf("Created default package: %s", pkg.Name)
+	}
+
+	log.Println("Default packages initialized successfully")
 	return nil
 }

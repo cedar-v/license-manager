@@ -15,12 +15,14 @@ import (
 type CuOrderHandler struct {
 	cuOrderService service.CuOrderService
 	paymentService service.PaymentService
+	packageService service.PackageService
 }
 
-func NewCuOrderHandler(cuOrderService service.CuOrderService, paymentService service.PaymentService) *CuOrderHandler {
+func NewCuOrderHandler(cuOrderService service.CuOrderService, paymentService service.PaymentService, packageService service.PackageService) *CuOrderHandler {
 	return &CuOrderHandler{
 		cuOrderService: cuOrderService,
 		paymentService: paymentService,
+		packageService: packageService,
 	}
 }
 
@@ -35,56 +37,39 @@ func NewCuOrderHandler(cuOrderService service.CuOrderService, paymentService ser
 func (h *CuOrderHandler) GetPackages(c *gin.Context) {
 	lang := middleware.GetLanguage(c)
 
-	// 获取套餐列表
-	packages := h.getPackageList()
+	// 从数据库获取套餐列表
+	packages, err := h.packageService.GetCuPackageList(c.Request.Context())
+	if err != nil {
+		status, errCode, message := i18n.NewI18nErrorResponse("800005", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	// 转换为map数组格式（兼容原有结构）
+	result := make([]map[string]interface{}, len(packages))
+	for i, pkg := range packages {
+		result[i] = map[string]interface{}{
+			"id":          pkg.ID,
+			"name":        pkg.Name,
+			"type":        pkg.Type,
+			"price":       pkg.Price,
+			"max_devices": pkg.MaxDevices,
+			"description": pkg.Description,
+			"features":    pkg.Features,
+			"details":     pkg.Details,
+		}
+	}
 
 	c.JSON(http.StatusOK, models.APIResponse{
 		Code:      "000000",
 		Message:   i18n.GetI18nErrorMessage("000000", lang),
-		Data:      packages,
+		Data:      result,
 		Timestamp: getCurrentTimestamp(),
 	})
-}
-
-// getPackageList 获取套餐列表（暂时写死数据）
-func (h *CuOrderHandler) getPackageList() []map[string]interface{} {
-	return []map[string]interface{}{
-		{
-			"id":          "trial",
-			"name":        "试用版",
-			"type":        "trial",
-			"price":       0,
-			"max_devices": 1,
-			"description": "免费体验全部功能",
-			"details":     "包含全部功能|试用期限制|1个许可等",
-		},
-		{
-			"id":          "basic",
-			"name":        "基础版",
-			"type":        "basic",
-			"price":       300,
-			"max_devices": 1000,
-			"description": "小型企业最佳选择",
-			"details":     "包含基础功能|批量许可购买|折扣优惠等",
-		},
-		{
-			"id":          "professional",
-			"name":        "专业版",
-			"type":        "professional",
-			"price":       2000,
-			"max_devices": 1000,
-			"description": "企业级完整解决方案",
-			"details":     "包含高级功能|技术支持|数据分析等",
-		}, {
-			"id":          "custom",
-			"name":        "企业定制版",
-			"type":        "custom",
-			"price":       "定制报价",
-			"max_devices": 0,
-			"description": "按需定制",
-			"details":     "包含高级功能|技术支持|数据分析等",
-		},
-	}
 }
 
 // CalculatePrice 计算订单价格

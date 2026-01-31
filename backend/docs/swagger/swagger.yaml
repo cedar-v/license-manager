@@ -1335,6 +1335,9 @@ definitions:
       cu_user_id:
         description: 申请人客户用户ID
         type: string
+      cu_user_phone:
+        description: 申请人客户用户手机号
+        type: string
       customer_id:
         description: 客户ID
         type: string
@@ -1471,6 +1474,9 @@ definitions:
         type: string
       cu_user_id:
         description: 申请人客户用户ID
+        type: string
+      cu_user_phone:
+        description: 申请人客户用户手机号
         type: string
       customer_id:
         description: 客户ID
@@ -1793,6 +1799,123 @@ definitions:
       total_orders:
         description: 订单总数
         type: integer
+    type: object
+  models.PackageCreateRequest:
+    properties:
+      description:
+        maxLength: 500
+        type: string
+      duration_description:
+        maxLength: 200
+        type: string
+      features:
+        description: JSON格式
+        type: string
+      name:
+        maxLength: 100
+        minLength: 1
+        type: string
+      price:
+        minimum: 0
+        type: number
+      price_description:
+        maxLength: 100
+        type: string
+      remark:
+        maxLength: 500
+        type: string
+      sort_order:
+        type: integer
+      status:
+        enum:
+        - 0
+        - 1
+        type: integer
+      type:
+        enum:
+        - trial
+        - basic
+        - professional
+        - custom
+        type: string
+    required:
+    - name
+    - type
+    type: object
+  models.PackageListResponse:
+    properties:
+      packages:
+        items:
+          $ref: '#/definitions/models.PackageResponse'
+        type: array
+      total_count:
+        type: integer
+    type: object
+  models.PackageResponse:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      duration_description:
+        type: string
+      features:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      price_description:
+        type: string
+      sort_order:
+        type: integer
+      status:
+        type: integer
+      type:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.PackageUpdateRequest:
+    properties:
+      description:
+        maxLength: 500
+        type: string
+      duration_description:
+        maxLength: 200
+        type: string
+      features:
+        description: JSON格式
+        type: string
+      name:
+        maxLength: 100
+        minLength: 1
+        type: string
+      price:
+        minimum: 0
+        type: number
+      price_description:
+        maxLength: 100
+        type: string
+      remark:
+        maxLength: 500
+        type: string
+      sort_order:
+        type: integer
+      status:
+        enum:
+        - 0
+        - 1
+        type: integer
+      type:
+        enum:
+        - trial
+        - basic
+        - professional
+        - custom
+        type: string
     type: object
   models.PaymentBusinessOrder:
     properties:
@@ -2433,6 +2556,8 @@ paths:
           description: 服务器内部错误
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: 客户发票列表
       tags:
       - 发票管理
@@ -2482,6 +2607,8 @@ paths:
           description: 服务器内部错误
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: 客户申请发票
       tags:
       - 发票管理
@@ -2524,6 +2651,8 @@ paths:
           description: 服务器内部错误
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: 客户发票详情
       tags:
       - 发票管理
@@ -2561,6 +2690,8 @@ paths:
           description: 服务器内部错误
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: 客户发票下载
       tags:
       - 发票管理
@@ -2589,6 +2720,8 @@ paths:
           description: 服务器内部错误
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: 客户发票汇总信息
       tags:
       - 发票管理
@@ -3753,6 +3886,281 @@ paths:
       summary: 获取指定类型的枚举值
       tags:
       - 枚举管理
+  /api/packages:
+    get:
+      consumes:
+      - application/json
+      description: 管理员获取套餐列表，支持类型和状态筛选
+      parameters:
+      - description: 套餐类型筛选
+        in: query
+        name: type
+        type: string
+      - description: 状态筛选，1-启用，0-禁用
+        in: query
+        name: status
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.PackageListResponse'
+              type: object
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取套餐列表
+      tags:
+      - 套餐管理
+    post:
+      consumes:
+      - application/json
+      description: 创建新的套餐
+      parameters:
+      - description: 套餐创建请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.PackageCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.PackageResponse'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 创建套餐
+      tags:
+      - 套餐管理
+  /api/packages/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除指定套餐（软删除）
+      parameters:
+      - description: 套餐ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 套餐不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 删除套餐
+      tags:
+      - 套餐管理
+    get:
+      consumes:
+      - application/json
+      description: 根据ID获取套餐详细信息
+      parameters:
+      - description: 套餐ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.PackageResponse'
+              type: object
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 套餐不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取套餐详情
+      tags:
+      - 套餐管理
+    put:
+      consumes:
+      - application/json
+      description: 更新指定套餐的信息
+      parameters:
+      - description: 套餐ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 套餐更新请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.PackageUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.PackageResponse'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 套餐不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 更新套餐
+      tags:
+      - 套餐管理
+  /api/packages/{id}/status:
+    put:
+      consumes:
+      - application/json
+      description: 启用或禁用套餐
+      parameters:
+      - description: 套餐ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 状态，1-启用，0-禁用
+        in: query
+        name: status
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.PackageResponse'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 套餐不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 更新套餐状态
+      tags:
+      - 套餐管理
   /api/payment/{payment_no}/status:
     get:
       consumes:
@@ -4634,6 +5042,8 @@ paths:
           description: 服务器内部错误
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: 管理员发票列表
       tags:
       - 发票管理
@@ -4676,6 +5086,8 @@ paths:
           description: 服务器内部错误
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: 管理员发票详情
       tags:
       - 发票管理
@@ -4728,6 +5140,8 @@ paths:
           description: 服务器内部错误
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: 管理员发票开票
       tags:
       - 发票管理
@@ -4780,6 +5194,8 @@ paths:
           description: 服务器内部错误
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: 管理员发票驳回
       tags:
       - 发票管理
@@ -4812,6 +5228,8 @@ paths:
           description: 服务器内部错误
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: 管理员发票汇总信息
       tags:
       - 发票管理

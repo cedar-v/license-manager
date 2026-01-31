@@ -49,6 +49,7 @@ func SetupRouter() *gin.Engine {
 	paymentRepo := repository.NewPaymentRepository(db)
 	cuInvoiceRepo := repository.NewCuInvoiceRepository(db)
 	adminInvoiceRepo := repository.NewAdminInvoiceRepository(db)
+	packageRepo := repository.NewPackageRepository(db)
 
 	// 获取logger实例
 	log := logger.GetLogger()
@@ -103,7 +104,8 @@ func SetupRouter() *gin.Engine {
 	customerHandler := handlers.NewCustomerHandler(customerService)
 	cuAuthHandler := handlers.NewCuAuthHandler(cuUserService)
 	cuProfileHandler := handlers.NewCuProfileHandler(cuUserService)
-	cuOrderHandler := handlers.NewCuOrderHandler(cuOrderService, paymentService)
+	packageService := service.NewPackageService(packageRepo, db)
+	cuOrderHandler := handlers.NewCuOrderHandler(cuOrderService, paymentService, packageService)
 	cuDeviceHandler := handlers.NewCuDeviceHandler(cuDeviceService)
 	paymentHandler := handlers.NewPaymentHandler(paymentService)
 	cuAuthorizationHandler := handlers.NewCuAuthorizationHandler(authCodeService)
@@ -115,6 +117,7 @@ func SetupRouter() *gin.Engine {
 	dashboardHandler := handlers.NewDashboardHandler(dashboardService)
 	adminInvoiceService := service.NewAdminInvoiceService(adminInvoiceRepo, cuOrderRepo, userRepo, cuUserRepo, db)
 	adminInvoiceHandler := handlers.NewAdminInvoiceHandler(adminInvoiceService)
+	packageHandler := handlers.NewPackageHandler(packageService)
 
 	// 健康检测接口（无需认证）
 	router.GET("/health", systemHandler.HealthCheck)
@@ -193,6 +196,14 @@ func SetupRouter() *gin.Engine {
 			auth.POST("/v1/invoices/:id/reject", adminInvoiceHandler.RejectInvoice)
 			auth.POST("/v1/invoices/:id/issue", adminInvoiceHandler.IssueInvoice)
 			auth.POST("/v1/invoices/upload", adminInvoiceHandler.UploadInvoiceFile)
+
+			// 套餐管理（管理员）
+			auth.GET("/packages", packageHandler.GetPackages)
+			auth.GET("/packages/:id", packageHandler.GetPackageDetail)
+			auth.POST("/packages", packageHandler.CreatePackage)
+			auth.PUT("/packages/:id", packageHandler.UpdatePackage)
+			auth.DELETE("/packages/:id", packageHandler.DeletePackage)
+			auth.PUT("/packages/:id/status", packageHandler.UpdatePackageStatus)
 		}
 
 		// 管理员接口
