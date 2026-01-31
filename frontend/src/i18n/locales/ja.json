@@ -54,7 +54,9 @@
     "menu": {
       "dashboard": "ダッシュボード",
       "customers": "顧客管理",
+      "enterpriseLeads": "企業リード",
       "licenses": "ライセンス管理",
+      "invoices": "発票管理",
       "roles": "ロールと権限",
       "users": "システムユーザー"
     },
@@ -75,6 +77,7 @@
     "breadcrumb": {
       "dashboard": "ダッシュボード",
       "customers": "顧客管理",
+      "enterpriseLeads": "企業リード",
       "licenses": "ライセンス管理",
       "invoices": "発票管理",
       "invoiceDetail": "発票申請の詳細",
@@ -88,6 +91,142 @@
       "profile": "プロフィール",
       "workspace": "ワークスペース",
       "unknown": "未知ページ"
+    }
+  },
+
+  "enterpriseLeads": {
+    "title": "企業リード",
+    "stats": {
+      "total": "リード総数",
+      "pending": "未連絡",
+      "contacting": "連絡済み",
+      "completed": "成約済み",
+      "rejected": "失注"
+    },
+    "filter": {
+      "searchPlaceholder": "キーワードを入力して検索",
+      "search": "検索",
+      "statusPlaceholder": "全ステータス",
+      "allStatus": "全ステータス"
+    },
+    "table": {
+      "title": "企業リード一覧",
+      "id": "リードID",
+      "company": "企業名",
+      "contact": "担当者",
+      "phone": "連絡先電話",
+      "submittedAt": "提出時間",
+      "status": "ステータス",
+      "actions": "操作"
+    },
+    "status": {
+      "pending": "未連絡",
+      "contacting": "連絡済み",
+      "completed": "成約済み",
+      "rejected": "失注"
+    },
+    "actions": {
+      "view": "表示",
+      "edit": "編集",
+      "delete": "削除",
+      "refresh": "更新"
+    }
+  },
+
+  "invoices": {
+    "title": "発票管理",
+    "detailTitle": "発票申請の詳細",
+    "stats": {
+      "all": "全申請数",
+      "pending": "保留中",
+      "success": "発行済み",
+      "rejected": "却下済み"
+    },
+    "filter": {
+      "searchLabel": "発票番号/注文番号で検索:",
+      "searchPlaceholder": "発票番号または注文番号を入力",
+      "statusLabel": "ステータス:",
+      "allStatus": "全ステータス",
+      "pending": "保留中",
+      "success": "発行済み",
+      "rejected": "却下済み",
+      "timeLabel": "申請時間:",
+      "reset": "リセット",
+      "query": "検索"
+    },
+    "table": {
+      "invoiceNo": "発票申請番号",
+      "user": "ユーザー",
+      "orderNo": "注文番号",
+      "applyTime": "申請時間",
+      "status": "ステータス",
+      "amount": "金額",
+      "operation": "操作",
+      "listTitle": "発票申請一覧"
+    },
+    "actions": {
+      "view": "表示",
+      "upload": "アップロード",
+      "reject": "却下",
+      "back": "戻る",
+      "submit": "送信",
+      "cancel": "キャンセル",
+      "confirmUpload": "アップロード確定",
+      "confirmReject": "却下確定"
+    },
+    "detail": {
+      "basicInfo": "基本情報",
+      "invoiceInfo": "発票情報",
+      "rejectInfo": "却下情報",
+      "approveInfo": "承認情報",
+      "invoiceNo": "発票申請番号",
+      "orderNo": "関連注文番号",
+      "applyTime": "申請時間",
+      "status": "ステータス",
+      "userInfo": "ユーザー情報",
+      "phone": "電話番号",
+      "amount": "金額",
+      "email": "メールアドレス",
+      "invoiceType": "発票タイプ",
+      "invoiceTitle": "発票名義",
+      "taxId": "納税者識別番号",
+      "content": "内容",
+      "remark": "備考",
+      "rejectReason": "却下理由",
+      "rejectTime": "却下時間",
+      "rejectUser": "却下担当者",
+      "finishTime": "完了時間",
+      "approveUser": "アップロード担当者",
+      "fileName": "ファイル名",
+      "approveTime": "アップロード時間"
+    },
+    "dialog": {
+      "uploadTitle": "発票ファイルのアップロード",
+      "rejectTitle": "発票申請の却下",
+      "rejectAlert": "却下後、ユーザーに通知され、再申請が必要になります。",
+      "reasonLabel": "却下理由",
+      "reasonTip": "具体的な却下理由を選択または入力してください",
+      "reasonPlaceholder": "理由を選択してください",
+      "remarkLabel": "詳細説明",
+      "remarkPlaceholder": "ユーザーが情報を修正しやすくなるよう、詳細な説明を入力してください",
+      "uploadLabel": "発票ファイルのアップロード",
+      "uploadDraggerText": "クリックしてアップロード / ドラッグ＆ドロップ",
+      "uploadTip": "PDF形式に対応。最大10MB",
+      "finishTimeLabel": "完了時間",
+      "finishTimePlaceholder": "日時を選択",
+      "remarkPlaceholderUpload": "備考を入力してください",
+      "reasons": {
+        "title_error": "名義情報の誤り",
+        "tax_id_error": "納税者識別番号の誤り",
+        "attachment_error": "添付ファイルが不鮮明または誤り",
+        "other": "その他の理由"
+      }
+    },
+    "messages": {
+      "uploadSuccess": "アップロードに成功しました",
+      "rejectSuccess": "申請を却下しました",
+      "fetchError": "データの取得に失敗しました",
+      "fetchDetailError": "詳細の取得に失敗しました"
     }
   },
   "common": {

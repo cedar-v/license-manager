@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="visible"
-    title="驳回发票申请"
+    :title="t('invoices.dialog.rejectTitle')"
     width="640px"
     class="reject-invoice-dialog"
     :show-close="true"
@@ -10,47 +10,47 @@
     <div class="reject-dialog-content">
       <div class="reject-alert">
         <el-icon class="alert-icon"><warning-filled /></el-icon>
-        <span class="alert-text">驳回后，用户将收到通知并需要重新提交申请。</span>
+        <span class="alert-text">{{ t('invoices.dialog.rejectAlert') }}</span>
       </div>
 
       <div class="info-summary" v-if="invoiceData">
         <div class="summary-item">
-          <span class="label">发票申请号：</span>
-          <span class="value">{{ invoiceData.invoiceNo }}</span>
+          <span class="label">{{ t('invoices.detail.invoiceNo') }}：</span>
+          <span class="value">{{ invoiceData.invoice_no }}</span>
         </div>
         <div class="summary-item">
-          <span class="label">用户信息：</span>
-          <span class="value">{{ invoiceData.user }}</span>
+          <span class="label">{{ t('invoices.detail.userInfo') }}：</span>
+          <span class="value">{{ invoiceData.applicant_name }}</span>
         </div>
         <div class="summary-item full-width">
-          <span class="label">发票抬头：</span>
-          <span class="value">{{ invoiceData.invoiceTitle }}</span>
+          <span class="label">{{ t('invoices.detail.invoiceTitle') }}：</span>
+          <span class="value">{{ invoiceData.title }}</span>
         </div>
       </div>
 
       <el-form :model="form" ref="formRef" label-position="top">
         <div class="label-row">
-          <span class="section-label required">驳回原因</span>
-          <span class="label-tip">请选择或输入驳回的具体原因</span>
+          <span class="section-label required">{{ t('invoices.dialog.reasonLabel') }}</span>
+          <span class="label-tip">{{ t('invoices.dialog.reasonTip') }}</span>
         </div>
-        <el-form-item prop="reason" :rules="[{ required: true, message: '请选择驳回原因', trigger: 'change' }]">
-          <el-select v-model="form.reason" placeholder="请选择驳回原因" style="width: 100%">
-            <el-option label="发票抬头信息有误" value="title_error" />
-            <el-option label="纳税人识别号不正确" value="tax_id_error" />
-            <el-option label="附件不清晰或有误" value="attachment_error" />
-            <el-option label="其他原因" value="other" />
+        <el-form-item prop="reason" :rules="[{ required: true, message: t('invoices.dialog.reasonPlaceholder'), trigger: 'change' }]">
+          <el-select v-model="form.reason" :placeholder="t('invoices.dialog.reasonPlaceholder')" style="width: 100%">
+            <el-option :label="t('invoices.dialog.reasons.title_error')" value="title_error" />
+            <el-option :label="t('invoices.dialog.reasons.tax_id_error')" value="tax_id_error" />
+            <el-option :label="t('invoices.dialog.reasons.attachment_error')" value="attachment_error" />
+            <el-option :label="t('invoices.dialog.reasons.other')" value="other" />
           </el-select>
         </el-form-item>
 
         <div class="label-row">
-          <span class="section-label">详细说明</span>
+          <span class="section-label">{{ t('invoices.dialog.remarkLabel') }}</span>
         </div>
-        <el-form-item prop="remark">
+        <el-form-item prop="suggestion">
           <el-input
-            v-model="form.remark"
+            v-model="form.suggestion"
             type="textarea"
             :rows="4"
-            placeholder="请输入详细的驳回说明，帮助用户更准确地修改信息"
+            :placeholder="t('invoices.dialog.remarkPlaceholder')"
             maxlength="200"
             show-word-limit
           />
@@ -59,8 +59,8 @@
     </div>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="visible = false">取消</el-button>
-        <el-button type="danger" @click="handleSubmit">确认驳回</el-button>
+        <el-button @click="visible = false">{{ t('invoices.actions.cancel') }}</el-button>
+        <el-button type="danger" @click="handleSubmit">{{ t('invoices.actions.confirmReject') }}</el-button>
       </div>
     </template>
   </el-dialog>
@@ -68,9 +68,11 @@
 
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { WarningFilled } from '@element-plus/icons-vue'
 
+const { t } = useI18n()
 const props = defineProps<{
   modelValue: boolean
   invoiceData: any
@@ -82,7 +84,7 @@ const visible = ref(props.modelValue)
 const formRef = ref()
 const form = reactive({
   reason: '',
-  remark: ''
+  suggestion: ''
 })
 
 watch(() => props.modelValue, (val) => {
@@ -103,7 +105,6 @@ const handleSubmit = async () => {
   if (!formRef.value) return
   await formRef.value.validate((valid: boolean) => {
     if (valid) {
-      ElMessage.success('发票申请已驳回')
       emit('submit', { ...form })
       visible.value = false
     }

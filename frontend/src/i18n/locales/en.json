@@ -54,7 +54,9 @@
     "menu": {
       "dashboard": "Dashboard",
       "customers": "Customer Management",
+      "enterpriseLeads": "Enterprise Leads",
       "licenses": "License Management",
+      "invoices": "Invoice Management",
       "roles": "Roles & Permissions",
       "users": "System Users"
     },
@@ -75,10 +77,11 @@
     "breadcrumb": {
       "dashboard": "Dashboard",
       "customers": "Customer Management",
-        "licenses": "License Management",
-        "invoices": "Invoice Management",
-        "invoiceDetail": "Invoice Detail",
-        "licenseList": "License List",
+      "enterpriseLeads": "Enterprise Leads",
+      "licenses": "License Management",
+      "invoices": "Invoice Management",
+      "invoiceDetail": "Invoice Detail",
+      "licenseList": "License List",
       "createLicense": "Create License",
       "viewLicense": "View License",
       "roles": "Roles & Permissions",
@@ -90,6 +93,143 @@
       "unknown": "Unknown Page"
     }
   },
+
+  "enterpriseLeads": {
+    "title": "Enterprise Leads",
+    "stats": {
+      "total": "Total Leads",
+      "pending": "Pending",
+      "contacting": "Contacted",
+      "completed": "Converted",
+      "rejected": "Rejected"
+    },
+    "filter": {
+      "searchPlaceholder": "Search by keywords",
+      "search": "Search",
+      "statusPlaceholder": "All Status",
+      "allStatus": "All Status"
+    },
+    "table": {
+      "title": "Enterprise Leads List",
+      "id": "Lead ID",
+      "company": "Company Name",
+      "contact": "Contact",
+      "phone": "Phone",
+      "submittedAt": "Submitted At",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "Pending",
+      "contacting": "Contacted",
+      "completed": "Converted",
+      "rejected": "Rejected"
+    },
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete",
+      "refresh": "Refresh"
+    }
+  },
+
+  "invoices": {
+    "title": "Invoice Management",
+    "detailTitle": "Invoice Application Detail",
+    "stats": {
+      "all": "Total Applications",
+      "pending": "Pending",
+      "success": "Invoiced",
+      "rejected": "Rejected"
+    },
+    "filter": {
+      "searchLabel": "Search Invoice/Order No:",
+      "searchPlaceholder": "Enter invoice or order number",
+      "statusLabel": "Status:",
+      "allStatus": "All Status",
+      "pending": "Pending",
+      "success": "Invoiced",
+      "rejected": "Rejected",
+      "timeLabel": "Apply Time:",
+      "reset": "Reset",
+      "query": "Filter"
+    },
+    "table": {
+      "invoiceNo": "Invoice App No",
+      "user": "User",
+      "orderNo": "Order No",
+      "applyTime": "Apply Time",
+      "status": "Status",
+      "amount": "Amount",
+      "operation": "Operation",
+      "listTitle": "Invoice Application List"
+    },
+    "actions": {
+      "view": "View",
+      "upload": "Upload",
+      "reject": "Reject",
+      "back": "Back",
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "confirmUpload": "Confirm Upload",
+      "confirmReject": "Confirm Reject"
+    },
+    "detail": {
+      "basicInfo": "Basic Information",
+      "invoiceInfo": "Invoice Information",
+      "rejectInfo": "Reject Information",
+      "approveInfo": "Approve Information",
+      "invoiceNo": "Invoice App No",
+      "orderNo": "Related Order No",
+      "applyTime": "Apply Time",
+      "status": "Status",
+      "userInfo": "User Info",
+      "phone": "Phone",
+      "amount": "Amount",
+      "email": "Email",
+      "invoiceType": "Invoice Type",
+      "invoiceTitle": "Invoice Title",
+      "taxId": "Tax ID",
+      "content": "Content",
+      "remark": "Remark",
+      "rejectReason": "Reject Reason",
+      "rejectTime": "Reject Time",
+      "rejectUser": "Reject By",
+      "finishTime": "Finish Time",
+      "approveUser": "Upload By",
+      "fileName": "Invoice File",
+      "approveTime": "Upload Time"
+    },
+    "dialog": {
+      "uploadTitle": "Upload Invoice File",
+      "rejectTitle": "Reject Invoice Application",
+      "rejectAlert": "After rejection, the user will be notified and need to resubmit.",
+      "reasonLabel": "Reject Reason",
+      "reasonTip": "Please select or enter the specific reason",
+      "reasonPlaceholder": "Please select reason",
+      "remarkLabel": "Details",
+      "remarkPlaceholder": "Enter detailed instructions to help user modify information",
+      "uploadLabel": "Upload Invoice File",
+      "uploadDraggerText": "Click to upload / drag to this area",
+      "uploadTip": "Support PDF format. Max 10MB",
+      "finishTimeLabel": "Finish Time",
+      "finishTimePlaceholder": "Select date and time",
+      "remarkPlaceholderUpload": "Enter remark",
+      "reasons": {
+        "title_error": "Incorrect title info",
+        "tax_id_error": "Incorrect tax ID",
+        "attachment_error": "Unclear or wrong attachment",
+        "other": "Other reasons"
+      }
+    },
+    "messages": {
+      "uploadSuccess": "Invoice uploaded successfully",
+      "rejectSuccess": "Application rejected",
+      "fetchError": "Failed to fetch data",
+      "fetchDetailError": "Failed to fetch details"
+    }
+  },
+
   "common": {
     "cancel": "Cancel",
     "confirm": "Confirm"

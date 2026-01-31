@@ -62,9 +62,19 @@ const routes: Array<RouteRecordRaw> = [
     ]
   },
   {
+    path: "/enterprise-leads",
+    component: () => import("@/views/EnterpriseLeads/index.vue"),
+    meta: { title: "企业线索", requiresAuth: true }
+  },
+  {
     path: "/invoices",
     component: () => import("@/views/Invoices/index.vue"),
     meta: { title: "发票管理", requiresAuth: true }
+  },
+  {
+    path: "/packages",
+    component: () => import("@/views/Packages/index.vue"),
+    meta: { title: "套餐管理", requiresAuth: true }
   },
   {
     path: "/invoices/detail/:id",

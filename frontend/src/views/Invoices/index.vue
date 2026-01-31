@@ -3,16 +3,24 @@
     <div class="invoice-container">
       <!-- 统计卡片 -->
       <div class="stats-row">
-        <div v-for="stat in stats" :key="stat.label" class="stat-card" :class="stat.type">
+        <div v-for="stat in stats" :key="stat.key" class="stat-card" :class="stat.type">
           <div class="stat-info">
-            <div class="stat-label">{{ stat.label }}</div>
+            <div class="stat-label">{{ t(`invoices.stats.${stat.type}`) }}</div>
             <div class="stat-value">{{ stat.value }}</div>
           </div>
           <div class="stat-icon-wrapper">
-            <el-icon v-if="stat.icon === 'document'"><Document /></el-icon>
-            <el-icon v-else-if="stat.icon === 'warning'"><Warning /></el-icon>
-            <el-icon v-else-if="stat.icon === 'success'"><CircleCheck /></el-icon>
-            <el-icon v-else-if="stat.icon === 'error'"><CircleClose /></el-icon>
+            <el-icon v-if="stat.icon === 'document'">
+              <Document />
+            </el-icon>
+            <el-icon v-else-if="stat.icon === 'warning'">
+              <Warning />
+            </el-icon>
+            <el-icon v-else-if="stat.icon === 'success'">
+              <CircleCheck />
+            </el-icon>
+            <el-icon v-else-if="stat.icon === 'error'">
+              <CircleClose />
+            </el-icon>
           </div>
         </div>
       </div>
@@ -20,34 +28,29 @@
       <!-- 搜索和筛选 -->
       <div class="filter-section">
         <el-form :inline="true" :model="filterForm" class="filter-form">
-          <el-form-item label="搜索发票号/订单号:">
-            <el-input v-model="filterForm.keyword" placeholder="输入发票号或订单号" />
+          <el-form-item :label="t('invoices.filter.searchLabel')">
+            <el-input v-model="filterForm.keyword" :placeholder="t('invoices.filter.searchPlaceholder')" />
           </el-form-item>
-          <el-form-item label="开票状态:">
-            <el-select v-model="filterForm.status" placeholder="全部状态" style="width: 150px">
-              <el-option label="全部状态" value="" />
-              <el-option label="待处理" value="pending" />
-              <el-option label="已开票" value="success" />
-              <el-option label="已驳回" value="rejected" />
+          <el-form-item :label="t('invoices.filter.statusLabel')">
+            <el-select v-model="filterForm.status" :placeholder="t('invoices.filter.allStatus')" style="width: 150px">
+              <el-option :label="t('invoices.filter.allStatus')" value="" />
+              <el-option :label="t('invoices.filter.pending')" value="pending" />
+              <el-option :label="t('invoices.filter.success')" value="success" />
+              <el-option :label="t('invoices.filter.rejected')" value="rejected" />
             </el-select>
           </el-form-item>
           <div class="filter-right">
             <div class="selected-count">
               <!-- <span class="count-badge">{{ totalCount }}</span> -->
             </div>
-            <el-form-item label="申请时间:">
-              <el-date-picker
-                v-model="filterForm.dateRange"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                format="YYYY年MM月DD日"
-              />
+            <el-form-item :label="t('invoices.filter.timeLabel')">
+              <el-date-picker v-model="filterForm.dateRange" type="daterange" range-separator="-"
+                :start-placeholder="t('chart.licenseTrend.datePicker.startPlaceholder')" 
+                :end-placeholder="t('chart.licenseTrend.datePicker.endPlaceholder')" format="YYYY/MM/DD" />
             </el-form-item>
             <el-form-item>
-              <el-button @click="resetFilter">重置</el-button>
-              <el-button type="primary" class="btn-filter" @click="handleFilter">筛选</el-button>
+              <el-button @click="resetFilter">{{ t('invoices.filter.reset') }}</el-button>
+              <el-button type="primary" class="btn-filter" @click="handleFilter">{{ t('invoices.filter.query') }}</el-button>
             </el-form-item>
           </div>
         </el-form>
@@ -57,58 +60,53 @@
       <div class="table-section" v-loading="loading">
         <div class="table-header-title">
           <span class="title-line"></span>
-          <h3>发票申请列表</h3>
+          <h3>{{ t('invoices.table.listTitle') }}</h3>
           <!-- <el-button
             type="primary"
             class="btn-create"
             @click="handleCreate"
             style="margin-left: auto"
-            >新增发票申请</el-button
+            >{{ t('invoices.actions.create') }}</el-button
           > -->
         </div>
         <el-table
           :data="tableData"
-          stripe
           style="width: 100%"
           :header-cell-style="{
-            background: '#E6F7FF',
-            color: '#000',
-            borderRight: '1px solid #BAE7FF'
+            backgroundColor: 'var(--app-bg-color)',
+            color: 'var(--app-text-primary)',
+            borderRight: '1px solid var(--app-border-light)'
           }"
+          :row-style="getRowStyle"
         >
-          <el-table-column prop="invoiceNo" label="发票申请号" min-width="150" />
-          <el-table-column label="用户" min-width="120">
+
+          <el-table-column prop="invoice_no" :label="t('invoices.table.invoiceNo')" min-width="150" />
+          <el-table-column :label="t('invoices.table.user')" min-width="120">
             <template #default="{ row }">
               <div class="user-info">
-                <span class="user-name">{{ row.user }}</span>
-                <span class="user-type" :class="row.userType">{{ row.userTypeLabel }}</span>
+                <span class="user-name">{{ row.applicant_name }}</span>
+                <span class="user-type" :class="row.order_package_name">{{ row.order_package_name }}</span>
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="orderNo" label="订单号" min-width="150" />
-          <el-table-column prop="time" label="申请时间" min-width="180" />
-          <el-table-column label="开票状态" width="100">
+          <el-table-column prop="order_no" :label="t('invoices.table.orderNo')" min-width="150" />
+          <el-table-column prop="created_at" :label="t('invoices.table.applyTime')" min-width="180" />
+          <el-table-column :label="t('invoices.table.status')" width="100">
             <template #default="{ row }">
-              <span class="status-text" :class="row.status">{{ row.statusLabel }}</span>
+              <span class="status-text" :class="row.status">{{ row.status_display }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="amount" label="发票金额" width="120">
+          <el-table-column prop="amount" :label="t('invoices.table.amount')" width="120">
             <template #default="{ row }">
               ¥{{ (row.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }) }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="180" fixed="right">
+          <el-table-column :label="t('invoices.table.operation')" width="200" fixed="right">
             <template #default="{ row }">
-              <el-button link type="primary" style="color: #019c7c" @click="handleView(row)"
-                >查看</el-button
-              >
+              <el-button link type="primary" style="color: #019c7c" @click="handleView(row)">{{ t('invoices.actions.view') }}</el-button>
               <template v-if="row.status === 'pending'">
-                <el-button link type="success" style="color: #52c41a" @click="handleUpload(row)"
-                  >上传</el-button
-                >
-                <el-button link type="danger" style="color: #f5222d" @click="handleReject(row)"
-                  >驳回</el-button
-                >
+                <el-button link type="success" style="color: #52c41a" @click="handleUpload(row)">{{ t('invoices.actions.upload') }}</el-button>
+                <el-button link type="danger" style="color: #f5222d" @click="handleReject(row)">{{ t('invoices.actions.reject') }}</el-button>
               </template>
             </template>
           </el-table-column>
@@ -116,32 +114,18 @@
 
         <!-- 分页 -->
         <div class="pagination-container">
-          <el-pagination
-            v-model:current-page="currentPage"
-            v-model:page-size="pageSize"
-            :page-sizes="[10, 20, 50, 100]"
-            layout="prev, pager, next, jumper, sizes, total"
-            :total="totalCount"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-          >
+          <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[10, 20, 50, 100]"
+            layout="prev, pager, next, jumper, sizes, total" :total="totalCount" @size-change="handleSizeChange"
+            @current-change="handleCurrentChange">
           </el-pagination>
         </div>
       </div>
 
       <!-- 上传发票对话框 -->
-      <UploadInvoiceDialog
-        v-model="uploadVisible"
-        :invoice-data="currentRow"
-        @submit="handleUploadSubmit"
-      />
+      <UploadInvoiceDialog v-model="uploadVisible" :invoice-data="currentRow" @submit="handleUploadSubmit" />
 
       <!-- 驳回申请对话框 -->
-      <RejectInvoiceDialog
-        v-model="rejectVisible"
-        :invoice-data="currentRow"
-        @submit="handleRejectSubmit"
-      />
+      <RejectInvoiceDialog v-model="rejectVisible" :invoice-data="currentRow" @submit="handleRejectSubmit" />
 
       <!-- 新增申请对话框 -->
       <el-dialog v-model="createVisible" title="新增发票申请" width="500px">
@@ -150,12 +134,7 @@
             <el-input v-model="createForm.orderNo" placeholder="请输入订单号" />
           </el-form-item>
           <el-form-item label="开票金额">
-            <el-input-number
-              v-model="createForm.amount"
-              :precision="2"
-              :step="100"
-              style="width: 100%"
-            />
+            <el-input-number v-model="createForm.amount" :precision="2" :step="100" style="width: 100%" />
           </el-form-item>
           <el-form-item label="抬头类型">
             <el-radio-group v-model="createForm.userType">
@@ -182,17 +161,19 @@ import { Document, Warning, CircleCheck, CircleClose } from '@element-plus/icons
 import { ElMessage } from 'element-plus'
 import UploadInvoiceDialog from './components/UploadInvoiceDialog.vue'
 import RejectInvoiceDialog from './components/RejectInvoiceDialog.vue'
-import { getInvoices, getInvoiceSummary, type Invoice } from '@/api/invoice'
+import { getInvoices, getInvoiceSummary, uploadInvoice, rejectInvoice, type Invoice } from '@/api/invoice'
+import { formatDateTime } from '@/utils/date'
 
 const { t } = useI18n()
 const router = useRouter()
 
 const stats = ref([
-  { label: '全部发票申请', value: '0', type: 'all', icon: 'document', key: 'total' },
-  { label: '待处理申请', value: '0', type: 'pending', icon: 'warning', key: 'pending' },
-  { label: '已开票', value: '0', type: 'success', icon: 'success', key: 'completed' },
-  { label: '已驳回', value: '0', type: 'rejected', icon: 'error', key: 'rejected' }
+  { label: '全部发票申请', value: '0', type: 'all', icon: 'document', key: 'total_count' },
+  { label: '待处理申请', value: '0', type: 'pending', icon: 'warning', key: 'pending_count' },
+  { label: '已开票', value: '0', type: 'success', icon: 'success', key: 'completed_count' },
+  { label: '已驳回', value: '0', type: 'rejected', icon: 'error', key: 'rejected_count' }
 ])
+
 
 const filterForm = reactive({
   keyword: '',
@@ -210,16 +191,25 @@ const uploadVisible = ref(false)
 const rejectVisible = ref(false)
 const currentRow = ref<any>(null)
 
+const getRowStyle = ({ rowIndex }: { rowIndex: number }) => {
+  return rowIndex % 2 === 1
+    ? { backgroundColor: 'var(--app-bg-color)' }
+    : { backgroundColor: 'var(--app-content-bg)' }
+}
+
 const fetchSummary = async () => {
+
   try {
     const res = await getInvoiceSummary()
     if (res.code === '000000' && res.data) {
-      stats.value.forEach(stat => {
-        if (stat.key && (res.data as any)[stat.key] !== undefined) {
-          stat.value = (res.data as any)[stat.key].toString()
+      stats.value.forEach((item: any) => {
+        const value = (res.data as any)[item.key]
+        if (value !== undefined) {
+          item.value = String(value)
         }
       })
     }
+
   } catch (error) {
     console.error('Fetch summary error:', error)
   }
@@ -240,12 +230,18 @@ const fetchData = async () => {
     }
     const res = await getInvoices(params)
     if (res.code === '000000') {
-      tableData.value = res.data.list
-      totalCount.value = res.data.total
+        fetchSummary()
+      res.data.invoices.forEach((item: any) => {
+        item.created_at = formatDateTime(item.created_at)
+      })
+      tableData.value = res.data.invoices
+      totalCount.value = res.data.total_count
     }
+
+
   } catch (error: any) {
     console.error('Fetch invoices error:', error)
-    ElMessage.error(error.backendMessage || '获取数据失败')
+    ElMessage.error(error.backendMessage || t('invoices.messages.fetchError'))
   } finally {
     loading.value = false
   }
@@ -253,7 +249,7 @@ const fetchData = async () => {
 
 onMounted(() => {
   fetchData()
-  fetchSummary()
+
 })
 
 const createForm = reactive({
@@ -267,7 +263,7 @@ const handleCreate = () => {
 }
 
 const submitCreate = () => {
-  ElMessage.success('提交申请成功')
+  ElMessage.success(t('invoices.messages.createSuccess'))
   createVisible.value = false
 }
 
@@ -285,7 +281,7 @@ const resetFilter = () => {
 }
 
 const handleView = (row: any) => {
-  router.push(`/invoices/detail/${row.id || row.invoiceNo}`)
+  router.push(`/invoices/detail/${row.id || row.invoice_no}`)
 }
 
 const handleUpload = (row: any) => {
@@ -293,10 +289,35 @@ const handleUpload = (row: any) => {
   uploadVisible.value = true
 }
 
-const handleUploadSubmit = (data: any) => {
-  console.log('Upload Submit:', data)
-  fetchData()
-  fetchSummary()
+const handleUploadSubmit = async (data: any) => {
+  console.log('handleUploadSubmit triggered:', data)
+  if (!currentRow.value || !currentRow.value.invoice_no) {
+    console.error('No current row or invoice_no')
+    return
+  }
+  try {
+    const formData = new FormData()
+    formData.append('invoice_no', currentRow.value.id)
+    if (data.fileList && data.fileList.length > 0) { 
+      const file = data.fileList[0].raw
+      console.log('File to upload:', file)
+      formData.append('file', file)
+    } else {
+      ElMessage.warning(t('invoices.dialog.uploadTip'))
+      return
+    }
+
+    const res = await uploadInvoice(formData)
+    console.log('Upload response:', res)
+    if (res.code === '000000') {
+      ElMessage.success(t('invoices.messages.uploadSuccess'))
+      fetchData()
+      fetchSummary()
+    }
+  } catch (error: any) {
+    console.error('Upload invoice error:', error)
+    ElMessage.error(error.backendMessage || t('invoices.messages.fetchError'))
+  }
 }
 
 const handleReject = (row: any) => {
@@ -304,10 +325,23 @@ const handleReject = (row: any) => {
   rejectVisible.value = true
 }
 
-const handleRejectSubmit = (data: any) => {
-  console.log('Reject Submit:', data)
-  fetchData()
-  fetchSummary()
+const handleRejectSubmit = async (data: any) => {
+  if (!currentRow.value?.id) return
+  try {
+    const reasonText = data.reason === 'other' ? data.suggestion : t(`invoices.dialog.reasons.${data.reason}`)
+    const res = await rejectInvoice(currentRow.value.id, {
+      reject_reason: reasonText,
+      suggestion: data.suggestion
+    })
+    if (res.code === '000000') {
+      ElMessage.success(t('invoices.messages.rejectSuccess'))
+      fetchData()
+      fetchSummary()
+    }
+  } catch (error: any) {
+    console.error('Reject error:', error)
+    ElMessage.error(error.backendMessage || t('invoices.messages.fetchError'))
+  }
 }
 
 const handleSizeChange = (val: number) => {
@@ -324,9 +358,10 @@ const handleCurrentChange = (val: number) => {
 <style lang="scss" scoped>
 .invoice-container {
   padding: 24px;
-  background-color: #f0f2f5;
+  background-color: var(--app-bg-color);
   min-height: calc(100vh - 80px);
 }
+
 
 .stats-row {
   display: grid;
@@ -336,26 +371,26 @@ const handleCurrentChange = (val: number) => {
 }
 
 .stat-card {
-  background: #fff;
+  background: var(--app-content-bg);
   border-radius: 4px;
   padding: 20px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-  border: 1px solid transparent;
+  box-shadow: var(--app-shadow);
+  border: 1px solid var(--app-border-light);
   height: 96px;
 
   .stat-label {
     font-size: 14px;
-    color: #8c8c8c;
+    color: var(--app-text-secondary);
     margin-bottom: 8px;
   }
 
   .stat-value {
     font-size: 28px;
     font-weight: 600;
-    color: #019c7c;
+    color: var(--el-color-primary);
     line-height: 1.2;
   }
 
@@ -370,31 +405,35 @@ const handleCurrentChange = (val: number) => {
   }
 
   &.all .stat-icon-wrapper {
-    background: #e6f7ff;
-    color: #1890ff;
+    background: var(--el-color-primary-light-9);
+    color: var(--el-color-primary);
   }
+
   &.pending .stat-icon-wrapper {
-    background: #fff7e6;
-    color: #faad14;
+    background: var(--el-color-warning-light-9);
+    color: var(--el-color-warning);
   }
+
   &.success .stat-icon-wrapper {
-    background: #f6ffed;
-    color: #52c41a;
+    background: var(--el-color-success-light-9);
+    color: var(--el-color-success);
   }
+
   &.rejected .stat-icon-wrapper {
-    background: #f9f0ff;
-    color: #722ed1;
+    background: var(--el-color-danger-light-9);
+    color: var(--el-color-danger);
   }
 }
 
+
 .filter-section {
-  background: #fff;
+  background: var(--app-content-bg);
   padding: 16px 24px;
   border-radius: 4px;
   margin-bottom: 24px;
   display: flex;
   align-items: center;
-  border: 1px solid #f0f0f0;
+  border: 1px solid var(--app-border-light);
 
   .filter-form {
     width: 100%;
@@ -408,7 +447,7 @@ const handleCurrentChange = (val: number) => {
 
       .el-form-item__label {
         font-weight: 500;
-        color: #262626;
+        color: var(--app-text-primary);
       }
     }
   }
@@ -420,6 +459,7 @@ const handleCurrentChange = (val: number) => {
 
     :deep(.el-form-item) {
       margin-right: 12px;
+
       &:last-child {
         margin-right: 0;
       }
@@ -427,10 +467,12 @@ const handleCurrentChange = (val: number) => {
   }
 }
 
+
 .selected-count {
   margin-right: 24px;
+
   .count-badge {
-    background: #ff4d4f;
+    background: var(--el-color-danger);
     color: #fff;
     padding: 0 12px;
     border-radius: 4px;
@@ -442,22 +484,27 @@ const handleCurrentChange = (val: number) => {
   }
 }
 
+
 .btn-filter {
-  background-color: #019c7c;
-  border-color: #019c7c;
+  background-color: var(--el-color-primary);
+  border-color: var(--el-color-primary);
   padding: 8px 24px;
+
   &:hover {
-    background-color: #017c63;
-    border-color: #017c63;
+    background-color: var(--el-color-primary-dark-2);
+    border-color: var(--el-color-primary-dark-2);
   }
 }
 
+
 .table-section {
-  background: #fff;
+  background: var(--app-content-bg);
   padding: 24px;
   border-radius: 4px;
-  border: 1px solid #f0f0f0;
+  border: 1px solid var(--app-border-light);
+  box-shadow: var(--app-shadow);
 }
+
 
 .table-header-title {
   display: flex;
@@ -494,10 +541,12 @@ const handleCurrentChange = (val: number) => {
     border-radius: 2px;
     height: 20px;
     line-height: 20px;
+
     &.personal {
       background: #e6f7ff;
       color: #1890ff;
     }
+
     &.enterprise {
       background: #f6ffed;
       color: #52c41a;
@@ -509,9 +558,11 @@ const handleCurrentChange = (val: number) => {
   &.success {
     color: #1890ff;
   }
+
   &.pending {
     color: #faad14;
   }
+
   &.rejected {
     color: #bfbfbf;
   }
@@ -538,6 +589,7 @@ const handleCurrentChange = (val: number) => {
     color: #262626;
     height: 54px;
     border-right: 1px solid #bae7ff;
+
     &:last-child {
       border-right: none;
     }
@@ -557,8 +609,10 @@ const handleCurrentChange = (val: number) => {
   .stats-row {
     gap: 16px;
   }
+
   .stat-card {
     padding: 16px;
+
     .stat-value {
       font-size: 24px;
     }

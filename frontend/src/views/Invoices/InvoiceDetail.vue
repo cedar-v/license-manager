@@ -1,16 +1,17 @@
 <template>
-  <Layout>
+  <Layout :page-title="t('invoices.detailTitle')">
     <div class="invoice-detail-container" v-loading="loading">
       <div class="detail-header">
         <div class="header-left">
-          <span class="back-link" @click="handleBack">发票管理</span>
-          <span class="separator">/</span>
-          <span class="current-page">发票申请详情</span>
+          <el-button link @click="handleBack">
+            <el-icon><ArrowLeft /></el-icon>
+            {{ t('invoices.title') }}
+          </el-button>
         </div>
         <div class="header-actions">
-          <el-button v-if="detailData.status === 'pending'" class="btn-upload" type="primary" @click="handleUpload">上传发票</el-button>
-          <el-button v-if="detailData.status === 'pending'" class="btn-reject" type="danger" @click="handleReject">驳回申请</el-button>
-          <el-button @click="handleBack">返回</el-button>
+          <el-button v-if="detailData.status === 'pending'" class="btn-upload" type="primary" @click="handleUpload">{{ t('invoices.actions.upload') }}</el-button>
+          <el-button v-if="detailData.status === 'pending'" class="btn-reject" type="danger" @click="handleReject">{{ t('invoices.actions.reject') }}</el-button>
+          <el-button @click="handleBack">{{ t('invoices.actions.back') }}</el-button>
         </div>
       </div>
 
@@ -19,25 +20,25 @@
         <div class="detail-card">
           <div class="card-title">
             <span class="title-line"></span>
-            <h3>基本信息</h3>
+            <h3>{{ t('invoices.detail.basicInfo') }}</h3>
           </div>
           <el-descriptions :column="4" class="info-descriptions">
-            <el-descriptions-item label="发票申请号">{{ detailData.invoiceNo }}</el-descriptions-item>
-            <el-descriptions-item label="关联订单号">{{ detailData.orderNo }}</el-descriptions-item>
-            <el-descriptions-item label="申请时间">{{ detailData.applyTime }}</el-descriptions-item>
-            <el-descriptions-item label="开票状态">
+            <el-descriptions-item :label="t('invoices.detail.invoiceNo')">{{ detailData.invoice_no }}</el-descriptions-item>
+            <el-descriptions-item :label="t('invoices.detail.orderNo')">{{ detailData.order_no }}</el-descriptions-item>
+            <el-descriptions-item :label="t('invoices.detail.applyTime')">{{ detailData.created_at }}</el-descriptions-item>
+            <el-descriptions-item :label="t('invoices.detail.status')">
               <span :class="['status-tag', detailData.status]">
-                {{ detailData.statusLabel }}
+                {{ detailData.status_display }}
               </span>
             </el-descriptions-item>
-            <el-descriptions-item label="用户信息">
-              {{ detailData.user }} <span class="user-type">({{ detailData.userTypeLabel }})</span>
+            <el-descriptions-item :label="t('invoices.detail.userInfo')">
+              {{ detailData.applicant_name }} <span class="user-type">({{ detailData.order_package_name }})</span>
             </el-descriptions-item>
-            <el-descriptions-item label="联系电话">{{ detailData.phone }}</el-descriptions-item>
-            <el-descriptions-item label="开票金额">
+            <el-descriptions-item :label="t('invoices.detail.phone')">{{ detailData.applicant_phone }}</el-descriptions-item>
+            <el-descriptions-item :label="t('invoices.detail.amount')">
               <span class="amount-value">¥{{ (detailData.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }) }}</span>
             </el-descriptions-item>
-            <el-descriptions-item label="收票邮箱">{{ detailData.email }}</el-descriptions-item>
+            <el-descriptions-item :label="t('invoices.detail.email')">{{ detailData.receiver_email }}</el-descriptions-item>
           </el-descriptions>
         </div>
 
@@ -45,14 +46,14 @@
         <div class="detail-card">
           <div class="card-title">
             <span class="title-line"></span>
-            <h3>开票信息</h3>
+            <h3>{{ t('invoices.detail.invoiceInfo') }}</h3>
           </div>
           <el-descriptions :column="4" class="info-descriptions">
-            <el-descriptions-item label="发票类型">{{ detailData.invoiceType }}</el-descriptions-item>
-            <el-descriptions-item label="发票抬头">{{ detailData.invoiceTitle }}</el-descriptions-item>
-            <el-descriptions-item label="纳税人识别号">{{ detailData.taxId }}</el-descriptions-item>
-            <el-descriptions-item label="开票内容">{{ detailData.content }}</el-descriptions-item>
-            <el-descriptions-item label="备注信息" :span="4">{{ detailData.remark }}</el-descriptions-item>
+            <el-descriptions-item :label="t('invoices.detail.invoiceType')">{{ detailData.invoice_type_display }}</el-descriptions-item>
+            <el-descriptions-item :label="t('invoices.detail.invoiceTitle')">{{ detailData.title }}</el-descriptions-item>
+            <el-descriptions-item :label="t('invoices.detail.taxId')">{{ detailData.taxpayer_id }}</el-descriptions-item>
+            <el-descriptions-item :label="t('invoices.detail.content')">{{ detailData.content }}</el-descriptions-item>
+            <el-descriptions-item :label="t('invoices.detail.remark')" :span="4">{{ detailData.remark }}</el-descriptions-item>
           </el-descriptions>
         </div>
 
@@ -60,20 +61,20 @@
         <div class="detail-card reject-info-card" v-if="detailData.status === 'rejected'">
           <div class="card-title">
             <span class="title-line"></span>
-            <h3>驳回信息</h3>
+            <h3>{{ t('invoices.detail.rejectInfo') }}</h3>
           </div>
           <div class="info-content">
             <div class="info-row">
-              <span class="label">驳回原因：</span>
-              <span class="value">{{ detailData.rejectReason }}</span>
+              <span class="label">{{ t('invoices.detail.rejectReason') }}：</span>
+              <span class="value">{{ detailData.reject_reason }}</span>
             </div>
             <div class="info-row">
-              <span class="label">驳回时间：</span>
-              <span class="value">{{ detailData.rejectTime }}</span>
+              <span class="label">{{ t('invoices.detail.rejectTime') }}：</span>
+              <span class="value">{{ detailData.rejected_at }}</span>
             </div>
             <div class="info-row">
-              <span class="label">驳回人员：</span>
-              <span class="value">{{ detailData.rejectUser }}</span>
+              <span class="label">{{ t('invoices.detail.rejectUser') }}：</span>
+              <span class="value">{{ detailData.rejected_by }}</span>
             </div>
           </div>
         </div>
@@ -82,26 +83,28 @@
         <div class="detail-card approve-info-card" v-if="detailData.status === 'completed'">
           <div class="card-title">
             <span class="title-line"></span>
-            <h3>通过信息</h3>
+            <h3>{{ t('invoices.detail.approveInfo') }}</h3>
           </div>
           <div class="info-content">
             <div class="info-row">
-              <span class="label">开票完成时间：</span>
-              <span class="value">{{ detailData.finishTime }}</span>
+              <span class="label">{{ t('invoices.detail.finishTime') }}：</span>
+              <span class="value">{{ detailData.uploaded_at }}</span>
             </div>
             <div class="info-row">
-              <span class="label">上传人员：</span>
-              <span class="value">{{ detailData.approveUser }}</span>
+              <span class="label">{{ t('invoices.detail.approveUser') }}：</span>
+              <span class="value">{{ detailData.uploader_name }}</span>
             </div>
             <div class="info-row">
-              <span class="label">发票文件：</span>
+              <span class="label">{{ t('invoices.detail.fileName') }}：</span>
               <span class="value">
-                <el-link type="primary" :underline="false">{{ detailData.fileName }} ({{ detailData.fileSize }})</el-link>
+                <el-link v-if="detailData.invoice_file_url" type="primary" :underline="false" :href="detailData.invoice_file_url" target="_blank">
+                  {{ detailData.invoice_file_url.split('/').pop() }}
+                </el-link>
               </span>
             </div>
             <div class="info-row">
-              <span class="label">上传时间：</span>
-              <span class="value">{{ detailData.approveTime }}</span>
+              <span class="label">{{ t('invoices.detail.approveTime') }}：</span>
+              <span class="value">{{ detailData.uploaded_at }}</span>
             </div>
           </div>
         </div>
@@ -127,12 +130,16 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
+import { ArrowLeft } from '@element-plus/icons-vue'
 import Layout from '@/components/common/layout/Layout.vue'
 import UploadInvoiceDialog from './components/UploadInvoiceDialog.vue'
 import RejectInvoiceDialog from './components/RejectInvoiceDialog.vue'
 import { getInvoiceDetail, uploadInvoice, rejectInvoice, type Invoice } from '@/api/invoice'
+import { formatDateTime } from '@/utils/date'
 
+const { t } = useI18n()
 const router = useRouter()
 const route = useRoute()
 
@@ -141,20 +148,19 @@ const rejectVisible = ref(false)
 const loading = ref(false)
 
 const detailData = ref<Partial<Invoice>>({
-  invoiceNo: '',
-  orderNo: '',
-  applyTime: '',
+  invoice_no: '',
+  order_no: '',
+  created_at: '',
   status: 'pending',
-  statusLabel: '待处理',
-  user: '',
-  userType: '',
-  userTypeLabel: '',
-  phone: '',
+  status_display: t('invoices.filter.pending'),
+  applicant_name: '',
+  order_package_name: '',
+  applicant_phone: '',
   amount: 0,
-  email: '',
-  invoiceType: '',
-  invoiceTitle: '',
-  taxId: '',
+  receiver_email: '',
+  invoice_type_display: '',
+  title: '',
+  taxpayer_id: '',
   content: '',
   remark: ''
 })
@@ -166,11 +172,15 @@ const fetchDetail = async () => {
   try {
     const res = await getInvoiceDetail(id)
     if (res.code === '000000' && res.data) {
-      detailData.value = res.data
+      const data = res.data
+      data.created_at = formatDateTime(data.created_at)
+      if (data.rejected_at) data.rejected_at = formatDateTime(data.rejected_at)
+      if (data.uploaded_at) data.uploaded_at = formatDateTime(data.uploaded_at)
+      detailData.value = data
     }
   } catch (error: any) {
     console.error('Fetch invoice detail error:', error)
-    ElMessage.error(error.backendMessage || '获取详情失败')
+    ElMessage.error(error.backendMessage || t('invoices.messages.fetchDetailError'))
   } finally {
     loading.value = false
   }
@@ -189,14 +199,32 @@ const handleUpload = () => {
 }
 
 const handleUploadSubmit = async (data: any) => {
+  console.log('handleUploadSubmit detail triggered:', data)
+  if (!detailData.value.invoice_no) {
+    console.error('No detail data invoice_no')
+    return
+  }
   try {
-    const res = await uploadInvoice(detailData.value.id!, data)
+    const formData = new FormData()
+    formData.append('invoice_no', detailData.value.id!)
+    if (data.fileList && data.fileList.length > 0) {
+      const file = data.fileList[0].raw
+      console.log('File to upload (detail):', file)
+      formData.append('file', file)
+    } else {
+      ElMessage.warning(t('invoices.dialog.uploadTip'))
+      return
+    }
+
+    const res = await uploadInvoice(formData)
+    console.log('Upload response (detail):', res)
     if (res.code === '000000') {
-      ElMessage.success('上传成功')
+      ElMessage.success(t('invoices.messages.uploadSuccess'))
       fetchDetail()
     }
   } catch (error: any) {
-    ElMessage.error(error.backendMessage || '上传失败')
+    console.error('Upload error detail:', error)
+    ElMessage.error(error.backendMessage || t('invoices.messages.fetchDetailError'))
   }
 }
 
@@ -205,14 +233,20 @@ const handleReject = () => {
 }
 
 const handleRejectSubmit = async (data: any) => {
+  if (!detailData.value.id) return
   try {
-    const res = await rejectInvoice(detailData.value.id!, data)
+    const reasonText = data.reason === 'other' ? data.suggestion : t(`invoices.dialog.reasons.${data.reason}`)
+    const res = await rejectInvoice(detailData.value.id, {
+      reject_reason: reasonText,
+      suggestion: data.suggestion
+    })
     if (res.code === '000000') {
-      ElMessage.success('已驳回')
+      ElMessage.success(t('invoices.messages.rejectSuccess'))
       fetchDetail()
     }
   } catch (error: any) {
-    ElMessage.error(error.backendMessage || '驳回失败')
+    console.error('Reject error detail:', error)
+    ElMessage.error(error.backendMessage || t('invoices.messages.fetchDetailError'))
   }
 }
 </script>
@@ -220,7 +254,7 @@ const handleRejectSubmit = async (data: any) => {
 <style lang="scss" scoped>
 .invoice-detail-container {
   padding: 24px;
-  background-color: #F0F2F5;
+  background-color: var(--app-bg-color);
   min-height: calc(100vh - 80px);
 }
 
@@ -229,30 +263,25 @@ const handleRejectSubmit = async (data: any) => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
-  background: #fff;
+  background: var(--app-content-bg);
   padding: 16px 24px;
   border-radius: 4px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--app-border-light);
+  box-shadow: var(--app-shadow);
 
   .header-left {
     display: flex;
     align-items: center;
-    font-size: 14px;
 
-    .back-link {
-      color: #8C8C8C;
-      cursor: pointer;
-      &:hover { color: #019C7C; }
-    }
-
-    .separator {
-      margin: 0 8px;
-      color: #BFBFBF;
-    }
-
-    .current-page {
-      color: #262626;
-      font-weight: 500;
+    :deep(.el-button) {
+      font-size: 14px;
+      color: var(--app-text-secondary);
+      &:hover {
+        color: var(--el-color-primary);
+      }
+      .el-icon {
+        margin-right: 4px;
+      }
     }
   }
 }
@@ -262,15 +291,15 @@ const handleRejectSubmit = async (data: any) => {
   gap: 12px;
 
   .btn-upload {
-    background-color: #019C7C;
-    border-color: #019C7C;
-    &:hover { background-color: #017c63; border-color: #017c63; }
+    background-color: var(--el-color-primary);
+    border-color: var(--el-color-primary);
+    &:hover { background-color: var(--el-color-primary-dark-2); border-color: var(--el-color-primary-dark-2); }
   }
 
   .btn-reject {
-    background-color: #F5222D;
-    border-color: #F5222D;
-    &:hover { background-color: #d32029; border-color: #d32029; }
+    background-color: var(--el-color-danger);
+    border-color: var(--el-color-danger);
+    &:hover { background-color: var(--el-color-danger-dark-2); border-color: var(--el-color-danger-dark-2); }
   }
 }
 
@@ -281,10 +310,11 @@ const handleRejectSubmit = async (data: any) => {
 }
 
 .detail-card {
-  background: #fff;
+  background: var(--app-content-bg);
   padding: 24px;
   border-radius: 4px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--app-border-light);
+  box-shadow: var(--app-shadow);
 
   .card-title {
     display: flex;
@@ -294,7 +324,7 @@ const handleRejectSubmit = async (data: any) => {
     .title-line {
       width: 4px;
       height: 16px;
-      background: #019C7C;
+      background: var(--el-color-primary);
       margin-right: 12px;
     }
 
@@ -302,7 +332,7 @@ const handleRejectSubmit = async (data: any) => {
       margin: 0;
       font-size: 18px;
       font-weight: 600;
-      color: #262626;
+      color: var(--app-text-primary);
     }
   }
 
@@ -318,13 +348,13 @@ const handleRejectSubmit = async (data: any) => {
       }
 
       .label {
-        color: #595959;
+        color: var(--app-text-secondary);
         width: 120px;
         flex-shrink: 0;
       }
 
       .value {
-        color: #262626;
+        color: var(--app-text-primary);
       }
     }
   }
@@ -333,11 +363,11 @@ const handleRejectSubmit = async (data: any) => {
 :deep(.info-descriptions) {
   .el-descriptions__label {
     width: 120px;
-    color: #595959;
+    color: var(--app-text-secondary);
     font-weight: normal;
   }
   .el-descriptions__content {
-    color: #262626;
+    color: var(--app-text-primary);
   }
 }
 
@@ -345,9 +375,9 @@ const handleRejectSubmit = async (data: any) => {
   padding: 2px 8px;
   border-radius: 2px;
   font-size: 12px;
-  &.pending { background: #FFF7E6; color: #FAAD14; border: 1px solid #FFE7BA; }
-  &.completed { background: #F6FFED; color: #52C41A; border: 1px solid #B7EB8F; }
-  &.rejected { background: #FFF1F0; color: #F5222D; border: 1px solid #FFA39E; }
+  &.pending { background: var(--el-color-warning-light-9); color: var(--el-color-warning); border: 1px solid var(--el-color-warning-light-5); }
+  &.completed { background: var(--el-color-success-light-9); color: var(--el-color-success); border: 1px solid var(--el-color-success-light-5); }
+  &.rejected { background: var(--el-color-danger-light-9); color: var(--el-color-danger); border: 1px solid var(--el-color-danger-light-5); }
 }
 
 .amount-value {
@@ -355,7 +385,7 @@ const handleRejectSubmit = async (data: any) => {
 }
 
 .user-type {
-  color: #8C8C8C;
+  color: var(--app-text-secondary);
 }
 
 // 弹窗通用基础样式

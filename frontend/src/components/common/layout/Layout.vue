@@ -64,8 +64,10 @@ const { t } = useI18n()
 const defaultNavItems = computed(() => [
   { id: "dashboard", label: t('navigation.menu.dashboard'), href: "/dashboard", icon: "dashboard" },
   { id: "customers", label: t('navigation.menu.customers'), href: "/customers", icon: "customers" },
+  { id: "enterprise-leads", label: t('navigation.menu.enterpriseLeads'), href: "/enterprise-leads", icon: "enterprise-leads" },
   { id: "licenses", label: t('navigation.menu.licenses'), href: "/licenses", icon: "licenses" },
-  { id: "invoices", label: t('navigation.menu.invoices'), href: "/invoices", icon: "invoices" }
+  { id: "invoices", label: t('navigation.menu.invoices'), href: "/invoices", icon: "invoices" },
+  { id: "packages", label: t('navigation.menu.packages'), href: "/packages", icon: "packages" }
   // 暂时隐藏角色和系统用户菜单，后续版本再开启
   // { id: "roles", label: t('navigation.menu.roles'), href: "/roles", icon: "roles" },
   // { id: "users", label: t('navigation.menu.users'), href: "/users", icon: "users" }

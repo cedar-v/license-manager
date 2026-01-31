@@ -1,7 +1,7 @@
 <template>
-  <el-dialog
+    <el-dialog
     v-model="visible"
-    title="上传发票文件"
+    :title="t('invoices.dialog.uploadTitle')"
     width="680px"
     class="upload-invoice-dialog"
     :show-close="true"
@@ -11,30 +11,30 @@
       <!-- 信息摘要 -->
       <div class="info-summary" v-if="invoiceData">
         <div class="summary-item">
-          <span class="label">发票申请号：</span>
-          <span class="value">{{ invoiceData.invoiceNo }}</span>
+          <span class="label">{{ t('invoices.detail.invoiceNo') }}：</span>
+          <span class="value">{{ invoiceData.invoice_no }}</span>
         </div>
         <div class="summary-item">
-          <span class="label">关联订单号：</span>
-          <span class="value">{{ invoiceData.orderNo }}</span>
+          <span class="label">{{ t('invoices.detail.orderNo') }}：</span>
+          <span class="value">{{ invoiceData.order_no }}</span>
         </div>
         <div class="summary-item">
-          <span class="label">用户信息：</span>
-          <span class="value">{{ invoiceData.user }} ({{ invoiceData.userTypeLabel || '个人版' }})</span>
+          <span class="label">{{ t('invoices.detail.userInfo') }}：</span>
+          <span class="value">{{ invoiceData.applicant_name }} ({{ invoiceData.order_package_name || '个人版' }})</span>
         </div>
         <div class="summary-item">
-          <span class="label">发票抬头：</span>
-          <span class="value">{{ invoiceData.invoiceTitle }}</span>
+          <span class="label">{{ t('invoices.detail.invoiceTitle') }}：</span>
+          <span class="value">{{ invoiceData.title }}</span>
         </div>
         <div class="summary-item">
-          <span class="label">开票金额：</span>
+          <span class="label">{{ t('invoices.detail.amount') }}：</span>
           <span class="value">¥{{ (invoiceData.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }) }}</span>
         </div>
       </div>
 
       <!-- 上传区域 -->
       <div class="upload-section">
-        <p class="section-label">上传发票文件</p>
+        <p class="section-label">{{ t('invoices.dialog.uploadLabel') }}</p>
         <el-upload
           class="invoice-uploader"
           drag
@@ -44,11 +44,11 @@
         >
           <el-icon class="el-icon--upload"><upload-filled /></el-icon>
           <div class="el-upload__text">
-            <span class="upload-link">点击上传</span> / 拖拽到此区域
+            <span class="upload-link">{{ t('invoices.dialog.uploadDraggerText').split(' / ')[0] }}</span> / {{ t('invoices.dialog.uploadDraggerText').split(' / ')[1] }}
           </div>
           <template #tip>
             <div class="el-upload__tip">
-              支持PDF格式。最大文件大小10MB
+              {{ t('invoices.dialog.uploadTip') }}
             </div>
           </template>
         </el-upload>
@@ -56,34 +56,13 @@
 
       <!-- 表单项 -->
       <div class="form-section">
-        <div class="form-item">
-          <p class="section-label">开票完成时间</p>
-          <el-date-picker
-            v-model="form.finishTime"
-            type="datetime"
-            placeholder="选择日期时间"
-            format="YYYY/MM/DD HH:mm"
-            value-format="YYYY/MM/DD HH:mm"
-            style="width: 100%"
-          />
-        </div>
-        <div class="form-item">
-          <p class="section-label">备注 (可选)</p>
-          <el-input
-            v-model="form.remark"
-            type="textarea"
-            :rows="3"
-            placeholder="输入备注信息"
-            maxlength="500"
-            show-word-limit
-          />
-        </div>
+        <!-- 移除了 API 不支持的 issued_at 和 remark 字段 -->
       </div>
     </div>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="visible = false">取消</el-button>
-        <el-button type="primary" class="btn-submit" @click="handleSubmit">确认上传</el-button>
+        <el-button @click="visible = false">{{ t('invoices.actions.cancel') }}</el-button>
+        <el-button type="primary" class="btn-submit" @click="handleSubmit">{{ t('invoices.actions.confirmUpload') }}</el-button>
       </div>
     </template>
   </el-dialog>
@@ -91,9 +70,11 @@
 
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { UploadFilled } from '@element-plus/icons-vue'
 
+const { t } = useI18n()
 const props = defineProps<{
   modelValue: boolean
   invoiceData: any
@@ -103,25 +84,39 @@ const emit = defineEmits(['update:modelValue', 'submit'])
 
 const visible = ref(props.modelValue)
 const form = reactive({
-  finishTime: '2026/01/14 06:20',
-  remark: '',
-  fileList: []
+  fileList: [] as any[]
 })
 
 watch(() => props.modelValue, (val) => {
   visible.value = val
+  if (val) {
+    // Reset form when opening
+    form.fileList = []
+  }
 })
 
 watch(visible, (val) => {
   emit('update:modelValue', val)
 })
 
+const handleChange = (_file: any, fileList: any) => {
+  form.fileList = fileList
+}
+
+const handleRemove = (_file: any, fileList: any) => {
+  form.fileList = fileList
+}
+
 const handleClose = () => {
   // Reset form if needed
 }
 
 const handleSubmit = () => {
-  ElMessage.success('发票上传成功')
+  console.log('handleSubmit clicked, fileList:', form.fileList)
+  if (form.fileList.length === 0) {
+    ElMessage.warning(t('invoices.dialog.uploadTip'))
+    return
+  }
   emit('submit', { ...form })
   visible.value = false
 }
