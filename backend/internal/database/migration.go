@@ -31,6 +31,7 @@ func AutoMigrate() error {
 		&models.AuthorizationChange{},
 		&models.Invoice{}, // 发票表
 		&models.Package{}, // 套餐表
+		&models.Lead{},    // 线索表
 	)
 	if err != nil {
 		return fmt.Errorf("failed to migrate database: %w", err)

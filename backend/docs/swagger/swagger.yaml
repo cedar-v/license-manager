@@ -1569,6 +1569,114 @@ definitions:
         description: 上传后的文件URL
         type: string
     type: object
+  models.LeadCreateRequest:
+    properties:
+      company_name:
+        maxLength: 200
+        minLength: 1
+        type: string
+      contact_email:
+        maxLength: 100
+        type: string
+      contact_name:
+        maxLength: 100
+        minLength: 1
+        type: string
+      contact_phone:
+        maxLength: 20
+        minLength: 1
+        type: string
+      extra_info:
+        type: string
+      requirement:
+        minLength: 1
+        type: string
+    required:
+    - company_name
+    - contact_name
+    - contact_phone
+    - requirement
+    type: object
+  models.LeadListResponse:
+    properties:
+      leads:
+        items:
+          $ref: '#/definitions/models.LeadResponse'
+        type: array
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total_count:
+        type: integer
+    type: object
+  models.LeadResponse:
+    properties:
+      company_name:
+        type: string
+      contact_email:
+        type: string
+      contact_name:
+        type: string
+      contact_phone:
+        type: string
+      created_at:
+        type: string
+      extra_info:
+        type: string
+      follow_up_date:
+        type: string
+      follow_up_record:
+        type: string
+      id:
+        type: string
+      internal_note:
+        type: string
+      lead_no:
+        type: string
+      requirement:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.LeadUpdateRequest:
+    properties:
+      company_name:
+        maxLength: 200
+        minLength: 1
+        type: string
+      contact_email:
+        maxLength: 100
+        type: string
+      contact_name:
+        maxLength: 100
+        minLength: 1
+        type: string
+      contact_phone:
+        maxLength: 20
+        minLength: 1
+        type: string
+      extra_info:
+        type: string
+      follow_up_date:
+        type: string
+      follow_up_record:
+        type: string
+      internal_note:
+        type: string
+      requirement:
+        minLength: 1
+        type: string
+      status:
+        enum:
+        - pending
+        - contacted
+        - converted
+        - invalid
+        type: string
+    type: object
   models.License:
     properties:
       activated_at:
@@ -3886,6 +3994,278 @@ paths:
       summary: 获取指定类型的枚举值
       tags:
       - 枚举管理
+  /api/leads:
+    get:
+      consumes:
+      - application/json
+      description: 管理员获取线索列表，支持分页和筛选
+      parameters:
+      - description: 页码，默认1
+        in: query
+        minimum: 1
+        name: page
+        type: integer
+      - description: 每页条数，默认10，最大100
+        in: query
+        maximum: 100
+        minimum: 1
+        name: page_size
+        type: integer
+      - description: 关键词检索
+        in: query
+        name: search
+        type: string
+      - description: 状态筛选
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.LeadListResponse'
+              type: object
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取线索列表
+      tags:
+      - 企业线索
+    post:
+      consumes:
+      - application/json
+      description: 用户提交企业线索，无需鉴权
+      parameters:
+      - description: 线索创建请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.LeadCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.LeadResponse'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 创建线索
+      tags:
+      - 企业线索
+  /api/leads/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除指定线索
+      parameters:
+      - description: 线索ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 线索不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 删除线索
+      tags:
+      - 企业线索
+    get:
+      consumes:
+      - application/json
+      description: 根据ID获取线索详细信息
+      parameters:
+      - description: 线索ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.LeadResponse'
+              type: object
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 线索不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取线索详情
+      tags:
+      - 企业线索
+    put:
+      consumes:
+      - application/json
+      description: 更新线索信息，用于线索跟进
+      parameters:
+      - description: 线索ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 线索更新请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.LeadUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.LeadResponse'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 线索不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 更新线索
+      tags:
+      - 企业线索
+  /api/leads/{id}/status:
+    put:
+      consumes:
+      - application/json
+      description: 快速更新线索状态
+      parameters:
+      - description: 线索ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: '状态: pending/contacted/converted/invalid'
+        in: query
+        name: status
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.LeadResponse'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 线索不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 更新线索状态
+      tags:
+      - 企业线索
   /api/packages:
     get:
       consumes:

@@ -50,6 +50,7 @@ func SetupRouter() *gin.Engine {
 	cuInvoiceRepo := repository.NewCuInvoiceRepository(db)
 	adminInvoiceRepo := repository.NewAdminInvoiceRepository(db)
 	packageRepo := repository.NewPackageRepository(db)
+	leadRepo := repository.NewLeadRepository(db)
 
 	// 获取logger实例
 	log := logger.GetLogger()
@@ -118,6 +119,8 @@ func SetupRouter() *gin.Engine {
 	adminInvoiceService := service.NewAdminInvoiceService(adminInvoiceRepo, cuOrderRepo, userRepo, cuUserRepo, db)
 	adminInvoiceHandler := handlers.NewAdminInvoiceHandler(adminInvoiceService)
 	packageHandler := handlers.NewPackageHandler(packageService)
+	leadService := service.NewLeadService(leadRepo, db)
+	leadHandler := handlers.NewLeadHandler(leadService)
 
 	// 健康检测接口（无需认证）
 	router.GET("/health", systemHandler.HealthCheck)
@@ -143,6 +146,9 @@ func SetupRouter() *gin.Engine {
 
 			// 公共发票下载接口
 			public.GET("/public/invoices/download", adminInvoiceHandler.DownloadByToken)
+
+			// 线索收集（无需鉴权）
+			public.POST("/leads", leadHandler.CreateLead)
 		}
 
 		// 需要认证的接口
@@ -204,6 +210,13 @@ func SetupRouter() *gin.Engine {
 			auth.PUT("/packages/:id", packageHandler.UpdatePackage)
 			auth.DELETE("/packages/:id", packageHandler.DeletePackage)
 			auth.PUT("/packages/:id/status", packageHandler.UpdatePackageStatus)
+
+			// 线索管理（管理员）
+			auth.GET("/leads", leadHandler.GetLeads)
+			auth.GET("/leads/:id", leadHandler.GetLead)
+			auth.PUT("/leads/:id", leadHandler.UpdateLead)
+			auth.PUT("/leads/:id/status", leadHandler.UpdateLeadStatus)
+			auth.DELETE("/leads/:id", leadHandler.DeleteLead)
 		}
 
 		// 管理员接口
