@@ -102,6 +102,7 @@ func (h *AuthorizationCodeHandler) CreateAuthorizationCode(c *gin.Context) {
 // @Param page query int false "页码，默认1" minimum(1)
 // @Param page_size query int false "每页条数，默认20，最大100" minimum(1) maximum(100)
 // @Param customer_id query string false "客户ID筛选"
+// @Param code query string false "授权码(模糊匹配)"
 // @Param status query string false "状态筛选" Enums(normal, locked, expired)
 // @Param start_date query string false "创建开始时间"
 // @Param end_date query string false "创建结束时间"

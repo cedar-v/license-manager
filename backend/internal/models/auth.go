@@ -132,6 +132,7 @@ type AuthorizationCodeListRequest struct {
 	Page       int    `form:"page" binding:"omitempty,min=1"`                            // 页码，默认1
 	PageSize   int    `form:"page_size" binding:"omitempty,min=1,max=100"`               // 每页条数，默认20，最大100
 	CustomerID string `form:"customer_id" binding:"omitempty"`                           // 客户ID筛选
+	Code       string `form:"code" binding:"omitempty"`                                  // 授权码模糊匹配
 	Status     string `form:"status" binding:"omitempty,oneof=normal locked expired"`    // 状态筛选
 	StartDate  string `form:"start_date" binding:"omitempty"`                            // 创建开始时间
 	EndDate    string `form:"end_date" binding:"omitempty"`                              // 创建结束时间

@@ -4,6 +4,7 @@ import (
 	"context"
 	"license-manager/internal/models"
 	"math"
+	"strings"
 	"time"
 
 	"gorm.io/gorm"
@@ -100,6 +101,10 @@ func (r *authorizationCodeRepository) GetAuthorizationCodeList(ctx context.Conte
 	}
 	if req.EndDate != "" {
 		query = query.Where("ac.created_at <= ?", req.EndDate)
+	}
+	if strings.TrimSpace(req.Code) != "" {
+		like := "%" + strings.TrimSpace(req.Code) + "%"
+		query = query.Where("ac.code LIKE ?", like)
 	}
 
 	// 获取总数
