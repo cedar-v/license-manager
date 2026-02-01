@@ -240,7 +240,7 @@ func (s *customerService) DeleteCustomer(ctx context.Context, id string) error {
 		return i18n.NewI18nError("900004", lang, err.Error())
 	}
 	if hasAuthCodes {
-		return i18n.NewI18nError("200006", lang)
+		return i18n.NewI18nError("200008", lang)
 	}
 
 	// 检查是否有关联的许可证
@@ -249,7 +249,7 @@ func (s *customerService) DeleteCustomer(ctx context.Context, id string) error {
 		return i18n.NewI18nError("900004", lang, err.Error())
 	}
 	if hasLicenses {
-		return i18n.NewI18nError("200006", lang)
+		return i18n.NewI18nError("200008", lang)
 	}
 
 	// 委托给Repository层进行物理删除
