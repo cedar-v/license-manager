@@ -213,6 +213,7 @@ func SetupRouter() *gin.Engine {
 
 			// 线索管理（管理员）
 			auth.GET("/leads", leadHandler.GetLeads)
+			auth.GET("/leads/summary", leadHandler.GetLeadSummary)
 			auth.GET("/leads/:id", leadHandler.GetLead)
 			auth.PUT("/leads/:id", leadHandler.UpdateLead)
 			auth.PUT("/leads/:id/status", leadHandler.UpdateLeadStatus)

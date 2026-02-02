@@ -104,6 +104,35 @@ func (h *LeadHandler) GetLeads(c *gin.Context) {
 	})
 }
 
+// GetLeadSummary 获取线索汇总
+// @Summary 获取线索汇总
+// @Description 管理员获取企业线索汇总统计信息
+// @Tags 企业线索
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} models.APIResponse{data=models.LeadSummaryResponse} "成功"
+// @Failure 401 {object} models.ErrorResponse "未认证"
+// @Failure 403 {object} models.ErrorResponse "权限不足"
+// @Failure 500 {object} models.ErrorResponse "服务器内部错误"
+// @Router /api/leads/summary [get]
+func (h *LeadHandler) GetLeadSummary(c *gin.Context) {
+	lang := middleware.GetLanguage(c)
+
+	summary, err := h.leadService.GetLeadSummary(c.Request.Context())
+	if err != nil {
+		handleI18nError(c, err, lang)
+		return
+	}
+
+	c.JSON(http.StatusOK, models.APIResponse{
+		Code:      "000000",
+		Message:   i18n.GetI18nErrorMessage("000000", lang),
+		Data:      summary,
+		Timestamp: getCurrentTimestamp(),
+	})
+}
+
 // GetLead 获取线索详情
 // @Summary 获取线索详情
 // @Description 根据ID获取线索详细信息

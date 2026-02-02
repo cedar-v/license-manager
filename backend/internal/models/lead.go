@@ -97,44 +97,44 @@ func (l *Lead) ToResponse() *LeadResponse {
 
 // LeadResponse 线索响应结构
 type LeadResponse struct {
-	ID             string     `json:"id"`
-	LeadNo         string     `json:"lead_no"`
-	CompanyName    string     `json:"company_name"`
-	ContactName    string     `json:"contact_name"`
-	ContactPhone   string     `json:"contact_phone"`
-	ContactEmail   string     `json:"contact_email"`
-	Requirement    string     `json:"requirement"`
-	ExtraInfo      string     `json:"extra_info"`
-	Status         string     `json:"status"`
-	FollowUpDate   *time.Time `json:"follow_up_date"`
-	FollowUpRecord string     `json:"follow_up_record"`
-	InternalNote   string     `json:"internal_note"`
-	CreatedAt      time.Time  `json:"created_at"`
-	UpdatedAt      time.Time  `json:"updated_at"`
+	ID             string     `json:"id"`               // 线索ID
+	LeadNo         string     `json:"lead_no"`          // 线索编号
+	CompanyName    string     `json:"company_name"`     // 公司名称
+	ContactName    string     `json:"contact_name"`     // 联系人
+	ContactPhone   string     `json:"contact_phone"`    // 联系电话
+	ContactEmail   string     `json:"contact_email"`    // 邮箱
+	Requirement    string     `json:"requirement"`      // 需求描述
+	ExtraInfo      string     `json:"extra_info"`       // 补充信息
+	Status         string     `json:"status"`           // 状态
+	FollowUpDate   *time.Time `json:"follow_up_date"`   // 跟进日期（RFC3339，如 2026-02-05T10:00:00Z）
+	FollowUpRecord string     `json:"follow_up_record"` // 跟进记录
+	InternalNote   string     `json:"internal_note"`    // 内部备注
+	CreatedAt      time.Time  `json:"created_at"`       // 创建时间
+	UpdatedAt      time.Time  `json:"updated_at"`       // 更新时间
 }
 
 // LeadCreateRequest 创建线索请求
 type LeadCreateRequest struct {
-	CompanyName  string `json:"company_name" binding:"required,min=1,max=200"`
-	ContactName  string `json:"contact_name" binding:"required,min=1,max=100"`
-	ContactPhone string `json:"contact_phone" binding:"required,min=1,max=20"`
-	ContactEmail string `json:"contact_email" binding:"omitempty,email,max=100"`
-	Requirement  string `json:"requirement" binding:"required,min=1"`
-	ExtraInfo    string `json:"extra_info"`
+	CompanyName  string `json:"company_name" binding:"required,min=1,max=200"`   // 公司名称
+	ContactName  string `json:"contact_name" binding:"required,min=1,max=100"`   // 联系人
+	ContactPhone string `json:"contact_phone" binding:"required,min=1,max=20"`   // 联系电话
+	ContactEmail string `json:"contact_email" binding:"omitempty,email,max=100"` // 邮箱
+	Requirement  string `json:"requirement" binding:"required,min=1"`            // 需求描述
+	ExtraInfo    string `json:"extra_info"`                                      // 补充信息
 }
 
 // LeadUpdateRequest 更新线索请求
 type LeadUpdateRequest struct {
-	CompanyName    string     `json:"company_name" binding:"omitempty,min=1,max=200"`
-	ContactName    string     `json:"contact_name" binding:"omitempty,min=1,max=100"`
-	ContactPhone   string     `json:"contact_phone" binding:"omitempty,min=1,max=20"`
-	ContactEmail   string     `json:"contact_email" binding:"omitempty,email,max=100"`
-	Requirement    string     `json:"requirement" binding:"omitempty,min=1"`
-	ExtraInfo      string     `json:"extra_info"`
-	Status         string     `json:"status" binding:"omitempty,oneof=pending contacted converted invalid"`
-	FollowUpDate   *time.Time `json:"follow_up_date"`
-	FollowUpRecord string     `json:"follow_up_record"`
-	InternalNote   string     `json:"internal_note"`
+	CompanyName    string     `json:"company_name" binding:"omitempty,min=1,max=200"`                       // 公司名称
+	ContactName    string     `json:"contact_name" binding:"omitempty,min=1,max=100"`                       // 联系人
+	ContactPhone   string     `json:"contact_phone" binding:"omitempty,min=1,max=20"`                       // 联系电话
+	ContactEmail   string     `json:"contact_email" binding:"omitempty,email,max=100"`                      // 邮箱
+	Requirement    string     `json:"requirement" binding:"omitempty,min=1"`                                // 需求描述
+	ExtraInfo      string     `json:"extra_info"`                                                           // 补充信息
+	Status         string     `json:"status" binding:"omitempty,oneof=pending contacted converted invalid"` // 状态
+	FollowUpDate   *time.Time `json:"follow_up_date"`                                                       // 跟进日期（RFC3339，如 2026-02-05T10:00:00Z）
+	FollowUpRecord string     `json:"follow_up_record"`                                                     // 跟进记录
+	InternalNote   string     `json:"internal_note"`                                                        // 内部备注
 }
 
 // LeadListRequest 线索列表请求
@@ -151,4 +151,13 @@ type LeadListResponse struct {
 	TotalCount int64           `json:"total_count"`
 	Page       int             `json:"page"`
 	PageSize   int             `json:"page_size"`
+}
+
+// LeadSummaryResponse 线索汇总响应
+type LeadSummaryResponse struct {
+	TotalCount     int64 `json:"total_count"`     // 线索总数
+	PendingCount   int64 `json:"pending_count"`   // 待跟进数量
+	ContactedCount int64 `json:"contacted_count"` // 已跟进数量
+	ConvertedCount int64 `json:"converted_count"` // 已成交数量
+	InvalidCount   int64 `json:"invalid_count"`   // 已流失数量
 }

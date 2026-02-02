@@ -14,6 +14,7 @@ type LeadRepository interface {
 	Delete(id string) error
 	GetByID(id string) (*models.Lead, error)
 	GetList(ctx context.Context, req *models.LeadListRequest) ([]*models.Lead, int64, error)
+	GetSummary(ctx context.Context) (*models.LeadSummaryResponse, error)
 }
 
 type leadRepository struct {
@@ -94,4 +95,37 @@ func (r *leadRepository) GetList(ctx context.Context, req *models.LeadListReques
 	}
 
 	return leads, total, nil
+}
+
+func (r *leadRepository) GetSummary(ctx context.Context) (*models.LeadSummaryResponse, error) {
+	var row struct {
+		TotalCount     int64 `gorm:"column:total_count"`
+		PendingCount   int64 `gorm:"column:pending_count"`
+		ContactedCount int64 `gorm:"column:contacted_count"`
+		ConvertedCount int64 `gorm:"column:converted_count"`
+		InvalidCount   int64 `gorm:"column:invalid_count"`
+	}
+
+	err := r.db.WithContext(ctx).Model(&models.Lead{}).Select(
+		"COUNT(*) as total_count, " +
+			"SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as pending_count, " +
+			"SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as contacted_count, " +
+			"SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as converted_count, " +
+			"SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as invalid_count",
+		string(models.LeadStatusPending),
+		string(models.LeadStatusContacted),
+		string(models.LeadStatusConverted),
+		string(models.LeadStatusInvalid),
+	).Scan(&row).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.LeadSummaryResponse{
+		TotalCount:     row.TotalCount,
+		PendingCount:   row.PendingCount,
+		ContactedCount: row.ContactedCount,
+		ConvertedCount: row.ConvertedCount,
+		InvalidCount:   row.InvalidCount,
+	}, nil
 }

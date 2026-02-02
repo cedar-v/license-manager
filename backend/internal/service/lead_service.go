@@ -18,6 +18,7 @@ type LeadService interface {
 	DeleteLead(ctx context.Context, id string) error
 	GetLead(ctx context.Context, id string) (*models.Lead, error)
 	GetLeadList(ctx context.Context, req *models.LeadListRequest) (*models.LeadListResponse, error)
+	GetLeadSummary(ctx context.Context) (*models.LeadSummaryResponse, error)
 }
 
 type leadService struct {
@@ -156,4 +157,15 @@ func (s *leadService) GetLeadList(ctx context.Context, req *models.LeadListReque
 		Page:       page,
 		PageSize:   pageSize,
 	}, nil
+}
+
+func (s *leadService) GetLeadSummary(ctx context.Context) (*models.LeadSummaryResponse, error) {
+	lang := pkgcontext.GetLanguageFromContext(ctx)
+
+	summary, err := s.repo.GetSummary(ctx)
+	if err != nil {
+		return nil, i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	return summary, nil
 }

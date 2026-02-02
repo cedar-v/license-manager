@@ -57,7 +57,7 @@ func (s *adminInvoiceService) RejectInvoice(ctx context.Context, invoiceID strin
 
 	// 验证状态
 	if invoice.Status != models.InvoiceStatusPending {
-		return nil, i18n.NewI18nError("700004", lang)
+		return nil, i18n.NewI18nError("900001", lang)
 	}
 
 	now := time.Now()
@@ -84,15 +84,11 @@ func (s *adminInvoiceService) IssueInvoice(ctx context.Context, invoiceID string
 		return nil, i18n.NewI18nError("700001", lang)
 	}
 
-	// 验证状态：允许从pending或rejected状态开票
-	if invoice.Status != models.InvoiceStatusPending && invoice.Status != models.InvoiceStatusRejected {
-		return nil, i18n.NewI18nError("700004", lang)
-	}
+	prevStatus := invoice.Status
 
-	// 解析开票时间
 	issuedAt, err := time.Parse(time.RFC3339, req.IssuedAt)
 	if err != nil {
-		return nil, i18n.NewI18nError("700004", lang)
+		return nil, i18n.NewI18nError("900001", lang)
 	}
 
 	now := time.Now()
@@ -103,8 +99,8 @@ func (s *adminInvoiceService) IssueInvoice(ctx context.Context, invoiceID string
 	invoice.UploadedBy = &adminID
 	invoice.UpdatedAt = now
 
-	// 清除驳回信息（如果是从rejected状态开票）
-	if invoice.Status == models.InvoiceStatusRejected {
+	// Clear reject info when issuing from rejected status.
+	if prevStatus == models.InvoiceStatusRejected {
 		invoice.RejectReason = nil
 		invoice.Suggestion = nil
 		invoice.RejectedAt = nil
