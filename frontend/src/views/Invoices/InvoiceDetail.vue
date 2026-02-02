@@ -97,7 +97,7 @@
             <div class="info-row">
               <span class="label">{{ t('invoices.detail.fileName') }}：</span>
               <span class="value">
-                <el-link v-if="detailData.invoice_file_url" type="primary" :underline="false" :href="detailData.invoice_file_url" target="_blank">
+                <el-link @click="downloadFile(detailData.invoice_file_url!)" v-if="detailData.invoice_file_url" type="primary" >
                   {{ detailData.invoice_file_url.split('/').pop() }}
                 </el-link>
               </span>
@@ -138,6 +138,7 @@ import UploadInvoiceDialog from './components/UploadInvoiceDialog.vue'
 import RejectInvoiceDialog from './components/RejectInvoiceDialog.vue'
 import { getInvoiceDetail, uploadInvoice, rejectInvoice, issueInvoice, type Invoice } from '@/api/invoice'
 import { formatDateTime } from '@/utils/date'
+import { envUrl1 } from '@/api/https'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -266,6 +267,14 @@ const handleRejectSubmit = async (data: any) => {
     console.error('Reject error detail:', error)
     ElMessage.error(error.backendMessage || t('invoices.messages.fetchDetailError'))
   }
+}
+
+// 每一项的点击事件
+const downloadFile = (e:string)=>{
+  if (!e) return
+  // 如果是相对路径，拼上基础路径
+  const url = e.startsWith('http') ? e : envUrl1 + e
+  window.open(url)
 }
 </script>
 

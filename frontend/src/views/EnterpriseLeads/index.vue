@@ -243,6 +243,10 @@ const handleDelete = (row: any) => {
 const handleUpdate = async (updatedData: any) => {
   try {
     const { id, ...data } = updatedData
+    // 格式化日期为 ISO 8601 格式 (2026-02-05T10:00:00Z)，去除毫秒
+    if (data.follow_up_date) {
+      data.follow_up_date = new Date(data.follow_up_date).toISOString().replace(/\.\d{3}/, '')
+    }
     const res = await updateLead(id, data)
     if (res.code === '000000') {
       ElMessage.success(t('enterpriseLeads.messages.updateSuccess'))
