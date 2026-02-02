@@ -74,6 +74,7 @@ func (p *Package) ToResponse() *PackageResponse {
 		Features:            p.Features,
 		Status:              p.Status,
 		SortOrder:           p.SortOrder,
+		Remark:              p.Remark,
 		CreatedAt:           p.CreatedAt,
 		UpdatedAt:           p.UpdatedAt,
 	}
@@ -91,6 +92,7 @@ type PackageResponse struct {
 	Features            string    `json:"features"`
 	Status              int       `json:"status"`
 	SortOrder           int       `json:"sort_order"`
+	Remark              string    `json:"remark"`
 	CreatedAt           time.Time `json:"created_at"`
 	UpdatedAt           time.Time `json:"updated_at"`
 }

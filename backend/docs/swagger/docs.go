@@ -8974,6 +8974,9 @@ const docTemplate = `{
                 "price_description": {
                     "type": "string"
                 },
+                "remark": {
+                    "type": "string"
+                },
                 "sort_order": {
                     "type": "integer"
                 },
