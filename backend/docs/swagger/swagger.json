@@ -2963,6 +2963,64 @@
                 }
             }
         },
+        "/api/leads/summary": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "管理员获取企业线索汇总统计信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "企业线索"
+                ],
+                "summary": "获取线索汇总",
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.LeadSummaryResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "权限不足",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/leads/{id}": {
             "get": {
                 "security": [
@@ -4116,6 +4174,12 @@
                         "type": "string",
                         "description": "客户ID筛选",
                         "name": "customer_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "授权码(模糊匹配)",
+                        "name": "code",
                         "in": "query"
                     },
                     {
@@ -7886,7 +7950,6 @@
         "models.InvoiceCreateRequest": {
             "type": "object",
             "required": [
-                "content",
                 "invoice_type",
                 "order_id",
                 "receiver_email",
@@ -7894,7 +7957,7 @@
             ],
             "properties": {
                 "content": {
-                    "description": "开票内容，必填，最大200字符",
+                    "description": "开票内容，非必填，最多200字符",
                     "type": "string",
                     "maxLength": 200
                 },
@@ -7924,7 +7987,7 @@
                     "type": "string"
                 },
                 "title": {
-                    "description": "发票抬头，必填，最大200字符",
+                    "description": "发票抬头，必填，最多200字符",
                     "type": "string",
                     "maxLength": 200
                 }
@@ -8285,28 +8348,34 @@
             ],
             "properties": {
                 "company_name": {
+                    "description": "公司名称",
                     "type": "string",
                     "maxLength": 200,
                     "minLength": 1
                 },
                 "contact_email": {
+                    "description": "邮箱",
                     "type": "string",
                     "maxLength": 100
                 },
                 "contact_name": {
+                    "description": "联系人",
                     "type": "string",
                     "maxLength": 100,
                     "minLength": 1
                 },
                 "contact_phone": {
+                    "description": "联系电话",
                     "type": "string",
                     "maxLength": 20,
                     "minLength": 1
                 },
                 "extra_info": {
+                    "description": "补充信息",
                     "type": "string"
                 },
                 "requirement": {
+                    "description": "需求描述",
                     "type": "string",
                     "minLength": 1
                 }
@@ -8336,46 +8405,85 @@
             "type": "object",
             "properties": {
                 "company_name": {
+                    "description": "公司名称",
                     "type": "string"
                 },
                 "contact_email": {
+                    "description": "邮箱",
                     "type": "string"
                 },
                 "contact_name": {
+                    "description": "联系人",
                     "type": "string"
                 },
                 "contact_phone": {
+                    "description": "联系电话",
                     "type": "string"
                 },
                 "created_at": {
+                    "description": "创建时间",
                     "type": "string"
                 },
                 "extra_info": {
+                    "description": "补充信息",
                     "type": "string"
                 },
                 "follow_up_date": {
+                    "description": "跟进日期（RFC3339，如 2026-02-05T10:00:00Z）",
                     "type": "string"
                 },
                 "follow_up_record": {
+                    "description": "跟进记录",
                     "type": "string"
                 },
                 "id": {
+                    "description": "线索ID",
                     "type": "string"
                 },
                 "internal_note": {
+                    "description": "内部备注",
                     "type": "string"
                 },
                 "lead_no": {
+                    "description": "线索编号",
                     "type": "string"
                 },
                 "requirement": {
+                    "description": "需求描述",
                     "type": "string"
                 },
                 "status": {
+                    "description": "状态",
                     "type": "string"
                 },
                 "updated_at": {
+                    "description": "更新时间",
                     "type": "string"
+                }
+            }
+        },
+        "models.LeadSummaryResponse": {
+            "type": "object",
+            "properties": {
+                "contacted_count": {
+                    "description": "已跟进数量",
+                    "type": "integer"
+                },
+                "converted_count": {
+                    "description": "已成交数量",
+                    "type": "integer"
+                },
+                "invalid_count": {
+                    "description": "已流失数量",
+                    "type": "integer"
+                },
+                "pending_count": {
+                    "description": "待跟进数量",
+                    "type": "integer"
+                },
+                "total_count": {
+                    "description": "线索总数",
+                    "type": "integer"
                 }
             }
         },
@@ -8383,41 +8491,51 @@
             "type": "object",
             "properties": {
                 "company_name": {
+                    "description": "公司名称",
                     "type": "string",
                     "maxLength": 200,
                     "minLength": 1
                 },
                 "contact_email": {
+                    "description": "邮箱",
                     "type": "string",
                     "maxLength": 100
                 },
                 "contact_name": {
+                    "description": "联系人",
                     "type": "string",
                     "maxLength": 100,
                     "minLength": 1
                 },
                 "contact_phone": {
+                    "description": "联系电话",
                     "type": "string",
                     "maxLength": 20,
                     "minLength": 1
                 },
                 "extra_info": {
+                    "description": "补充信息",
                     "type": "string"
                 },
                 "follow_up_date": {
+                    "description": "跟进日期（RFC3339，如 2026-02-05T10:00:00Z）",
                     "type": "string"
                 },
                 "follow_up_record": {
+                    "description": "跟进记录",
                     "type": "string"
                 },
                 "internal_note": {
+                    "description": "内部备注",
                     "type": "string"
                 },
                 "requirement": {
+                    "description": "需求描述",
                     "type": "string",
                     "minLength": 1
                 },
                 "status": {
+                    "description": "状态",
                     "type": "string",
                     "enum": [
                         "pending",
