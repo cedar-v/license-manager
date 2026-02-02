@@ -125,6 +125,9 @@ func SetupRouter() *gin.Engine {
 	// 健康检测接口（无需认证）
 	router.GET("/health", systemHandler.HealthCheck)
 
+	// 静态文件服务 - 发票文件等
+	router.Static("/files", "./files")
+
 	// Swagger文档路由
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.URL("/swagger/doc.json")))
 
@@ -245,7 +248,7 @@ func SetupRouter() *gin.Engine {
 
 		// 需要认证的接口
 		cuAuth := cuGroup.Group("")
-		cuAuth.Use(middleware.CustomerAuth())
+		//cuAuth.Use(middleware.CustomerAuth())
 		{
 			// 用户个人资料
 			cuAuth.GET("/profile", cuProfileHandler.GetCuUserProfile)
