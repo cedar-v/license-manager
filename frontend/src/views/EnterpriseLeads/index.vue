@@ -21,16 +21,17 @@
               :placeholder="t('enterpriseLeads.filter.searchPlaceholder')"
               class="search-input"
               clearable
+              @keyup.enter="handleFilter"
             >
               <template #append>
-                <el-button class="search-btn">
+                <el-button class="search-btn" @click="handleFilter">
                   <el-icon><Search /></el-icon>
                 </el-button>
               </template>
             </el-input>
           </div>
           <div class="status-group">
-            <el-select v-model="filters.status" class="status-select" :placeholder="t('enterpriseLeads.filter.statusPlaceholder')">
+            <el-select v-model="filters.status" class="status-select" :placeholder="t('enterpriseLeads.filter.statusPlaceholder')" clearable @change="handleFilter">
               <el-option :label="t('enterpriseLeads.filter.allStatus')" value="" />
               <el-option :label="t('enterpriseLeads.status.pending')" value="pending" />
               <el-option :label="t('enterpriseLeads.status.contacting')" value="contacting" />
@@ -41,13 +42,13 @@
         </div>
       </div>
 
-      <div class="list-card">
+      <div class="list-card" v-loading="loading">
         <div class="list-header">
           <div class="list-title">
             <span class="title-bar"></span>
             <span>{{ t('enterpriseLeads.table.title') }}</span>
           </div>
-          <el-button class="refresh-btn" :icon="Refresh" text>
+          <el-button class="refresh-btn" :icon="Refresh" text @click="handleRefresh">
             {{ t('enterpriseLeads.actions.refresh') }}
           </el-button>
         </div>
@@ -62,12 +63,12 @@
             fontWeight: '600'
           }"
         >
-          <el-table-column prop="id" :label="t('enterpriseLeads.table.id')" width="100" />
-          <el-table-column prop="company" :label="t('enterpriseLeads.table.company')" min-width="220" />
-          <el-table-column prop="contact" :label="t('enterpriseLeads.table.contact')" min-width="120" />
-          <el-table-column prop="phone" :label="t('enterpriseLeads.table.phone')" min-width="140" />
-          <el-table-column prop="submittedAt" :label="t('enterpriseLeads.table.submittedAt')" min-width="160" />
-          <el-table-column :label="t('enterpriseLeads.table.status')" min-width="120">
+          <el-table-column prop="id" :label="t('enterpriseLeads.table.id')" />
+          <el-table-column prop="company_name" :label="t('enterpriseLeads.table.company')" />
+          <el-table-column prop="contact_name" :label="t('enterpriseLeads.table.contact')" width="100" />
+          <el-table-column prop="contact_phone" :label="t('enterpriseLeads.table.phone')" />
+          <el-table-column prop="created_at" :label="t('enterpriseLeads.table.submittedAt')" />
+          <el-table-column :label="t('enterpriseLeads.table.status')" width="80">
             <template #default="{ row }">
               <span class="status-tag" :class="row.status">{{ t(`enterpriseLeads.status.${row.status}`) }}</span>
             </template>
@@ -77,7 +78,7 @@
               <div class="action-buttons">
                 <el-button size="small" class="btn-view" @click="handleView(row)">{{ t('enterpriseLeads.actions.view') }}</el-button>
                 <el-button size="small" class="btn-edit" @click="handleEdit(row)">{{ t('enterpriseLeads.actions.edit') }}</el-button>
-                <el-button size="small" class="btn-delete">{{ t('enterpriseLeads.actions.delete') }}</el-button>
+                <el-button size="small" class="btn-delete" @click="handleDelete(row)">{{ t('enterpriseLeads.actions.delete') }}</el-button>
               </div>
             </template>
           </el-table-column>
@@ -98,32 +99,35 @@
 
     <LeadDetailDialog
       v-model="detailVisible"
-      :data="selectedLead"
+      :id="selectedLead?.id"
     />
 
     <LeadEditDialog
       v-model="editVisible"
-      :data="selectedLead"
+      :id="selectedLead?.id"
       @save="handleUpdate"
     />
   </Layout>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Layout from '@/components/common/layout/Layout.vue'
-import { Document, Phone, CircleCheck, CircleClose, Refresh, User, OfficeBuilding, Search } from '@element-plus/icons-vue'
+import { Phone, CircleCheck, Refresh, User, OfficeBuilding, Search } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import LeadDetailDialog from './components/LeadDetailDialog.vue'
 import LeadEditDialog from './components/LeadEditDialog.vue'
+import { getLeads, getLeadSummary, updateLead, deleteLead, type Lead } from '@/api/lead'
+import { formatDateTime } from '@/utils/date'
 
 const { t } = useI18n()
 
 const stats = ref([
-  { key: 'total', value: 21978, icon: OfficeBuilding },
-  { key: 'pending', value: 21978, icon: Phone },
-  { key: 'contacting', value: 21978, icon: CircleCheck },
-  { key: 'completed', value: 21978, icon: User }
+  { key: 'total', value: 0, icon: OfficeBuilding, field: 'total_count' },
+  { key: 'pending', value: 0, icon: Phone, field: 'pending_count' },
+  { key: 'contacting', value: 0, icon: CircleCheck, field: 'contacted_count' },
+  { key: 'completed', value: 0, icon: User, field: 'converted_count' }
 ])
 
 const filters = ref({
@@ -131,56 +135,74 @@ const filters = ref({
   status: ''
 })
 
-const tableData = ref([
-  {
-    id: '1001',
-    company: '上海智能制造有限公司',
-    contact: '张教授',
-    phone: '13800138001',
-    submittedAt: '2024-01-15 10:30',
-    status: 'contacting'
-  },
-  {
-    id: '1002',
-    company: '上海智能制造有限公司',
-    contact: '张教授',
-    phone: '13800138001',
-    submittedAt: '2024-01-15 10:30',
-    status: 'contacting'
-  },
-  {
-    id: '1003',
-    company: '上海智能制造有限公司',
-    contact: '张教授',
-    phone: '13800138001',
-    submittedAt: '2024-01-15 10:30',
-    status: 'pending'
-  },
-  {
-    id: '1004',
-    company: '上海智能制造有限公司',
-    contact: '张教授',
-    phone: '13800138001',
-    submittedAt: '2024-01-15 10:30',
-    status: 'completed'
-  },
-  {
-    id: '1005',
-    company: '上海智能制造有限公司',
-    contact: '张教授',
-    phone: '13800138001',
-    submittedAt: '2024-01-15 10:30',
-    status: 'rejected'
-  }
-])
-
+const tableData = ref<Lead[]>([])
+const loading = ref(false)
 const page = ref(1)
 const pageSize = ref(10)
-const total = ref(21978)
+const total = ref(0)
 
 const detailVisible = ref(false)
 const editVisible = ref(false)
 const selectedLead = ref<any>(null)
+
+const fetchSummary = async () => {
+  try {
+    const res = await getLeadSummary()
+    if (res.code === '000000' && res.data) {
+      stats.value.forEach(item => {
+        if (res.data[item.field] !== undefined) {
+          item.value = res.data[item.field]
+        }
+      })
+    }
+  } catch (error) {
+    console.error('Fetch lead summary error:', error)
+  }
+}
+
+const fetchData = async () => {
+  loading.value = true
+  try {
+    const params = {
+      page: page.value,
+      page_size: pageSize.value,
+      search: filters.value.keyword,
+      status: filters.value.status
+    }
+    const res = await getLeads(params)
+    if (res.code === '000000' && res.data) {
+      tableData.value = res.data.leads.map((item: any) => ({
+        ...item,
+        created_at: formatDateTime(item.created_at)
+      }))
+      total.value = res.data.total_count
+    }
+  } catch (error: any) {
+    console.error('Fetch leads error:', error)
+    ElMessage.error(error.backendMessage || t('enterpriseLeads.messages.fetchError'))
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchData()
+  fetchSummary()
+})
+
+watch([page, pageSize], () => {
+  fetchData()
+})
+
+const handleFilter = () => {
+  page.value = 1
+  fetchData()
+}
+
+const handleRefresh = () => {
+  fetchData()
+  fetchSummary()
+}
 
 const handleView = (row: any) => {
   selectedLead.value = row
@@ -192,10 +214,48 @@ const handleEdit = (row: any) => {
   editVisible.value = true
 }
 
-const handleUpdate = (updatedData: any) => {
-  const index = tableData.value.findIndex(item => item.id === updatedData.id)
-  if (index !== -1) {
-    tableData.value[index] = updatedData
+const handleDelete = (row: any) => {
+  ElMessageBox.confirm(
+    t('enterpriseLeads.messages.deleteConfirm'),
+    t('common.confirm'),
+    {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
+      type: 'warning',
+    }
+  ).then(async () => {
+    try {
+      const res = await deleteLead(row.id)
+      if (res.code === '000000') {
+        ElMessage.success(t('enterpriseLeads.messages.deleteSuccess'))
+        fetchData()
+        fetchSummary()
+      }
+    } catch (error: any) {
+      console.error('Delete lead error:', error)
+      ElMessage.error(error.backendMessage || t('enterpriseLeads.messages.deleteError'))
+    }
+  }).catch(() => {
+    // Cancelled
+  })
+}
+
+const handleUpdate = async (updatedData: any) => {
+  try {
+    const { id, ...data } = updatedData
+    // 格式化日期为 ISO 8601 格式 (2026-02-05T10:00:00Z)，去除毫秒
+    if (data.follow_up_date) {
+      data.follow_up_date = new Date(data.follow_up_date).toISOString().replace(/\.\d{3}/, '')
+    }
+    const res = await updateLead(id, data)
+    if (res.code === '000000') {
+      ElMessage.success(t('enterpriseLeads.messages.updateSuccess'))
+      fetchData()
+      fetchSummary()
+    }
+  } catch (error: any) {
+    console.error('Update lead error:', error)
+    ElMessage.error(error.backendMessage || t('enterpriseLeads.messages.updateError'))
   }
 }
 </script>

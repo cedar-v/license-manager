@@ -152,6 +152,19 @@
       "recordPlaceholder": "记录与客户的沟通情况，反馈，下一步计划...",
       "remarkPlaceholder": "内部使用的备注信息，客户不可见",
       "statusRequired": "请选择状态"
+    },
+    "validation": {
+      "nameRequired": "请输入企业名称",
+      "contactRequired": "请输入联系人"
+    },
+    "messages": {
+      "fetchError": "获取列表失败",
+      "fetchDetailError": "获取详情失败",
+      "updateSuccess": "更新成功",
+      "updateError": "更新失败",
+      "deleteSuccess": "删除成功",
+      "deleteError": "删除失败",
+      "deleteConfirm": "确认删除该线索吗？此操作不可撤销。"
     }
   },
 
@@ -162,6 +175,8 @@
       "id": "套餐ID",
       "name": "套餐名称",
       "price": "价格",
+      "free": "免费",
+      "customPlan": "定制方案",
       "cycle": "周期",
       "createdAt": "创建时间",
       "updatedAt": "更新时间",
@@ -179,12 +194,14 @@
       "price": "价格",
       "cycle": "周期/描述",
       "description": "套餐描述",
+      "priceDescription": "价格描述",
       "features": "套餐特性",
       "status": "状态",
       "sort": "显示顺序",
       "remark": "备注",
       "save": "保存更改",
       "descPlaceholder": "体验完整功能，适合新用户试用评估",
+      "priceDescPlaceholder": "例如：定制方案 / 按需定价",
       "remarkPlaceholder": "请输入备注",
       "featurePlaceholder": "请输入特性内容"
     }
@@ -196,7 +213,7 @@
     "stats": {
       "all": "全部发票申请",
       "pending": "待处理申请",
-      "success": "已开票",
+      "completed": "已开票",
       "rejected": "已驳回"
     },
     "filter": {
@@ -205,7 +222,7 @@
       "statusLabel": "开票状态:",
       "allStatus": "全部状态",
       "pending": "待处理",
-      "success": "已开票",
+      "completed": "已开票",
       "rejected": "已驳回",
       "timeLabel": "申请时间:",
       "reset": "重置",

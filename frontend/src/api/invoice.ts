@@ -12,7 +12,7 @@ export interface Invoice {
   order_package_name: string;
   created_at: string;
   updated_at: string;
-  status: 'pending' | 'completed' | 'rejected';
+  status: 'pending' | 'success' | 'rejected';
   status_display: string;
   amount: number;
   title: string;
@@ -117,3 +117,11 @@ export function uploadInvoice(data: FormData): Promise<ApiResponse> {
 export function rejectInvoice(id: string, data: any): Promise<ApiResponse> {
   return Axios.post(`/api/v1/invoices/${id}/reject`, data)
 }
+
+/**
+ * 管理员发票开票
+ */
+export function issueInvoice(id: string, data: { invoice_file_url: string, issued_at: string }): Promise<ApiResponse> {
+  return Axios.post(`/api/v1/invoices/${id}/issue`, data)
+}
+

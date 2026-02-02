@@ -1,23 +1,23 @@
 <template>
     <div class="dialog_box">
-        <el-dialog v-model="visible" :title="t('enterpriseLeads.detail.title', { company: data?.company })"
-            width="800px" class="lead-detail-dialog" destroy-on-close>
-            <div v-if="data" class="detail-content">
+        <el-dialog v-model="visible" :title="t('enterpriseLeads.detail.title', { company: detailData?.company_name })"
+            width="800px" class="lead-detail-dialog" destroy-on-close v-loading="loading">
+            <div v-if="detailData" class="detail-content">
                 <!-- 企业基本信息 -->
                 <div class="detail-section">
                     <h3 class="section-title">{{ t('enterpriseLeads.detail.basicInfo') }}</h3>
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="label">{{ t('enterpriseLeads.table.company') }}：</span>
-                            <span class="value">{{ data.company }}</span>
+                            <span class="value">{{ detailData.company_name }}</span>
                         </div>
                         <div class="info-item">
                             <span class="label">{{ t('enterpriseLeads.table.contact') }}：</span>
-                            <span class="value">{{ data.contact }}</span>
+                            <span class="value">{{ detailData.contact_name }}</span>
                         </div>
                         <div class="info-item">
                             <span class="label">{{ t('enterpriseLeads.table.phone') }}：</span>
-                            <span class="value">{{ data.phone }}</span>
+                            <span class="value">{{ detailData.contact_phone }}</span>
                         </div>
                     </div>
                 </div>
@@ -28,16 +28,15 @@
                     <div class="info-list">
                         <div class="info-item">
                             <span class="label">{{ t('enterpriseLeads.detail.email') }}：</span>
-                            <span class="value">{{ data.email || 'wangming@sh-smart.com' }}</span>
+                            <span class="value">{{ detailData.contact_email || '-' }}</span>
                         </div>
                         <div class="info-item block">
                             <span class="label">{{ t('enterpriseLeads.detail.description') }}：</span>
-                            <span class="value">{{ data.description ||
-                                '我们需要为生产线上的500台设备部署专业版授权，同时为办公室的200台电脑部署基础版授权。需要支持离线授权功能，部署时间为下个月初。' }}</span>
+                            <span class="value">{{ detailData.requirement || '-' }}</span>
                         </div>
                         <div class="info-item block">
                             <span class="label">{{ t('enterpriseLeads.detail.otherInfo') }}：</span>
-                            <span class="value">{{ data.otherInfo || '预算范围在50-80万之间，决策时间约2周。' }}</span>
+                            <span class="value">{{ detailData.extra_info || '-' }}</span>
                         </div>
                     </div>
                 </div>
@@ -48,27 +47,26 @@
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="label">{{ t('enterpriseLeads.table.submittedAt') }}：</span>
-                            <span class="value">{{ data.submittedAt }}</span>
+                            <span class="value">{{ detailData.created_at }}</span>
                         </div>
                         <div class="info-item">
                             <span class="label">{{ t('enterpriseLeads.table.status') }}：</span>
-                            <span class="status-value" :class="data.status">{{
-                                t(`enterpriseLeads.status.${data.status}`) }}</span>
+                            <span class="status-value" :class="detailData.status">{{
+                                t(`enterpriseLeads.status.${detailData.status}`) }}</span>
                         </div>
                         <div class="info-item">
                             <span class="label">{{ t('enterpriseLeads.detail.followUpDate') }}：</span>
-                            <span class="value">{{ data.followUpDate || '2025-12-21' }}</span>
+                            <span class="value">{{ detailData.follow_up_date || '-' }}</span>
                         </div>
                     </div>
                     <div class="info-list mt-12">
                         <div class="info-item block">
                             <span class="label">{{ t('enterpriseLeads.detail.followUpRecord') }}：</span>
-                            <span class="value">{{ data.followUpRecord || '已初步沟通，客户对专业版的AI功能非常感兴趣，需要提供详细的功能演示。'
-                                }}</span>
+                            <span class="value">{{ detailData.follow_up_record || '-' }}</span>
                         </div>
                         <div class="info-item block">
                             <span class="label">{{ t('enterpriseLeads.detail.internalRemark') }}：</span>
-                            <span class="value">{{ data.internalRemark || '高价值客户，需要安排技术专家进行演示。' }}</span>
+                            <span class="value">{{ detailData.internal_note || '-' }}</span>
                         </div>
                     </div>
                 </div>
@@ -80,19 +78,47 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { getLeadDetail, type Lead } from '@/api/lead'
+import { ElMessage } from 'element-plus'
+import { formatDateTime } from '@/utils/date'
 
 const props = defineProps<{
     modelValue: boolean
-    data: any
+    id: string | number | null
 }>()
 
 const emit = defineEmits(['update:modelValue'])
 
 const { t } = useI18n()
 const visible = ref(props.modelValue)
+const loading = ref(false)
+const detailData = ref<Lead | null>(null)
+
+const fetchDetail = async (id: string | number) => {
+    loading.value = true
+    try {
+        const res = await getLeadDetail(id)
+        if (res.code === '000000' && res.data) {
+            const data = res.data
+            detailData.value = {
+                ...data,
+                created_at: formatDateTime(data.created_at || ''),
+                follow_up_date: data.follow_up_date ? formatDateTime(data.follow_up_date) : null
+            }
+        }
+    } catch (error: any) {
+        console.error('Fetch lead detail error:', error)
+        ElMessage.error(error.backendMessage || t('enterpriseLeads.messages.fetchDetailError'))
+    } finally {
+        loading.value = false
+    }
+}
 
 watch(() => props.modelValue, (val) => {
     visible.value = val
+    if (val && props.id) {
+        fetchDetail(props.id)
+    }
 })
 
 watch(visible, (val) => {

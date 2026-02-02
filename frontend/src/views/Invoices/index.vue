@@ -35,7 +35,7 @@
             <el-select v-model="filterForm.status" :placeholder="t('invoices.filter.allStatus')" style="width: 150px">
               <el-option :label="t('invoices.filter.allStatus')" value="" />
               <el-option :label="t('invoices.filter.pending')" value="pending" />
-              <el-option :label="t('invoices.filter.success')" value="success" />
+              <el-option :label="t('invoices.filter.completed')" value="issued" />
               <el-option :label="t('invoices.filter.rejected')" value="rejected" />
             </el-select>
           </el-form-item>
@@ -84,8 +84,8 @@
           <el-table-column :label="t('invoices.table.user')" min-width="120">
             <template #default="{ row }">
               <div class="user-info">
-                <span class="user-name">{{ row.applicant_name }}</span>
-                <span class="user-type" :class="row.order_package_name">{{ row.order_package_name }}</span>
+                <span class="user-name">{{ row.cu_user_phone }}</span>
+                <!-- <span class="user-type" :class="row.order_package_name">{{ row.order_package_name }}</span> -->
               </div>
             </template>
           </el-table-column>
@@ -161,7 +161,7 @@ import { Document, Warning, CircleCheck, CircleClose } from '@element-plus/icons
 import { ElMessage } from 'element-plus'
 import UploadInvoiceDialog from './components/UploadInvoiceDialog.vue'
 import RejectInvoiceDialog from './components/RejectInvoiceDialog.vue'
-import { getInvoices, getInvoiceSummary, uploadInvoice, rejectInvoice, type Invoice } from '@/api/invoice'
+import { getInvoices, getInvoiceSummary, uploadInvoice, rejectInvoice, issueInvoice, type Invoice } from '@/api/invoice'
 import { formatDateTime } from '@/utils/date'
 
 const { t } = useI18n()
@@ -170,7 +170,7 @@ const router = useRouter()
 const stats = ref([
   { label: '全部发票申请', value: '0', type: 'all', icon: 'document', key: 'total_count' },
   { label: '待处理申请', value: '0', type: 'pending', icon: 'warning', key: 'pending_count' },
-  { label: '已开票', value: '0', type: 'success', icon: 'success', key: 'completed_count' },
+  { label: '已开票', value: '0', type: 'completed', icon: 'success', key: 'issued_count' },
   { label: '已驳回', value: '0', type: 'rejected', icon: 'error', key: 'rejected_count' }
 ])
 
@@ -291,10 +291,11 @@ const handleUpload = (row: any) => {
 
 const handleUploadSubmit = async (data: any) => {
   console.log('handleUploadSubmit triggered:', data)
-  if (!currentRow.value || !currentRow.value.invoice_no) {
-    console.error('No current row or invoice_no')
+  if (!currentRow.value || !currentRow.value.id) {
+    console.error('No current row or id')
     return
   }
+  loading.value = true
   try {
     const formData = new FormData()
     formData.append('invoice_no', currentRow.value.id)
@@ -304,19 +305,36 @@ const handleUploadSubmit = async (data: any) => {
       formData.append('file', file)
     } else {
       ElMessage.warning(t('invoices.dialog.uploadTip'))
+      loading.value = false
       return
     }
 
-    const res = await uploadInvoice(formData)
-    console.log('Upload response:', res)
-    if (res.code === '000000') {
-      ElMessage.success(t('invoices.messages.uploadSuccess'))
-      fetchData()
-      fetchSummary()
+    // 1. 上传文件
+    const uploadRes = await uploadInvoice(formData)
+    console.log('Upload response:', uploadRes)
+    
+    if (uploadRes.code === '000000' && (uploadRes.data?.file_url || uploadRes.data?.url)) {
+      const fileUrl = uploadRes.data.file_url || uploadRes.data.url
+      // 2. 调用开票接口
+      const issueRes = await issueInvoice(currentRow.value.id, {
+        invoice_file_url: fileUrl,
+        issued_at: data.issued_at ? new Date(data.issued_at).toISOString().replace(/\.\d{3}/, '') : ''
+      })
+      
+      if (issueRes.code === '000000') {
+        ElMessage.success(t('invoices.messages.uploadSuccess'))
+        uploadVisible.value = false
+        fetchData()
+        fetchSummary()
+      }
+    } else {
+      throw new Error(uploadRes.message || 'Upload failed')
     }
   } catch (error: any) {
     console.error('Upload invoice error:', error)
-    ElMessage.error(error.backendMessage || t('invoices.messages.fetchError'))
+    ElMessage.error(error.backendMessage || error.message || t('invoices.messages.fetchError'))
+  } finally {
+    loading.value = false
   }
 }
 
@@ -414,7 +432,7 @@ const handleCurrentChange = (val: number) => {
     color: var(--el-color-warning);
   }
 
-  &.success .stat-icon-wrapper {
+  &.completed .stat-icon-wrapper {
     background: var(--el-color-success-light-9);
     color: var(--el-color-success);
   }
@@ -555,7 +573,7 @@ const handleCurrentChange = (val: number) => {
 }
 
 .status-text {
-  &.success {
+  &.completed {
     color: #1890ff;
   }
 

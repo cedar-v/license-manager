@@ -6,6 +6,7 @@ import { errorCodeType } from './errorCodeType'
 import { generateAcceptLanguageHeader } from '@/utils/language'
 // 路由
 import router from '@/router'
+export const envUrl1 = import.meta.env.VITE_API_BASE_URL
 
 const envUrl = import.meta.env.VITE_API_BASE_URL
 console.log('API Base URL:', envUrl)
