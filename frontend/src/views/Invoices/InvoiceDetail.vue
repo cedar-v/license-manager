@@ -80,7 +80,7 @@
         </div>
 
         <!-- 通过信息 (仅在状态为已开票时显示) -->
-        <div class="detail-card approve-info-card" v-if="detailData.status === 'completed'">
+        <div class="detail-card approve-info-card" v-if="detailData.status_display === '已开票'">
           <div class="card-title">
             <span class="title-line"></span>
             <h3>{{ t('invoices.detail.approveInfo') }}</h3>
@@ -136,7 +136,7 @@ import { ArrowLeft } from '@element-plus/icons-vue'
 import Layout from '@/components/common/layout/Layout.vue'
 import UploadInvoiceDialog from './components/UploadInvoiceDialog.vue'
 import RejectInvoiceDialog from './components/RejectInvoiceDialog.vue'
-import { getInvoiceDetail, uploadInvoice, rejectInvoice, type Invoice } from '@/api/invoice'
+import { getInvoiceDetail, uploadInvoice, rejectInvoice, issueInvoice, type Invoice } from '@/api/invoice'
 import { formatDateTime } from '@/utils/date'
 
 const { t } = useI18n()
@@ -200,31 +200,49 @@ const handleUpload = () => {
 
 const handleUploadSubmit = async (data: any) => {
   console.log('handleUploadSubmit detail triggered:', data)
-  if (!detailData.value.invoice_no) {
-    console.error('No detail data invoice_no')
+  if (!detailData.value.id) {
+    console.error('No detail data id')
     return
   }
+  loading.value = true
   try {
     const formData = new FormData()
-    formData.append('invoice_no', detailData.value.id!)
+    formData.append('invoice_no', detailData.value.id)
     if (data.fileList && data.fileList.length > 0) {
       const file = data.fileList[0].raw
       console.log('File to upload (detail):', file)
       formData.append('file', file)
     } else {
       ElMessage.warning(t('invoices.dialog.uploadTip'))
+      loading.value = false
       return
     }
 
-    const res = await uploadInvoice(formData)
-    console.log('Upload response (detail):', res)
-    if (res.code === '000000') {
-      ElMessage.success(t('invoices.messages.uploadSuccess'))
-      fetchDetail()
+    // 1. 上传文件
+    const uploadRes = await uploadInvoice(formData)
+    console.log('Upload response (detail):', uploadRes)
+    
+    if (uploadRes.code === '000000' && (uploadRes.data?.file_url || uploadRes.data?.url)) {
+      const fileUrl = uploadRes.data.file_url || uploadRes.data.url
+      // 2. 调用开票接口
+      const issueRes = await issueInvoice(detailData.value.id, {
+        invoice_file_url: fileUrl,
+        issued_at: data.issued_at
+      })
+      
+      if (issueRes.code === '000000') {
+        ElMessage.success(t('invoices.messages.uploadSuccess'))
+        uploadVisible.value = false
+        fetchDetail()
+      }
+    } else {
+      throw new Error(uploadRes.message || 'Upload failed')
     }
   } catch (error: any) {
     console.error('Upload error detail:', error)
-    ElMessage.error(error.backendMessage || t('invoices.messages.fetchDetailError'))
+    ElMessage.error(error.backendMessage || error.message || t('invoices.messages.fetchDetailError'))
+  } finally {
+    loading.value = false
   }
 }
 

@@ -2,18 +2,55 @@
  <div>
      <el-dialog
     v-model="visible"
-    :title="t('enterpriseLeads.edit.title', { company: data?.company })"
-    width="800px"
-    class="lead-edit-dialog"
-    destroy-on-close
-  >
-    <el-form
-      ref="formRef"
-      :model="form"
-      :rules="rules"
-      label-position="top"
-      class="edit-form"
-    >
+     :title="t('enterpriseLeads.edit.title', { company: detailData?.company_name })"
+     width="800px"
+     class="lead-edit-dialog"
+     destroy-on-close
+     v-loading="loading"
+   >
+     <el-form
+       ref="formRef"
+       :model="form"
+       :rules="rules"
+       label-position="top"
+       class="edit-form"
+     >
+      <div class="form-row">
+        <el-form-item :label="t('enterpriseLeads.table.company')" prop="company_name" class="flex-1">
+          <el-input v-model="form.company_name" :placeholder="t('enterpriseLeads.table.company')" />
+        </el-form-item>
+        <el-form-item :label="t('enterpriseLeads.table.contact')" prop="contact_name" class="flex-1">
+          <el-input v-model="form.contact_name" :placeholder="t('enterpriseLeads.table.contact')" />
+        </el-form-item>
+      </div>
+
+      <div class="form-row">
+        <el-form-item :label="t('enterpriseLeads.table.phone')" prop="contact_phone" class="flex-1">
+          <el-input v-model="form.contact_phone" :placeholder="t('enterpriseLeads.table.phone')" />
+        </el-form-item>
+        <el-form-item :label="t('enterpriseLeads.detail.email')" prop="contact_email" class="flex-1">
+          <el-input v-model="form.contact_email" :placeholder="t('enterpriseLeads.detail.email')" />
+        </el-form-item>
+      </div>
+
+      <el-form-item :label="t('enterpriseLeads.detail.description')" prop="requirement">
+        <el-input
+          v-model="form.requirement"
+          type="textarea"
+          :rows="3"
+          :placeholder="t('enterpriseLeads.detail.description')"
+        />
+      </el-form-item>
+
+      <el-form-item :label="t('enterpriseLeads.detail.otherInfo')" prop="extra_info">
+        <el-input
+          v-model="form.extra_info"
+          type="textarea"
+          :rows="2"
+          :placeholder="t('enterpriseLeads.detail.otherInfo')"
+        />
+      </el-form-item>
+
       <div class="form-row">
         <el-form-item :label="t('enterpriseLeads.table.status')" prop="status" class="flex-1">
           <el-select v-model="form.status" class="w-full" :placeholder="t('enterpriseLeads.filter.statusPlaceholder')">
@@ -23,9 +60,9 @@
             <el-option :label="t('enterpriseLeads.status.rejected')" value="rejected" />
           </el-select>
         </el-form-item>
-        <el-form-item :label="t('enterpriseLeads.detail.followUpDate')" prop="followUpDate" class="flex-1">
+        <el-form-item :label="t('enterpriseLeads.detail.followUpDate')" prop="follow_up_date" class="flex-1">
           <el-date-picker
-            v-model="form.followUpDate"
+            v-model="form.follow_up_date"
             type="date"
             class="w-full"
             :placeholder="t('enterpriseLeads.edit.datePlaceholder')"
@@ -34,29 +71,29 @@
           />
         </el-form-item>
       </div>
-
-      <el-form-item :label="t('enterpriseLeads.detail.followUpRecord')" prop="followUpRecord">
-        <el-input
-          v-model="form.followUpRecord"
-          type="textarea"
-          :rows="4"
-          maxlength="500"
-          show-word-limit
-          :placeholder="t('enterpriseLeads.edit.recordPlaceholder')"
-        />
-      </el-form-item>
-
-      <el-form-item :label="t('enterpriseLeads.detail.internalRemark')" prop="internalRemark">
-        <el-input
-          v-model="form.internalRemark"
-          type="textarea"
-          :rows="4"
-          maxlength="500"
-          show-word-limit
-          :placeholder="t('enterpriseLeads.edit.remarkPlaceholder')"
-        />
-      </el-form-item>
-    </el-form>
+ 
+       <el-form-item :label="t('enterpriseLeads.detail.followUpRecord')" prop="follow_up_record">
+         <el-input
+           v-model="form.follow_up_record"
+           type="textarea"
+           :rows="4"
+           maxlength="500"
+           show-word-limit
+           :placeholder="t('enterpriseLeads.edit.recordPlaceholder')"
+         />
+       </el-form-item>
+ 
+       <el-form-item :label="t('enterpriseLeads.detail.internalRemark')" prop="internal_note">
+         <el-input
+           v-model="form.internal_note"
+           type="textarea"
+           :rows="4"
+           maxlength="500"
+           show-word-limit
+           :placeholder="t('enterpriseLeads.edit.remarkPlaceholder')"
+         />
+       </el-form-item>
+     </el-form>
 
     <template #footer>
       <div class="dialog-footer">
@@ -74,10 +111,12 @@
 import { ref, watch, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { FormInstance, FormRules } from 'element-plus'
+import { getLeadDetail, type Lead } from '@/api/lead'
+import { ElMessage } from 'element-plus'
 
 const props = defineProps<{
   modelValue: boolean
-  data: any
+  id: string | number | null
 }>()
 
 const emit = defineEmits(['update:modelValue', 'save'])
@@ -85,25 +124,58 @@ const emit = defineEmits(['update:modelValue', 'save'])
 const { t } = useI18n()
 const visible = ref(props.modelValue)
 const formRef = ref<FormInstance>()
+const loading = ref(false)
+const detailData = ref<Lead | null>(null)
 
 const form = reactive({
+  company_name: '',
+  contact_email: '',
+  contact_name: '',
+  contact_phone: '',
+  extra_info: '',
+  requirement: '',
   status: '',
-  followUpDate: '',
-  followUpRecord: '',
-  internalRemark: ''
+  follow_up_date: '',
+  follow_up_record: '',
+  internal_note: ''
 })
 
 const rules = reactive<FormRules>({
-  status: [{ required: true, message: t('enterpriseLeads.edit.statusRequired'), trigger: 'change' }]
+  status: [{ required: true, message: t('enterpriseLeads.edit.statusRequired'), trigger: 'change' }],
+  company_name: [{ required: true, message: t('enterpriseLeads.validation.nameRequired'), trigger: 'blur' }],
+  contact_name: [{ required: true, message: t('enterpriseLeads.validation.contactRequired'), trigger: 'blur' }]
 })
+
+const fetchDetail = async (id: string | number) => {
+  loading.value = true
+  try {
+    const res = await getLeadDetail(id)
+    if (res.code === '000000' && res.data) {
+      const data = res.data
+      detailData.value = data
+      form.company_name = data.company_name || ''
+      form.contact_email = data.contact_email || ''
+      form.contact_name = data.contact_name || ''
+      form.contact_phone = data.contact_phone || ''
+      form.extra_info = data.extra_info || ''
+      form.requirement = data.requirement || ''
+      form.status = data.status
+      form.follow_up_date = data.follow_up_date || ''
+      form.follow_up_record = data.follow_up_record || ''
+      form.internal_note = data.internal_note || ''
+    }
+  } catch (error: any) {
+    console.error('Fetch lead detail error:', error)
+    ElMessage.error(error.backendMessage || t('enterpriseLeads.messages.fetchDetailError'))
+  } finally {
+    loading.value = false
+  }
+}
 
 watch(() => props.modelValue, (val) => {
   visible.value = val
-  if (val && props.data) {
-    form.status = props.data.status
-    form.followUpDate = props.data.followUpDate || '2026-01-14'
-    form.followUpRecord = props.data.followUpRecord || ''
-    form.internalRemark = props.data.internalRemark || ''
+  if (val && props.id) {
+    fetchDetail(props.id)
   }
 })
 
@@ -115,7 +187,7 @@ const handleSave = async () => {
   if (!formRef.value) return
   await formRef.value.validate((valid) => {
     if (valid) {
-      emit('save', { ...props.data, ...form })
+      emit('save', { id: props.id, ...form })
       visible.value = false
     }
   })

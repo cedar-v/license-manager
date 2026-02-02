@@ -11,7 +11,7 @@
                         <el-select v-model="form.type" class="w-full">
                             <el-option label="试用版" value="trial" />
                             <el-option label="基础版" value="basic" />
-                            <el-option label="专业版" value="pro" />
+                            <el-option label="专业版" value="professional" />
                             <el-option label="定制版" value="custom" />
                         </el-select>
                     </el-form-item>
@@ -19,12 +19,16 @@
 
                 <div class="form-row">
                     <el-form-item :label="t('packages.edit.price')" prop="price" class="flex-1">
-                        <el-input v-model="form.price" />
+                        <el-input-number v-model="form.price" :min="0" class="w-full" controls-position="right" />
                     </el-form-item>
-                    <el-form-item :label="t('packages.edit.cycle')" prop="cycle" class="flex-1">
-                        <el-input v-model="form.cycle" />
+                    <el-form-item :label="t('packages.edit.cycle')" prop="duration_description" class="flex-1">
+                        <el-input v-model="form.duration_description" />
                     </el-form-item>
                 </div>
+
+                <el-form-item :label="t('packages.edit.priceDescription')" prop="price_description">
+                    <el-input v-model="form.price_description" :placeholder="t('packages.edit.priceDescPlaceholder')" />
+                </el-form-item>
 
                 <el-form-item :label="t('packages.edit.description')" prop="description">
                     <el-input v-model="form.description" type="textarea" :rows="4" maxlength="500" show-word-limit
@@ -34,7 +38,7 @@
                 <div class="features-section">
                     <label class="section-label">{{ t('packages.edit.features') }}</label>
                     <div class="features-list">
-                        <div v-for="(feature, index) in form.features" :key="index" class="feature-item">
+                        <div v-for="(_, index) in form.features" :key="index" class="feature-item">
                             <el-input v-model="form.features[index]"
                                 :placeholder="t('packages.edit.featurePlaceholder')" />
                             <el-button class="btn-remove" @click="removeFeature(index)">
@@ -54,12 +58,12 @@
                 <div class="form-row mt-20">
                     <el-form-item :label="t('packages.edit.status')" prop="status" class="flex-1">
                         <el-select v-model="form.status" class="w-full">
-                            <el-option :label="t('packages.status.enabled')" value="enabled" />
-                            <el-option :label="t('packages.status.disabled')" value="disabled" />
+                            <el-option :label="t('packages.status.enabled')" :value="1" />
+                            <el-option :label="t('packages.status.disabled')" :value="2" />
                         </el-select>
                     </el-form-item>
-                    <el-form-item :label="t('packages.edit.sort')" prop="sort" class="flex-1">
-                        <el-input-number v-model="form.sort" :min="1" class="w-full" controls-position="right" />
+                    <el-form-item :label="t('packages.edit.sort')" prop="sort_order" class="flex-1">
+                        <el-input-number v-model="form.sort_order" :min="1" class="w-full" controls-position="right" />
                     </el-form-item>
                 </div>
 
@@ -101,12 +105,13 @@ const formRef = ref<FormInstance>()
 const form = reactive({
     name: '',
     type: '',
-    price: '',
-    cycle: '',
+    price: 0,
+    price_description: '',
+    duration_description: '',
     description: '',
     features: [] as string[],
-    status: 'enabled',
-    sort: 1,
+    status: 1,
+    sort_order: 1,
     remark: ''
 })
 
@@ -114,10 +119,10 @@ const rules = reactive<FormRules>({
     name: [{ required: true, message: t('common.required'), trigger: 'blur' }],
     type: [{ required: true, message: t('common.required'), trigger: 'change' }],
     price: [{ required: true, message: t('common.required'), trigger: 'blur' }],
-    cycle: [{ required: true, message: t('common.required'), trigger: 'blur' }],
+    duration_description: [{ required: true, message: t('common.required'), trigger: 'blur' }],
     description: [{ required: true, message: t('common.required'), trigger: 'blur' }],
     status: [{ required: true, message: t('common.required'), trigger: 'change' }],
-    sort: [{ required: true, message: t('common.required'), trigger: 'blur' }]
+    sort_order: [{ required: true, message: t('common.required'), trigger: 'blur' }]
 })
 
 watch(() => props.modelValue, (val) => {
@@ -125,12 +130,13 @@ watch(() => props.modelValue, (val) => {
     if (val && props.data) {
         form.name = props.data.name || ''
         form.type = props.data.type || 'trial'
-        form.price = props.data.price || ''
-        form.cycle = props.data.cycle || ''
-        form.description = props.data.description || '体验完整功能，适合新用户试用评估'
-        form.features = props.data.features || ['全部功能试用', '支持1台设备激活', '基础功能支持', '永久授权', '高级功能', '离线授权支持']
-        form.status = props.data.status || 'enabled'
-        form.sort = props.data.sort || 6
+        form.price = Number(props.data.price) || 0
+        form.price_description = props.data.price_description || ''
+        form.duration_description = props.data.duration_description || ''
+        form.description = props.data.description || ''
+        form.features = Array.isArray(props.data.features) ? [...props.data.features] : []
+        form.status = props.data.status === 1 ? 1 : 2
+        form.sort_order = props.data.sort_order || 1
         form.remark = props.data.remark || ''
     }
 })
