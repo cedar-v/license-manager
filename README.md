@@ -40,8 +40,9 @@
 
 > 💡 这是一个当前功能的演示环境，您可以体验已开发的核心特性。
 
-## 官方文档
+## 官方
 
+官方网站请访问：[https://www.cedar-v.com](https://www.cedar-v.com)
 官方文档请访问：[https://docs.cedar-v.com](https://docs.lm.cedar-v.com)
 
 ## Star收藏与关注
