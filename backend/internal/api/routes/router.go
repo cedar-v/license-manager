@@ -248,7 +248,7 @@ func SetupRouter() *gin.Engine {
 
 		// 需要认证的接口
 		cuAuth := cuGroup.Group("")
-		//cuAuth.Use(middleware.CustomerAuth())
+		cuAuth.Use(middleware.CustomerAuth())
 		{
 			// 用户个人资料
 			cuAuth.GET("/profile", cuProfileHandler.GetCuUserProfile)
