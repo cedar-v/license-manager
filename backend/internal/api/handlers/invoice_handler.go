@@ -35,7 +35,7 @@ func NewAdminInvoiceHandler(invoiceService service.AdminInvoiceService) *AdminIn
 // @Param page_size query int false "每页条数，默认10，最大100" minimum(1) maximum(100)
 // @Param status query string false "状态筛选，pending-待处理/issued-已开票/rejected-已驳回"
 // @Param search query string false "搜索关键词，支持发票号或订单号模糊匹配"
-// @Param apply_date query string false "申请日期筛选，格式YYYY-MM-DD"
+// @Param apply_date query string false "申请日期筛选，格式YYYY-MM-DD 或 RFC3339范围(start,end)"
 // @Param customer_id query string false "客户ID筛选"
 // @Success 200 {object} models.APIResponse{data=models.InvoiceListResponse} "成功"
 // @Failure 401 {object} models.ErrorResponse "未认证"

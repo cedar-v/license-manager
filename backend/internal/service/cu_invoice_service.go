@@ -7,6 +7,7 @@ import (
 	"license-manager/internal/repository"
 	pkgcontext "license-manager/pkg/context"
 	"license-manager/pkg/i18n"
+	"strings"
 	"time"
 
 	"gorm.io/gorm"
@@ -192,13 +193,53 @@ func (s *cuInvoiceService) generateInvoiceNo() string {
 
 // parseDateRange 解析日期范围
 func (s *cuInvoiceService) parseDateRange(dateStr string) (*time.Time, *time.Time, error) {
-	// 假设输入格式为 YYYY-MM-DD
-	start, err := time.Parse("2006-01-02", dateStr)
+	parts := strings.Split(dateStr, ",")
+	if len(parts) == 1 {
+		start, _, err := s.parseFlexibleTime(strings.TrimSpace(dateStr))
+		if err != nil {
+			return nil, nil, err
+		}
+		end := start.AddDate(0, 0, 1)
+		return &start, &end, nil
+	}
+	if len(parts) != 2 {
+		return nil, nil, fmt.Errorf("invalid date range")
+	}
+
+	startText := strings.TrimSpace(parts[0])
+	endText := strings.TrimSpace(parts[1])
+	if startText == "" || endText == "" {
+		return nil, nil, fmt.Errorf("invalid date range")
+	}
+
+	start, _, err := s.parseFlexibleTime(startText)
 	if err != nil {
 		return nil, nil, err
 	}
-
-	end := start.AddDate(0, 0, 1) // 下一天
+	end, endDateOnly, err := s.parseFlexibleTime(endText)
+	if err != nil {
+		return nil, nil, err
+	}
+	if endDateOnly {
+		end = end.AddDate(0, 0, 1)
+	}
+	if end.Before(start) {
+		start, end = end, start
+	}
 
 	return &start, &end, nil
+}
+
+func (s *cuInvoiceService) parseFlexibleTime(value string) (time.Time, bool, error) {
+	if t, err := time.Parse(time.RFC3339Nano, value); err == nil {
+		return t, false, nil
+	}
+	if t, err := time.Parse(time.RFC3339, value); err == nil {
+		return t, false, nil
+	}
+	t, err := time.Parse("2006-01-02", value)
+	if err != nil {
+		return time.Time{}, false, err
+	}
+	return t, true, nil
 }
