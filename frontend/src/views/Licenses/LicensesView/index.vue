@@ -809,9 +809,9 @@ onMounted(() => {
   .sidebar-item {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 12px;
-    padding: 16px 0;
+    padding: 16px 24px;
     margin: 8px 16px;
     cursor: pointer;
     transition: all 0.3s;

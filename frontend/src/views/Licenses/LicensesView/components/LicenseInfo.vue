@@ -798,8 +798,11 @@ const submitAddLicense = async () => {
 }
 
 .empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
   padding: 40px;
-  text-align: center;
 }
 
 // 响应式布局

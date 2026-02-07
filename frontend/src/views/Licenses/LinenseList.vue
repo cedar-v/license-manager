@@ -42,7 +42,6 @@
           <el-table-column
             prop="code"
             :label="t('pages.licenses.list.table.code')"
-            :width="220"
             show-overflow-tooltip
             align="center"
           >
@@ -54,7 +53,7 @@
               >
             </template>
           </el-table-column>
-          <el-table-column prop="status" :label="t('pages.licenses.list.table.status')" :width="100" align="center">
+          <el-table-column prop="status" :label="t('pages.licenses.list.table.status')" :width="150" align="center">
             <template #default="scope">
               <div class="status-tag" :class="getStatusClass(scope.row.status)">
                 {{ scope.row.status_display }}
@@ -63,7 +62,6 @@
           </el-table-column>
           <el-table-column
             :label="t('pages.licenses.list.table.activationProgress')"
-            :width="220"
             align="center"
           >
             <template #default="scope">
@@ -89,7 +87,6 @@
           <el-table-column
             prop="description"
             :label="t('pages.licenses.list.table.description')"
-            :min-width="200"
             show-overflow-tooltip
             align="center"
           >

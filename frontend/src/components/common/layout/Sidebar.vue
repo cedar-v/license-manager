@@ -167,10 +167,11 @@ const handleNavClick = (item: NavItem, event: Event) => {
 .logo-text {
   font-family: 'Swis721 BlkCn BT', sans-serif;
   font-size: 30px;
+  font-style: normal;
   font-weight: 400;
-  color: var(--app-text-primary);
+  color: #333;
   @include text-ellipsis;
-  line-height: 1.2;
+  line-height: normal;
 
   @include mobile {
     font-size: 24px;
@@ -258,7 +259,7 @@ const handleNavClick = (item: NavItem, event: Event) => {
   text-decoration: none;
   border-radius: 24px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 1;
   
