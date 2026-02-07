@@ -73,6 +73,7 @@ errors:
     "500015": "Verification code does not exist"
     "500016": "SMS sending too frequent, please try again later"
     "500017": "SMS sending failed"
+    "500018": "Account locked, please try again later"
 
   # Package order module (60xxxx)
   cu_package:

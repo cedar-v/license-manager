@@ -185,7 +185,7 @@ func (s *cuUserService) Login(ctx context.Context, req *models.CuUserLoginReques
 		// 密码登录（默认行为）
 		// 检查是否被锁定
 		if user.IsAccountLocked() {
-			return nil, "", i18n.NewI18nError("500003", lang) // 账号已被锁定
+			return nil, "", i18n.NewI18nError("500018", lang) // 账号已被锁定
 		}
 
 		// 验证密码
@@ -210,7 +210,7 @@ func (s *cuUserService) Login(ctx context.Context, req *models.CuUserLoginReques
 				if err := s.repo.LockAccount(user.ID, lockUntil); err != nil {
 					// 记录错误但不影响登录流程
 				}
-				return nil, "", i18n.NewI18nError("500003", lang) // 账号已被锁定
+				return nil, "", i18n.NewI18nError("500018", lang) // 账号已被锁定
 			}
 
 			return nil, "", i18n.NewI18nError("500003", lang) // 手机号或密码错误
