@@ -97,15 +97,6 @@ watch(() => props.modelValue, (val) => {
 watch(visible, (val) => {
   emit('update:modelValue', val)
 })
-
-const handleChange = (_file: any, fileList: any) => {
-  form.fileList = fileList
-}
-
-const handleRemove = (_file: any, fileList: any) => {
-  form.fileList = fileList
-}
-
 const handleClose = () => {
   // Reset form if needed
 }

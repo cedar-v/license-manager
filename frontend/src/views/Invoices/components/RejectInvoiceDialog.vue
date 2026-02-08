@@ -69,7 +69,6 @@
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ElMessage } from 'element-plus'
 import { WarningFilled } from '@element-plus/icons-vue'
 
 const { t } = useI18n()
