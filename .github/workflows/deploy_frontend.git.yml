@@ -108,7 +108,7 @@ jobs:
         sshpass -p "${{ secrets.PASS43 }}" rsync -avz --info=progress2 \
           -e "ssh -o StrictHostKeyChecking=no" \
           frontend/production/ \
-          pi@${{ secrets.HOST43 }}:/home/pi/lm-www/frontend_tmp/production/ > /tmp/rsync.log 2>&1 &
+          root@${{ secrets.HOST43 }}:/home/pi/lm-www/frontend_tmp/production/ > /tmp/rsync.log 2>&1 &
         RSYNC_PID=$!
         
         # 每10秒显示一次进度
@@ -119,7 +119,7 @@ jobs:
           sleep 10
             # 通过SSH检查目标目录大小
             TRANSFERRED=$(sshpass -p "${{ secrets.PASS43 }}" ssh -o StrictHostKeyChecking=no \
-              pi@${{ secrets.HOST43 }} \
+              root@${{ secrets.HOST43 }} \
               "du -sb /home/pi/lm-www/frontend_tmp/production 2>/dev/null | cut -f1" || echo "0")
           
           if [ "$TRANSFERRED" != "0" ] && [ "$TOTAL_SIZE" != "0" ]; then
@@ -154,7 +154,7 @@ jobs:
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.HOST43 }}
-        username: pi
+        username: root
         password: ${{ secrets.PASS43 }}
         port: 22
         script: |
