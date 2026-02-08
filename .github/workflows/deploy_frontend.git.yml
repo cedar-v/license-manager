@@ -76,14 +76,14 @@ jobs:
     - name: Prepare temp directory
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.HOST_PI }}
-        username: pi
-        password: ${{ secrets.PASS_PI }}
+        host: ${{ secrets.HOST43 }}
+        username: root
+        password: ${{ secrets.PASS43 }}
         port: 22
         script: |
           sudo rm -rf /home/pi/lm-www/frontend_tmp
           sudo mkdir -p /home/pi/lm-www/frontend_tmp/production
-          sudo chown -R pi:pi /home/pi/lm-www/frontend_tmp
+          sudo chown -R root:root /home/pi/lm-www/frontend_tmp
 
     # 安装 rsync（用于带进度显示的文件传输）
     - name: Install rsync
@@ -105,10 +105,10 @@ jobs:
         echo "Starting file transfer with rsync..."
         
         # 启动后台传输（使用 --info=progress2 只显示总体进度，减少输出）
-        sshpass -p "${{ secrets.PASS_PI }}" rsync -avz --info=progress2 \
+        sshpass -p "${{ secrets.PASS43 }}" rsync -avz --info=progress2 \
           -e "ssh -o StrictHostKeyChecking=no" \
           frontend/production/ \
-          pi@${{ secrets.HOST_PI }}:/home/pi/lm-www/frontend_tmp/production/ > /tmp/rsync.log 2>&1 &
+          pi@${{ secrets.HOST43 }}:/home/pi/lm-www/frontend_tmp/production/ > /tmp/rsync.log 2>&1 &
         RSYNC_PID=$!
         
         # 每10秒显示一次进度
@@ -118,8 +118,8 @@ jobs:
         while kill -0 $RSYNC_PID 2>/dev/null; do
           sleep 10
             # 通过SSH检查目标目录大小
-            TRANSFERRED=$(sshpass -p "${{ secrets.PASS_PI }}" ssh -o StrictHostKeyChecking=no \
-              pi@${{ secrets.HOST_PI }} \
+            TRANSFERRED=$(sshpass -p "${{ secrets.PASS43 }}" ssh -o StrictHostKeyChecking=no \
+              pi@${{ secrets.HOST43 }} \
               "du -sb /home/pi/lm-www/frontend_tmp/production 2>/dev/null | cut -f1" || echo "0")
           
           if [ "$TRANSFERRED" != "0" ] && [ "$TOTAL_SIZE" != "0" ]; then
@@ -153,9 +153,9 @@ jobs:
     - name: Deploy to production
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.HOST_PI }}
+        host: ${{ secrets.HOST43 }}
         username: pi
-        password: ${{ secrets.PASS_PI }}
+        password: ${{ secrets.PASS43 }}
         port: 22
         script: |
           set -e
