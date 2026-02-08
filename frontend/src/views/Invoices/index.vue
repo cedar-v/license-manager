@@ -258,10 +258,6 @@ const createForm = reactive({
   userType: 'personal'
 })
 
-const handleCreate = () => {
-  createVisible.value = true
-}
-
 const submitCreate = () => {
   ElMessage.success(t('invoices.messages.createSuccess'))
   createVisible.value = false
