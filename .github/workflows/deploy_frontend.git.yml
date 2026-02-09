@@ -171,7 +171,8 @@ jobs:
           sudo rm -rf /home/pi/lm-www/frontend_tmp
           
           echo "Setting permissions..."
-          sudo chown -R www-data:www-data /home/pi/lm-www/frontend/
+          # 将前端目录权限授予 nginx 运行用户（OpenCloudOS 上通常为 nginx）
+          sudo chown -R nginx:nginx /home/pi/lm-www/frontend/
           sudo chmod -R 644 /home/pi/lm-www/frontend/
           sudo find /home/pi/lm-www/frontend/ -type d -exec chmod 755 {} \;
           
