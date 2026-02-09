@@ -109,8 +109,7 @@ definitions:
         description: 客户ID
         type: string
       customer_info:
-        allOf:
-        - $ref: '#/definitions/models.CustomerInfoForAuthCode'
+        $ref: '#/definitions/models.CustomerInfoForAuthCode'
         description: 客户信息（仅在详情接口返回）
       customer_name:
         description: 客户名称
@@ -338,8 +337,7 @@ definitions:
   models.AuthorizationCodeShareResponse:
     properties:
       new_authorization_code:
-        allOf:
-        - $ref: '#/definitions/models.AuthorizationCodeShareResponseItem'
+        $ref: '#/definitions/models.AuthorizationCodeShareResponseItem'
         description: 新生成的授权码信息
     type: object
   models.AuthorizationCodeShareResponseItem:
@@ -862,8 +860,7 @@ definitions:
       address:
         type: string
       authorization_stats:
-        allOf:
-        - $ref: '#/definitions/models.AuthorizationStats'
+        $ref: '#/definitions/models.AuthorizationStats'
         description: 授权统计信息（仅在详情接口返回）
       company_size:
         type: string
@@ -1097,12 +1094,10 @@ definitions:
   models.DashboardAuthorizationTrendResponse:
     properties:
       period:
-        allOf:
-        - $ref: '#/definitions/models.TrendPeriod'
+        $ref: '#/definitions/models.TrendPeriod'
         description: 时间段信息
       summary:
-        allOf:
-        - $ref: '#/definitions/models.TrendSummary'
+        $ref: '#/definitions/models.TrendSummary'
         description: 汇总信息
       trend_data:
         description: 趋势数据
@@ -1127,8 +1122,7 @@ definitions:
         description: 激活时间
         type: string
       authorization_info:
-        allOf:
-        - $ref: '#/definitions/models.AuthorizationInfo'
+        $ref: '#/definitions/models.AuthorizationInfo'
         description: 授权信息
       device_info:
         additionalProperties: true
@@ -1731,8 +1725,7 @@ definitions:
       activation_ip:
         type: string
       authorization_code:
-        allOf:
-        - $ref: '#/definitions/models.AuthorizationCode'
+        $ref: '#/definitions/models.AuthorizationCode'
         description: 关联字段（用于查询时的JOIN）
       authorization_code_id:
         type: string
@@ -2146,8 +2139,7 @@ definitions:
         description: 支付金额，单位元
         type: number
       business_order:
-        allOf:
-        - $ref: '#/definitions/models.PaymentBusinessOrder'
+        $ref: '#/definitions/models.PaymentBusinessOrder'
         description: 关联的业务订单信息
       payment_no:
         description: 支付单号
@@ -2230,8 +2222,7 @@ definitions:
         description: 即将过期数量（30天内即将过期的授权码，且未被锁定）
         type: integer
       growth_rate:
-        allOf:
-        - $ref: '#/definitions/models.GrowthRate'
+        $ref: '#/definitions/models.GrowthRate'
         description: 增长率（同比上月）
       total_auth_codes:
         description: 总授权码数量（所有授权码的累计总数）
@@ -2300,7 +2291,7 @@ info:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: 软件授权管理平台API文档
+  description: Bearer token for authentication
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
@@ -2689,7 +2680,7 @@ paths:
         in: query
         name: search
         type: string
-      - description: 申请日期筛选，格式YYYY-MM-DD
+      - description: 申请日期筛选，格式YYYY-MM-DD 或 RFC3339范围(start,end)
         in: query
         name: apply_date
         type: string
@@ -2739,14 +2730,16 @@ paths:
             - $ref: '#/definitions/models.APIResponse'
             - properties:
                 data:
-                  properties:
-                    id:
-                      type: string
-                    invoice_no:
-                      type: string
-                    status:
-                      type: string
-                  type: object
+                  allOf:
+                  - type: object
+                  - properties:
+                      id:
+                        type: string
+                      invoice_no:
+                        type: string
+                      status:
+                        type: string
+                    type: object
               type: object
         "400":
           description: 请求参数无效
@@ -2904,27 +2897,31 @@ paths:
             - $ref: '#/definitions/models.APIResponse'
             - properties:
                 data:
-                  properties:
-                    token:
-                      type: string
-                    user:
-                      properties:
-                        customer_id:
-                          type: string
-                        email:
-                          type: string
-                        id:
-                          type: string
-                        phone:
-                          type: string
-                        real_name:
-                          type: string
-                        status:
-                          type: string
-                        user_role:
-                          type: string
-                      type: object
-                  type: object
+                  allOf:
+                  - type: object
+                  - properties:
+                      token:
+                        type: string
+                      user:
+                        allOf:
+                        - type: object
+                        - properties:
+                            customer_id:
+                              type: string
+                            email:
+                              type: string
+                            id:
+                              type: string
+                            phone:
+                              type: string
+                            real_name:
+                              type: string
+                            status:
+                              type: string
+                            user_role:
+                              type: string
+                          type: object
+                    type: object
               type: object
         "400":
           description: 请求参数无效
@@ -3024,20 +3021,22 @@ paths:
             - $ref: '#/definitions/models.APIResponse'
             - properties:
                 data:
-                  properties:
-                    expire_time:
-                      type: string
-                    id:
-                      type: string
-                    order_no:
-                      type: string
-                    payment_no:
-                      type: string
-                    payment_url:
-                      type: string
-                    total_amount:
-                      type: number
-                  type: object
+                  allOf:
+                  - type: object
+                  - properties:
+                      expire_time:
+                        type: string
+                      id:
+                        type: string
+                      order_no:
+                        type: string
+                      payment_no:
+                        type: string
+                      payment_url:
+                        type: string
+                      total_amount:
+                        type: number
+                    type: object
               type: object
         "400":
           description: 请求参数无效
@@ -3119,18 +3118,84 @@ paths:
           schema:
             $ref: '#/definitions/models.APIResponse'
         "400":
-          description: Bad Request
+          description: ""
         "401":
-          description: Unauthorized
+          description: ""
         "403":
-          description: Forbidden
+          description: ""
         "404":
-          description: Not Found
+          description: ""
         "409":
-          description: Conflict
+          description: ""
       security:
       - BearerAuth: []
       summary: 删除订单
+      tags:
+      - 客户订单管理
+  /api/cu/orders/{order_id}/pay:
+    post:
+      consumes:
+      - application/json
+      description: 对指定订单继续支付，如果支付单已过期则创建新的支付单
+      parameters:
+      - description: 订单ID
+        in: path
+        name: order_id
+        required: true
+        type: string
+      - description: 支付方式
+        enum:
+        - alipay
+        - wechat
+        in: query
+        name: payment_method
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  allOf:
+                  - type: object
+                  - properties:
+                      expire_time:
+                        type: string
+                      order_id:
+                        type: string
+                      order_no:
+                        type: string
+                      payment_no:
+                        type: string
+                      payment_url:
+                        type: string
+                      total_amount:
+                        type: number
+                    type: object
+              type: object
+        "400":
+          description: 订单状态不允许继续支付
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: 订单不存在
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 继续支付
       tags:
       - 客户订单管理
   /api/cu/orders/calculate:
@@ -3144,12 +3209,14 @@ paths:
         name: request
         required: true
         schema:
-          properties:
-            license_count:
-              type: integer
-            package_id:
-              type: string
-          type: object
+          allOf:
+          - type: object
+          - properties:
+              license_count:
+                type: integer
+              package_id:
+                type: string
+            type: object
       produces:
       - application/json
       responses:
@@ -3160,18 +3227,20 @@ paths:
             - $ref: '#/definitions/models.APIResponse'
             - properties:
                 data:
-                  properties:
-                    discount_description:
-                      type: string
-                    discount_rate:
-                      type: number
-                    license_count:
-                      type: integer
-                    total_amount:
-                      type: number
-                    unit_price:
-                      type: number
-                  type: object
+                  allOf:
+                  - type: object
+                  - properties:
+                      discount_description:
+                        type: string
+                      discount_rate:
+                        type: number
+                      license_count:
+                        type: integer
+                      total_amount:
+                        type: number
+                      unit_price:
+                        type: number
+                    type: object
               type: object
         "400":
           description: 请求参数无效
@@ -3236,18 +3305,20 @@ paths:
             - properties:
                 data:
                   items:
-                    properties:
-                      id:
-                        type: string
-                      max_devices:
-                        type: integer
-                      name:
-                        type: string
-                      price:
-                        type: number
-                      type:
-                        type: string
-                    type: object
+                    allOf:
+                    - type: object
+                    - properties:
+                        id:
+                          type: string
+                        max_devices:
+                          type: integer
+                        name:
+                          type: string
+                        price:
+                          type: number
+                        type:
+                          type: string
+                      type: object
                   type: array
               type: object
       summary: 获取套餐列表
@@ -3501,27 +3572,31 @@ paths:
             - $ref: '#/definitions/models.APIResponse'
             - properties:
                 data:
-                  properties:
-                    token:
-                      type: string
-                    user:
-                      properties:
-                        customer_id:
-                          type: string
-                        email:
-                          type: string
-                        id:
-                          type: string
-                        phone:
-                          type: string
-                        real_name:
-                          type: string
-                        status:
-                          type: string
-                        user_role:
-                          type: string
-                      type: object
-                  type: object
+                  allOf:
+                  - type: object
+                  - properties:
+                      token:
+                        type: string
+                      user:
+                        allOf:
+                        - type: object
+                        - properties:
+                            customer_id:
+                              type: string
+                            email:
+                              type: string
+                            id:
+                              type: string
+                            phone:
+                              type: string
+                            real_name:
+                              type: string
+                            status:
+                              type: string
+                            user_role:
+                              type: string
+                          type: object
+                    type: object
               type: object
         "400":
           description: 请求参数无效
@@ -5477,7 +5552,7 @@ paths:
         in: query
         name: search
         type: string
-      - description: 申请日期筛选，格式YYYY-MM-DD
+      - description: 申请日期筛选，格式YYYY-MM-DD 或 RFC3339范围(start,end)
         in: query
         name: apply_date
         type: string
@@ -6121,7 +6196,6 @@ schemes:
 - https
 securityDefinitions:
   BearerAuth:
-    description: Bearer token for authentication
     in: header
     name: Authorization
     type: apiKey
