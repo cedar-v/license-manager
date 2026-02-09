@@ -15,6 +15,7 @@
               filterable
               size="large"
               class="customer-select"
+              style="font-size: 20px !important;"
               @change="handleCustomerChange"
             >
               <el-option
@@ -165,14 +166,15 @@ onMounted(() => {
 }
 
 .platform-title {
-  font-family: 'PangMenZhengDao', 'Source Han Sans CN', sans-serif;
+  font-family: 'PangMenZhengDao';
   font-size: 56px;
+  font-style: normal;
   font-weight: 400;
   color: #1C1C28;
   text-align: center;
   margin: 0;
-  letter-spacing: 0.06em;
-  line-height: 1.2;
+  letter-spacing: 3.36px;
+  line-height: normal;
 }
 
 .action-section {
@@ -222,10 +224,10 @@ onMounted(() => {
 
   :deep(.el-input__wrapper) {
     height: 60px !important;
-    font-size: 20px;
+    font-size: 20px !important;
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid #E3E3E3;
-    border-radius: 8px;
+    border-radius: 8px !important;
     padding: 0 48px 0 16px;
     box-sizing: border-box;
     display: flex;

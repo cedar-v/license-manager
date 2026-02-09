@@ -7,9 +7,13 @@
             <span class="title-bar"></span>
             <span>{{ t('packages.table.title') }}</span>
           </div>
-          <el-button class="refresh-btn" :icon="Refresh" text @click="fetchData">
-            {{ t('enterpriseLeads.actions.refresh') }}
-          </el-button>
+          <el-button 
+            class="refresh-btn" 
+            :icon="Refresh" 
+            circle 
+            @click="fetchData"
+            :loading="loading"
+          />
         </div>
 
         <el-table
@@ -23,7 +27,7 @@
             height: '50px'
           }"
         >
-          <el-table-column prop="id" :label="t('packages.table.id')" width="100" />
+          <!-- <el-table-column prop="id" :label="t('packages.table.id')" width="100" /> -->
           <el-table-column prop="name" :label="t('packages.table.name')" min-width="150" />
           <el-table-column prop="price" :label="t('packages.table.price')" min-width="120">
             <template #default="{ row }">
@@ -192,6 +196,9 @@ const handleUpdate = async (updatedData: any) => {
 }
 
 .list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
 }
 
@@ -202,6 +209,20 @@ const handleUpdate = async (updatedData: any) => {
   font-size: 18px;
   font-weight: 600;
   color: #333;
+}
+
+.refresh-btn {
+  border-color: #E6F7F3;
+  background-color: #E6F7F3 !important;
+  color: #00a870 !important;
+  transition: all 0.3s;
+  
+  &:hover {
+    border-color: #00a870;
+    background-color: #00a870 !important;
+    color: #fff !important;
+    transform: rotate(180deg);
+  }
 }
 
 .title-bar {

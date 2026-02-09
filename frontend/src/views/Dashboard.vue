@@ -137,7 +137,7 @@ const statsData = ref([
   { id: 2, key: 'active_licenses', value: '', label: t('dashboard.stats.totalLicenses'), icon: icon2 },//活跃许可证
   { id: 3, key: 'expiring_soon', value: '', label: t('dashboard.stats.activeLicenses'), icon: icon3 },//即将过期
   { id: 4, key: 'abnormal_alerts', value: '', label: t('dashboard.stats.expired'), icon: icon4 },//异常警告
-  { id: 5, key: 'growth_rate', value: '', label: t('dashboard.stats.onlineClients'), icon: icon5 },//增长率
+  // { id: 5, key: 'growth_rate', value: '', label: t('dashboard.stats.onlineClients'), icon: icon5 },//增长率
   { id: 6, key: 'auth_codes', value: '', label: t('dashboard.stats.expiringSoon'), icon: icon6 },//授权码增长率
   { id: 7, key: 'licenses', value: '', label: t('dashboard.stats.authSuccessRate24h'), icon: icon7 }//许可证增长率
 ])
@@ -229,10 +229,9 @@ onMounted(() => {
 
 // 统计卡片区域 - 基于1920*1080设计的vw适配
 .stats-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 0.8fr 1.5fr; /* 前5个正常，第6个缩小，第7个放大 */
-  gap: 1.04vw; /* 20px/1920 = 1.04vw */
-  margin-bottom: 2.08vw; /* 40px/1920 = 2.08vw */
+  display: flex;
+  gap: 2.08vw; /* 卡片之间的间距 40px/1920 = 2.08vw */
+  margin-bottom: 1.25vw; /* 24px/1920 = 1.25vw */
   padding: 1.25vw; /* 24px/1920 = 1.25vw */
   background: linear-gradient(135deg, #019C7C 0%, #1db584 100%);
   border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
@@ -279,8 +278,10 @@ onMounted(() => {
 }
 
 .stats-card {
+  flex: 1; /* 等宽分布 */
   display: flex;
-  align-items: stretch;
+  align-items: center;
+  justify-content: center; /* 内容居中 */
   gap: 0.83vw; /* 16px/1920 = 0.83vw */
   position: relative;
   z-index: 2; /* 确保内容显示在背景图片和网格纹理之上 */
@@ -289,9 +290,9 @@ onMounted(() => {
   &:not(:last-child)::after {
     content: '';
     position: absolute;
-    right: -0.52vw; /* -10px/1920 = -0.52vw */
+    left: 100%; /* 从卡片右边缘开始 */
     top: 50%;
-    transform: translateY(-50%);
+    transform: translate(calc(2.08vw / 2), -50%); /* 向右移动gap的一半，垂直居中 */
     width: 1px;
     height: 3.33vw; /* 64px/1920 = 3.33vw */
     background: linear-gradient(
@@ -355,16 +356,6 @@ onMounted(() => {
   }
 }
 
-// 紧凑型卡片样式（专门针对到期提醒）
-.stats-card.compact-card  {
-  min-width: 10vw !important; /* 48px/1920 = 2.5vw */
-}
-
-// 大型卡片样式（专门针对近24小时授权验证成功率）
-.stats-card.large-card  {
-  min-width: 10vw !important; /* 115px/1920 = 6vw */
-}
-
 // 内容区域 - 默认上下布局，充满屏幕宽度和高度
 .content-section {
   display: flex;
@@ -395,20 +386,21 @@ onMounted(() => {
 }
 
 .card-header {
-  padding: 1.25vw 1.25vw 0; /* 24px/1920 = 1.25vw */
+  padding: 24px 24px 0; /* 调整为24px符合4px倍数 */
 
   .card-title {
     font-size: 1.04vw; /* 20px/1920 = 1.04vw */
-    font-weight: 400;
+    font-weight: 500; /* 调整为中等粗细 */
     color: var(--app-text-primary);
     margin: 0;
     line-height: 1.3;
+    font-family: 'Source Han Sans CN', sans-serif;
   }
 }
 
 // 表格卡片
 .table-container {
-  padding: 1.35vw 1.25vw 1.25vw; /* 26px 24px 24px → 1.35vw 1.25vw 1.25vw */
+  padding: 24px; /* 使用24px统一padding，符合4px倍数 */
   flex: 1; /* 占据剩余高度 */
   overflow: auto; /* 如果内容过多，允许滚动 */
   display: flex;
@@ -425,13 +417,12 @@ onMounted(() => {
 
     .table-header th {
       background-color: var(--app-bg-color) !important;
-
       color: var(--app-text-primary);
       font-weight: 500;
       font-size: 16px;
       font-family: 'Source Han Sans CN', sans-serif;
       height: 48px;
-      padding: 13px 20px;
+      padding: 12px 20px; /* 调整为12px符合4px倍数 */
       border-bottom: none;
     }
 
@@ -439,11 +430,11 @@ onMounted(() => {
       height: 48px;
 
       td {
-        padding: 13px 20px;
+        padding: 12px 20px; /* 调整为12px符合4px倍数 */
         border-bottom: 1px solid var(--app-border-light);
         font-size: 14px;
         font-family: 'Source Han Sans CN', sans-serif;
-        font-weight: 350;
+        font-weight: 400; /* 调整为正常粗细 */
         color: var(--app-text-primary);
       }
 
@@ -456,16 +447,24 @@ onMounted(() => {
       }
     }
 
-    // 序号列和状态列居中
-    .el-table__body tr td:nth-child(1),
-    .el-table__body tr td:nth-child(4) {
+    // 序号列居中
+    .el-table__body tr td:nth-child(1) {
       text-align: center;
     }
 
-    // 状态列防止文本溢出
+    // 状态列居中
     .el-table__body tr td:nth-child(4) {
+      text-align: center;
       overflow: visible;
       text-overflow: initial;
+    }
+
+    // 其他列左对齐（客户名称、描述、时间等）
+    .el-table__body tr td:nth-child(2),
+    .el-table__body tr td:nth-child(3),
+    .el-table__body tr td:nth-child(5),
+    .el-table__body tr td:nth-child(6) {
+      text-align: left;
     }
   }
 }
@@ -502,6 +501,7 @@ onMounted(() => {
 // 响应式设计 - 移动端切换回px单位确保可读性
 @media (max-width: 768px) {
   .stats-section {
+    display: grid; /* 在移动端切换回 grid 布局 */
     grid-template-columns: repeat(2, 1fr);
     gap: 16px; /* 移动端使用固定像素 */
     padding: 16px;

@@ -97,12 +97,12 @@
             :row-style="getRowStyle"
             :max-height="'calc(100vh - 265px)'"
           >
-          <el-table-column prop="customer_code" :label="t('customers.table.customerCode')" :width="170" show-overflow-tooltip  align="left">
+          <el-table-column prop="customer_code" :label="t('customers.table.customerCode')" :width="140" show-overflow-tooltip  align="left">
             <template #default="scope">
               <span class="customer-code customer-code-link" @click="handleViewCustomerDetail(scope.row)" style="cursor:pointer; color:var(--el-color-primary)">{{ scope.row.customer_code }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="customer_name" :label="t('customers.table.customerName')" :width="180" show-overflow-tooltip  align="center">
+          <el-table-column prop="customer_name" :label="t('customers.table.customerName')" :width="200" show-overflow-tooltip  align="center">
             <template #default="scope">
               <span class="ellipsis-text">{{ scope.row.customer_name }}</span>
             </template>
@@ -110,7 +110,7 @@
           <el-table-column prop="customer_type_display" :label="t('customers.table.customerType')" :width="130"  align="center">
           </el-table-column>
           <el-table-column prop="contact_person" :label="t('customers.table.contactPerson')" :width="140"    align="center" />
-          <el-table-column prop="email" :label="t('customers.table.email')" :width="160" show-overflow-tooltip  align="center">
+          <el-table-column prop="email" :label="t('customers.table.email')" :width="200" show-overflow-tooltip  align="center">
              <template #default="scope">
               <span class="ellipsis-text">{{ scope.row.email }}</span>
             </template>
