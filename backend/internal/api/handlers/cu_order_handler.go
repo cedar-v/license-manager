@@ -189,12 +189,26 @@ func (h *CuOrderHandler) CreateOrder(c *gin.Context) {
 		return
 	}
 
-	// 根据套餐类型和支付方式决定处理逻辑
-	if req.PackageID == "trial" {
-		// 试用版订单：直接生成授权码（每月1-25日内）
+	// 先计算价格，根据金额决定处理逻辑
+	priceResult, err := h.cuOrderService.CalculatePrice(c.Request.Context(), req.PackageID, req.LicenseCount)
+	if err != nil {
+		c.JSON(err.(*i18n.I18nError).HttpCode, models.ErrorResponse{
+			Code:      err.(*i18n.I18nError).Code,
+			Message:   err.(*i18n.I18nError).Message,
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	// 如果金额为0（免费/试用版），直接生成授权码，无论是否传了payment_method
+	if priceResult.TotalAmount == 0 {
 		h.createFreeOrder(c, cuUserID.(string), customerID.(string), &req)
-	} else if req.PaymentMethod == "" {
-		// 免费订单：直接创建订单
+		return
+	}
+
+	// 如果金额大于0，根据是否传了payment_method决定处理逻辑
+	if req.PaymentMethod == "" {
+		// 金额大于0但没有传支付方式，走免费订单流程（直接生成授权码）
 		h.createFreeOrder(c, cuUserID.(string), customerID.(string), &req)
 	} else {
 		// 付费订单：创建订单和支付单
