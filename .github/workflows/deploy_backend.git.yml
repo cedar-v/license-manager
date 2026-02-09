@@ -18,7 +18,7 @@ jobs:
     steps:
     # 通过SSH连接服务器进行部署
     - name: Deploy to server
-      uses: appleboy/ssh-action@v1.2.0
+      uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.HOST43 }}
         username: root
