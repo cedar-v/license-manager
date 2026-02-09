@@ -93,7 +93,7 @@ func SetupRouter() *gin.Engine {
 	cuUserService := service.NewCuUserService(cuUserRepo, customerRepo, smsService, db)
 	authCodeService := service.NewAuthorizationCodeService(authCodeRepo, customerRepo, cuUserRepo, licenseRepo)
 	packageService := service.NewPackageService(packageRepo, db)
-	cuOrderService := service.NewCuOrderService(cuOrderRepo, cuUserRepo, authCodeRepo, packageRepo, db)
+	cuOrderService := service.NewCuOrderService(cuOrderRepo, cuUserRepo, authCodeRepo, packageRepo, paymentRepo, db)
 	cuDeviceService := service.NewCuDeviceService(licenseRepo)
 	paymentService := service.NewPaymentService(paymentRepo, cuOrderRepo, convertPaymentConfig(cfg.Payment), db)
 	enumService := service.NewEnumService()
@@ -263,6 +263,7 @@ func SetupRouter() *gin.Engine {
 			cuAuth.POST("/orders", cuOrderHandler.CreateOrder)
 			cuAuth.GET("/orders/:order_id", cuOrderHandler.GetOrder)
 			cuAuth.PUT("/orders/:order_id/cancel", cuOrderHandler.CancelOrder)
+			cuAuth.POST("/orders/:order_id/pay", cuOrderHandler.ContinuePay)
 			cuAuth.GET("/orders", cuOrderHandler.GetUserOrders)
 			cuAuth.GET("/orders/summary", cuOrderHandler.GetOrderSummary)
 

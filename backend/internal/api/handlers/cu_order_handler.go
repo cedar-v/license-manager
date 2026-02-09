@@ -539,3 +539,130 @@ func (h *CuOrderHandler) GetOrderSummary(c *gin.Context) {
 		Data:    result,
 	})
 }
+
+// ContinuePay 继续支付
+// @Summary 继续支付
+// @Description 对指定订单继续支付，如果支付单已过期则创建新的支付单
+// @Tags 客户订单管理
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param order_id path string true "订单ID"
+// @Param payment_method query string false "支付方式" Enums(alipay, wechat)
+// @Success 200 {object} models.APIResponse{data=object{order_id=string,order_no=string,payment_no=string,payment_url=string,total_amount=number,expire_time=string}} "成功"
+// @Failure 401 {object} models.ErrorResponse "未认证"
+// @Failure 403 {object} models.ErrorResponse "权限不足"
+// @Failure 404 {object} models.ErrorResponse "订单不存在"
+// @Failure 400 {object} models.ErrorResponse "订单状态不允许继续支付"
+// @Router /api/cu/orders/{order_id}/pay [post]
+func (h *CuOrderHandler) ContinuePay(c *gin.Context) {
+	orderID := c.Param("order_id")
+	if orderID == "" {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("900001", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	// 获取用户ID和客户ID
+	cuUserID, exists := c.Get("cu_user_id")
+	if !exists {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("100004", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	customerID, exists := c.Get("cu_customer_id")
+	if !exists {
+		lang := middleware.GetLanguage(c)
+		status, errCode, message := i18n.NewI18nErrorResponse("100004", lang)
+		c.JSON(status, models.ErrorResponse{
+			Code:      errCode,
+			Message:   message,
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	// 获取支付方式（可选，默认使用配置的默认支付方式）
+	paymentMethod := c.DefaultQuery("payment_method", "")
+
+	// 调用服务层
+	ctx := middleware.WithLanguage(c.Request.Context(), c)
+	result, err := h.cuOrderService.ContinuePay(ctx, orderID, cuUserID.(string), customerID.(string), paymentMethod)
+	if err != nil {
+		c.JSON(err.(*i18n.I18nError).HttpCode, models.ErrorResponse{
+			Code:      err.(*i18n.I18nError).Code,
+			Message:   err.(*i18n.I18nError).Message,
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	// 如果支付单号为空，说明需要创建新的支付单
+	if result.PaymentNo == "" {
+		// 获取订单信息以获取金额
+		order, err := h.cuOrderService.GetOrder(ctx, orderID, cuUserID.(string))
+		if err != nil {
+			c.JSON(err.(*i18n.I18nError).HttpCode, models.ErrorResponse{
+				Code:      err.(*i18n.I18nError).Code,
+				Message:   err.(*i18n.I18nError).Message,
+				Timestamp: getCurrentTimestamp(),
+			})
+			return
+		}
+
+		// 创建新的支付单
+		paymentReq := &models.PaymentCreateRequest{
+			BusinessType:  models.BusinessTypePackageOrder,
+			BusinessID:    &order.ID,
+			CustomerID:    customerID.(string),
+			CuUserID:      cuUserID.(string),
+			Amount:        order.TotalAmount,
+			Currency:      "CNY",
+			PaymentMethod: paymentMethod,
+		}
+
+		payment, err := h.paymentService.CreatePayment(ctx, paymentReq)
+		if err != nil {
+			lang := middleware.GetLanguage(c)
+			status, errCode, message := i18n.NewI18nErrorResponse("602001", lang)
+			c.JSON(status, models.ErrorResponse{
+				Code:      errCode,
+				Message:   message + ": " + err.Error(),
+				Timestamp: getCurrentTimestamp(),
+			})
+			return
+		}
+
+		// 更新返回结果
+		result.PaymentNo = payment.PaymentNo
+		result.PaymentURL = payment.PaymentURL
+		result.ExpireTime = payment.ExpireTime
+	}
+
+	lang := middleware.GetLanguage(c)
+	successMsg := i18n.GetI18nErrorMessage("000000", lang)
+	c.JSON(http.StatusOK, models.APIResponse{
+		Code:    "000000",
+		Message: successMsg,
+		Data: gin.H{
+			"order_id":     result.OrderID,
+			"order_no":     result.OrderNo,
+			"payment_no":   result.PaymentNo,
+			"payment_url":  result.PaymentURL,
+			"total_amount": result.TotalAmount,
+			"expire_time":  result.ExpireTime.Format("2006-01-02T15:04:05Z"),
+		},
+		Timestamp: getCurrentTimestamp(),
+	})
+}

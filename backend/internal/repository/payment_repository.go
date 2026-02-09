@@ -39,7 +39,11 @@ func (r *paymentRepository) GetByPaymentNo(ctx context.Context, paymentNo string
 
 func (r *paymentRepository) GetByBusinessID(ctx context.Context, businessType, businessID string) (*models.Payment, error) {
 	var payment models.Payment
-	err := r.db.WithContext(ctx).Where("business_type = ? AND business_id = ?", businessType, businessID).First(&payment).Error
+	// 按创建时间倒序，获取最新的支付单
+	err := r.db.WithContext(ctx).
+		Where("business_type = ? AND business_id = ?", businessType, businessID).
+		Order("created_at DESC").
+		First(&payment).Error
 	if err != nil {
 		return nil, err
 	}

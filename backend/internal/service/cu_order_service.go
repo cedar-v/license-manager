@@ -26,6 +26,17 @@ type CuOrderService interface {
 	CancelOrder(ctx context.Context, orderID, cuUserID string) (*models.CuOrder, error)
 	DeleteOrder(ctx context.Context, orderID, cuUserID string) error
 	UpdateOrderStatus(ctx context.Context, orderID string, status string) error
+	ContinuePay(ctx context.Context, orderID, cuUserID, customerID, paymentMethod string) (*ContinuePayResponse, error)
+}
+
+// ContinuePayResponse 继续支付响应
+type ContinuePayResponse struct {
+	OrderID      string     `json:"order_id"`       // 订单ID
+	OrderNo      string     `json:"order_no"`       // 订单号
+	PaymentNo    string     `json:"payment_no"`     // 支付单号
+	PaymentURL   *string    `json:"payment_url"`    // 支付链接
+	TotalAmount  float64    `json:"total_amount"`   // 订单总金额
+	ExpireTime   time.Time  `json:"expire_time"`    // 支付过期时间
 }
 
 type PriceCalculationResult struct {
@@ -55,6 +66,7 @@ type cuOrderService struct {
 	cuUserRepo   repository.CuUserRepository
 	authCodeRepo repository.AuthorizationCodeRepository
 	packageRepo  repository.PackageRepository
+	paymentRepo repository.PaymentRepository
 	db           *gorm.DB
 }
 
@@ -63,6 +75,7 @@ func NewCuOrderService(
 	cuUserRepo repository.CuUserRepository,
 	authCodeRepo repository.AuthorizationCodeRepository,
 	packageRepo repository.PackageRepository,
+	paymentRepo repository.PaymentRepository,
 	db *gorm.DB,
 ) CuOrderService {
 	return &cuOrderService{
@@ -70,6 +83,7 @@ func NewCuOrderService(
 		cuUserRepo:   cuUserRepo,
 		authCodeRepo: authCodeRepo,
 		packageRepo:  packageRepo,
+		paymentRepo:  paymentRepo,
 		db:           db,
 	}
 }
@@ -585,4 +599,60 @@ func parseMaxDevicesFromFeatures(features string) int {
 	}
 
 	return maxDevices
+}
+
+// ContinuePay 继续支付：获取订单的支付信息，如果支付单已过期则返回订单信息供重新创建支付单
+func (s *cuOrderService) ContinuePay(ctx context.Context, orderID, cuUserID, customerID, paymentMethod string) (*ContinuePayResponse, error) {
+	lang := pkgcontext.GetLanguageFromContext(ctx)
+
+	// 1. 验证订单
+	order, err := s.repo.GetByID(orderID)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, i18n.NewI18nError("601001", lang) // 订单不存在
+		}
+		return nil, i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	// 2. 检查权限：只能支付自己的订单
+	if order.CuUserID != cuUserID {
+		return nil, i18n.NewI18nError("100005", lang) // 权限不足
+	}
+
+	// 3. 检查订单状态：只有待支付订单才能继续支付
+	if order.Status != "pending" {
+		return nil, i18n.NewI18nError("601007", lang) // 订单状态不允许继续支付
+	}
+
+	// 4. 查询订单的最新支付单
+	payment, err := s.paymentRepo.GetByBusinessID(ctx, models.BusinessTypePackageOrder, orderID)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	// 5. 如果支付单存在且可用（pending 且未过期），直接返回
+	if payment != nil && err == nil {
+		now := time.Now()
+		if payment.Status == models.PaymentStatusPending && payment.ExpireTime.After(now) {
+			return &ContinuePayResponse{
+				OrderID:     order.ID,
+				OrderNo:     order.OrderNo,
+				PaymentNo:   payment.PaymentNo,
+				PaymentURL:  payment.PaymentURL,
+				TotalAmount: order.TotalAmount,
+				ExpireTime:  payment.ExpireTime,
+			}, nil
+		}
+	}
+
+	// 6. 支付单不存在或已过期，返回订单信息（让 handler 层创建新的支付单）
+	// 这里返回一个特殊标记，表示需要创建新的支付单
+	return &ContinuePayResponse{
+		OrderID:     order.ID,
+		OrderNo:     order.OrderNo,
+		PaymentNo:   "", // 空字符串表示需要创建新的支付单
+		PaymentURL:  nil,
+		TotalAmount: order.TotalAmount,
+		ExpireTime:  time.Time{}, // 零值表示需要创建新的支付单
+	}, nil
 }
