@@ -181,6 +181,14 @@ jobs:
           ls -la /home/pi/lm-www/frontend/production/ || echo "Warning: production directory not found"
           
           echo "Reloading nginx..."
-          sudo systemctl reload nginx
+          # 与服务器手动操作保持一致：先测试配置，再重载
+          if command -v nginx >/dev/null 2>&1; then
+            echo "Testing nginx config (nginx -t)..."
+            sudo nginx -t
+            echo "Reloading nginx (nginx -s reload)..."
+            sudo nginx -s reload
+          else
+            echo "⚠️ 未找到 nginx 命令，请确认 nginx 是否已安装并在 PATH 中"
+          fi
           
           echo "✅ Deployment completed!"

@@ -37,5 +37,19 @@ jobs:
           source /root/.profile || true
           
           cd /root/license-manager
-          git pull origin main
+
+          echo "Starting git pull with retry (max 5 times)..."
+          max_retries=5
+          count=0
+          until git pull origin main; do
+            count=$((count + 1))
+            if [ "$count" -ge "$max_retries" ]; then
+              echo "❌ git pull failed after $max_retries attempts."
+              exit 1
+            fi
+            echo "⚠️ git pull failed (attempt $count/$max_retries), retrying in 10 seconds..."
+            sleep 10
+          done
+
+          echo "✅ git pull succeeded."
           pm2 restart license_manager
