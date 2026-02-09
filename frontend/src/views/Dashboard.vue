@@ -123,7 +123,6 @@ import icon1 from '@/assets/icons/dashboard/icon1.png'
 import icon2 from '@/assets/icons/dashboard/icon2.png'
 import icon3 from '@/assets/icons/dashboard/icon3.png'
 import icon4 from '@/assets/icons/dashboard/icon4.png'
-import icon5 from '@/assets/icons/dashboard/icon5.png'
 import icon6 from '@/assets/icons/dashboard/icon6.png'
 import icon7 from '@/assets/icons/dashboard/icon7.png'
 
