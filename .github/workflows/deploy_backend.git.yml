@@ -20,22 +20,22 @@ jobs:
     - name: Deploy to server
       uses: appleboy/ssh-action@v1.2.0
       with:
-        host: ${{ secrets.HOST_PI }}
-        username: pi
-        password: ${{ secrets.PASS_PI }}
+        host: ${{ secrets.HOST43 }}
+        username: root
+        password: ${{ secrets.PASS43 }}
         port: 22
         command_timeout: 10m
         script_stop: true
         envs: USER
         script: |
-          # 确保使用正确的用户环境
-          export HOME=/home/pi
-          export USER=pi
+          # 确保使用正确的用户环境（云服务器 root）
+          export HOME=/root
+          export USER=root
           
-          # 加载pi用户的环境配置（包括代理设置）
-          source /home/pi/.bashrc || true
-          source /home/pi/.profile || true
+          # 加载 root 用户的环境配置（包括代理设置）
+          source /root/.bashrc || true
+          source /root/.profile || true
           
-          cd /home/pi/license-manager
+          cd /root/license-manager
           git pull origin main
           pm2 restart license_manager

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"license-manager/internal/models"
 	"license-manager/internal/repository"
@@ -35,31 +36,6 @@ type PriceCalculationResult struct {
 	DiscountDesc string  `json:"discount_description"`
 }
 
-// 套餐配置（临时写死，后续可改为配置化）
-var packageConfigs = map[string]PackageConfig{
-	"trial": {
-		Name:       "试用版",
-		Price:      0,
-		MaxDevices: 1, // 试用版限制1个许可
-	},
-	"basic": {
-		Name:       "基础版",
-		Price:      300,
-		MaxDevices: 1000, // 基础版最多1000个许可
-	},
-	"professional": {
-		Name:       "专业版",
-		Price:      2000,
-		MaxDevices: 1000, // 专业版最多1000个许可
-	},
-}
-
-type PackageConfig struct {
-	Name       string
-	Price      float64
-	MaxDevices int
-}
-
 // 折扣规则配置
 var discountRules = []DiscountRule{
 	{MinQuantity: 50, MaxQuantity: 99, Rate: 0.9, Description: "50-99许可9折优惠"},
@@ -78,33 +54,48 @@ type cuOrderService struct {
 	repo         repository.CuOrderRepository
 	cuUserRepo   repository.CuUserRepository
 	authCodeRepo repository.AuthorizationCodeRepository
+	packageRepo  repository.PackageRepository
 	db           *gorm.DB
 }
 
-func NewCuOrderService(repo repository.CuOrderRepository, cuUserRepo repository.CuUserRepository, authCodeRepo repository.AuthorizationCodeRepository, db *gorm.DB) CuOrderService {
+func NewCuOrderService(
+	repo repository.CuOrderRepository,
+	cuUserRepo repository.CuUserRepository,
+	authCodeRepo repository.AuthorizationCodeRepository,
+	packageRepo repository.PackageRepository,
+	db *gorm.DB,
+) CuOrderService {
 	return &cuOrderService{
 		repo:         repo,
 		cuUserRepo:   cuUserRepo,
 		authCodeRepo: authCodeRepo,
+		packageRepo:  packageRepo,
 		db:           db,
 	}
 }
 
 func (s *cuOrderService) CreatePendingOrder(ctx context.Context, cuUserID, customerID string, req *models.CuOrderCreateRequest) (*models.CuOrder, error) {
+	lang := pkgcontext.GetLanguageFromContext(ctx)
+
 	// 计算价格
 	priceResult, err := s.CalculatePrice(ctx, req.PackageID, req.LicenseCount)
 	if err != nil {
 		return nil, err
 	}
 
+	// 从数据库获取套餐配置
+	pkgEntity, maxDevices, err := s.getPackageForOrder(ctx, req.PackageID)
+	if err != nil {
+		return nil, err
+	}
+
+	// 再次校验数量（防御性校验）
+	if req.LicenseCount > maxDevices {
+		return nil, i18n.NewI18nError("601005", lang)
+	}
+
 	// 生成订单号
 	orderNo := s.generateOrderNo()
-
-	// 获取套餐配置
-	packageConfig, exists := packageConfigs[req.PackageID]
-	if !exists {
-		return nil, i18n.NewI18nError("600001", "套餐不存在")
-	}
 
 	// 创建订单（pending状态）
 	order := &models.CuOrder{
@@ -112,7 +103,7 @@ func (s *cuOrderService) CreatePendingOrder(ctx context.Context, cuUserID, custo
 		CustomerID:   customerID,
 		CuUserID:     cuUserID,
 		PackageID:    req.PackageID,
-		PackageName:  packageConfig.Name,
+		PackageName:  pkgEntity.Name,
 		LicenseCount: req.LicenseCount,
 		UnitPrice:    priceResult.UnitPrice,
 		DiscountRate: priceResult.DiscountRate,
@@ -120,8 +111,8 @@ func (s *cuOrderService) CreatePendingOrder(ctx context.Context, cuUserID, custo
 		Status:       "pending", // 待支付状态
 	}
 
-	// 对于试用版，设置过期时间
-	if req.PackageID == "trial" {
+	// 对于试用版，设置过期时间（根据套餐类型判断）
+	if pkgEntity.Type == string(models.PackageTypeTrial) {
 		expiredAt := s.getTrialExpiryTime()
 		order.ExpiredAt = &expiredAt
 	}
@@ -154,19 +145,19 @@ func (s *cuOrderService) CreateOrder(ctx context.Context, cuUserID, customerID s
 		return nil, i18n.NewI18nError("900001", lang)
 	}
 
-	// 检查套餐是否存在
-	pkg, exists := packageConfigs[req.PackageID]
-	if !exists {
-		return nil, i18n.NewI18nError("600001", lang) // 套餐不存在
+	// 检查套餐是否存在（从数据库）
+	pkgEntity, maxDevices, err := s.getPackageForOrder(ctx, req.PackageID)
+	if err != nil {
+		return nil, err
 	}
 
 	// 验证许可数量
-	if req.LicenseCount > pkg.MaxDevices {
+	if req.LicenseCount > maxDevices {
 		return nil, i18n.NewI18nError("601005", lang) // 许可数量超出限制
 	}
 
-	// 试用版特殊检查
-	if req.PackageID == "trial" {
+	// 试用版特殊检查（根据套餐类型判断）
+	if pkgEntity.Type == string(models.PackageTypeTrial) {
 		// 试用版不支持批量购买
 		if req.LicenseCount != 1 {
 			return nil, i18n.NewI18nError("600004", lang) // 试用版不支持批量购买
@@ -204,7 +195,7 @@ func (s *cuOrderService) CreateOrder(ctx context.Context, cuUserID, customerID s
 		CustomerID:   customerID,
 		CuUserID:     cuUserID,
 		PackageID:    req.PackageID,
-		PackageName:  pkg.Name,
+		PackageName:  pkgEntity.Name,
 		LicenseCount: req.LicenseCount,
 		UnitPrice:    priceResult.UnitPrice,
 		DiscountRate: priceResult.DiscountRate,
@@ -234,7 +225,7 @@ func (s *cuOrderService) CreateOrder(ctx context.Context, cuUserID, customerID s
 	// 计算授权时间
 	var startDate, endDate time.Time
 	var expiredAt *time.Time
-	if req.PackageID == "trial" {
+	if pkgEntity.Type == string(models.PackageTypeTrial) {
 		// 试用版：从今天到当月25日
 		trialExpiry := time.Date(now.Year(), now.Month(), 25, 23, 59, 59, 0, now.Location())
 		if now.Day() > 25 {
@@ -256,7 +247,7 @@ func (s *cuOrderService) CreateOrder(ctx context.Context, cuUserID, customerID s
 	var featureConfigMap, usageLimitsMap map[string]interface{}
 
 	// 根据套餐类型设置配置信息
-	if req.PackageID == "basic" {
+	if pkgEntity.Type == string(models.PackageTypeBasic) {
 		usageLimitsMap = map[string]interface{}{
 			"type": "standard",
 		}
@@ -264,7 +255,7 @@ func (s *cuOrderService) CreateOrder(ctx context.Context, cuUserID, customerID s
 
 	customParametersMap := map[string]interface{}{
 		"package_id":    req.PackageID,
-		"package_name":  pkg.Name,
+		"package_name":  pkgEntity.Name,
 		"license_count": req.LicenseCount,
 	}
 
@@ -276,7 +267,7 @@ func (s *cuOrderService) CreateOrder(ctx context.Context, cuUserID, customerID s
 	}
 
 	// 构建订单描述
-	description := fmt.Sprintf("%s - %d个许可", pkg.Name, req.LicenseCount)
+	description := fmt.Sprintf("%s - %d个许可", pkgEntity.Name, req.LicenseCount)
 
 	// 处理JSON字段（用于数据库存储与后续生成产品激活码 payload）
 	var featureConfig, usageLimits, customParameters models.JSON
@@ -501,20 +492,14 @@ func (s *cuOrderService) GetOrderSummary(ctx context.Context, customerID string)
 func (s *cuOrderService) CalculatePrice(ctx context.Context, packageID string, licenseCount int) (*PriceCalculationResult, error) {
 	lang := pkgcontext.GetLanguageFromContext(ctx)
 
-	// 检查套餐是否存在
-	pkg, exists := packageConfigs[packageID]
-	if !exists {
-		return nil, i18n.NewI18nError("600001", lang) // 套餐不存在
+	// 从数据库获取套餐配置
+	pkgEntity, maxDevices, err := s.getPackageForOrder(ctx, packageID)
+	if err != nil {
+		return nil, err
 	}
 
-	// 检查套餐是否已下架（虽然当前是写死配置，但保留这个检查）
-	// TODO: 如果将来添加status字段，可以在这里检查
-	// if pkg.Status != "active" {
-	//     return nil, i18n.NewI18nError("600002", lang) // 套餐已下架
-	// }
-
 	// 验证许可数量
-	if licenseCount > pkg.MaxDevices {
+	if licenseCount > maxDevices {
 		return nil, i18n.NewI18nError("601005", lang) // 许可数量超出限制
 	}
 
@@ -530,10 +515,10 @@ func (s *cuOrderService) CalculatePrice(ctx context.Context, packageID string, l
 	}
 
 	// 计算总价
-	totalAmount := pkg.Price * float64(licenseCount) * discountRate
+	totalAmount := pkgEntity.Price * float64(licenseCount) * discountRate
 
 	return &PriceCalculationResult{
-		UnitPrice:    pkg.Price,
+		UnitPrice:    pkgEntity.Price,
 		LicenseCount: licenseCount,
 		DiscountRate: discountRate,
 		TotalAmount:  totalAmount,
@@ -551,4 +536,53 @@ func (s *cuOrderService) generateOrderNo() string {
 	nano := now.UnixNano() % 1000000000 // 取最后9位
 
 	return fmt.Sprintf("ORD%s%09d", dateStr, nano)
+}
+
+// getPackageForOrder 从数据库获取套餐配置，并解析最大许可数量
+func (s *cuOrderService) getPackageForOrder(ctx context.Context, packageID string) (*models.Package, int, error) {
+	lang := pkgcontext.GetLanguageFromContext(ctx)
+
+	if packageID == "" {
+		return nil, 0, i18n.NewI18nError("600001", lang)
+	}
+
+	pkgEntity, err := s.packageRepo.GetByID(packageID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, 0, i18n.NewI18nError("600001", lang) // 套餐不存在
+		}
+		return nil, 0, i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	// 检查套餐是否启用
+	if pkgEntity.Status != 1 {
+		return nil, 0, i18n.NewI18nError("600002", lang) // 套餐已下架
+	}
+
+	maxDevices := parseMaxDevicesFromFeatures(pkgEntity.Features)
+	return pkgEntity, maxDevices, nil
+}
+
+// parseMaxDevicesFromFeatures 从 features JSON 中解析 "X个许可"
+func parseMaxDevicesFromFeatures(features string) int {
+	// 默认最大许可数，与原始写死配置保持一致
+	maxDevices := 1000
+	if features == "" {
+		return maxDevices
+	}
+
+	var featureList []string
+	if err := json.Unmarshal([]byte(features), &featureList); err != nil {
+		return maxDevices
+	}
+
+	for _, f := range featureList {
+		var n int
+		if _, err := fmt.Sscanf(f, "%d个许可", &n); err == nil && n > 0 {
+			maxDevices = n
+			break
+		}
+	}
+
+	return maxDevices
 }
