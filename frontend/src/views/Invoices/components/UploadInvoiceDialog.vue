@@ -31,7 +31,7 @@
         <!-- 上传区域 -->
         <div class="upload-section">
           <p class="section-label">{{ t('invoices.dialog.uploadLabel') }}</p>
-          <el-upload class="invoice-uploader" drag action="#" :auto-upload="false" v-model:file-list="form.fileList">
+          <el-upload class="invoice-uploader" drag action="#" :auto-upload="false" v-model:file-list="form.fileList" accept=".pdf" :before-upload="beforeUpload">
             <el-icon class="el-icon--upload"><upload-filled /></el-icon>
             <div class="el-upload__text">
               <span class="upload-link">{{ t('invoices.dialog.uploadDraggerText').split(' / ')[0] }}</span> / {{
@@ -99,6 +99,15 @@ watch(visible, (val) => {
 })
 const handleClose = () => {
   // Reset form if needed
+}
+
+const beforeUpload = (file: File) => {
+  const isPDF = file.type === 'application/pdf' || file.name.endsWith('.pdf')
+  if (!isPDF) {
+    ElMessage.error('只能上传PDF格式的文件')
+    return false
+  }
+  return true
 }
 
 const handleSubmit = () => {
