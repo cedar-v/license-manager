@@ -28,30 +28,43 @@
       <!-- 搜索和筛选 -->
       <div class="filter-section">
         <el-form :inline="true" :model="filterForm" class="filter-form">
-          <el-form-item :label="t('invoices.filter.searchLabel')">
-            <el-input v-model="filterForm.keyword" :placeholder="t('invoices.filter.searchPlaceholder')" />
-          </el-form-item>
-          <el-form-item :label="t('invoices.filter.statusLabel')">
-            <el-select v-model="filterForm.status" :placeholder="t('invoices.filter.allStatus')" style="width: 150px">
-              <el-option :label="t('invoices.filter.allStatus')" value="" />
-              <el-option :label="t('invoices.filter.pending')" value="pending" />
-              <el-option :label="t('invoices.filter.completed')" value="issued" />
-              <el-option :label="t('invoices.filter.rejected')" value="rejected" />
-            </el-select>
-          </el-form-item>
-          <div class="filter-right">
-            <div class="selected-count">
-              <!-- <span class="count-badge">{{ totalCount }}</span> -->
-            </div>
+          <div class="form_box">
+            <el-form-item :label="t('invoices.filter.searchLabel')">
+              <el-input
+                v-model="filterForm.keyword"
+                :placeholder="t('invoices.filter.searchPlaceholder')"
+              />
+            </el-form-item>
+            <el-form-item :label="t('invoices.filter.statusLabel')">
+              <el-select
+                v-model="filterForm.status"
+                :placeholder="t('invoices.filter.allStatus')"
+                style="width: 150px"
+              >
+                <el-option :label="t('invoices.filter.allStatus')" value="" />
+                <el-option :label="t('invoices.filter.pending')" value="pending" />
+                <el-option :label="t('invoices.filter.completed')" value="issued" />
+                <el-option :label="t('invoices.filter.rejected')" value="rejected" />
+              </el-select>
+            </el-form-item>
             <el-form-item :label="t('invoices.filter.timeLabel')">
-              <el-date-picker v-model="filterForm.dateRange" type="daterange" range-separator="-"
-                :start-placeholder="t('chart.licenseTrend.datePicker.startPlaceholder')" 
-                :end-placeholder="t('chart.licenseTrend.datePicker.endPlaceholder')" format="YYYY/MM/DD" />
+              <el-date-picker
+                v-model="filterForm.dateRange"
+                type="daterange"
+                range-separator="-"
+                :start-placeholder="t('chart.licenseTrend.datePicker.startPlaceholder')"
+                :end-placeholder="t('chart.licenseTrend.datePicker.endPlaceholder')"
+                format="YYYY/MM/DD"
+              />
             </el-form-item>
-            <el-form-item>
-              <el-button @click="resetFilter">{{ t('invoices.filter.reset') }}</el-button>
-              <el-button type="primary" class="btn-filter" @click="handleFilter">{{ t('invoices.filter.query') }}</el-button>
-            </el-form-item>
+            <div class="filter-right">
+              <el-form-item>
+                <el-button @click="resetFilter">{{ t('invoices.filter.reset') }}</el-button>
+                <el-button type="primary" class="btn-filter" @click="handleFilter">{{
+                  t('invoices.filter.query')
+                }}</el-button>
+              </el-form-item>
+            </div>
           </div>
         </el-form>
       </div>
@@ -79,8 +92,11 @@
           }"
           :row-style="getRowStyle"
         >
-
-          <el-table-column prop="invoice_no" :label="t('invoices.table.invoiceNo')" min-width="150" />
+          <el-table-column
+            prop="invoice_no"
+            :label="t('invoices.table.invoiceNo')"
+            min-width="150"
+          />
           <el-table-column :label="t('invoices.table.user')" min-width="120">
             <template #default="{ row }">
               <div class="user-info">
@@ -90,7 +106,11 @@
             </template>
           </el-table-column>
           <el-table-column prop="order_no" :label="t('invoices.table.orderNo')" min-width="150" />
-          <el-table-column prop="created_at" :label="t('invoices.table.applyTime')" min-width="180" />
+          <el-table-column
+            prop="created_at"
+            :label="t('invoices.table.applyTime')"
+            min-width="180"
+          />
           <el-table-column :label="t('invoices.table.status')" width="100">
             <template #default="{ row }">
               <span class="status-text" :class="row.status">{{ row.status_display }}</span>
@@ -103,10 +123,16 @@
           </el-table-column>
           <el-table-column :label="t('invoices.table.operation')" width="200" fixed="right">
             <template #default="{ row }">
-              <el-button link type="primary" style="color: #019c7c" @click="handleView(row)">{{ t('invoices.actions.view') }}</el-button>
+              <el-button link type="primary" style="color: #019c7c" @click="handleView(row)">{{
+                t('invoices.actions.view')
+              }}</el-button>
               <template v-if="row.status === 'pending'">
-                <el-button link type="success" style="color: #52c41a" @click="handleUpload(row)">{{ t('invoices.actions.upload') }}</el-button>
-                <el-button link type="danger" style="color: #f5222d" @click="handleReject(row)">{{ t('invoices.actions.reject') }}</el-button>
+                <el-button link type="success" style="color: #52c41a" @click="handleUpload(row)">{{
+                  t('invoices.actions.upload')
+                }}</el-button>
+                <el-button link type="danger" style="color: #f5222d" @click="handleReject(row)">{{
+                  t('invoices.actions.reject')
+                }}</el-button>
               </template>
             </template>
           </el-table-column>
@@ -114,18 +140,32 @@
 
         <!-- 分页 -->
         <div class="pagination-container">
-          <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[10, 20, 50, 100]"
-            layout="prev, pager, next, jumper, sizes, total" :total="totalCount" @size-change="handleSizeChange"
-            @current-change="handleCurrentChange">
+          <el-pagination
+            v-model:current-page="currentPage"
+            v-model:page-size="pageSize"
+            :page-sizes="[10, 20, 50, 100]"
+            layout="prev, pager, next, jumper, sizes, total"
+            :total="totalCount"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+          >
           </el-pagination>
         </div>
       </div>
 
       <!-- 上传发票对话框 -->
-      <UploadInvoiceDialog v-model="uploadVisible" :invoice-data="currentRow" @submit="handleUploadSubmit" />
+      <UploadInvoiceDialog
+        v-model="uploadVisible"
+        :invoice-data="currentRow"
+        @submit="handleUploadSubmit"
+      />
 
       <!-- 驳回申请对话框 -->
-      <RejectInvoiceDialog v-model="rejectVisible" :invoice-data="currentRow" @submit="handleRejectSubmit" />
+      <RejectInvoiceDialog
+        v-model="rejectVisible"
+        :invoice-data="currentRow"
+        @submit="handleRejectSubmit"
+      />
 
       <!-- 新增申请对话框 -->
       <el-dialog v-model="createVisible" title="新增发票申请" width="500px">
@@ -134,7 +174,12 @@
             <el-input v-model="createForm.orderNo" placeholder="请输入订单号" />
           </el-form-item>
           <el-form-item label="开票金额">
-            <el-input-number v-model="createForm.amount" :precision="2" :step="100" style="width: 100%" />
+            <el-input-number
+              v-model="createForm.amount"
+              :precision="2"
+              :step="100"
+              style="width: 100%"
+            />
           </el-form-item>
           <el-form-item label="抬头类型">
             <el-radio-group v-model="createForm.userType">
@@ -161,7 +206,14 @@ import { Document, Warning, CircleCheck, CircleClose } from '@element-plus/icons
 import { ElMessage } from 'element-plus'
 import UploadInvoiceDialog from './components/UploadInvoiceDialog.vue'
 import RejectInvoiceDialog from './components/RejectInvoiceDialog.vue'
-import { getInvoices, getInvoiceSummary, uploadInvoice, rejectInvoice, issueInvoice, type Invoice } from '@/api/invoice'
+import {
+  getInvoices,
+  getInvoiceSummary,
+  uploadInvoice,
+  rejectInvoice,
+  issueInvoice,
+  type Invoice
+} from '@/api/invoice'
 import { formatDateTime } from '@/utils/date'
 
 const { t } = useI18n()
@@ -173,7 +225,6 @@ const stats = ref([
   { label: '已开票', value: '0', type: 'completed', icon: 'success', key: 'issued_count' },
   { label: '已驳回', value: '0', type: 'rejected', icon: 'error', key: 'rejected_count' }
 ])
-
 
 const filterForm = reactive({
   keyword: '',
@@ -198,7 +249,6 @@ const getRowStyle = ({ rowIndex }: { rowIndex: number }) => {
 }
 
 const fetchSummary = async () => {
-
   try {
     const res = await getInvoiceSummary()
     if (res.code === '000000' && res.data) {
@@ -209,7 +259,6 @@ const fetchSummary = async () => {
         }
       })
     }
-
   } catch (error) {
     console.error('Fetch summary error:', error)
   }
@@ -230,15 +279,13 @@ const fetchData = async () => {
     }
     const res = await getInvoices(params)
     if (res.code === '000000') {
-        fetchSummary()
+      fetchSummary()
       res.data.invoices.forEach((item: any) => {
         item.created_at = formatDateTime(item.created_at)
       })
       tableData.value = res.data.invoices
       totalCount.value = res.data.total_count
     }
-
-
   } catch (error: any) {
     console.error('Fetch invoices error:', error)
     ElMessage.error(error.backendMessage || t('invoices.messages.fetchError'))
@@ -249,7 +296,6 @@ const fetchData = async () => {
 
 onMounted(() => {
   fetchData()
-
 })
 
 const createForm = reactive({
@@ -295,7 +341,7 @@ const handleUploadSubmit = async (data: any) => {
   try {
     const formData = new FormData()
     formData.append('invoice_no', currentRow.value.id)
-    if (data.fileList && data.fileList.length > 0) { 
+    if (data.fileList && data.fileList.length > 0) {
       const file = data.fileList[0].raw
       console.log('File to upload:', file)
       formData.append('file', file)
@@ -308,15 +354,17 @@ const handleUploadSubmit = async (data: any) => {
     // 1. 上传文件
     const uploadRes = await uploadInvoice(formData)
     console.log('Upload response:', uploadRes)
-    
+
     if (uploadRes.code === '000000' && (uploadRes.data?.file_url || uploadRes.data?.url)) {
       const fileUrl = uploadRes.data.file_url || uploadRes.data.url
       // 2. 调用开票接口
       const issueRes = await issueInvoice(currentRow.value.id, {
         invoice_file_url: fileUrl,
-        issued_at: data.issued_at ? new Date(data.issued_at).toISOString().replace(/\.\d{3}/, '') : ''
+        issued_at: data.issued_at
+          ? new Date(data.issued_at).toISOString().replace(/\.\d{3}/, '')
+          : ''
       })
-      
+
       if (issueRes.code === '000000') {
         ElMessage.success(t('invoices.messages.uploadSuccess'))
         uploadVisible.value = false
@@ -342,7 +390,8 @@ const handleReject = (row: any) => {
 const handleRejectSubmit = async (data: any) => {
   if (!currentRow.value?.id) return
   try {
-    const reasonText = data.reason === 'other' ? data.suggestion : t(`invoices.dialog.reasons.${data.reason}`)
+    const reasonText =
+      data.reason === 'other' ? data.suggestion : t(`invoices.dialog.reasons.${data.reason}`)
     const res = await rejectInvoice(currentRow.value.id, {
       reject_reason: reasonText,
       suggestion: data.suggestion
@@ -375,7 +424,6 @@ const handleCurrentChange = (val: number) => {
   background-color: var(--app-bg-color);
   min-height: calc(100vh - 80px);
 }
-
 
 .stats-row {
   display: grid;
@@ -439,7 +487,6 @@ const handleCurrentChange = (val: number) => {
   }
 }
 
-
 .filter-section {
   background: var(--app-content-bg);
   padding: 16px 24px;
@@ -447,7 +494,15 @@ const handleCurrentChange = (val: number) => {
   margin-bottom: 24px;
   display: flex;
   align-items: center;
+  gap: 10px;
   border: 1px solid var(--app-border-light);
+  .form_box{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+  }
 
   .filter-form {
     width: 100%;
@@ -481,7 +536,6 @@ const handleCurrentChange = (val: number) => {
   }
 }
 
-
 .selected-count {
   margin-right: 24px;
 
@@ -498,7 +552,6 @@ const handleCurrentChange = (val: number) => {
   }
 }
 
-
 .btn-filter {
   background-color: var(--el-color-primary);
   border-color: var(--el-color-primary);
@@ -510,7 +563,6 @@ const handleCurrentChange = (val: number) => {
   }
 }
 
-
 .table-section {
   background: var(--app-content-bg);
   padding: 24px;
@@ -518,7 +570,6 @@ const handleCurrentChange = (val: number) => {
   border: 1px solid var(--app-border-light);
   box-shadow: var(--app-shadow);
 }
-
 
 .table-header-title {
   display: flex;
