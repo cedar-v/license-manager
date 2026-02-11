@@ -126,7 +126,9 @@ func SetupRouter() *gin.Engine {
 	router.GET("/health", systemHandler.HealthCheck)
 
 	// 静态文件服务 - 发票文件等
-	router.Static("/files", "./files")
+	// 发票PDF上传保存路径为 "../files/invoices"
+	// 这里将URL前缀 /files 映射到 "../files" 目录，保证 /files/invoices 下的文件可被访问
+	router.Static("/files", "../files")
 
 	// Swagger文档路由
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.URL("/swagger/doc.json")))
