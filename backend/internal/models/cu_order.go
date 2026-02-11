@@ -24,6 +24,9 @@ type CuOrder struct {
 	ExpiredAt         *time.Time     `gorm:"index" json:"expired_at"`
 	CreatedAt         time.Time      `gorm:"not null;index" json:"created_at"`
 	UpdatedAt         time.Time      `gorm:"not null" json:"updated_at"`
+
+	// 非持久化字段：是否已经申请发票（由服务层填充）
+	HasInvoiceApplied bool `gorm:"-" json:"-"`
 	DeletedAt         gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
@@ -90,6 +93,9 @@ type CuOrderResponse struct {
 	ExpiredAt         *time.Time `json:"expired_at"`         // 订单过期时间
 	CreatedAt         time.Time  `json:"created_at"`         // 创建时间
 	UpdatedAt         time.Time  `json:"updated_at"`         // 更新时间
+
+	// 是否已申请发票（根据 invoices 表判断）
+	HasInvoiceApplied bool `json:"has_invoice_applied"`
 }
 
 // ToResponse 转换为响应结构
@@ -110,6 +116,7 @@ func (o *CuOrder) ToResponse() *CuOrderResponse {
 		ExpiredAt:         o.ExpiredAt,
 		CreatedAt:         o.CreatedAt,
 		UpdatedAt:         o.UpdatedAt,
+		HasInvoiceApplied: o.HasInvoiceApplied,
 	}
 }
 

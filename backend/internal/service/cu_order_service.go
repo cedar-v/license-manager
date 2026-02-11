@@ -31,12 +31,12 @@ type CuOrderService interface {
 
 // ContinuePayResponse 继续支付响应
 type ContinuePayResponse struct {
-	OrderID      string     `json:"order_id"`       // 订单ID
-	OrderNo      string     `json:"order_no"`       // 订单号
-	PaymentNo    string     `json:"payment_no"`     // 支付单号
-	PaymentURL   *string    `json:"payment_url"`    // 支付链接
-	TotalAmount  float64    `json:"total_amount"`   // 订单总金额
-	ExpireTime   time.Time  `json:"expire_time"`    // 支付过期时间
+	OrderID     string    `json:"order_id"`     // 订单ID
+	OrderNo     string    `json:"order_no"`     // 订单号
+	PaymentNo   string    `json:"payment_no"`   // 支付单号
+	PaymentURL  *string   `json:"payment_url"`  // 支付链接
+	TotalAmount float64   `json:"total_amount"` // 订单总金额
+	ExpireTime  time.Time `json:"expire_time"`  // 支付过期时间
 }
 
 type PriceCalculationResult struct {
@@ -66,7 +66,8 @@ type cuOrderService struct {
 	cuUserRepo   repository.CuUserRepository
 	authCodeRepo repository.AuthorizationCodeRepository
 	packageRepo  repository.PackageRepository
-	paymentRepo repository.PaymentRepository
+	paymentRepo  repository.PaymentRepository
+	invoiceRepo  repository.CuInvoiceRepository
 	db           *gorm.DB
 }
 
@@ -76,6 +77,7 @@ func NewCuOrderService(
 	authCodeRepo repository.AuthorizationCodeRepository,
 	packageRepo repository.PackageRepository,
 	paymentRepo repository.PaymentRepository,
+	invoiceRepo repository.CuInvoiceRepository,
 	db *gorm.DB,
 ) CuOrderService {
 	return &cuOrderService{
@@ -84,6 +86,7 @@ func NewCuOrderService(
 		authCodeRepo: authCodeRepo,
 		packageRepo:  packageRepo,
 		paymentRepo:  paymentRepo,
+		invoiceRepo:  invoiceRepo,
 		db:           db,
 	}
 }
@@ -485,6 +488,17 @@ func (s *cuOrderService) GetUserOrders(ctx context.Context, cuUserID string, req
 	orders, total, err := s.repo.GetByCuUserID(ctx, cuUserID, req, createdAtStart, createdAtEnd)
 	if err != nil {
 		return nil, 0, i18n.NewI18nError("900004", lang, err.Error())
+	}
+
+	// 为订单填充“是否已申请发票”标记
+	if s.invoiceRepo != nil && len(orders) > 0 {
+		for _, order := range orders {
+			exists, err := s.invoiceRepo.CheckOrderInvoiceExists(order.ID)
+			if err != nil {
+				return nil, 0, i18n.NewI18nError("900004", lang, err.Error())
+			}
+			order.HasInvoiceApplied = exists
+		}
 	}
 
 	return orders, total, nil

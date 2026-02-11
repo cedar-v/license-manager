@@ -93,7 +93,7 @@ func SetupRouter() *gin.Engine {
 	cuUserService := service.NewCuUserService(cuUserRepo, customerRepo, smsService, db)
 	authCodeService := service.NewAuthorizationCodeService(authCodeRepo, customerRepo, cuUserRepo, licenseRepo)
 	packageService := service.NewPackageService(packageRepo, db)
-	cuOrderService := service.NewCuOrderService(cuOrderRepo, cuUserRepo, authCodeRepo, packageRepo, paymentRepo, db)
+	cuOrderService := service.NewCuOrderService(cuOrderRepo, cuUserRepo, authCodeRepo, packageRepo, paymentRepo, cuInvoiceRepo, db)
 	cuDeviceService := service.NewCuDeviceService(licenseRepo)
 	paymentService := service.NewPaymentService(paymentRepo, cuOrderRepo, convertPaymentConfig(cfg.Payment), db)
 	enumService := service.NewEnumService()
