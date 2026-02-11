@@ -74,6 +74,24 @@ export function useBreadcrumb() {
       return items
     }
 
+    // 特殊处理发票详情子路由（带ID）
+    if (currentPath.startsWith('/invoices/detail/')) {
+      const items: BreadcrumbItem[] = []
+
+      // 添加发票管理作为父级
+      items.push({
+        title: t('navigation.breadcrumb.invoices'),
+        path: '/invoices'
+      })
+
+      // 添加发票详情作为当前项
+      items.push({
+        title: t('navigation.breadcrumb.invoiceDetail')
+      })
+
+      return items
+    }
+
     // 从配置中获取面包屑
     const configKeys = routeBreadcrumbKeys[currentPath]
     if (configKeys) {

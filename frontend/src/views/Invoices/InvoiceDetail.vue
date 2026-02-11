@@ -74,7 +74,7 @@
             </div>
             <div class="info-row">
               <span class="label">{{ t('invoices.detail.rejectUser') }}：</span>
-              <span class="value">{{ detailData.rejected_by }}</span>
+              <span class="value">{{ detailData.rejecter_name }}</span>
             </div>
           </div>
         </div>

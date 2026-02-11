@@ -238,7 +238,7 @@ const totalCount = ref(0)
 const currentPage = ref(1)
 const pageSize = ref(10)
 const createVisible = ref(false)
-const uploadVisible = ref(false)
+const uploadVisible = ref(true)
 const rejectVisible = ref(false)
 const currentRow = ref<any>(null)
 
