@@ -82,7 +82,7 @@
       "licenses": "授权管理",
       "invoices": "发票管理",
       "packages": "套餐管理",
-      "invoiceDetail": "发票申请详情",
+      "invoiceDetail": "发票详情",
       "licenseList": "授权列表",
       "createLicense": "创建授权",
       "viewLicense": "查看授权",
