@@ -1,40 +1,8 @@
 /* 
- * Noto Sans SC 本地字体定义
- * 只包含实际使用的字重：400, 500, 700
- * 使用 font-display: swap 优化字体加载性能
+ * 字体加载策略
  */
 
-/* 常规字重 400 */
-@font-face {
-  font-family: 'Noto Sans SC';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('../fonts/noto-sans-sc-regular.woff2') format('woff2'),
-       url('../fonts/noto-sans-sc-regular.woff') format('woff');
-}
-
-/* 中等字重 500 */
-@font-face {
-  font-family: 'Noto Sans SC';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('../fonts/noto-sans-sc-medium.woff2') format('woff2'),
-       url('../fonts/noto-sans-sc-medium.woff') format('woff');
-}
-
-/* 粗体字重 700 */
-@font-face {
-  font-family: 'Noto Sans SC';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('../fonts/noto-sans-sc-bold.woff2') format('woff2'),
-       url('../fonts/noto-sans-sc-bold.woff') format('woff');
-}
-
-/* Swis721 BlkCn BT 字体 */
+/* Swis721 BlkCn BT 字体 (40KB) */
 @font-face {
   font-family: 'Swis721 BlkCn BT';
   font-style: normal;
@@ -43,36 +11,11 @@
   src: url('../fonts/Swis721-BlkCn-BT-Black.ttf') format('truetype');
 }
 
-/* PangMenZhengDao 字体 */
+/* PangMenZhengDao 字体 (980KB) */
 @font-face {
   font-family: 'PangMenZhengDao';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
   src: url('../fonts/PangMenZhengDao.ttf') format('truetype');
-}
-
-/* Source Han Sans CN (思源黑体) */
-@font-face {
-  font-family: 'Source Han Sans CN';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('../fonts/SourceHanSansSC-Regular.otf') format('opentype');
-}
-
-@font-face {
-  font-family: 'Source Han Sans CN';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('../fonts/SourceHanSansSC-Medium.otf') format('opentype');
-}
-
-@font-face {
-  font-family: 'Source Han Sans CN';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('../fonts/SourceHanSansSC-Bold.otf') format('opentype');
 }

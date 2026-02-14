@@ -232,7 +232,7 @@ const getStatusType = (changeType: string) => {
     gap: 4px;
 
     .filter-label {
-      font-family: 'Source Han Sans CN', sans-serif;
+      
       font-size: 14px;
       font-weight: 500;
       line-height: 22px;
@@ -251,7 +251,7 @@ const getStatusType = (changeType: string) => {
       }
 
       :deep(.el-input__inner) {
-        font-family: 'Source Han Sans CN', sans-serif;
+        
         font-size: 12px;
         font-weight: 500;
         line-height: 24px;
@@ -263,13 +263,13 @@ const getStatusType = (changeType: string) => {
       width: 280px;
 
       :deep(.el-range-separator) {
-        font-family: 'Source Han Sans CN', sans-serif;
+        
         font-size: 12px;
         color: #666666;
       }
 
       :deep(.el-range-input) {
-        font-family: 'Source Han Sans CN', sans-serif;
+        
         font-size: 12px;
         color: #1D1D1D;
       }
@@ -358,7 +358,7 @@ const getStatusType = (changeType: string) => {
         gap: 4px;
 
         .operation-title {
-          font-family: 'Source Han Sans CN', sans-serif;
+          
           font-size: 14px;
           font-weight: 500;
           line-height: 22px;
@@ -375,7 +375,7 @@ const getStatusType = (changeType: string) => {
       .status-tag {
         padding: 7px 16px;
         height: 24px;
-        font-family: 'Source Han Sans CN', sans-serif;
+        
         font-size: 14px;
         font-weight: 500;
         line-height: 21px;
@@ -404,7 +404,7 @@ const getStatusType = (changeType: string) => {
 
     .operator,
     .time {
-      font-family: 'Source Han Sans CN', sans-serif;
+      
       font-size: 14px;
       font-weight: 400;
       line-height: 18px;
@@ -418,7 +418,7 @@ const getStatusType = (changeType: string) => {
     gap: 8px;
 
     .detail-item {
-      font-family: 'Source Han Sans CN', sans-serif;
+      
       font-size: 14px;
       font-weight: 400;
       line-height: 22px;

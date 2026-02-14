@@ -517,7 +517,7 @@ const submitAddLicense = async () => {
   }
 
   :deep(.el-dialog__title) {
-    font-family: 'Source Han Sans CN', sans-serif;
+    
     font-size: 18px;
     font-weight: 600;
     color: #1d1d1d;
@@ -571,7 +571,7 @@ const submitAddLicense = async () => {
 
   :deep(.el-button) {
     padding: 7px 16px;
-    font-family: 'Source Han Sans CN', sans-serif;
+    
     font-size: 14px;
     font-weight: 500;
     line-height: 21px;
@@ -602,7 +602,7 @@ const submitAddLicense = async () => {
     margin-bottom: 12px;
 
     .device-title {
-      font-family: 'Source Han Sans CN', sans-serif;
+      
       font-size: 16px;
       font-weight: 700;
       line-height: 18px;
@@ -612,7 +612,7 @@ const submitAddLicense = async () => {
     :deep(.el-tag) {
       padding: 7px 16px;
       height: 24px;
-      font-family: 'Source Han Sans CN', sans-serif;
+      
       font-size: 14px;
       font-weight: 500;
       line-height: 21px;
@@ -637,7 +637,7 @@ const submitAddLicense = async () => {
     gap: 40px;
 
     .device-info-item {
-      font-family: 'Source Han Sans CN', sans-serif;
+      
       font-size: 14px;
       font-weight: 400;
       line-height: 22px;
@@ -664,7 +664,7 @@ const submitAddLicense = async () => {
     margin-bottom: 16px;
 
     .section-title {
-      font-family: 'Source Han Sans CN', sans-serif;
+      
       font-size: 16px;
       font-weight: 700;
       line-height: 18px;
@@ -672,7 +672,7 @@ const submitAddLicense = async () => {
     }
 
     .section-subtitle {
-      font-family: 'Source Han Sans CN', sans-serif;
+      
       font-size: 14px;
       font-weight: 400;
       line-height: 18px;
@@ -693,7 +693,7 @@ const submitAddLicense = async () => {
       gap: 30px;
 
       .info-label {
-        font-family: 'Source Han Sans CN', sans-serif;
+        
         font-size: 14px;
         font-weight: 400;
         line-height: 22px;
@@ -704,7 +704,7 @@ const submitAddLicense = async () => {
 
       .info-value {
         flex: 1;
-        font-family: 'Source Han Sans CN', sans-serif;
+        
         font-size: 14px;
         font-weight: 400;
         line-height: 22px;
@@ -730,7 +730,7 @@ const submitAddLicense = async () => {
       gap: 30px;
 
       .license-label {
-        font-family: 'Source Han Sans CN', sans-serif;
+        
         font-size: 14px;
         font-weight: 400;
         line-height: 22px;
@@ -741,7 +741,7 @@ const submitAddLicense = async () => {
 
       .license-value {
         flex: 1;
-        font-family: 'Source Han Sans CN', sans-serif;
+        
         font-size: 14px;
         font-weight: 400;
         line-height: 22px;
@@ -765,7 +765,7 @@ const submitAddLicense = async () => {
     background: #00C27C;
     border: none;
     color: #FFFFFF;
-    font-family: 'Source Han Sans CN', sans-serif;
+    
     font-size: 14px;
     font-weight: 500;
     line-height: 21px;

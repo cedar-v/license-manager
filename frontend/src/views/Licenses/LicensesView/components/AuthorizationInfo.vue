@@ -224,7 +224,7 @@ const formatDateRange = () => {
   padding: 16px 20px;
 
   .card-title {
-    font-family: 'Source Han Sans CN', sans-serif;
+    
     font-size: 16px;
     font-weight: 700;
     line-height: 18px;
@@ -243,7 +243,7 @@ const formatDateRange = () => {
     }
 
     .card-subtitle {
-      font-family: 'Source Han Sans CN', sans-serif;
+      
       font-size: 14px;
       font-weight: 400;
       line-height: 18px;
@@ -271,7 +271,7 @@ const formatDateRange = () => {
     gap: 8px;
 
     .info-label {
-      font-family: 'Source Han Sans CN', sans-serif;
+      
       font-size: 14px;
       font-weight: 400;
       line-height: 22px;
@@ -280,7 +280,7 @@ const formatDateRange = () => {
     }
 
     .info-value {
-      font-family: 'Source Han Sans CN', sans-serif;
+      
       font-size: 14px;
       font-weight: 400;
       line-height: 22px;
@@ -304,7 +304,7 @@ const formatDateRange = () => {
     }
 
     .tip-text {
-      font-family: 'Source Han Sans CN', sans-serif;
+      
       font-size: 14px;
       font-weight: 400;
       line-height: 22px;

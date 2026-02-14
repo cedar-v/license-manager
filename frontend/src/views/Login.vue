@@ -429,7 +429,7 @@ async function handleLogin() {
 
 .title {
   margin: 0 0 $spacing-medium 0;
-  font-family: 'Source Han Sans CN', sans-serif;
+  
   font-weight: 700;
   font-size: 32px; // 改为32px符合8px栅格
   line-height: 1.2;
@@ -445,7 +445,7 @@ async function handleLogin() {
 
 .subtitle {
   margin: 0 0 $spacing-large 0;
-  font-family: 'Source Han Sans CN', sans-serif;
+  
   font-weight: $font-weight-primary;
   font-size: $font-size-medium;
   line-height: 1.4;

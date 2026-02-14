@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
+    "@fontsource/noto-sans-sc": "^5.2.9",
     "axios": "^1.7.0",
     "echarts": "^5.6.0",
     "element-plus": "^2.10.5",

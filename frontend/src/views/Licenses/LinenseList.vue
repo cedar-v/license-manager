@@ -513,7 +513,7 @@ onMounted(async () => {
     padding: 0 !important;
     margin: 0 !important;
     height: 48px !important;
-    font-family: 'Source Han Sans CN', sans-serif !important;
+
     font-size: 14px !important;
     vertical-align: middle !important;
   }
@@ -571,7 +571,7 @@ onMounted(async () => {
 
 .license-code {
   color: var(--el-color-primary);
-  font-family: 'Source Han Sans CN', sans-serif;
+  
   font-weight: 400;
   font-size: 14px;
   line-height: 24px; // 改为24px符合8px栅格
@@ -748,7 +748,7 @@ onMounted(async () => {
   --el-pagination-text-color: var(--app-text-primary);
   --el-pagination-border-color: var(--app-border-color);
   --el-pagination-hover-color: #019c7c;
-  font-family: 'Source Han Sans CN', sans-serif;
+  
 }
 :deep(.el-pagination .btn-prev), :deep(.el-pagination .btn-next), :deep(.el-pagination .el-pager li) {
   width: 32px;
@@ -777,7 +777,7 @@ onMounted(async () => {
   border-color: var(--el-color-primary);
 }
 :deep(.el-pagination .el-pagination__total), :deep(.el-pagination .el-pagination__sizes) {
-  font-family: 'Source Han Sans CN', sans-serif;
+  
   font-weight: 350;
   font-size: 14px;
   color: var(--app-text-primary);
@@ -792,7 +792,7 @@ onMounted(async () => {
   background: var(--app-content-bg);
 }
 :deep(.el-pagination .el-pagination__jump) {
-  font-family: 'Source Han Sans CN', sans-serif;
+  
   font-weight: 350;
   font-size: 14px;
   color: var(--app-text-primary);
@@ -810,7 +810,7 @@ onMounted(async () => {
 }
 :deep(.el-pagination .el-pagination__jump .el-input__inner) {
   text-align: center;
-  font-family: 'Source Han Sans CN', sans-serif;
+  
   font-size: 14px;
   color: var(--app-text-primary);
 }

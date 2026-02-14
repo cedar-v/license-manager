@@ -763,7 +763,7 @@ onMounted(() => {
     top: 15px;
 
   .breadcrumb-item {
-    font-family: 'Source Han Sans CN', sans-serif;
+    
     font-size: 14px;
     font-weight: 400;
     line-height: 1.4285714285714286em;
@@ -820,7 +820,7 @@ onMounted(() => {
     border-radius: 28px;
 
     .text {
-      font-family: 'Source Han Sans CN', sans-serif;
+      
       font-size: 16px;
       font-weight: 500;
       line-height: 1.3;
@@ -870,7 +870,7 @@ onMounted(() => {
 }
 
 .license-code {
-  font-family: 'Source Han Sans CN', sans-serif;
+  
   font-size: 18px;
   font-weight: 700;
   line-height: 1.5;
@@ -899,7 +899,7 @@ onMounted(() => {
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s;
-  font-family: 'Source Han Sans CN', sans-serif;
+  
   height: 32px;
 
   &.copy-btn {
