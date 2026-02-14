@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -36,10 +37,19 @@ import (
 // @description Bearer token for authentication
 
 func main() {
+	// 定义命令行参数
+	var customPath string
+	flag.StringVar(&customPath, "config", "", "path to configuration file")
+	flag.StringVar(&customPath, "c", "", "path to configuration file (shorthand)")
+	flag.Parse()
+
 	// 加载配置
-	configPath := "config.yaml" // Docker 环境默认路径
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		configPath = "../configs/config.yaml" // 本地开发环境
+	configPath := customPath
+	if configPath == "" {
+		configPath = "config.yaml" // Docker 环境默认路径
+		if _, err := os.Stat(configPath); os.IsNotExist(err) {
+			configPath = "../configs/config.yaml" // 本地开发环境
+		}
 	}
 
 	if err := config.Load(configPath); err != nil {
