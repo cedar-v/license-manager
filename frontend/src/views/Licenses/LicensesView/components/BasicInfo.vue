@@ -125,7 +125,7 @@ const formatRemainingTime = (endDate?: string) => {
 
     .info-label {
       width: 80px;
-      font-family: 'Source Han Sans CN', sans-serif;
+      
       font-size: 14px;
       font-weight: 400;
       line-height: 2.2857142857142856em;
@@ -136,7 +136,7 @@ const formatRemainingTime = (endDate?: string) => {
 
     .info-value {
       flex: 1;
-      font-family: 'Source Han Sans CN', sans-serif;
+      
       font-size: 14px;
       font-weight: 500;
       line-height: 1.5em;
@@ -204,7 +204,7 @@ const formatRemainingTime = (endDate?: string) => {
     }
 
     .stat-label {
-      font-family: 'Source Han Sans CN', sans-serif;
+      
       font-size: 14px;
       font-weight: 400;
       line-height: 1.3;

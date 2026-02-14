@@ -393,7 +393,7 @@ onMounted(() => {
     color: var(--app-text-primary);
     margin: 0;
     line-height: 1.3;
-    font-family: 'Source Han Sans CN', sans-serif;
+    
   }
 }
 
@@ -419,7 +419,7 @@ onMounted(() => {
       color: var(--app-text-primary);
       font-weight: 500;
       font-size: 16px;
-      font-family: 'Source Han Sans CN', sans-serif;
+      
       height: 48px;
       padding: 12px 20px; /* 调整为12px符合4px倍数 */
       border-bottom: none;
@@ -432,7 +432,7 @@ onMounted(() => {
         padding: 12px 20px; /* 调整为12px符合4px倍数 */
         border-bottom: 1px solid var(--app-border-light);
         font-size: 14px;
-        font-family: 'Source Han Sans CN', sans-serif;
+        
         font-weight: 400; /* 调整为正常粗细 */
         color: var(--app-text-primary);
       }
@@ -473,7 +473,7 @@ onMounted(() => {
   border-radius: 4px;
   font-size: 12px;
   font-weight: 400;
-  font-family: 'Source Han Sans CN', sans-serif;
+  
   display: inline-flex;
   align-items: center;
   justify-content: center;

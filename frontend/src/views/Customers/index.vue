@@ -110,11 +110,6 @@
           <el-table-column prop="customer_type_display" :label="t('customers.table.customerType')" :width="130"  align="center">
           </el-table-column>
           <el-table-column prop="contact_person" :label="t('customers.table.contactPerson')" :width="140"    align="center" />
-          <el-table-column prop="email" :label="t('customers.table.email')" :width="200" show-overflow-tooltip  align="center">
-             <template #default="scope">
-              <span class="ellipsis-text">{{ scope.row.email }}</span>
-            </template>
-            </el-table-column>
           <el-table-column prop="customer_level_display" :label="t('customers.table.customerLevel')" :width="130" align="center">
            </el-table-column>
           <el-table-column prop="status_display" :label="t('customers.table.status')" :width="100"  align="center">
@@ -710,7 +705,7 @@ onMounted(async () => {
   --el-pagination-text-color: var(--app-text-primary);
   --el-pagination-border-color: var(--app-border-color);
   --el-pagination-hover-color: #019C7C;
-  font-family: 'Source Han Sans CN', sans-serif;
+  
 }
 
 /* 页码按钮样式 */
@@ -752,7 +747,7 @@ onMounted(async () => {
 /* 总数和每页条数样式 */
 :deep(.el-pagination .el-pagination__total),
 :deep(.el-pagination .el-pagination__sizes) {
-  font-family: 'Source Han Sans CN', sans-serif;
+  
   font-weight: 350;
   font-size: 14px;
   color: var(--app-text-primary);
@@ -772,7 +767,7 @@ onMounted(async () => {
 
 /* 跳转输入框 */
 :deep(.el-pagination .el-pagination__jump) {
-  font-family: 'Source Han Sans CN', sans-serif;
+  
   font-weight: 350;
   font-size: 14px;
   color: var(--app-text-primary);
@@ -793,7 +788,7 @@ onMounted(async () => {
 
 :deep(.el-pagination .el-pagination__jump .el-input__inner) {
   text-align: center;
-  font-family: 'Source Han Sans CN', sans-serif;
+  
   font-size: 14px;
   color: var(--app-text-primary);
 }
@@ -1285,7 +1280,7 @@ onMounted(async () => {
 :deep(.filter-select .el-select__selected-item) {
   font-size: 14px;
   color: var(--app-text-secondary);
-  font-family: 'Source Han Sans CN', sans-serif;
+  
   font-weight: 400;
   line-height: 24px;
 }
@@ -1293,7 +1288,7 @@ onMounted(async () => {
 :deep(.filter-select .el-select__placeholder) {
   font-size: 14px;
   color: var(--app-text-secondary);
-  font-family: 'Source Han Sans CN', sans-serif;
+  
   font-weight: 400;
   line-height: 24px;
 }
@@ -1333,7 +1328,7 @@ onMounted(async () => {
 
 :deep(.search-input .el-input__inner) {
   height: 26px;
-  font-family: 'Source Han Sans CN', sans-serif;
+  
   font-weight: 400;
   font-size: 14px;
   line-height: 24px;  // 改为24px符合8px栅格
@@ -1342,7 +1337,7 @@ onMounted(async () => {
 
 :deep(.search-input .el-input__inner::placeholder) {
   color: var(--app-text-secondary);
-  font-family: 'Source Han Sans CN', sans-serif;
+  
   font-weight: 400;
   font-size: 14px;
 }
@@ -1384,7 +1379,7 @@ onMounted(async () => {
 /* 客户编码样式 */
 .customer-code {
   color: var(--el-color-primary);
-  font-family: 'Source Han Sans CN', sans-serif;
+  
   font-weight: 400;
   font-size: 14px;
   line-height: 24px;  // 改为24px符合8px栅格
