@@ -42,7 +42,7 @@ func (h *CuInvoiceHandler) CreateInvoice(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse{
 			Code:      "900001",
-			Message:   i18n.GetI18nErrorMessage("900001", lang),
+			Message:   i18n.GetI18nErrorMessage("900001", lang) + ": " + err.Error(),
 			Timestamp: getCurrentTimestamp(),
 		})
 		return
@@ -93,7 +93,7 @@ func (h *CuInvoiceHandler) GetUserInvoices(c *gin.Context) {
 	if err := c.ShouldBindQuery(&req); err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse{
 			Code:      "900001",
-			Message:   i18n.GetI18nErrorMessage("900001", lang),
+			Message:   i18n.GetI18nErrorMessage("900001", lang) + ": " + err.Error(),
 			Timestamp: getCurrentTimestamp(),
 		})
 		return
@@ -225,7 +225,7 @@ func (h *CuInvoiceHandler) UpdateInvoice(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse{
 			Code:      "900001",
-			Message:   i18n.GetI18nErrorMessage("900001", lang),
+			Message:   i18n.GetI18nErrorMessage("900001", lang) + ": " + err.Error(),
 			Timestamp: getCurrentTimestamp(),
 		})
 		return

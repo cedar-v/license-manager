@@ -65,7 +65,7 @@ func (s *adminInvoiceService) RejectInvoice(ctx context.Context, invoiceID strin
 	now := time.Now()
 	invoice.Status = models.InvoiceStatusRejected
 	invoice.RejectReason = &req.RejectReason
-	invoice.Suggestion = &req.Suggestion
+	invoice.Suggestion = req.Suggestion
 	invoice.RejectedAt = &now
 	invoice.RejectedBy = &adminID
 	invoice.UpdatedAt = now

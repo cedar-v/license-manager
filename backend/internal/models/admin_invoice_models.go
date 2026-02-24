@@ -4,8 +4,8 @@ package models
 
 // InvoiceRejectRequest 发票驳回请求结构（管理端）
 type InvoiceRejectRequest struct {
-	RejectReason string `json:"reject_reason" binding:"required,max=500"` // 驳回原因，必填，最大500字符
-	Suggestion   string `json:"suggestion" binding:"required,max=500"`    // 修改建议，必填，最大500字符
+	RejectReason string  `json:"reject_reason" binding:"required,max=500"` // 驳回原因，必填，最大500字符
+	Suggestion   *string `json:"suggestion" binding:"omitempty,max=500"`   // 修改建议，非必填，最大500字符
 }
 
 // InvoiceIssueRequest 发票开票请求结构（管理端）

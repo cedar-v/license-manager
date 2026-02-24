@@ -156,7 +156,7 @@ func (h *AdminInvoiceHandler) RejectInvoice(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse{
 			Code:      "900001",
-			Message:   i18n.GetI18nErrorMessage("900001", lang),
+			Message:   i18n.GetI18nErrorMessage("900001", lang) + ": " + err.Error(),
 			Timestamp: getCurrentTimestamp(),
 		})
 		return
@@ -201,7 +201,7 @@ func (h *AdminInvoiceHandler) IssueInvoice(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse{
 			Code:      "900001",
-			Message:   i18n.GetI18nErrorMessage("900001", lang),
+			Message:   i18n.GetI18nErrorMessage("900001", lang) + ": " + err.Error(),
 			Timestamp: getCurrentTimestamp(),
 		})
 		return
@@ -244,7 +244,7 @@ func (h *AdminInvoiceHandler) UploadInvoiceFile(c *gin.Context) {
 	if invoiceNo == "" {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse{
 			Code:      "900001",
-			Message:   i18n.GetI18nErrorMessage("900001", lang),
+			Message:   i18n.GetI18nErrorMessage("900001", lang) + ": invoice_no is required",
 			Timestamp: getCurrentTimestamp(),
 		})
 		return
@@ -255,7 +255,7 @@ func (h *AdminInvoiceHandler) UploadInvoiceFile(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse{
 			Code:      "900001",
-			Message:   i18n.GetI18nErrorMessage("900001", lang),
+			Message:   i18n.GetI18nErrorMessage("900001", lang) + ": " + err.Error(),
 			Timestamp: getCurrentTimestamp(),
 		})
 		return
@@ -266,7 +266,7 @@ func (h *AdminInvoiceHandler) UploadInvoiceFile(c *gin.Context) {
 	if filepath.Ext(header.Filename) != ".pdf" {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse{
 			Code:      "900001",
-			Message:   i18n.GetI18nErrorMessage("900001", lang),
+			Message:   i18n.GetI18nErrorMessage("900001", lang) + ": file type must be pdf",
 			Timestamp: getCurrentTimestamp(),
 		})
 		return
@@ -281,7 +281,7 @@ func (h *AdminInvoiceHandler) UploadInvoiceFile(c *gin.Context) {
 	if err := c.SaveUploadedFile(header, filePath); err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
 			Code:      "900004",
-			Message:   i18n.GetI18nErrorMessage("900004", lang),
+			Message:   i18n.GetI18nErrorMessage("900004", lang) + ": " + err.Error(),
 			Timestamp: getCurrentTimestamp(),
 		})
 		return
@@ -320,7 +320,7 @@ func (h *AdminInvoiceHandler) DownloadByToken(c *gin.Context) {
 	if token == "" {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse{
 			Code:      "900001",
-			Message:   i18n.GetI18nErrorMessage("900001", lang),
+			Message:   i18n.GetI18nErrorMessage("900001", lang) + ": token is required",
 			Timestamp: getCurrentTimestamp(),
 		})
 		return

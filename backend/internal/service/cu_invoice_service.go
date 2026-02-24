@@ -196,17 +196,40 @@ func (s *cuInvoiceService) UpdateInvoice(ctx context.Context, invoiceID, cuUserI
 	}
 
 	// 业务逻辑校验：发票类型和纳税人识别号
-	if req.InvoiceType != models.InvoiceTypePersonal && (req.TaxpayerID == nil || *req.TaxpayerID == "") {
+	// 如果传入了新的 InvoiceType 或者 TaxpayerID，我们要校验最终的结果
+	finalInvoiceType := invoice.InvoiceType
+	if req.InvoiceType != nil {
+		finalInvoiceType = *req.InvoiceType
+	}
+
+	finalTaxpayerID := invoice.TaxpayerID
+	if req.TaxpayerID != nil {
+		finalTaxpayerID = req.TaxpayerID // This handles explicitly setting it to nil or "" as well if needed? Wait, if they set *req.TaxpayerID == "" it will just replace it.
+	}
+
+	if finalInvoiceType != models.InvoiceTypePersonal && (finalTaxpayerID == nil || *finalTaxpayerID == "") {
 		return nil, i18n.NewI18nError("700004", lang)
 	}
 
-	// 更新字段
-	invoice.InvoiceType = req.InvoiceType
-	invoice.Title = req.Title
-	invoice.TaxpayerID = req.TaxpayerID
-	invoice.Content = req.Content
-	invoice.ReceiverEmail = req.ReceiverEmail
-	invoice.Remark = req.Remark
+	// 更新字段（仅更新非空字段）
+	if req.InvoiceType != nil {
+		invoice.InvoiceType = *req.InvoiceType
+	}
+	if req.Title != nil {
+		invoice.Title = *req.Title
+	}
+	if req.TaxpayerID != nil {
+		invoice.TaxpayerID = req.TaxpayerID
+	}
+	if req.Content != nil {
+		invoice.Content = *req.Content
+	}
+	if req.ReceiverEmail != nil {
+		invoice.ReceiverEmail = *req.ReceiverEmail
+	}
+	if req.Remark != nil {
+		invoice.Remark = req.Remark
+	}
 
 	// 重置状态和驳回信息
 	invoice.Status = models.InvoiceStatusPending
