@@ -32,7 +32,7 @@
               </span>
             </el-descriptions-item>
             <el-descriptions-item :label="t('invoices.detail.userInfo')">
-              {{ detailData.applicant_name }} <span class="user-type">({{ detailData.order_package_name }})</span>
+              {{ detailData.applicant_name }}
             </el-descriptions-item>
             <el-descriptions-item :label="t('invoices.detail.phone')">{{ detailData.applicant_phone }}</el-descriptions-item>
             <el-descriptions-item :label="t('invoices.detail.amount')">
