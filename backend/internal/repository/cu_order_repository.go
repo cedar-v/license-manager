@@ -143,7 +143,7 @@ func (r *cuOrderRepository) CheckTrialOrderExists(cuUserID string, currentMonth 
 	endOfMonth := currentMonth + "-31 23:59:59"
 
 	err := r.db.Model(&models.CuOrder{}).
-		Where("cu_user_id = ? AND (status = 'paid' OR status = 'pending') AND created_at >= ? AND created_at <= ? AND deleted_at IS NULL",
+		Where("cu_orders.cu_user_id = ? AND (cu_orders.status = 'paid' OR cu_orders.status = 'pending') AND cu_orders.created_at >= ? AND cu_orders.created_at <= ? AND cu_orders.deleted_at IS NULL",
 			cuUserID, startOfMonth, endOfMonth).
 		// We need to join with package to check package type because package_id might be a UUID, not 'trial'.
 		// But if the order already recorded the type somewhere or if we just assume 'trial' is the package ID?
