@@ -139,12 +139,17 @@ func (r *cuOrderRepository) Delete(id string) error {
 
 func (r *cuOrderRepository) CheckTrialOrderExists(cuUserID string, currentMonth string) (bool, error) {
 	var count int64
-	startOfMonth := currentMonth + "-01"
-	endOfMonth := currentMonth + "-31"
+	startOfMonth := currentMonth + "-01 00:00:00"
+	endOfMonth := currentMonth + "-31 23:59:59"
 
 	err := r.db.Model(&models.CuOrder{}).
-		Where("cu_user_id = ? AND package_id = ? AND status = ? AND created_at >= ? AND created_at <= ? AND deleted_at IS NULL",
-			cuUserID, "trial", "paid", startOfMonth, endOfMonth).
+		Where("cu_user_id = ? AND (status = 'paid' OR status = 'pending') AND created_at >= ? AND created_at <= ? AND deleted_at IS NULL",
+			cuUserID, startOfMonth, endOfMonth).
+		// We need to join with package to check package type because package_id might be a UUID, not 'trial'.
+		// But if the order already recorded the type somewhere or if we just assume 'trial' is the package ID?
+		// Actually, let's just use a subquery or join to verify package type is trial.
+		Joins("JOIN packages ON packages.id = cu_orders.package_id").
+		Where("packages.type = ?", string(models.PackageTypeTrial)).
 		Count(&count).Error
 
 	return count > 0, err

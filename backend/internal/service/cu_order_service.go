@@ -106,6 +106,30 @@ func (s *cuOrderService) CreatePendingOrder(ctx context.Context, cuUserID, custo
 		return nil, err
 	}
 
+	// 对于试用版，进行特殊检查
+	if pkgEntity.Type == string(models.PackageTypeTrial) {
+		// 试用版不支持批量购买
+		if req.LicenseCount != 1 {
+			return nil, i18n.NewI18nError("600004", lang) // 试用版不支持批量购买
+		}
+
+		// 检查购买时间限制
+		now := time.Now()
+		if now.Day() > 25 {
+			return nil, i18n.NewI18nError("600003", lang) // 试用版购买时间限制
+		}
+
+		// 每个用户每月只能有一个试用版（包括pending的）
+		currentMonth := now.Format("2006-01")
+		exists, err := s.repo.CheckTrialOrderExists(cuUserID, currentMonth)
+		if err != nil {
+			return nil, i18n.NewI18nError("900004", lang, err.Error())
+		}
+		if exists {
+			return nil, i18n.NewI18nError("600005", lang) // 当月已购买试用版
+		}
+	}
+
 	// 再次校验数量（防御性校验）
 	if req.LicenseCount > maxDevices {
 		return nil, i18n.NewI18nError("601005", lang)
