@@ -17,6 +17,7 @@ type CuInvoiceRepository interface {
 
 	// ========== 通用工具方法 ==========
 	Create(invoice *models.Invoice) error
+	Update(invoice *models.Invoice) error
 	GetByID(id string) (*models.Invoice, error)
 	CheckOrderInvoiceExists(orderID string) (bool, error)
 }
@@ -31,6 +32,12 @@ func NewCuInvoiceRepository(db *gorm.DB) CuInvoiceRepository {
 
 func (r *cuInvoiceRepository) Create(invoice *models.Invoice) error {
 	return r.db.Create(invoice).Error
+}
+
+func (r *cuInvoiceRepository) Update(invoice *models.Invoice) error {
+	// 使用 Select 指定更新字段，确保可以清空某些字段（虽然此处目前主要是业务更新和状态重置）
+	// 或者直接使用 Save 更新全量字段
+	return r.db.Save(invoice).Error
 }
 
 func (r *cuInvoiceRepository) GetByID(id string) (*models.Invoice, error) {

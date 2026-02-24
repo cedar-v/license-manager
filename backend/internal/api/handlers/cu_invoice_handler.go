@@ -200,3 +200,54 @@ func (h *CuInvoiceHandler) DownloadInvoice(c *gin.Context) {
 	// 重定向到文件URL
 	c.Redirect(http.StatusFound, fileURL)
 }
+
+// UpdateInvoice 客户修改发票申请
+// @Summary 客户修改发票申请
+// @Description 客户修改已被驳回的发票申请并重新提交
+// @Tags 发票管理
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "发票ID"
+// @Param request body models.InvoiceUpdateRequest true "发票修改请求"
+// @Success 200 {object} models.APIResponse{data=object{id=string,invoice_no=string,status=string}} "成功"
+// @Failure 400 {object} models.ErrorResponse "请求参数无效"
+// @Failure 401 {object} models.ErrorResponse "未认证"
+// @Failure 403 {object} models.ErrorResponse "权限不足"
+// @Failure 404 {object} models.ErrorResponse "发票不存在"
+// @Failure 500 {object} models.ErrorResponse "服务器内部错误"
+// @Router /api/cu/invoices/{id} [put]
+func (h *CuInvoiceHandler) UpdateInvoice(c *gin.Context) {
+	lang := middleware.GetLanguage(c)
+	invoiceID := c.Param("id")
+
+	var req models.InvoiceUpdateRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Code:      "900001",
+			Message:   i18n.GetI18nErrorMessage("900001", lang),
+			Timestamp: getCurrentTimestamp(),
+		})
+		return
+	}
+
+	invoice, err := h.invoiceService.UpdateInvoice(c.Request.Context(), invoiceID, getCuUserID(c), &req)
+	if err != nil {
+		handleI18nError(c, err, lang)
+		return
+	}
+
+	response := invoice.ToResponse()
+	result := map[string]interface{}{
+		"id":         response.ID,
+		"invoice_no": response.InvoiceNo,
+		"status":     response.Status,
+	}
+
+	c.JSON(http.StatusOK, models.APIResponse{
+		Code:      "000000",
+		Message:   i18n.GetI18nErrorMessage("000000", lang),
+		Data:      result,
+		Timestamp: getCurrentTimestamp(),
+	})
+}

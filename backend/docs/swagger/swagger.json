@@ -5,7 +5,7 @@
     ],
     "swagger": "2.0",
     "info": {
-        "description": "Bearer token for authentication",
+        "description": "软件授权管理平台API文档",
         "title": "License Manager API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
@@ -726,25 +726,18 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "allOf": [
-                                                {
-                                                    "type": "object"
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
                                                 },
-                                                {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "string"
-                                                        },
-                                                        "invoice_no": {
-                                                            "type": "string"
-                                                        },
-                                                        "status": {
-                                                            "type": "string"
-                                                        }
-                                                    }
+                                                "invoice_no": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "string"
                                                 }
-                                            ]
+                                            }
                                         }
                                     }
                                 }
@@ -901,6 +894,103 @@
                         }
                     }
                 }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "客户修改已被驳回的发票申请并重新提交",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "发票管理"
+                ],
+                "summary": "客户修改发票申请",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "发票ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "发票修改请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.InvoiceUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "invoice_no": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "未认证",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "权限不足",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "发票不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
             }
         },
         "/api/cu/invoices/{id}/download": {
@@ -1000,52 +1090,38 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "allOf": [
-                                                {
-                                                    "type": "object"
+                                            "type": "object",
+                                            "properties": {
+                                                "token": {
+                                                    "type": "string"
                                                 },
-                                                {
+                                                "user": {
                                                     "type": "object",
                                                     "properties": {
-                                                        "token": {
+                                                        "customer_id": {
                                                             "type": "string"
                                                         },
-                                                        "user": {
-                                                            "allOf": [
-                                                                {
-                                                                    "type": "object"
-                                                                },
-                                                                {
-                                                                    "type": "object",
-                                                                    "properties": {
-                                                                        "customer_id": {
-                                                                            "type": "string"
-                                                                        },
-                                                                        "email": {
-                                                                            "type": "string"
-                                                                        },
-                                                                        "id": {
-                                                                            "type": "string"
-                                                                        },
-                                                                        "phone": {
-                                                                            "type": "string"
-                                                                        },
-                                                                        "real_name": {
-                                                                            "type": "string"
-                                                                        },
-                                                                        "status": {
-                                                                            "type": "string"
-                                                                        },
-                                                                        "user_role": {
-                                                                            "type": "string"
-                                                                        }
-                                                                    }
-                                                                }
-                                                            ]
+                                                        "email": {
+                                                            "type": "string"
+                                                        },
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "phone": {
+                                                            "type": "string"
+                                                        },
+                                                        "real_name": {
+                                                            "type": "string"
+                                                        },
+                                                        "status": {
+                                                            "type": "string"
+                                                        },
+                                                        "user_role": {
+                                                            "type": "string"
                                                         }
                                                     }
                                                 }
-                                            ]
+                                            }
                                         }
                                     }
                                 }
@@ -1209,34 +1285,27 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "allOf": [
-                                                {
-                                                    "type": "object"
+                                            "type": "object",
+                                            "properties": {
+                                                "expire_time": {
+                                                    "type": "string"
                                                 },
-                                                {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "expire_time": {
-                                                            "type": "string"
-                                                        },
-                                                        "id": {
-                                                            "type": "string"
-                                                        },
-                                                        "order_no": {
-                                                            "type": "string"
-                                                        },
-                                                        "payment_no": {
-                                                            "type": "string"
-                                                        },
-                                                        "payment_url": {
-                                                            "type": "string"
-                                                        },
-                                                        "total_amount": {
-                                                            "type": "number"
-                                                        }
-                                                    }
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "order_no": {
+                                                    "type": "string"
+                                                },
+                                                "payment_no": {
+                                                    "type": "string"
+                                                },
+                                                "payment_url": {
+                                                    "type": "string"
+                                                },
+                                                "total_amount": {
+                                                    "type": "number"
                                                 }
-                                            ]
+                                            }
                                         }
                                     }
                                 }
@@ -1295,22 +1364,15 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "allOf": [
-                                {
-                                    "type": "object"
+                            "type": "object",
+                            "properties": {
+                                "license_count": {
+                                    "type": "integer"
                                 },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "license_count": {
-                                            "type": "integer"
-                                        },
-                                        "package_id": {
-                                            "type": "string"
-                                        }
-                                    }
+                                "package_id": {
+                                    "type": "string"
                                 }
-                            ]
+                            }
                         }
                     }
                 ],
@@ -1326,31 +1388,24 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "allOf": [
-                                                {
-                                                    "type": "object"
+                                            "type": "object",
+                                            "properties": {
+                                                "discount_description": {
+                                                    "type": "string"
                                                 },
-                                                {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "discount_description": {
-                                                            "type": "string"
-                                                        },
-                                                        "discount_rate": {
-                                                            "type": "number"
-                                                        },
-                                                        "license_count": {
-                                                            "type": "integer"
-                                                        },
-                                                        "total_amount": {
-                                                            "type": "number"
-                                                        },
-                                                        "unit_price": {
-                                                            "type": "number"
-                                                        }
-                                                    }
+                                                "discount_rate": {
+                                                    "type": "number"
+                                                },
+                                                "license_count": {
+                                                    "type": "integer"
+                                                },
+                                                "total_amount": {
+                                                    "type": "number"
+                                                },
+                                                "unit_price": {
+                                                    "type": "number"
                                                 }
-                                            ]
+                                            }
                                         }
                                     }
                                 }
@@ -1532,19 +1587,19 @@
                         }
                     },
                     "400": {
-                        "description": ""
+                        "description": "Bad Request"
                     },
                     "401": {
-                        "description": ""
+                        "description": "Unauthorized"
                     },
                     "403": {
-                        "description": ""
+                        "description": "Forbidden"
                     },
                     "404": {
-                        "description": ""
+                        "description": "Not Found"
                     },
                     "409": {
-                        "description": ""
+                        "description": "Conflict"
                     }
                 }
             }
@@ -1598,34 +1653,27 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "allOf": [
-                                                {
-                                                    "type": "object"
+                                            "type": "object",
+                                            "properties": {
+                                                "expire_time": {
+                                                    "type": "string"
                                                 },
-                                                {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "expire_time": {
-                                                            "type": "string"
-                                                        },
-                                                        "order_id": {
-                                                            "type": "string"
-                                                        },
-                                                        "order_no": {
-                                                            "type": "string"
-                                                        },
-                                                        "payment_no": {
-                                                            "type": "string"
-                                                        },
-                                                        "payment_url": {
-                                                            "type": "string"
-                                                        },
-                                                        "total_amount": {
-                                                            "type": "number"
-                                                        }
-                                                    }
+                                                "order_id": {
+                                                    "type": "string"
+                                                },
+                                                "order_no": {
+                                                    "type": "string"
+                                                },
+                                                "payment_no": {
+                                                    "type": "string"
+                                                },
+                                                "payment_url": {
+                                                    "type": "string"
+                                                },
+                                                "total_amount": {
+                                                    "type": "number"
                                                 }
-                                            ]
+                                            }
                                         }
                                     }
                                 }
@@ -1686,31 +1734,24 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "allOf": [
-                                                    {
-                                                        "type": "object"
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
                                                     },
-                                                    {
-                                                        "type": "object",
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "string"
-                                                            },
-                                                            "max_devices": {
-                                                                "type": "integer"
-                                                            },
-                                                            "name": {
-                                                                "type": "string"
-                                                            },
-                                                            "price": {
-                                                                "type": "number"
-                                                            },
-                                                            "type": {
-                                                                "type": "string"
-                                                            }
-                                                        }
+                                                    "max_devices": {
+                                                        "type": "integer"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "price": {
+                                                        "type": "number"
+                                                    },
+                                                    "type": {
+                                                        "type": "string"
                                                     }
-                                                ]
+                                                }
                                             }
                                         }
                                     }
@@ -2117,52 +2158,38 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "allOf": [
-                                                {
-                                                    "type": "object"
+                                            "type": "object",
+                                            "properties": {
+                                                "token": {
+                                                    "type": "string"
                                                 },
-                                                {
+                                                "user": {
                                                     "type": "object",
                                                     "properties": {
-                                                        "token": {
+                                                        "customer_id": {
                                                             "type": "string"
                                                         },
-                                                        "user": {
-                                                            "allOf": [
-                                                                {
-                                                                    "type": "object"
-                                                                },
-                                                                {
-                                                                    "type": "object",
-                                                                    "properties": {
-                                                                        "customer_id": {
-                                                                            "type": "string"
-                                                                        },
-                                                                        "email": {
-                                                                            "type": "string"
-                                                                        },
-                                                                        "id": {
-                                                                            "type": "string"
-                                                                        },
-                                                                        "phone": {
-                                                                            "type": "string"
-                                                                        },
-                                                                        "real_name": {
-                                                                            "type": "string"
-                                                                        },
-                                                                        "status": {
-                                                                            "type": "string"
-                                                                        },
-                                                                        "user_role": {
-                                                                            "type": "string"
-                                                                        }
-                                                                    }
-                                                                }
-                                                            ]
+                                                        "email": {
+                                                            "type": "string"
+                                                        },
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "phone": {
+                                                            "type": "string"
+                                                        },
+                                                        "real_name": {
+                                                            "type": "string"
+                                                        },
+                                                        "status": {
+                                                            "type": "string"
+                                                        },
+                                                        "user_role": {
+                                                            "type": "string"
                                                         }
                                                     }
                                                 }
-                                            ]
+                                            }
                                         }
                                     }
                                 }
@@ -6495,7 +6522,11 @@
                 },
                 "customer_info": {
                     "description": "客户信息（仅在详情接口返回）",
-                    "$ref": "#/definitions/models.CustomerInfoForAuthCode"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.CustomerInfoForAuthCode"
+                        }
+                    ]
                 },
                 "customer_name": {
                     "description": "客户名称",
@@ -6804,7 +6835,11 @@
             "properties": {
                 "new_authorization_code": {
                     "description": "新生成的授权码信息",
-                    "$ref": "#/definitions/models.AuthorizationCodeShareResponseItem"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.AuthorizationCodeShareResponseItem"
+                        }
+                    ]
                 }
             }
         },
@@ -7121,6 +7156,10 @@
                 "expired_at": {
                     "description": "订单过期时间",
                     "type": "string"
+                },
+                "has_invoice_applied": {
+                    "description": "是否已申请发票（根据 invoices 表判断）",
+                    "type": "boolean"
                 },
                 "id": {
                     "description": "订单ID",
@@ -7517,7 +7556,11 @@
                 },
                 "authorization_stats": {
                     "description": "授权统计信息（仅在详情接口返回）",
-                    "$ref": "#/definitions/models.AuthorizationStats"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.AuthorizationStats"
+                        }
+                    ]
                 },
                 "company_size": {
                     "type": "string"
@@ -7842,11 +7885,19 @@
             "properties": {
                 "period": {
                     "description": "时间段信息",
-                    "$ref": "#/definitions/models.TrendPeriod"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.TrendPeriod"
+                        }
+                    ]
                 },
                 "summary": {
                     "description": "汇总信息",
-                    "$ref": "#/definitions/models.TrendSummary"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.TrendSummary"
+                        }
+                    ]
                 },
                 "trend_data": {
                     "description": "趋势数据",
@@ -7882,7 +7933,11 @@
                 },
                 "authorization_info": {
                     "description": "授权信息",
-                    "$ref": "#/definitions/models.AuthorizationInfo"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.AuthorizationInfo"
+                        }
+                    ]
                 },
                 "device_info": {
                     "description": "设备信息",
@@ -8478,6 +8533,47 @@
                 }
             }
         },
+        "models.InvoiceUpdateRequest": {
+            "type": "object",
+            "required": [
+                "invoice_type",
+                "receiver_email",
+                "title"
+            ],
+            "properties": {
+                "content": {
+                    "description": "开票内容，非必填，最多200字符",
+                    "type": "string",
+                    "maxLength": 200
+                },
+                "invoice_type": {
+                    "description": "发票类型，必填，personal-个人/enterprise-企业普票/vat_special-增值税专用发票",
+                    "type": "string",
+                    "enum": [
+                        "personal",
+                        "enterprise",
+                        "vat_special"
+                    ]
+                },
+                "receiver_email": {
+                    "description": "收票邮箱，必填，格式为邮箱地址",
+                    "type": "string"
+                },
+                "remark": {
+                    "description": "备注，可选",
+                    "type": "string"
+                },
+                "taxpayer_id": {
+                    "description": "纳税人识别号，企业发票必填，个人发票可为空",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "发票抬头，必填，最多200字符",
+                    "type": "string",
+                    "maxLength": 200
+                }
+            }
+        },
         "models.InvoiceUploadResponse": {
             "type": "object",
             "properties": {
@@ -8706,7 +8802,11 @@
                 },
                 "authorization_code": {
                     "description": "关联字段（用于查询时的JOIN）",
-                    "$ref": "#/definitions/models.AuthorizationCode"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.AuthorizationCode"
+                        }
+                    ]
                 },
                 "authorization_code_id": {
                     "type": "string"
@@ -9292,7 +9392,11 @@
                 },
                 "business_order": {
                     "description": "关联的业务订单信息",
-                    "$ref": "#/definitions/models.PaymentBusinessOrder"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.PaymentBusinessOrder"
+                        }
+                    ]
                 },
                 "payment_no": {
                     "description": "支付单号",
@@ -9407,7 +9511,11 @@
                 },
                 "growth_rate": {
                     "description": "增长率（同比上月）",
-                    "$ref": "#/definitions/models.GrowthRate"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.GrowthRate"
+                        }
+                    ]
                 },
                 "total_auth_codes": {
                     "description": "总授权码数量（所有授权码的累计总数）",
@@ -9501,6 +9609,7 @@
     },
     "securityDefinitions": {
         "BearerAuth": {
+            "description": "Bearer token for authentication",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

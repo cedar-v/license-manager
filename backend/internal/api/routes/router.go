@@ -288,6 +288,7 @@ func SetupRouter() *gin.Engine {
 			cuAuth.POST("/invoices", cuInvoiceHandler.CreateInvoice)
 			cuAuth.GET("/invoices", cuInvoiceHandler.GetUserInvoices)
 			cuAuth.GET("/invoices/:id", cuInvoiceHandler.GetUserInvoiceDetail)
+			cuAuth.PUT("/invoices/:id", cuInvoiceHandler.UpdateInvoice)
 			cuAuth.GET("/invoices/summary", cuInvoiceHandler.GetUserInvoiceSummary)
 			cuAuth.GET("/invoices/:id/download", cuInvoiceHandler.DownloadInvoice)
 		}

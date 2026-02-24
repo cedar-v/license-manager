@@ -14,6 +14,16 @@ type InvoiceCreateRequest struct {
 	Remark        *string `json:"remark,omitempty"`                                                      // 备注，可选
 }
 
+// InvoiceUpdateRequest 客户端修改发票请求结构
+type InvoiceUpdateRequest struct {
+	InvoiceType   string  `json:"invoice_type" binding:"required,oneof=personal enterprise vat_special"` // 发票类型，必填，personal-个人/enterprise-企业普票/vat_special-增值税专用发票
+	ReceiverEmail string  `json:"receiver_email" binding:"required,email"`                               // 收票邮箱，必填，格式为邮箱地址
+	Title         string  `json:"title" binding:"required,max=200"`                                      // 发票抬头，必填，最多200字符
+	TaxpayerID    *string `json:"taxpayer_id,omitempty"`                                                 // 纳税人识别号，企业发票必填，个人发票可为空
+	Content       string  `json:"content" binding:"omitempty,max=200"`                                   // 开票内容，非必填，最多200字符
+	Remark        *string `json:"remark,omitempty"`                                                      // 备注，可选
+}
+
 // InvoiceListRequest 发票列表查询请求结构
 // 注：apply_date 支持 YYYY-MM-DD 或 RFC3339 时间范围 "start,end"。
 type InvoiceListRequest struct {

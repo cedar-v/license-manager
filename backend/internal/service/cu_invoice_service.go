@@ -21,6 +21,7 @@ type CuInvoiceService interface {
 	GetUserInvoices(ctx context.Context, cuUserID string, req *models.InvoiceListRequest) (*models.InvoiceListResponse, error)
 	GetInvoiceSummary(ctx context.Context, cuUserID string) (*models.InvoiceSummaryResponse, error)
 	DownloadInvoice(ctx context.Context, invoiceID, cuUserID string) (string, error)
+	UpdateInvoice(ctx context.Context, invoiceID, cuUserID string, req *models.InvoiceUpdateRequest) (*models.Invoice, error)
 }
 
 type cuInvoiceService struct {
@@ -173,6 +174,54 @@ func (s *cuInvoiceService) DownloadInvoice(ctx context.Context, invoiceID, cuUse
 	}
 
 	return *invoice.InvoiceFileURL, nil
+}
+
+func (s *cuInvoiceService) UpdateInvoice(ctx context.Context, invoiceID, cuUserID string, req *models.InvoiceUpdateRequest) (*models.Invoice, error) {
+	lang := pkgcontext.GetLanguageFromContext(ctx)
+
+	// 获取原发票
+	invoice, err := s.repo.GetByID(invoiceID)
+	if err != nil {
+		return nil, i18n.NewI18nError("700001", lang)
+	}
+
+	// 权限校验
+	if invoice.CuUserID != cuUserID {
+		return nil, i18n.NewI18nError("700001", lang)
+	}
+
+	// 状态校验：只有被驳回的发票可以修改
+	if invoice.Status != models.InvoiceStatusRejected {
+		return nil, i18n.NewI18nError("700004", lang)
+	}
+
+	// 业务逻辑校验：发票类型和纳税人识别号
+	if req.InvoiceType != models.InvoiceTypePersonal && (req.TaxpayerID == nil || *req.TaxpayerID == "") {
+		return nil, i18n.NewI18nError("700004", lang)
+	}
+
+	// 更新字段
+	invoice.InvoiceType = req.InvoiceType
+	invoice.Title = req.Title
+	invoice.TaxpayerID = req.TaxpayerID
+	invoice.Content = req.Content
+	invoice.ReceiverEmail = req.ReceiverEmail
+	invoice.Remark = req.Remark
+
+	// 重置状态和驳回信息
+	invoice.Status = models.InvoiceStatusPending
+	invoice.RejectReason = nil
+	invoice.Suggestion = nil
+	invoice.RejectedAt = nil
+	invoice.RejectedBy = nil
+
+	// 更新数据库
+	err = s.repo.Update(invoice)
+	if err != nil {
+		return nil, err
+	}
+
+	return invoice, nil
 }
 
 // ========== 私有辅助方法 ==========
