@@ -212,6 +212,7 @@ import {
   uploadInvoice,
   rejectInvoice,
   issueInvoice,
+  getInvoiceDetail,
   type Invoice
 } from '@/api/invoice'
 import { formatDateTime } from '@/utils/date'
@@ -294,6 +295,27 @@ const fetchData = async () => {
   }
 }
 
+// 获取详情
+const fetchDetail = async (id: string) => {
+  if (!id) return
+  loading.value = true
+  try {
+    const res = await getInvoiceDetail(id)
+    if (res.code === '000000' && res.data) {
+      const data = res.data
+      data.created_at = formatDateTime(data.created_at)
+      if (data.rejected_at) data.rejected_at = formatDateTime(data.rejected_at)
+      if (data.uploaded_at) data.uploaded_at = formatDateTime(data.uploaded_at)
+      currentRow.value = data
+    }
+  } catch (error: any) {
+    console.error('Fetch invoice detail error:', error)
+    ElMessage.error(error.backendMessage || t('invoices.messages.fetchDetailError'))
+  } finally {
+    loading.value = false
+  }
+}
+
 onMounted(() => {
   fetchData()
 })
@@ -327,8 +349,11 @@ const handleView = (row: any) => {
 }
 
 const handleUpload = (row: any) => {
-  currentRow.value = row
-  uploadVisible.value = true
+  // currentRow.value = row
+  fetchDetail(row.id)
+  setTimeout(() => {
+    uploadVisible.value = true
+  }, 300)
 }
 
 const handleUploadSubmit = async (data: any) => {
@@ -383,8 +408,11 @@ const handleUploadSubmit = async (data: any) => {
 }
 
 const handleReject = (row: any) => {
-  currentRow.value = row
-  rejectVisible.value = true
+  fetchDetail(row.id)
+  // currentRow.value = row
+  setTimeout(() => {
+    rejectVisible.value = true
+  }, 300)
 }
 
 const handleRejectSubmit = async (data: any) => {
