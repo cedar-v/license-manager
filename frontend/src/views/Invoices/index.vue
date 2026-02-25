@@ -31,7 +31,7 @@
           <div class="form_box">
             <el-form-item :label="t('invoices.filter.searchLabel')">
               <el-input
-                v-model="filterForm.keyword"
+                v-model="filterForm.search"
                 :placeholder="t('invoices.filter.searchPlaceholder')"
               />
             </el-form-item>
@@ -228,7 +228,7 @@ const stats = ref([
 ])
 
 const filterForm = reactive({
-  keyword: '',
+  search: '',
   status: '',
   dateRange: [] as any[]
 })
@@ -271,12 +271,11 @@ const fetchData = async () => {
     const params: any = {
       page: currentPage.value,
       page_size: pageSize.value,
-      keyword: filterForm.keyword,
+      search: filterForm.search,
       status: filterForm.status
     }
     if (filterForm.dateRange && filterForm.dateRange.length === 2) {
-      params.start_date = filterForm.dateRange[0]
-      params.end_date = filterForm.dateRange[1]
+      params.apply_date = new Date(filterForm.dateRange[0]).toISOString() + ',' + new Date(filterForm.dateRange[1]).toISOString()
     }
     const res = await getInvoices(params)
     if (res.code === '000000') {
@@ -337,7 +336,7 @@ const handleFilter = () => {
 }
 
 const resetFilter = () => {
-  filterForm.keyword = ''
+  filterForm.search = ''
   filterForm.status = ''
   filterForm.dateRange = []
   currentPage.value = 1
