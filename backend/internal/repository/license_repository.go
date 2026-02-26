@@ -66,13 +66,18 @@ func (r *licenseRepository) GetLicenseList(ctx context.Context, req *models.Lice
 	}
 
 	// 在线状态筛选
-	if req.IsOnline != nil {
-		// 在线状态：最后心跳时间在5分钟内
-		fiveMinutesAgo := time.Now().Add(-5 * time.Minute)
-		if *req.IsOnline {
-			query = query.Where("licenses.last_heartbeat >= ?", fiveMinutesAgo)
-		} else {
-			query = query.Where("licenses.last_heartbeat < ? OR licenses.last_heartbeat IS NULL", fiveMinutesAgo)
+	if req.IsOnline != nil && *req.IsOnline != "" {
+		cfg := config.GetConfig()
+		heartbeatTimeoutSeconds := cfg.License.HeartbeatTimeout
+		if heartbeatTimeoutSeconds <= 0 {
+			heartbeatTimeoutSeconds = 300 // 默认5分钟
+		}
+		onlineThreshold := time.Now().Add(-time.Duration(heartbeatTimeoutSeconds) * time.Second)
+
+		if *req.IsOnline == "true" {
+			query = query.Where("licenses.last_heartbeat >= ?", onlineThreshold)
+		} else if *req.IsOnline == "false" {
+			query = query.Where("licenses.last_heartbeat < ? OR licenses.last_heartbeat IS NULL", onlineThreshold)
 		}
 	}
 
@@ -106,12 +111,19 @@ func (r *licenseRepository) GetLicenseList(ctx context.Context, req *models.Lice
 
 	// 转换为响应格式
 	list := make([]models.LicenseListItem, len(licenses))
+
+	cfg := config.GetConfig()
+	heartbeatTimeoutSeconds := cfg.License.HeartbeatTimeout
+	if heartbeatTimeoutSeconds <= 0 {
+		heartbeatTimeoutSeconds = 300 // 默认5分钟
+	}
+	onlineThreshold := time.Now().Add(-time.Duration(heartbeatTimeoutSeconds) * time.Second)
+
 	for i, license := range licenses {
 		// 计算在线状态
 		isOnline := false
 		if license.LastHeartbeat != nil {
-			fiveMinutesAgo := time.Now().Add(-5 * time.Minute)
-			isOnline = license.LastHeartbeat.After(fiveMinutesAgo)
+			isOnline = license.LastHeartbeat.After(onlineThreshold)
 		}
 
 		// 格式化时间
@@ -169,8 +181,13 @@ func (r *licenseRepository) GetLicenseByID(ctx context.Context, id string) (*mod
 
 	// 计算在线状态
 	if license.LastHeartbeat != nil {
-		fiveMinutesAgo := time.Now().Add(-5 * time.Minute)
-		license.IsOnline = license.LastHeartbeat.After(fiveMinutesAgo)
+		cfg := config.GetConfig()
+		heartbeatTimeoutSeconds := cfg.License.HeartbeatTimeout
+		if heartbeatTimeoutSeconds <= 0 {
+			heartbeatTimeoutSeconds = 300 // 默认5分钟
+		}
+		onlineThreshold := time.Now().Add(-time.Duration(heartbeatTimeoutSeconds) * time.Second)
+		license.IsOnline = license.LastHeartbeat.After(onlineThreshold)
 	}
 
 	return &license, nil
@@ -238,8 +255,13 @@ func (r *licenseRepository) GetLicenseByKey(ctx context.Context, licenseKey stri
 
 	// 计算在线状态
 	if license.LastHeartbeat != nil {
-		fiveMinutesAgo := time.Now().Add(-5 * time.Minute)
-		license.IsOnline = license.LastHeartbeat.After(fiveMinutesAgo)
+		cfg := config.GetConfig()
+		heartbeatTimeoutSeconds := cfg.License.HeartbeatTimeout
+		if heartbeatTimeoutSeconds <= 0 {
+			heartbeatTimeoutSeconds = 300 // 默认5分钟
+		}
+		onlineThreshold := time.Now().Add(-time.Duration(heartbeatTimeoutSeconds) * time.Second)
+		license.IsOnline = license.LastHeartbeat.After(onlineThreshold)
 	}
 
 	return &license, nil
@@ -299,10 +321,10 @@ func (r *licenseRepository) GetCustomerDeviceList(ctx context.Context, customerI
 	}
 
 	// 在线状态筛选
-	if req.IsOnline != nil {
-		if *req.IsOnline {
+	if req.IsOnline != nil && *req.IsOnline != "" {
+		if *req.IsOnline == "true" {
 			query = query.Where("licenses.last_heartbeat > ?", onlineThreshold)
-		} else {
+		} else if *req.IsOnline == "false" {
 			query = query.Where("(licenses.last_heartbeat <= ? OR licenses.last_heartbeat IS NULL)", onlineThreshold)
 		}
 	}
@@ -355,11 +377,11 @@ func (r *licenseRepository) GetCustomerDeviceList(ctx context.Context, customerI
 		// 格式化时间字段
 		var activatedAtStr, lastHeartbeatStr *string
 		if result.ActivatedAt != nil {
-			str := result.ActivatedAt.Format("2006-01-02T15:04:05Z")
+			str := result.ActivatedAt.Format(time.RFC3339)
 			activatedAtStr = &str
 		}
 		if result.LastHeartbeat != nil {
-			str := result.LastHeartbeat.Format("2006-01-02T15:04:05Z")
+			str := result.LastHeartbeat.Format(time.RFC3339)
 			lastHeartbeatStr = &str
 		}
 
@@ -379,7 +401,7 @@ func (r *licenseRepository) GetCustomerDeviceList(ctx context.Context, customerI
 			AuthorizationInfo: models.AuthorizationInfo{
 				AuthorizationCode:   result.AuthorizationCode,
 				AuthorizationCodeID: result.AuthorizationCodeID,
-				EndDate:             result.EndDate.Format("2006-01-02T15:04:05Z"),
+				EndDate:             result.EndDate.Format(time.RFC3339),
 				Description:         description,
 			},
 		}

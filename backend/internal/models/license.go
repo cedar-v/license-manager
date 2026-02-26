@@ -63,14 +63,14 @@ func (l *License) BeforeUpdate(tx *gorm.DB) error {
 
 // LicenseListRequest 许可证列表查询请求结构
 type LicenseListRequest struct {
-	Page                int    `form:"page" binding:"omitempty,min=1"`                                                   // 页码，默认1
-	PageSize            int    `form:"page_size" binding:"omitempty,min=1,max=100"`                                      // 每页条数，默认20，最大100
-	AuthorizationCodeID string `form:"authorization_code_id" binding:"omitempty"`                                        // 授权码ID筛选
-	CustomerID          string `form:"customer_id" binding:"omitempty"`                                                  // 客户ID筛选
-	Status              string `form:"status" binding:"omitempty,oneof=active inactive revoked"`                         // 状态筛选
-	IsOnline            *bool  `form:"is_online" binding:"omitempty"`                                                    // 在线状态筛选
-	Sort                string `form:"sort" binding:"omitempty,oneof=created_at updated_at activated_at last_heartbeat"` // 排序字段，默认created_at
-	Order               string `form:"order" binding:"omitempty,oneof=asc desc"`                                         // 排序方向，默认desc
+	Page                int     `form:"page" binding:"omitempty,min=1"`                                                   // 页码，默认1
+	PageSize            int     `form:"page_size" binding:"omitempty,min=1,max=100"`                                      // 每页条数，默认20，最大100
+	AuthorizationCodeID string  `form:"authorization_code_id" binding:"omitempty"`                                        // 授权码ID筛选
+	CustomerID          string  `form:"customer_id" binding:"omitempty"`                                                  // 客户ID筛选
+	Status              string  `form:"status" binding:"omitempty,oneof=active inactive revoked"`                         // 状态筛选
+	IsOnline            *string `form:"is_online" binding:"omitempty"`                                                    // 在线状态筛选
+	Sort                string  `form:"sort" binding:"omitempty,oneof=created_at updated_at activated_at last_heartbeat"` // 排序字段，默认created_at
+	Order               string  `form:"order" binding:"omitempty,oneof=asc desc"`                                         // 排序方向，默认desc
 }
 
 // LicenseListItem 许可证列表项结构
@@ -186,11 +186,11 @@ type GrowthRate struct {
 
 // DeviceListRequest 设备列表查询请求结构（客户用户接口）
 type DeviceListRequest struct {
-	Page                int    `form:"page" binding:"omitempty,min=1"`                   // 页码，默认1
-	PageSize            int    `form:"page_size" binding:"omitempty,min=1,max=100"`      // 每页数量，默认20，最大100
-	DeviceName          string `form:"device_name" binding:"omitempty,max=100"`          // 设备名称模糊搜索（匹配device_info.name）
-	AuthorizationCodeID string `form:"authorization_code_id" binding:"omitempty,len=36"` // 按授权码ID筛选设备
-	IsOnline            *bool  `form:"is_online" binding:"omitempty"`                    // 是否在线筛选（true在线，false离线；不传不过滤）
+	Page                int     `form:"page" binding:"omitempty,min=1"`                   // 页码，默认1
+	PageSize            int     `form:"page_size" binding:"omitempty,min=1,max=100"`      // 每页数量，默认20，最大100
+	DeviceName          string  `form:"device_name" binding:"omitempty,max=100"`          // 设备名称模糊搜索（匹配device_info.name）
+	AuthorizationCodeID string  `form:"authorization_code_id" binding:"omitempty,len=36"` // 按授权码ID筛选设备
+	IsOnline            *string `form:"is_online" binding:"omitempty"`                    // 是否在线筛选（true在线，false离线；不传不过滤）
 }
 
 // DeviceListItem 设备列表项结构（客户用户接口）
