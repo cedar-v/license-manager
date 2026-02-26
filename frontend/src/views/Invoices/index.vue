@@ -31,7 +31,7 @@
           <div class="form_box">
             <el-form-item :label="t('invoices.filter.searchLabel')">
               <el-input
-                v-model="filterForm.keyword"
+                v-model="filterForm.search"
                 :placeholder="t('invoices.filter.searchPlaceholder')"
               />
             </el-form-item>
@@ -212,6 +212,7 @@ import {
   uploadInvoice,
   rejectInvoice,
   issueInvoice,
+  getInvoiceDetail,
   type Invoice
 } from '@/api/invoice'
 import { formatDateTime } from '@/utils/date'
@@ -227,7 +228,7 @@ const stats = ref([
 ])
 
 const filterForm = reactive({
-  keyword: '',
+  search: '',
   status: '',
   dateRange: [] as any[]
 })
@@ -270,12 +271,11 @@ const fetchData = async () => {
     const params: any = {
       page: currentPage.value,
       page_size: pageSize.value,
-      keyword: filterForm.keyword,
+      search: filterForm.search,
       status: filterForm.status
     }
     if (filterForm.dateRange && filterForm.dateRange.length === 2) {
-      params.start_date = filterForm.dateRange[0]
-      params.end_date = filterForm.dateRange[1]
+      params.apply_date = new Date(filterForm.dateRange[0]).toISOString() + ',' + new Date(filterForm.dateRange[1]).toISOString()
     }
     const res = await getInvoices(params)
     if (res.code === '000000') {
@@ -289,6 +289,27 @@ const fetchData = async () => {
   } catch (error: any) {
     console.error('Fetch invoices error:', error)
     ElMessage.error(error.backendMessage || t('invoices.messages.fetchError'))
+  } finally {
+    loading.value = false
+  }
+}
+
+// 获取详情
+const fetchDetail = async (id: string) => {
+  if (!id) return
+  loading.value = true
+  try {
+    const res = await getInvoiceDetail(id)
+    if (res.code === '000000' && res.data) {
+      const data = res.data
+      data.created_at = formatDateTime(data.created_at)
+      if (data.rejected_at) data.rejected_at = formatDateTime(data.rejected_at)
+      if (data.uploaded_at) data.uploaded_at = formatDateTime(data.uploaded_at)
+      currentRow.value = data
+    }
+  } catch (error: any) {
+    console.error('Fetch invoice detail error:', error)
+    ElMessage.error(error.backendMessage || t('invoices.messages.fetchDetailError'))
   } finally {
     loading.value = false
   }
@@ -315,7 +336,7 @@ const handleFilter = () => {
 }
 
 const resetFilter = () => {
-  filterForm.keyword = ''
+  filterForm.search = ''
   filterForm.status = ''
   filterForm.dateRange = []
   currentPage.value = 1
@@ -327,8 +348,11 @@ const handleView = (row: any) => {
 }
 
 const handleUpload = (row: any) => {
-  currentRow.value = row
-  uploadVisible.value = true
+  // currentRow.value = row
+  fetchDetail(row.id)
+  setTimeout(() => {
+    uploadVisible.value = true
+  }, 300)
 }
 
 const handleUploadSubmit = async (data: any) => {
@@ -383,8 +407,11 @@ const handleUploadSubmit = async (data: any) => {
 }
 
 const handleReject = (row: any) => {
-  currentRow.value = row
-  rejectVisible.value = true
+  fetchDetail(row.id)
+  // currentRow.value = row
+  setTimeout(() => {
+    rejectVisible.value = true
+  }, 300)
 }
 
 const handleRejectSubmit = async (data: any) => {
