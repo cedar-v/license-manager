@@ -207,14 +207,24 @@ func (s *packageService) toCuPackageResponse(pkg *models.Package) *models.CuPack
 		details += fmt.Sprintf("%d个许可", maxDevices)
 	}
 
+	// 计算 display_price
+	displayPrice := ""
+	if pkg.Price != 0 {
+		displayPrice = fmt.Sprintf("￥%g", pkg.Price)
+	} else {
+		displayPrice = pkg.PriceDescription
+	}
+
 	return &models.CuPackageResponse{
-		ID:          pkg.ID,
-		Name:        pkg.Name,
-		Type:        pkg.Type,
-		Price:       pkg.Price,
-		MaxDevices:  maxDevices,
-		Description: pkg.Description,
-		Features:    pkg.Features,
-		Details:     details,
+		ID:               pkg.ID,
+		Name:             pkg.Name,
+		Type:             pkg.Type,
+		Price:            pkg.Price,
+		DisplayPrice:     displayPrice,
+		PriceDescription: pkg.PriceDescription,
+		MaxDevices:       maxDevices,
+		Description:      pkg.Description,
+		Features:         pkg.Features,
+		Details:          details,
 	}
 }

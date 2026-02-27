@@ -139,12 +139,14 @@ type PackageListResponse struct {
 
 // CuPackageResponse 用户端套餐响应（兼容原有结构）
 type CuPackageResponse struct {
-	ID          string  `json:"id"`
-	Name        string  `json:"name"`
-	Type        string  `json:"type"`
-	Price       float64 `json:"price"`
-	MaxDevices  int     `json:"max_devices"` // 从features中解析
-	Description string  `json:"description"`
-	Features    string  `json:"features"`
-	Details     string  `json:"details"`
+	ID               string  `json:"id"`
+	Name             string  `json:"name"`
+	Type             string  `json:"type"`
+	Price            float64 `json:"price"`
+	DisplayPrice     string  `json:"display_price"`
+	PriceDescription string  `json:"price_description"`
+	MaxDevices       int     `json:"max_devices"` // 从features中解析
+	Description      string  `json:"description"`
+	Features         string  `json:"features"`
+	Details          string  `json:"details"`
 }

@@ -53,14 +53,16 @@ func (h *CuOrderHandler) GetPackages(c *gin.Context) {
 	result := make([]map[string]interface{}, len(packages))
 	for i, pkg := range packages {
 		result[i] = map[string]interface{}{
-			"id":          pkg.ID,
-			"name":        pkg.Name,
-			"type":        pkg.Type,
-			"price":       pkg.Price,
-			"max_devices": pkg.MaxDevices,
-			"description": pkg.Description,
-			"features":    pkg.Features,
-			"details":     pkg.Details,
+			"id":                pkg.ID,
+			"name":              pkg.Name,
+			"type":              pkg.Type,
+			"price":             pkg.Price,
+			"display_price":     pkg.DisplayPrice,
+			"price_description": pkg.PriceDescription,
+			"max_devices":       pkg.MaxDevices,
+			"description":       pkg.Description,
+			"features":          pkg.Features,
+			"details":           pkg.Details,
 		}
 	}
 
