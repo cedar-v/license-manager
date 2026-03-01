@@ -39,7 +39,7 @@
                   {{ t('packages.table.free') }}
                 </template>
                 <template v-else>
-                  {{ typeof row.price === 'number' ? `¥${row.price}` : row.price }}
+                  {{ typeof row.price === 'number' ? `${t('packages.table.priceSymbol')}${row.price}` : row.price }}
                 </template>
               </span>
             </template>
@@ -57,7 +57,7 @@
           <el-table-column :label="t('packages.table.actions')" width="100" fixed="right">
             <template #default="{ row }">
               <el-button size="small" class="btn-edit" @click="handleEdit(row)">
-                {{ t('enterpriseLeads.actions.edit') }}
+                {{ t('packages.actions.edit') }}
               </el-button>
             </template>
           </el-table-column>
@@ -116,7 +116,7 @@ const fetchData = async () => {
     }
   } catch (error: any) {
     console.error('Fetch packages error:', error)
-    ElMessage.error(error.backendMessage || t('enterpriseLeads.messages.fetchError'))
+    ElMessage.error(error.backendMessage || t('packages.messages.fetchError'))
   } finally {
     loading.value = false
   }
@@ -155,7 +155,7 @@ const handleEdit = async (row: any) => {
     }
   } catch (error: any) {
     console.error('Fetch package detail error:', error)
-    ElMessage.error(error.backendMessage || t('enterpriseLeads.messages.fetchDetailError'))
+    ElMessage.error(error.backendMessage || t('packages.messages.fetchDetailError'))
   } finally {
     loading.value = false
   }
@@ -170,12 +170,12 @@ const handleUpdate = async (updatedData: any) => {
     }
     const res = await updatePackage(id, data)
     if (res.code === '000000') {
-      ElMessage.success(t('enterpriseLeads.messages.updateSuccess'))
+      ElMessage.success(t('packages.messages.updateSuccess'))
       fetchData()
     }
   } catch (error: any) {
     console.error('Update package error:', error)
-    ElMessage.error(error.backendMessage || t('enterpriseLeads.messages.updateError'))
+    ElMessage.error(error.backendMessage || t('packages.messages.updateError'))
   }
 }
 

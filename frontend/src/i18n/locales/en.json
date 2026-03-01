@@ -57,6 +57,7 @@
       "enterpriseLeads": "Enterprise Leads",
       "licenses": "License Management",
       "invoices": "Invoice Management",
+      "packages": "Package Management",
       "roles": "Roles & Permissions",
       "users": "System Users"
     },
@@ -80,6 +81,7 @@
       "enterpriseLeads": "Enterprise Leads",
       "licenses": "License Management",
       "invoices": "Invoice Management",
+      "packages": "Package Management",
       "invoiceDetail": "Invoice Detail",
       "licenseList": "License List",
       "createLicense": "Create License",
@@ -130,6 +132,61 @@
       "edit": "Edit",
       "delete": "Delete",
       "refresh": "Refresh"
+    }
+  },
+
+  "packages": {
+    "title": "Package Management",
+    "table": {
+      "title": "Price Package Management",
+      "id": "Package ID",
+      "name": "Package Name",
+      "price": "Price",
+      "priceSymbol": "$",
+      "free": "Free",
+      "customPlan": "Custom Plan",
+      "cycle": "Cycle",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "edit": {
+      "title": "Edit Package",
+      "name": "Package Name",
+      "type": "Package Type",
+      "types": {
+        "trial": "Trial Version",
+        "basic": "Basic",
+        "professional": "Professional",
+        "custom": "Custom"
+      },
+      "price": "Price",
+      "cycle": "Cycle/Description",
+      "description": "Package Description",
+      "priceDescription": "Price Description",
+      "features": "Package Features",
+      "status": "Status",
+      "sort": "Display Order",
+      "remark": "Remark",
+      "save": "Save Changes",
+      "descPlaceholder": "Experience full features, suitable for new users to trial",
+      "priceDescPlaceholder": "e.g. Custom Plan / Pay as you go",
+      "remarkPlaceholder": "Please enter remark",
+      "featurePlaceholder": "Please enter feature content"
+    },
+    "actions": {
+      "edit": "Edit"
+    },
+    "messages": {
+      "fetchError": "Failed to fetch list",
+      "fetchDetailError": "Failed to fetch details",
+      "updateSuccess": "Updated successfully",
+      "updateError": "Failed to update"
     }
   },
 

@@ -9,10 +9,10 @@
                     </el-form-item>
                     <el-form-item :label="t('packages.edit.type')" prop="type" class="flex-1">
                         <el-select v-model="form.type" class="w-full">
-                            <el-option label="试用版" value="trial" />
-                            <el-option label="基础版" value="basic" />
-                            <el-option label="专业版" value="professional" />
-                            <el-option label="定制版" value="custom" />
+                            <el-option :label="t('packages.edit.types.trial')" value="trial" />
+                            <el-option :label="t('packages.edit.types.basic')" value="basic" />
+                            <el-option :label="t('packages.edit.types.professional')" value="professional" />
+                            <el-option :label="t('packages.edit.types.custom')" value="custom" />
                         </el-select>
                     </el-form-item>
                 </div>
