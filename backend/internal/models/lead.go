@@ -119,7 +119,7 @@ type LeadCreateRequest struct {
 	ContactName  string `json:"contact_name" binding:"required,min=1,max=100"`   // 联系人
 	ContactPhone string `json:"contact_phone" binding:"required,min=1,max=20"`   // 联系电话
 	ContactEmail string `json:"contact_email" binding:"omitempty,email,max=100"` // 邮箱
-	Requirement  string `json:"requirement" binding:"required,min=1"`            // 需求描述
+	Requirement  string `json:"requirement" binding:"omitempty"`                 // 需求描述
 	ExtraInfo    string `json:"extra_info"`                                      // 补充信息
 }
 

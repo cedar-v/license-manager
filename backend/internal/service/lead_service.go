@@ -37,12 +37,18 @@ func NewLeadService(repo repository.LeadRepository, db *gorm.DB) LeadService {
 func (s *leadService) CreateLead(ctx context.Context, req *models.LeadCreateRequest) (*models.Lead, error) {
 	lang := pkgcontext.GetLanguageFromContext(ctx)
 
+	// 如果 requirement 为空，设置默认值 "Empty"
+	requirement := req.Requirement
+	if requirement == "" {
+		requirement = "Empty"
+	}
+
 	lead := &models.Lead{
 		CompanyName:  req.CompanyName,
 		ContactName:  req.ContactName,
 		ContactPhone: req.ContactPhone,
 		ContactEmail: req.ContactEmail,
-		Requirement:  req.Requirement,
+		Requirement:  requirement,
 		ExtraInfo:    req.ExtraInfo,
 		Status:       string(models.LeadStatusPending),
 	}
