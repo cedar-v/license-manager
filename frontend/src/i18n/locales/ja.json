@@ -57,6 +57,7 @@
       "enterpriseLeads": "企業リード",
       "licenses": "ライセンス管理",
       "invoices": "発票管理",
+      "packages": "パッケージ管理",
       "roles": "ロールと権限",
       "users": "システムユーザー"
     },
@@ -80,6 +81,7 @@
       "enterpriseLeads": "企業リード",
       "licenses": "ライセンス管理",
       "invoices": "発票管理",
+      "packages": "パッケージ管理",
       "invoiceDetail": "発票申請の詳細",
       "licenseList": "ライセンス一覧",
       "createLicense": "ライセンス作成",
@@ -130,6 +132,61 @@
       "edit": "編集",
       "delete": "削除",
       "refresh": "更新"
+    }
+  },
+
+  "packages": {
+    "title": "パッケージ管理",
+    "table": {
+      "title": "価格パッケージ管理",
+      "id": "パッケージID",
+      "name": "パッケージ名",
+      "price": "価格",
+      "priceSymbol": "¥",
+      "free": "無料",
+      "customPlan": "カスタムプラン",
+      "cycle": "期間",
+      "createdAt": "作成日時",
+      "updatedAt": "更新日時",
+      "status": "ステータス",
+      "actions": "操作"
+    },
+    "status": {
+      "enabled": "有効",
+      "disabled": "無効"
+    },
+    "edit": {
+      "title": "パッケージ編集",
+      "name": "パッケージ名",
+      "type": "パッケージタイプ",
+      "types": {
+        "trial": "試用版",
+        "basic": "ベーシック",
+        "professional": "プロフェッショナル",
+        "custom": "カスタム"
+      },
+      "price": "価格",
+      "cycle": "期間/説明",
+      "description": "パッケージ説明",
+      "priceDescription": "価格説明",
+      "features": "パッケージ機能",
+      "status": "ステータス",
+      "sort": "表示順序",
+      "remark": "備考",
+      "save": "変更を保存",
+      "descPlaceholder": "全機能を体験、新ユーザー向け試用評価に最適",
+      "priceDescPlaceholder": "例：カスタムプラン / 需要に応じた価格設定",
+      "remarkPlaceholder": "備考を入力してください",
+      "featurePlaceholder": "機能内容を入力してください"
+    },
+    "actions": {
+      "edit": "編集"
+    },
+    "messages": {
+      "fetchError": "一覧の取得に失敗しました",
+      "fetchDetailError": "詳細の取得に失敗しました",
+      "updateSuccess": "更新しました",
+      "updateError": "更新に失敗しました"
     }
   },
 

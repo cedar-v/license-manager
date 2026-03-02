@@ -175,6 +175,7 @@
       "id": "套餐ID",
       "name": "套餐名称",
       "price": "价格",
+      "priceSymbol": "¥",
       "free": "免费",
       "customPlan": "定制方案",
       "cycle": "周期",
@@ -191,6 +192,12 @@
       "title": "编辑套餐",
       "name": "套餐名称",
       "type": "套餐类型",
+      "types": {
+        "trial": "试用版",
+        "basic": "基础版",
+        "professional": "专业版",
+        "custom": "定制版"
+      },
       "price": "价格",
       "cycle": "周期/描述",
       "description": "套餐描述",
@@ -204,6 +211,15 @@
       "priceDescPlaceholder": "例如：定制方案 / 按需定价",
       "remarkPlaceholder": "请输入备注",
       "featurePlaceholder": "请输入特性内容"
+    },
+    "actions": {
+      "edit": "编辑"
+    },
+    "messages": {
+      "fetchError": "获取列表失败",
+      "fetchDetailError": "获取详情失败",
+      "updateSuccess": "更新成功",
+      "updateError": "更新失败"
     }
   },
 

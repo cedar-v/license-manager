@@ -26,6 +26,7 @@ const routeBreadcrumbKeys: Record<string, string[]> = {
   '/licenses': ['licenses'],
   '/invoices': ['invoices'],
   '/invoices/detail': ['invoices', 'invoiceDetail'],
+  '/packages': ['packages'],
   '/roles': ['roles'],
   '/users': ['users'],
   '/login': ['login']
