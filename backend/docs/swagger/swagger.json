@@ -5,7 +5,7 @@
     ],
     "swagger": "2.0",
     "info": {
-        "description": "软件授权管理平台API文档",
+        "description": "软件授权管理系统API文档",
         "title": "License Manager API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {

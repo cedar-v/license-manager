@@ -9628,7 +9628,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{"http", "https"},
 	Title:            "License Manager API",
-	Description:      "软件授权管理平台API文档",
+	Description:      "软件授权管理系统API文档",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

@@ -18,7 +18,7 @@ import (
 
 // @title License Manager API
 // @version 1.0
-// @description 软件授权管理平台API文档
+// @description 软件授权管理系统API文档
 // @termsOfService http://swagger.io/terms/
 
 // @contact.name API Support

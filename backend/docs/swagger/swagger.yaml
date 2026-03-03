@@ -2334,7 +2334,7 @@ info:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: 软件授权管理平台API文档
+  description: 软件授权管理系统API文档
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
