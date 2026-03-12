@@ -159,11 +159,11 @@ const chartOption = computed(() => {
   
   return {
     grid: {
-      left: 60,
-      right: 50,
+      left: '3%',   // percentage so margins scale with container width
+      right: '3%',
       top: 30,
-      bottom: 60,
-      containLabel: false
+      bottom: 30,   // reduced: containLabel handles room for axis labels
+      containLabel: true // axis labels are always contained within the grid boundary
     },
     xAxis: {
       type: 'category',
@@ -216,6 +216,7 @@ const chartOption = computed(() => {
         fontSize: 12
       },
       extraCssText: 'box-shadow: 0px 4px 12px 0px rgba(59, 210, 180, 0.2); backdrop-filter: blur(4px);',
+      appendToBody: true, // mount tooltip DOM on <body> to escape overflow:hidden on card
       formatter: (params: any) => {
         const data = params[0]
         return `${t('chart.licenseTrend.tooltip.licenseCount')}: ${data.value}`
@@ -387,7 +388,7 @@ onMounted(() => {
   border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
   box-shadow: var(--app-shadow);
   overflow: hidden;
-  height: 100%; /* 充满容器高度 */
+  /* Height is driven by the chart canvas below; card grows to fit content */
   display: flex;
   flex-direction: column;
 }
@@ -498,14 +499,15 @@ onMounted(() => {
 
 .chart-container {
   padding: 1.35vw 1.25vw 1.25vw; /* 26px 24px 24px → vw */
-  flex: 1; /* 占据剩余高度 */
+  flex-shrink: 0; /* chart canvas height drives card size — never compress */
   display: flex;
-  min-height: 0; /* 防止flex溢出 */
+  position: relative; /* establish stacking context for chart canvas */
   
   .trend-chart {
     width: 100%;
-    height: 100%; /* 充满容器 */
-    min-height: 12.8vw; /* 最小高度246px/1920 = 12.8vw，确保图表可读性 */
+    height: 18vw;      /* ~346px at 1920px reference width */
+    max-height: 248px; /* keeps total card height ≤ 352px (248 + ~50px padding + ~54px header) */
+    min-height: 200px; /* absolute floor so chart is always readable */
   }
 }
 

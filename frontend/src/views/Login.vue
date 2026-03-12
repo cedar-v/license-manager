@@ -35,21 +35,18 @@
         <p class="hero-subtitle">{{ t('login.heroSubtitle') }}</p>
         <div class="hero-stats">
           <div class="stat-item">
-            <span class="stat-label">{{ t('login.stats.totalAuthCodes') }}</span>
             <span class="stat-number">10K+</span>
-            <span class="stat-sublabel">{{ t('login.stats.totalAuthCodesSubLabel') }}</span>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
             <span class="stat-label">{{ t('login.stats.activeLicenses') }}</span>
-            <span class="stat-number">8,234</span>
-            <span class="stat-sublabel">{{ t('login.stats.activeLicensesSubLabel') }}</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
-            <span class="stat-label">{{ t('login.stats.systemUptime') }}</span>
             <span class="stat-number">99.9%</span>
-            <span class="stat-sublabel">{{ t('login.stats.systemUptimeSubLabel') }}</span>
+            <span class="stat-label">{{ t('login.stats.uptime') }}</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-number">24/7</span>
+            <span class="stat-label">{{ t('login.stats.support') }}</span>
           </div>
         </div>
       </div>

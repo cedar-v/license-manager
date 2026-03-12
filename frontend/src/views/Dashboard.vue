@@ -237,9 +237,12 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-/* content-container样式 */
+/* content-container styles */
 .content-container {
-  min-height: calc(100vh - 80px);
+  /* Use a definite height so flex children with height:100% can resolve correctly.
+     min-height alone does not propagate to children in CSS. */
+  height: calc(100vh - 80px);
+  min-height: 600px; /* floor so content is never crushed on very small viewports */
   padding: 24px;
   width: 100%;
   margin: 0;
@@ -411,10 +414,9 @@ onMounted(() => {
   min-height: 0; /* 防止flex子元素溢出 */
 }
 
-// 图表区域 - 占据50%高度
+// Chart section: auto-sized by chart card content, never shrinks
 .chart-section {
-  flex: 0.5; /* 50%高度 */
-  min-height: 300px; /* 确保最小高度 */
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
 }
@@ -427,8 +429,8 @@ onMounted(() => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  flex: 0.6; /* 占据60%高度 */
-  min-height: 0; /* 防止flex子元素溢出 */
+  flex: 1; /* fill all remaining space after chart card */
+  min-height: 250px; /* ensure table always has usable space */
 }
 
 .card-header {
