@@ -17,7 +17,18 @@
       "usernameMinLength": "用户名至少需要3个字符",
       "passwordRequired": "请输入密码",
       "passwordMinLength": "密码至少需要6个字符"
-    }
+    },
+    "heroTitleLine1": "软件授权",
+    "heroTitleLine2": "管理系统",
+    "heroSubtitle": "赋能软件商业化，构建 B2B 与 B2C 全场景的软件授权体系。",
+    "stats": {
+      "activeLicenses": "活跃许可证",
+      "uptime": "可用率",
+      "support": "全天支持"
+    },
+    "welcomeTitle": "欢迎回来",
+    "welcomeSubtitle": "登录您的账户以继续",
+    "copyright": "© 2025 Cedar-V. 保留所有权利。"
   },
   "sidebar": {
     "expand": "展开侧边栏",
@@ -328,9 +339,8 @@
     "licenseTrend": {
       "title": "授权趋势",
       "quickOptions": {
-        "today": "本日",
-        "week": "本周",
-        "month": "本月"
+        "week": "最近7天",
+        "month": "最近30天"
       },
       "datePicker": {
         "rangeSeparator": "至",
@@ -347,9 +357,8 @@
       "endDate": "结束日期",
       "separator": "至",
       "quickOptions": {
-        "today": "本日",
-        "week": "本周",
-        "month": "本月"
+        "week": "最近7天",
+        "month": "最近30天"
       }
     }
   },

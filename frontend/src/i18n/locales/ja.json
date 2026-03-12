@@ -17,7 +17,18 @@
       "usernameMinLength": "ユーザー名は3文字以上である必要があります",
       "passwordRequired": "パスワードを入力してください",
       "passwordMinLength": "パスワードは6文字以上である必要があります"
-    }
+    },
+    "heroTitleLine1": "セキュアな",
+    "heroTitleLine2": "ライセンス管理",
+    "heroSubtitle": "エンタープライズグレードのプラットフォームで、ソフトウェアライセンス管理を効率化。",
+    "stats": {
+      "activeLicenses": "アクティブライセンス",
+      "uptime": "稼働率",
+      "support": "サポート"
+    },
+    "welcomeTitle": "おかえりなさい",
+    "welcomeSubtitle": "アカウントにサインインして続けてください",
+    "copyright": "© 2025 Cedar-V. All rights reserved."
   },
   "sidebar": {
     "expand": "サイドバーを展開",
@@ -294,9 +305,8 @@
     "licenseTrend": {
       "title": "ライセンストレンド",
       "quickOptions": {
-        "today": "今日",
-        "week": "今週",
-        "month": "今月"
+        "week": "直7日間",
+        "month": "直30日間"
       },
       "datePicker": {
         "rangeSeparator": "から",
@@ -313,9 +323,8 @@
       "endDate": "終了日付",
       "separator": "から",
       "quickOptions": {
-        "today": "今日",
-        "week": "今週",
-        "month": "今月"
+        "week": "直7日間",
+        "month": "直30日間"
       }
     }
   },

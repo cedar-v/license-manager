@@ -121,7 +121,6 @@ const appStore = useAppStore()
 
 // 快捷选择选项
 const quickOptions = computed(() => [
-  { label: t('chart.licenseTrend.quickOptions.today'), value: 'today' },
   { label: t('chart.licenseTrend.quickOptions.week'), value: 'week' },
   { label: t('chart.licenseTrend.quickOptions.month'), value: 'month' }
 ])
@@ -161,7 +160,7 @@ const chartOption = computed(() => {
   return {
     grid: {
       left: 60,
-      right: 30,
+      right: 50,
       top: 30,
       bottom: 60,
       containLabel: false
@@ -277,24 +276,17 @@ const handleQuickSelect = (value: string) => {
   let endDate: Date
   
   switch (value) {
-    case 'today':
-      // 本日：今天到今天
+    case 'week':
+      // 最近7天：今天往前6天
       startDate = new Date(today)
+      startDate.setDate(today.getDate() - 6)
       endDate = new Date(today)
       break
-    case 'week':
-      // 本周：本周一到本周日
-      const currentDay = today.getDay() // 0=周日, 1=周一, ..., 6=周六
-      const mondayOffset = currentDay === 0 ? 6 : currentDay - 1 // 计算到周一的偏移
-      startDate = new Date(today)
-      startDate.setDate(today.getDate() - mondayOffset)
-      endDate = new Date(startDate)
-      endDate.setDate(startDate.getDate() + 6) // 周日
-      break
     case 'month':
-      // 本月：当前月1号到当前月末
-      startDate = new Date(today.getFullYear(), today.getMonth(), 1)
-      endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0) // 下个月0号=本月最后一天
+      // 最近30天：今天往前29天
+      startDate = new Date(today)
+      startDate.setDate(today.getDate() - 29)
+      endDate = new Date(today)
       break
     default:
       return

@@ -17,7 +17,18 @@
       "usernameMinLength": "Username must be at least 3 characters",
       "passwordRequired": "Please enter password",
       "passwordMinLength": "Password must be at least 6 characters"
-    }
+    },
+    "heroTitleLine1": "Secure License",
+    "heroTitleLine2": "Management",
+    "heroSubtitle": "Streamline your software licensing workflow with our enterprise-grade platform.",
+    "stats": {
+      "activeLicenses": "Active Licenses",
+      "uptime": "Uptime",
+      "support": "Support"
+    },
+    "welcomeTitle": "Welcome back",
+    "welcomeSubtitle": "Sign in to your account to continue",
+    "copyright": "© 2025 Cedar-V. All rights reserved."
   },
   "sidebar": {
     "expand": "Expand Sidebar",
@@ -295,9 +306,8 @@
     "licenseTrend": {
       "title": "License Trend",
       "quickOptions": {
-        "today": "Today",
-        "week": "This Week",
-        "month": "This Month"
+        "week": "Last 7 Days",
+        "month": "Last 30 Days"
       },
       "datePicker": {
         "rangeSeparator": "to",
@@ -314,9 +324,8 @@
       "endDate": "End Date",
       "separator": "to",
       "quickOptions": {
-        "today": "Today",
-        "week": "This Week",
-        "month": "This Month"
+        "week": "Last 7 Days",
+        "month": "Last 30 Days"
       }
     }
   },
