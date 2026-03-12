@@ -22,7 +22,12 @@
     "heroTitleLine2": "Management",
     "heroSubtitle": "Streamline your software licensing workflow with our enterprise-grade platform.",
     "stats": {
+      "totalAuthCodes": "Total Auth Codes",
+      "totalAuthCodesSubLabel": "2.4K new this month",
       "activeLicenses": "Active Licenses",
+      "activeLicensesSubLabel": "+12% vs. last month",
+      "systemUptime": "System Uptime",
+      "systemUptimeSubLabel": "24/7 Online",
       "uptime": "Uptime",
       "support": "Support"
     },
@@ -37,13 +42,19 @@
   "dashboard": {
     "title": "Dashboard",
     "stats": {
-      "totalCustomers": "Total Customers",
-      "totalLicenses": "Total Licenses",
+      "totalAuthCodes": "Total Auth Codes",
       "activeLicenses": "Active Licenses",
-      "expired": "Expired",
-      "onlineClients": "Online Clients",
-      "expiringSoon": "Expiring Soon",
-      "authSuccessRate24h": "24h Auth Success Rate"
+      "todayNewLicenses": "New Today",
+      "expiringIn7Days": "Expiring in 7 Days",
+      "expiringIn30Days": "Expiring in 30 Days",
+      "abnormalAlerts": "Abnormal Alerts",
+      "subText": {
+        "monthNew": "{n} new this month",
+        "vsLastMonth": "{rate}% vs. last month",
+        "yesterday": "{n} yesterday",
+        "urgent": "Urgent Follow-up",
+        "heartbeatTimeout": "Heartbeat Timeout"
+      }
     },
     "recentLicenses": {
       "title": "Recent Licenses",

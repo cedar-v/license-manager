@@ -35,18 +35,21 @@
         <p class="hero-subtitle">{{ t('login.heroSubtitle') }}</p>
         <div class="hero-stats">
           <div class="stat-item">
+            <span class="stat-label">{{ t('login.stats.totalAuthCodes') }}</span>
             <span class="stat-number">10K+</span>
+            <span class="stat-sublabel">{{ t('login.stats.totalAuthCodesSubLabel') }}</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
             <span class="stat-label">{{ t('login.stats.activeLicenses') }}</span>
+            <span class="stat-number">8,234</span>
+            <span class="stat-sublabel">{{ t('login.stats.activeLicensesSubLabel') }}</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
+            <span class="stat-label">{{ t('login.stats.systemUptime') }}</span>
             <span class="stat-number">99.9%</span>
-            <span class="stat-label">{{ t('login.stats.uptime') }}</span>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <span class="stat-number">24/7</span>
-            <span class="stat-label">{{ t('login.stats.support') }}</span>
+            <span class="stat-sublabel">{{ t('login.stats.systemUptimeSubLabel') }}</span>
           </div>
         </div>
       </div>
@@ -657,26 +660,35 @@ $phi-inv: 38.2%;
 .stat-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-}
-
-.stat-number {
-  font-size: 24px;
-  font-weight: 700;
-  color: #ffffff;
+  align-items: flex-start;
+  gap: 2px;
 }
 
 .stat-label {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.6);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 400;
+  margin-bottom: 2px;
+}
+
+.stat-number {
+  font-size: 28px;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.stat-sublabel {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 400;
 }
 
 .stat-divider {
   width: 1px;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.2);
+  height: 56px;
+  background: rgba(255, 255, 255, 0.15);
 }
 
 /* 右侧登录区域 - 38.2% */

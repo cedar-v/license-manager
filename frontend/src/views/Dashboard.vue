@@ -10,11 +10,10 @@
   <Layout app-name="Cedar-V" :page-title="t('dashboard.title')">
     <!-- 页面内容 -->
     <div class="content-container dashboard">
-      <!-- 统计卡片区域 -->
+      <!-- stats card area -->
       <div class="stats-section">
         <div
           class="stats-card"
-          :class="{ 'compact-card': stat.id === 6, 'large-card': stat.id === 7 }"
           v-for="stat in statsData"
           :key="stat.id"
         >
@@ -27,6 +26,9 @@
             <div class="stat-label">{{ stat.label }}</div>
             <div class="stat-value-row">
               <div class="stat-value">{{ stat.value }}</div>
+            </div>
+            <div v-if="stat.subText" class="stat-sub-text" :class="stat.subTextClass">
+              {{ stat.subText }}
             </div>
           </div>
         </div>
@@ -114,7 +116,7 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Layout from '@/components/common/layout/Layout.vue'
 import LicenseTrendChart from '@/components/charts/LicenseTrendChart.vue'
-import { getRecentAuthorizations, type RecentAuthorizationItem, getOverviewStats} from '@/api/dashboard'
+import { getRecentAuthorizations, type RecentAuthorizationItem, getOverviewStats, type StatsOverviewData } from '@/api/dashboard'
 import { ElMessage } from 'element-plus'
 import { formatDate } from '@/utils/date'
 
@@ -129,16 +131,14 @@ import icon7 from '@/assets/icons/dashboard/icon7.png'
 // 使用国际化
 const { t } = useI18n()
 
-// 统计卡片数据（接口动态获取 value，其余静态配置）
+// stats card definitions — value and subText are filled dynamically from API
 const statsData = ref([
-
-  { id: 1, key: 'total_auth_codes', value: '', label: t('dashboard.stats.totalCustomers'), icon: icon1 },//总授权码
-  { id: 2, key: 'active_licenses', value: '', label: t('dashboard.stats.totalLicenses'), icon: icon2 },//活跃许可证
-  { id: 3, key: 'expiring_soon', value: '', label: t('dashboard.stats.activeLicenses'), icon: icon3 },//即将过期
-  { id: 4, key: 'abnormal_alerts', value: '', label: t('dashboard.stats.expired'), icon: icon4 },//异常警告
-  // { id: 5, key: 'growth_rate', value: '', label: t('dashboard.stats.onlineClients'), icon: icon5 },//增长率
-  { id: 6, key: 'auth_codes', value: '', label: t('dashboard.stats.expiringSoon'), icon: icon6 },//授权码增长率
-  { id: 7, key: 'licenses', value: '', label: t('dashboard.stats.authSuccessRate24h'), icon: icon7 }//许可证增长率
+  { id: 1, key: 'total_auth_codes',    value: '', label: t('dashboard.stats.totalAuthCodes'),    icon: icon1, subText: '', subTextClass: '' },
+  { id: 2, key: 'active_licenses',     value: '', label: t('dashboard.stats.activeLicenses'),    icon: icon2, subText: '', subTextClass: '' },
+  { id: 3, key: 'today_new_licenses',  value: '', label: t('dashboard.stats.todayNewLicenses'),  icon: icon3, subText: '', subTextClass: '' },
+  { id: 4, key: 'expiring_in_7days',   value: '', label: t('dashboard.stats.expiringIn7Days'),   icon: icon4, subText: '', subTextClass: '' },
+  { id: 5, key: 'expiring_in_30days',  value: '', label: t('dashboard.stats.expiringIn30Days'),  icon: icon6, subText: '', subTextClass: '' },
+  { id: 6, key: 'abnormal_alerts',     value: '', label: t('dashboard.stats.abnormalAlerts'),    icon: icon7, subText: '', subTextClass: '' },
 ])
 
 // 最近授权数据 - 响应式数据
@@ -174,29 +174,57 @@ const fetchRecentAuthorizations = async () => {
   }
 }
 
-// 获取仪表盘统计数据
+// Populates statsData cards from API response
+const applyStatsData = (data: StatsOverviewData) => {
+  statsData.value.forEach(item => {
+    const raw = (data as any)[item.key]
+    if (raw !== undefined) item.value = String(raw)
+  })
+
+  // Card 1: total auth codes + month new as sub-text
+  const card1 = statsData.value.find(c => c.key === 'total_auth_codes')
+  if (card1) {
+    card1.subText = t('dashboard.stats.subText.monthNew').replace('{n}', String(data.month_new_auth_codes))
+    card1.subTextClass = 'sub-positive'
+  }
+
+  // Card 2: active licenses + MoM growth rate as sub-text
+  const card2 = statsData.value.find(c => c.key === 'active_licenses')
+  if (card2 && data.growth_rate) {
+    const rate = data.growth_rate.licenses_mom
+    card2.subText = t('dashboard.stats.subText.vsLastMonth').replace('{rate}', `${rate >= 0 ? '+' : ''}${rate.toFixed(2)}`)
+    card2.subTextClass = rate >= 0 ? 'sub-positive' : 'sub-negative'
+  }
+
+  // Card 3: today new licenses + yesterday count as sub-text
+  const card3 = statsData.value.find(c => c.key === 'today_new_licenses')
+  if (card3) {
+    card3.subText = t('dashboard.stats.subText.yesterday').replace('{n}', String(data.yesterday_new_licenses))
+    card3.subTextClass = ''
+  }
+
+  // Card 4: expiring in 7 days — fixed urgent sub-text
+  const card4 = statsData.value.find(c => c.key === 'expiring_in_7days')
+  if (card4) {
+    card4.subText = data.expiring_in_7days > 0 ? t('dashboard.stats.subText.urgent') : ''
+    card4.subTextClass = data.expiring_in_7days > 0 ? 'sub-warning' : ''
+  }
+
+  // Card 6: abnormal alerts — heartbeat timeout hint
+  const card6 = statsData.value.find(c => c.key === 'abnormal_alerts')
+  if (card6) {
+    card6.subText = t('dashboard.stats.subText.heartbeatTimeout')
+    card6.subTextClass = data.abnormal_alerts > 0 ? 'sub-warning' : ''
+  }
+}
+
+// Fetch dashboard overview stats from API
 const fetchDashboardStats = async () => {
   try {
     const resp = await getOverviewStats()
-    const data = resp.data
-    statsData.value.forEach(item => {
-      // 处理直接映射的字段
-      if (data[item.key] !== undefined && typeof data[item.key] !== 'object') {
-        item.value = data[item.key]
-      }
-      // 处理嵌套在 growth_rate 中的字段（授权码增长率和许可证增长率）
-      if (data.growth_rate && data.growth_rate[item.key] !== undefined) {
-        const rateValue = data.growth_rate[item.key]
-        // 如果是数字类型，格式化为保留两位小数的百分比
-        if (typeof rateValue === 'number') {
-          item.value = `${rateValue.toFixed(2)}%`
-        } else {
-          item.value = rateValue
-        }
-      }
-    })
-  } catch (e) {
-    ElMessage.error('获取仪表盘统计数据失败')
+    applyStatsData(resp.data)
+  } catch {
+    ElMessage.error(t('dashboard.fetchError') || 'Failed to load dashboard stats')
   }
 }
 
@@ -352,6 +380,25 @@ onMounted(() => {
   .stat-value {
     font-size: 1.25vw; /* 24px/1920 = 0.73vw */
     color: rgba(255, 255, 255, 0.9);
+  }
+
+  .stat-sub-text {
+    font-size: 0.63vw; /* ~12px */
+    margin-top: 0.16vw;
+    color: rgba(255, 255, 255, 0.65);
+    white-space: nowrap;
+
+    &.sub-positive {
+      color: rgba(200, 255, 220, 0.9);
+    }
+
+    &.sub-negative {
+      color: rgba(255, 200, 200, 0.9);
+    }
+
+    &.sub-warning {
+      color: rgba(255, 230, 150, 0.9);
+    }
   }
 }
 
