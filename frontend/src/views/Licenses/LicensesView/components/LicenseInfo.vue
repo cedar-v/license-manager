@@ -184,7 +184,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, reactive, computed, nextTick } from 'vue'
-import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage, ElMessageBox, type FormInstance, type FormRules, type MessageBoxInputData } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import type { AuthorizationCode, LicenseDevice, LicenseDeviceCreateRequest } from '@/api/license'
 import { getLicenseDevices, getLicenseDeviceDetail, createLicenseDevice, downloadLicenseFile, revokeLicense } from '@/api/license'
@@ -421,7 +421,7 @@ const handleRevokeLicense = async (device: LicenseDevice) => {
 
   let reason = ''
   try {
-    const { value } = await ElMessageBox.prompt(
+    const { value } = (await ElMessageBox.prompt(
       t('pages.licenses.detail.messages.revokeConfirm'),
       t('pages.licenses.detail.messages.revokeTitle'),
       {
@@ -441,7 +441,7 @@ const handleRevokeLicense = async (device: LicenseDevice) => {
         },
         inputErrorMessage: t('pages.licenses.detail.messages.revokeReasonRequired')
       }
-    )
+    )) as MessageBoxInputData
     reason = value.trim()
   } catch {
     return
