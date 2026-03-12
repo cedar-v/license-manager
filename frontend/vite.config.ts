@@ -180,7 +180,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
             // Element Plus icons
             elementIcons: ['@element-plus/icons-vue'],
             // ECharts (large library, isolated for better caching)
-            echarts: ['echarts', 'vue-echarts', 'zrender'],
+            echarts: ['echarts', 'vue-echarts'],
             // Utilities
             utils: ['axios'],
             // i18n
