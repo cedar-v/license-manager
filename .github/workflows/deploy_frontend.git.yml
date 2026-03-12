@@ -25,8 +25,13 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: frontend/package-lock.json
+
+    # 设置pnpm
+    - name: Set up pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10
+        run_install: false
 
     # 缓存node_modules（不缓存构建输出，确保每次都是最新构建）
     - name: Cache dependencies
@@ -34,7 +39,8 @@ jobs:
       with:
         path: |
           frontend/node_modules
-        key: ${{ runner.os }}-frontend-deps-${{ hashFiles('frontend/package-lock.json') }}
+          ~/.pnpm-store
+        key: ${{ runner.os }}-frontend-deps-${{ hashFiles('frontend/pnpm-lock.yaml') }}
         restore-keys: |
           ${{ runner.os }}-frontend-deps-
 
@@ -42,7 +48,7 @@ jobs:
     - name: Install dependencies
       run: |
         cd frontend
-        npm ci
+        pnpm install --frozen-lockfile
 
     # 清理旧的构建目录（确保使用最新代码构建）
     - name: Clean old build artifacts
@@ -59,9 +65,9 @@ jobs:
         export VITE_OUTDIR=production
         export VITE_ADDRESS_BASE_URL=/production/
         # 先执行类型检查
-        npm run type-check
+        pnpm run type-check
         # 然后执行构建
-        npm run build:prod
+        pnpm run build:prod
         # 检查构建结果
         echo "Build completed, checking production directory:"
         ls -la production/
