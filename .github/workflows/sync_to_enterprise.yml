@@ -27,17 +27,14 @@ jobs:
           REPO_URL="https://x-access-token:$TOKEN@github.com/cedar-v/license-manager-enterprise.git"
           
           echo "Cloning enterprise repo..."
-          git clone "$REPO_URL" /tmp/enterprise-repo 2>/dev/null || {
-            mkdir -p /tmp/enterprise-repo
-            cd /tmp/enterprise-repo
-            git init
-            git remote add origin "$REPO_URL"
-          }
+          git clone "$REPO_URL" /tmp/enterprise-repo
           
           cd /tmp/enterprise-repo
           
-          # 复制新文件覆盖
+          # 清理 enterprise repo 里的 .git（避免复制过来的）
           rm -rf .git
+          
+          # 从原始仓库复制文件，排除 .git 目录
           cd "$GITHUB_WORKSPACE"
           cp -r . /tmp/enterprise-repo/
           
@@ -48,6 +45,8 @@ jobs:
               -c "user.name=github-actions[bot]" \
               commit -m "Sync from license-manager - $(date)" || echo "Nothing to commit"
           
-          git push origin master --force
+          # 显式设置 remote 并 push
+          git remote add enterprise "$REPO_URL"
+          git push enterprise master --force
           
           echo "Done!"
