@@ -22,6 +22,7 @@ jobs:
 
       - name: Add enterprise remote
         run: |
+          echo "Token loaded: ${{ secrets.ENTERPRISE_REPO_TOKEN != '' }}"
           git remote add enterprise https://x-access-token:${{ secrets.ENTERPRISE_REPO_TOKEN }}@github.com/cedar-v/license-manager-enterprise.git
 
       - name: Push to enterprise license-manager branch
