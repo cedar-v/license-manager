@@ -15,24 +15,30 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Configure Git
+      - name: Set up Git
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Add enterprise remote
         run: |
-          echo "Token loaded: ${{ secrets.ENTERPRISE_REPO_TOKEN != '' }}"
+          echo "Adding enterprise remote..."
           TOKEN="${{ secrets.ENTERPRISE_REPO_TOKEN }}"
-          echo "Token first 4 chars: ${TOKEN:0:4}"
-          git remote add enterprise https://x-access-token:${{ secrets.ENTERPRISE_REPO_TOKEN }}@github.com/cedar-v/license-manager-enterprise.git
+          echo "Token prefix: ${TOKEN:0:10}"
+          git remote add enterprise https://x-access-token:$TOKEN@github.com/cedar-v/license-manager-enterprise.git
+          echo "Remote added successfully"
 
-      - name: Test remote connection
+      - name: Verify remote and push
+        env:
+          TOKEN: "${{ secrets.ENTERPRISE_REPO_TOKEN }}"
         run: |
-          echo "=== Testing remote connection ==="
-          git ls-remote enterprise
-          echo "=== Test complete ==="
-
-      - name: Push to enterprise license-manager branch
-        run: |
-          git push enterprise main:license-manager --force
+          echo "Verifying remote exists..."
+          # 先测试是否能访问
+          if git ls-remote enterprise 2>&1; then
+            echo "Remote accessible, pushing..."
+            git push enterprise main:license-manager --force
+            echo "Push completed successfully!"
+          else
+            echo "Failed to access remote"
+            exit 1
+          fi
