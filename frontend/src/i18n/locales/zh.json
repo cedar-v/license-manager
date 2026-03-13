@@ -31,8 +31,8 @@
       "uptime": "可用率",
       "support": "全天支持"
     },
-    "welcomeTitle": "欢迎回来",
-    "welcomeSubtitle": "登录您的账户以继续",
+    "welcomeTitle": "授权管理平台",
+    "welcomeSubtitle": "登录您的账户",
     "copyright": "© 2025 Cedar-V. 保留所有权利。"
   },
   "sidebar": {

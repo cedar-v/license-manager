@@ -21,7 +21,7 @@
       <!-- 品牌标识 -->
       <div class="brand-header">
         <div class="brand-logo">
-          <svg width="32" height="31" viewBox="0 0 54 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg width="48" height="48" viewBox="0 0 54 52" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M26.3125 11.4814L22.25 19.5947V22.7148L27.1191 13.0576L29.7393 18.1777L18.7988 40H0L13.5938 22.8037H14L13.8125 23.1201L7.46875 33.541H17.8438V16.9111L7.1875 25.6475L18.0312 10.1406L11.625 14.4463V14.2588L20.4375 0L26.3125 11.4814Z" fill="#ffffff"/>
             <path d="M34.5498 39.9996H28.75L24.5938 32.8864L27.125 27.6246L34.5498 39.9996ZM41 39.9996H36.2705L27.9346 25.941L30.7188 20.1559L41 39.9996Z" fill="rgba(255,255,255,0.7)"/>
           </svg>
@@ -76,7 +76,6 @@
             :rules="loginRules"
             @submit.prevent="handleLogin"
             class="login-form"
-            size="large"
           >
             <el-form-item prop="username">
               <el-input
@@ -84,7 +83,9 @@
                 :placeholder="t('login.usernamePlaceholder')"
                 :prefix-icon="User"
                 clearable
-                class="login-input"
+                :class="['login-input', { 'is-field-valid': fieldStatus.username }]"
+                size="large"
+                @blur="validateFieldOnBlur('username')"
               />
             </el-form-item>
 
@@ -96,7 +97,9 @@
                 :prefix-icon="Lock"
                 show-password
                 clearable
-                class="login-input"
+                :class="['login-input', { 'is-field-valid': fieldStatus.password }]"
+                size="large"
+                @blur="validateFieldOnBlur('password')"
                 @keyup.enter="handleLogin"
               />
             </el-form-item>
@@ -138,7 +141,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
@@ -165,6 +168,27 @@ const loginForm = reactive({
 })
 
 const rememberMe = ref(false)
+
+const fieldStatus = reactive({
+  username: false,
+  password: false
+})
+
+watch(() => loginForm.username, (val) => { if (!val) fieldStatus.username = false })
+watch(() => loginForm.password, (val) => { if (!val) fieldStatus.password = false })
+
+async function validateFieldOnBlur(field: 'username' | 'password') {
+  if (!loginForm[field]) {
+    fieldStatus[field] = false
+    return
+  }
+  try {
+    await loginFormRef.value?.validateField(field)
+    fieldStatus[field] = true
+  } catch {
+    fieldStatus[field] = false
+  }
+}
 
 const loginRules: FormRules = {
   username: [
@@ -558,24 +582,24 @@ $phi-inv: 38.2%;
 }
 
 .wave-1 {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='0.15' d='M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,138.7C672,128,768,160,864,181.3C960,203,1056,213,1152,192C1248,171,1344,117,1392,90.7L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
-  animation: waveMove 18s linear infinite;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%23ffffff' fill-opacity='0.15' d='M0,192 C240,256 480,128 720,192 C960,256 1200,128 1440,192 L1440,320 L0,320 Z'%3E%3C/path%3E%3C/svg%3E");
+  animation: waveMove 12s linear infinite;
   height: 240px;
 
   :global([data-theme='dark']) & {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%2300ffc8' fill-opacity='0.12' d='M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,138.7C672,128,768,160,864,181.3C960,203,1056,213,1152,192C1248,171,1344,117,1392,90.7L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%2300ffc8' fill-opacity='0.12' d='M0,192 C240,256 480,128 720,192 C960,256 1200,128 1440,192 L1440,320 L0,320 Z'%3E%3C/path%3E%3C/svg%3E");
   }
 }
 
 .wave-2 {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='0.08' d='M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,250.7C960,235,1056,181,1152,165.3C1248,149,1344,171,1392,181.3L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
-  animation: waveMove 14s linear infinite reverse;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%23ffffff' fill-opacity='0.08' d='M0,224 C360,160 720,288 1080,224 C1260,192 1350,240 1440,224 L1440,320 L0,320 Z'%3E%3C/path%3E%3C/svg%3E");
+  animation: waveMove 16s linear infinite reverse;
   height: 200px;
   bottom: 30px;
   opacity: 0.2;
 
   :global([data-theme='dark']) & {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%2300c8ff' fill-opacity='0.08' d='M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,250.7C960,235,1056,181,1152,165.3C1248,149,1344,171,1392,181.3L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%2300c8ff' fill-opacity='0.08' d='M0,224 C360,160 720,288 1080,224 C1260,192 1350,240 1440,224 L1440,320 L0,320 Z'%3E%3C/path%3E%3C/svg%3E");
     opacity: 0.3;
   }
 }
@@ -609,14 +633,12 @@ $phi-inv: 38.2%;
   top: 40px;
   left: 48px;
   display: flex;
-  align-items: center;
-  gap: 12px;
   z-index: 10;
 }
 
 .brand-name {
   font-family: 'Swis721 BlkCn BT', Arial, sans-serif;
-  font-size: 22px;
+  font-size: 30px;
   font-weight: 600;
   color: #ffffff;
   letter-spacing: 0.5px;
@@ -746,7 +768,7 @@ $phi-inv: 38.2%;
 
 .login-container {
   width: 100%;
-  max-width: 340px;
+  max-width: 581px;
   padding: 0 40px;
 }
 
@@ -761,15 +783,15 @@ $phi-inv: 38.2%;
 }
 
 .login-header {
-  margin-bottom: 32px;
+  margin-bottom: 40px;
 }
 
 .title {
-  margin: 0 0 8px 0;
+  margin: 0 0 12px 0;
   font-weight: 600;
-  font-size: 26px;
+  font-size: 32px;
   line-height: 1.3;
-  color: #111827;
+  color: #1a1a1a;
 
   :global([data-theme='dark']) & {
     color: #f9fafb;
@@ -778,8 +800,10 @@ $phi-inv: 38.2%;
 
 .subtitle {
   margin: 0;
-  font-size: 14px;
-  color: #6b7280;
+  font-size: 16px;
+  color: #666666;
+  font-weight: 400;
+  line-height: 1.5;
 
   :global([data-theme='dark']) & {
     color: #9ca3af;
@@ -790,35 +814,43 @@ $phi-inv: 38.2%;
   width: 100%;
 }
 
+.login-form :deep(.el-form-item) {
+  margin-bottom: 24px;
+}
+
+.login-input {
+  height: 48px;
+}
+
 .login-input :deep(.el-input__wrapper) {
-  height: 46px;
-  border-radius: 10px;
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
-  box-shadow: none;
+  height: 48px !important;
+  min-height: 48px !important;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px #dbdbdb inset;
   transition: all 0.25s ease;
-  padding: 0 14px;
+  padding: 0 16px;
+  padding-left: 0;
+  position: relative;
 
   :global([data-theme='dark']) & {
     background-color: #111827;
-    border-color: #374151;
+    box-shadow: 0 0 0 1px #374151 inset;
   }
 
   &:hover {
-    border-color: #d1d5db;
+    box-shadow: 0 0 0 1px #019c7c inset;
 
     :global([data-theme='dark']) & {
-      border-color: #4b5563;
+      box-shadow: 0 0 0 1px #4b5563 inset;
     }
   }
 
-  &.is-focus {
-    border-color: #019c7c !important;
-    box-shadow: 0 0 0 4px rgba(1, 156, 124, 0.08) !important;
+}
 
-    :global([data-theme='dark']) & {
-      border-color: #00c896 !important;
-      box-shadow: 0 0 0 4px rgba(0, 200, 150, 0.1) !important;
+.login-input {
+  &.is-field-valid {
+    :deep(.el-input__wrapper) {
+      box-shadow: 0 0 0 1px #019c7c inset !important;
     }
   }
 }
@@ -826,13 +858,14 @@ $phi-inv: 38.2%;
 .login-input :deep(.el-input__inner) {
   height: 100%;
   font-size: 14px;
-  color: #111827;
+  color: #333333;
   background-color: transparent;
   border: none;
   box-shadow: none;
+  padding-left: 56px;
 
   &::placeholder {
-    color: #9ca3af;
+    color: #999999;
   }
 
   :global([data-theme='dark']) & {
@@ -845,36 +878,109 @@ $phi-inv: 38.2%;
 }
 
 .login-input :deep(.el-input__prefix) {
-  color: #9ca3af;
-  margin-right: 8px;
+  color: #019c7c;
+  margin-right: 0;
+  padding: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.login-input :deep(.el-input__prefix)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 24px;
+  background-color: #e8e8e8;
 
   :global([data-theme='dark']) & {
-    color: #6b7280;
+    background-color: #374151;
+  }
+}
+
+.login-input :deep(.el-input__prefix-inner) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.login-input :deep(.el-input__icon),
+.login-input :deep(.el-icon) {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  line-height: 1;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-input :deep(.el-input__prefix-inner .el-icon) {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* 后缀图标（清除按钮、密码切换） */
+.login-input :deep(.el-input__suffix) {
+  position: absolute;
+  right: 16px;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.login-input :deep(.el-input__suffix-inner) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.login-input :deep(.el-input__clear),
+.login-input :deep(.el-input__password) {
+  color: #999999;
+  cursor: pointer;
+  
+  &:hover {
+    color: #019c7c;
   }
 }
 
 .login-button {
   width: 100%;
-  height: 46px;
-  font-size: 14px;
+  height: 48px;
+  font-size: 16px;
   font-weight: 500;
-  border-radius: 10px;
-  background: #111827;
+  border-radius: 8px;
+  background: #019c7c;
   border: none;
-  margin-top: 8px;
+  margin-top: 32px;
   transition: all 0.25s ease;
+  color: #ffffff;
 
   :global([data-theme='dark']) & {
-    background: #00c896;
-    color: #000000;
+    background: #019c7c;
+    color: #ffffff;
   }
 
   &:hover {
-    background: #374151;
+    background: #018a6d;
     transform: translateY(-1px);
 
     :global([data-theme='dark']) & {
-      background: color.adjust(#00c896, $lightness: -5%);
+      background: #018a6d;
     }
   }
 
@@ -893,7 +999,7 @@ $phi-inv: 38.2%;
 
 .forgot-link {
   font-size: 13px;
-  color: #6b7280;
+  color: #999999;
   transition: color 0.25s ease;
 
   :global([data-theme='dark']) & {
@@ -904,14 +1010,14 @@ $phi-inv: 38.2%;
     color: #019c7c;
 
     :global([data-theme='dark']) & {
-      color: #00c896;
+      color: #019c7c;
     }
   }
 }
 
 .login-form :deep(.el-checkbox__label) {
   font-size: 13px;
-  color: #374151;
+  color: #666666;
   padding-left: 6px;
 
   :global([data-theme='dark']) & {
@@ -920,14 +1026,18 @@ $phi-inv: 38.2%;
 }
 
 .login-form :deep(.el-checkbox__inner) {
-  border-radius: 5px;
-  border-color: #d1d5db;
+  border-radius: 4px;
+  border-color: #d9d9d9;
   width: 16px;
   height: 16px;
 
   :global([data-theme='dark']) & {
     border-color: #4b5563;
     background-color: transparent;
+  }
+
+  &:hover {
+    border-color: #019c7c;
   }
 }
 
@@ -936,8 +1046,16 @@ $phi-inv: 38.2%;
   border-color: #019c7c;
 
   :global([data-theme='dark']) & {
-    background-color: #00c896;
-    border-color: #00c896;
+    background-color: #019c7c;
+    border-color: #019c7c;
+  }
+}
+
+.login-form :deep(.el-checkbox__input.is-checked + .el-checkbox__label) {
+  color: #019c7c;
+
+  :global([data-theme='dark']) & {
+    color: #019c7c;
   }
 }
 
