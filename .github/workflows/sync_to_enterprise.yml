@@ -1,3 +1,4 @@
+# 同步社区版代码到企业版
 name: Sync to Enterprise
 
 on:
@@ -10,43 +11,40 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout source code
+      # 1. 检出当前仓库
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Sync to enterprise repo
-        env:
-          TOKEN: ${{ secrets.ENTERPRISE_REPO_TOKEN }}
+      # 2. 配置远程仓库
+      - name: Configure remote
         run: |
-          # 设置 git config
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-          
-          # 用认证 URL
-          REPO_URL="https://x-access-token:$TOKEN@github.com/cedar-v/license-manager-enterprise.git"
-          
-          echo "Cloning enterprise repo..."
-          git clone "$REPO_URL" /tmp/enterprise-repo
-          
-          cd /tmp/enterprise-repo
-          
-          # 清理 enterprise repo 里的 .git（避免复制过来的）
-          rm -rf .git
-          
-          # 从原始仓库复制文件，排除 .git 目录
-          cd "$GITHUB_WORKSPACE"
-          cp -r . /tmp/enterprise-repo/
-          
-          cd /tmp/enterprise-repo
-          git init
-          git add -A
-          git -c "user.email=github-actions[bot]@users.noreply.github.com" \
-              -c "user.name=github-actions[bot]" \
-              commit -m "Sync from license-manager - $(date)" || echo "Nothing to commit"
-          
-          # 显式设置 remote 并 push
-          git remote add enterprise "$REPO_URL"
-          git push enterprise master --force
-          
-          echo "Done!"
+          git remote add enterprise https://${{ secrets.ENTERPRISE_GH_TOKEN }}@github.com/cedar-v/license-manager-enterprise.git
+          git remote -v
+        shell: bash
+
+      # 3. 配置 Git 用户信息
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+        shell: bash
+
+      # 4. 切换到 license-manager 分支，不存在则创建
+      - name: Switch to license-manager branch
+        run: |
+          git checkout license-manager || git checkout -b license-manager
+        shell: bash
+
+      # 5. 合并 main 分支的更新
+      - name: Merge main to license-manager
+        run: |
+          git merge origin/main --no-edit
+        shell: bash
+
+      # 6. 推送到企业版仓库
+      - name: Push to enterprise
+        run: |
+          git push enterprise license-manager --force
+        shell: bash
