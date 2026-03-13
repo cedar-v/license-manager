@@ -15,20 +15,47 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Debug info
+        env:
+          TOKEN: ${{ secrets.ENTERPRISE_REPO_TOKEN }}
+        run: |
+          echo "=== Debug Info ==="
+          echo "Token prefix: ${TOKEN:0:10}"
+          
+          # 用 gh API 检查仓库是否存在
+          echo "Checking repo via API..."
+          curl -s -H "Authorization: token $TOKEN" \
+            "https://api.github.com/repos/cedar-v/license-manager-enterprise" | head -20
+          
+          echo ""
+          echo "Checking user repos..."
+          curl -s -H "Authorization: token $TOKEN" \
+            "https://api.github.com/user/repos?per_page=100" | grep -o '"full_name":"[^"]*license-manager[^"]*"' || echo "No matching repo found"
+
       - name: Sync to enterprise repo
         env:
           TOKEN: ${{ secrets.ENTERPRISE_REPO_TOKEN }}
         run: |
-          # 使用 gh CLI
-          echo "Checking gh auth..."
-          echo "$TOKEN" | gh auth login --hostname github.com --with-token
+          # 直接用认证 URL clone 和 push
+          REPO_URL="https://x-access-token:$TOKEN@github.com/cedar-v/license-manager-enterprise.git"
           
-          gh auth status
+          echo "Cloning enterprise repo..."
+          git clone "$REPO_URL" /tmp/enterprise-repo || {
+            echo "Clone failed!"
+            exit 1
+          }
           
-          echo "Setting up git remote..."
-          git remote add enterprise https://github.com/cedar-v/license-manager-enterprise.git
+          cd /tmp/enterprise-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          echo "Pushing to enterprise..."
-          git push enterprise main:license-manager --force
+          echo "Copying files..."
+          cd "$GITHUB_WORKSPACE"
+          cp -r . /tmp/enterprise-repo/
+          
+          cd /tmp/enterprise-repo
+          git add -A
+          git commit -m "Sync from license-manager - $(date)" || echo "Nothing to commit"
+          git push origin master --force
           
           echo "Done!"
