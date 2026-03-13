@@ -1,0 +1,28 @@
+name: Sync to Enterprise
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Add enterprise remote
+        run: |
+          git remote add enterprise https://x-access-token:${{ secrets.ENTERPRISE_REPO_TOKEN }}@github.com/cedar-v/license-manager-enterprise.git
+
+      - name: Push to enterprise license-manager branch
+        run: |
+          git push enterprise main:license-manager --force

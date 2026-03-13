@@ -14,8 +14,8 @@ cd license-manager
 # 查看当前远程仓库（应该只有 origin 指向开源项目）
 git remote -v
 
-# 添加你的私有仓库（命名为 private）
-git remote add private https://github.com/cedar-v/license-manager-sszn.git
+# 添加你的私有仓库（命名为 enterprise）
+git remote add enterprise https://github.com/cedar-v/license-manager-enterprise.git
 
 # 验证（现在应该有两个远程仓库）
 git remote -v
@@ -25,8 +25,8 @@ git remote -v
 ```
 origin    https://github.com/cedar-v/license-manager.git (fetch)
 origin    https://github.com/cedar-v/license-manager.git (push)
-private   https://github.com/cedar-v/license-manager-sszn.git (fetch)
-private   https://github.com/cedar-v/license-manager-sszn.git (push)
+enterprise   https://github.com/cedar-v/license-manager-enterprise.git (fetch)
+enterprise   https://github.com/cedar-v/license-manager-enterprise.git (push)
 ```
 
 ### 第三步：创建并切换到 license-manager 分支
@@ -35,7 +35,7 @@ private   https://github.com/cedar-v/license-manager-sszn.git (push)
 git checkout -b license-manager
 
 # 推送到私有仓库
-git push -u private license-manager
+git push -u enterprise license-manager
 ```
 
 ---
@@ -55,7 +55,7 @@ git pull origin main
 # git pull origin master
 
 # 3. 推送到你的私有仓库
-git push private license-manager
+git push enterprise license-manager
 ```
 
 ---
@@ -69,6 +69,6 @@ git push private license-manager
 #!/bin/bash
 git checkout license-manager
 git pull origin main
-git push private license-manager
+git push enterprise license-manager
 echo "同步完成！"
 ```
