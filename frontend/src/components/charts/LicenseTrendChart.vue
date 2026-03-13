@@ -121,7 +121,6 @@ const appStore = useAppStore()
 
 // 快捷选择选项
 const quickOptions = computed(() => [
-  { label: t('chart.licenseTrend.quickOptions.today'), value: 'today' },
   { label: t('chart.licenseTrend.quickOptions.week'), value: 'week' },
   { label: t('chart.licenseTrend.quickOptions.month'), value: 'month' }
 ])
@@ -160,11 +159,11 @@ const chartOption = computed(() => {
   
   return {
     grid: {
-      left: 60,
-      right: 30,
+      left: '3%',   // percentage so margins scale with container width
+      right: '3%',
       top: 30,
-      bottom: 60,
-      containLabel: false
+      bottom: 30,   // reduced: containLabel handles room for axis labels
+      containLabel: true // axis labels are always contained within the grid boundary
     },
     xAxis: {
       type: 'category',
@@ -217,6 +216,7 @@ const chartOption = computed(() => {
         fontSize: 12
       },
       extraCssText: 'box-shadow: 0px 4px 12px 0px rgba(59, 210, 180, 0.2); backdrop-filter: blur(4px);',
+      appendToBody: true, // mount tooltip DOM on <body> to escape overflow:hidden on card
       formatter: (params: any) => {
         const data = params[0]
         return `${t('chart.licenseTrend.tooltip.licenseCount')}: ${data.value}`
@@ -277,24 +277,17 @@ const handleQuickSelect = (value: string) => {
   let endDate: Date
   
   switch (value) {
-    case 'today':
-      // 本日：今天到今天
+    case 'week':
+      // 最近7天：今天往前6天
       startDate = new Date(today)
+      startDate.setDate(today.getDate() - 6)
       endDate = new Date(today)
       break
-    case 'week':
-      // 本周：本周一到本周日
-      const currentDay = today.getDay() // 0=周日, 1=周一, ..., 6=周六
-      const mondayOffset = currentDay === 0 ? 6 : currentDay - 1 // 计算到周一的偏移
-      startDate = new Date(today)
-      startDate.setDate(today.getDate() - mondayOffset)
-      endDate = new Date(startDate)
-      endDate.setDate(startDate.getDate() + 6) // 周日
-      break
     case 'month':
-      // 本月：当前月1号到当前月末
-      startDate = new Date(today.getFullYear(), today.getMonth(), 1)
-      endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0) // 下个月0号=本月最后一天
+      // 最近30天：今天往前29天
+      startDate = new Date(today)
+      startDate.setDate(today.getDate() - 29)
+      endDate = new Date(today)
       break
     default:
       return
@@ -395,7 +388,7 @@ onMounted(() => {
   border-radius: 0.42vw; /* 8px/1920 = 0.42vw */
   box-shadow: var(--app-shadow);
   overflow: hidden;
-  height: 100%; /* 充满容器高度 */
+  /* Height is driven by the chart canvas below; card grows to fit content */
   display: flex;
   flex-direction: column;
 }
@@ -506,14 +499,15 @@ onMounted(() => {
 
 .chart-container {
   padding: 1.35vw 1.25vw 1.25vw; /* 26px 24px 24px → vw */
-  flex: 1; /* 占据剩余高度 */
+  flex-shrink: 0; /* chart canvas height drives card size — never compress */
   display: flex;
-  min-height: 0; /* 防止flex溢出 */
+  position: relative; /* establish stacking context for chart canvas */
   
   .trend-chart {
     width: 100%;
-    height: 100%; /* 充满容器 */
-    min-height: 12.8vw; /* 最小高度246px/1920 = 12.8vw，确保图表可读性 */
+    height: 18vw;      /* ~346px at 1920px reference width */
+    max-height: 248px; /* keeps total card height ≤ 352px (248 + ~50px padding + ~54px header) */
+    min-height: 200px; /* absolute floor so chart is always readable */
   }
 }
 

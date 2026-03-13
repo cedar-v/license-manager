@@ -716,76 +716,99 @@ func parseJSONField(raw models.JSON) map[string]interface{} {
 	return result
 }
 
-// GetStatsOverview 获取授权概览统计
+// GetStatsOverview returns dashboard overview statistics
 func (s *licenseService) GetStatsOverview(ctx context.Context) (*models.StatsOverviewResponse, error) {
 	lang := pkgcontext.GetLanguageFromContext(ctx)
 
-	// 获取配置信息
+	// Load heartbeat timeout config
 	cfg := config.GetConfig()
 	offlineTimeout := time.Duration(cfg.License.HeartbeatTimeout) * time.Second
 
-	// 计算时间点
 	now := time.Now()
 	onlineThreshold := now.Add(-offlineTimeout)
+
+	// Time boundaries
+	todayStart := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	yesterdayStart := todayStart.AddDate(0, 0, -1)
+	monthStart := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+	expire7d := now.AddDate(0, 0, 7)
+	expire30d := now.AddDate(0, 0, 30)
 	lastMonth := now.AddDate(0, -1, 0)
 
 	var stats models.StatsOverviewResponse
 
-	// 执行统计查询
 	err := s.db.Transaction(func(tx *gorm.DB) error {
-		// 1. 总授权码数量
+		// 1. Total auth codes (stock)
 		if err := tx.Model(&models.AuthorizationCode{}).Count(&stats.TotalAuthCodes).Error; err != nil {
 			return err
 		}
 
-		// 2. 活跃许可证数量（状态为active）
+		// 2. Active licenses (stock)
 		if err := tx.Model(&models.License{}).Where("status = ?", "active").Count(&stats.ActiveLicenses).Error; err != nil {
 			return err
 		}
 
-		// 3. 即将过期数量（授权码在30天内过期，且状态为active）
-		expireThreshold := now.AddDate(0, 0, 30)
-		if err := tx.Model(&models.AuthorizationCode{}).
-			Where("end_date <= ? AND end_date > ? AND is_locked = false", expireThreshold, now).
-			Count(&stats.ExpiringSoon).Error; err != nil {
+		// 3. Licenses created today (flow)
+		if err := tx.Model(&models.License{}).Where("created_at >= ?", todayStart).Count(&stats.TodayNewLicenses).Error; err != nil {
 			return err
 		}
 
-		// 4. 异常告警数量（许可证超时未心跳）
+		// 4. Licenses created yesterday (flow, for comparison)
+		if err := tx.Model(&models.License{}).Where("created_at >= ? AND created_at < ?", yesterdayStart, todayStart).Count(&stats.YesterdayNewLicenses).Error; err != nil {
+			return err
+		}
+
+		// 5. Auth codes created this calendar month (flow)
+		if err := tx.Model(&models.AuthorizationCode{}).Where("created_at >= ?", monthStart).Count(&stats.MonthNewAuthCodes).Error; err != nil {
+			return err
+		}
+
+		// 6. Expiring within 7 days (risk, not locked)
+		if err := tx.Model(&models.AuthorizationCode{}).
+			Where("end_date <= ? AND end_date > ? AND is_locked = false", expire7d, now).
+			Count(&stats.ExpiringIn7Days).Error; err != nil {
+			return err
+		}
+
+		// 7. Expiring within 30 days (risk, not locked)
+		if err := tx.Model(&models.AuthorizationCode{}).
+			Where("end_date <= ? AND end_date > ? AND is_locked = false", expire30d, now).
+			Count(&stats.ExpiringIn30Days).Error; err != nil {
+			return err
+		}
+
+		// 8. Abnormal alerts: active licenses with heartbeat timeout
 		if err := tx.Model(&models.License{}).
 			Where("status = 'active' AND (last_heartbeat < ? OR last_heartbeat IS NULL)", onlineThreshold).
 			Count(&stats.AbnormalAlerts).Error; err != nil {
 			return err
 		}
 
-		// 5. 计算同比上月的授权码和许可证数量（用于计算增长率）
+		// 9. MoM growth rates (sub-text only, not standalone cards)
 		var lastMonthAuthCodes, lastMonthActiveLicenses int64
 
-		// 上月同期授权码总数（一个月前同一时刻的累计总数）
 		if err := tx.Model(&models.AuthorizationCode{}).
 			Where("created_at <= ?", lastMonth).
 			Count(&lastMonthAuthCodes).Error; err != nil {
 			return err
 		}
 
-		// 上月同期活跃许可证总数（一个月前同一时刻的状态为active的许可证数）
 		if err := tx.Model(&models.License{}).
 			Where("status = ? AND created_at <= ?", "active", lastMonth).
 			Count(&lastMonthActiveLicenses).Error; err != nil {
 			return err
 		}
 
-		// 计算增长率（同比上月：当前总数相比一个月前总数的增长率）
 		if lastMonthAuthCodes > 0 {
-			stats.GrowthRate.AuthCodes = float64(stats.TotalAuthCodes-lastMonthAuthCodes) / float64(lastMonthAuthCodes) * 100
-		} else {
-			stats.GrowthRate.AuthCodes = 0
+			stats.GrowthRate.AuthCodesMoM = float64(stats.TotalAuthCodes-lastMonthAuthCodes) / float64(lastMonthAuthCodes) * 100
+		} else if stats.TotalAuthCodes > 0 {
+			stats.GrowthRate.AuthCodesMoM = 100.0
 		}
 
 		if lastMonthActiveLicenses > 0 {
-			stats.GrowthRate.Licenses = float64(stats.ActiveLicenses-lastMonthActiveLicenses) / float64(lastMonthActiveLicenses) * 100
-		} else {
-			stats.GrowthRate.Licenses = 0
+			stats.GrowthRate.LicensesMoM = float64(stats.ActiveLicenses-lastMonthActiveLicenses) / float64(lastMonthActiveLicenses) * 100
+		} else if stats.ActiveLicenses > 0 {
+			stats.GrowthRate.LicensesMoM = 100.0
 		}
 
 		return nil

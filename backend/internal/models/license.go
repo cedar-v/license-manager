@@ -169,19 +169,30 @@ type HeartbeatResponse struct {
 	HeartbeatInterval int     `json:"heartbeat_interval"` // 下次心跳间隔(秒)
 }
 
-// StatsOverviewResponse 授权概览统计响应结构
+// StatsOverviewResponse stats overview API response
 type StatsOverviewResponse struct {
-	TotalAuthCodes int64      `json:"total_auth_codes"` // 总授权码数量（所有授权码的累计总数）
-	ActiveLicenses int64      `json:"active_licenses"`  // 活跃许可证数量（状态为active的许可证总数）
-	ExpiringSoon   int64      `json:"expiring_soon"`    // 即将过期数量（30天内即将过期的授权码，且未被锁定）
-	AbnormalAlerts int64      `json:"abnormal_alerts"`  // 异常告警数量（活跃许可证中心跳超时的数量，超过配置的心跳超时时间未收到心跳）
-	GrowthRate     GrowthRate `json:"growth_rate"`      // 增长率（同比上月）
+	// Stock metrics
+	TotalAuthCodes int64 `json:"total_auth_codes"` // total authorization codes ever created
+	ActiveLicenses int64 `json:"active_licenses"`  // licenses with status=active
+
+	// Flow metrics
+	TodayNewLicenses     int64 `json:"today_new_licenses"`      // licenses created today
+	YesterdayNewLicenses int64 `json:"yesterday_new_licenses"`  // licenses created yesterday (for comparison)
+	MonthNewAuthCodes    int64 `json:"month_new_auth_codes"`    // auth codes created this calendar month
+
+	// Risk metrics
+	ExpiringIn7Days  int64 `json:"expiring_in_7days"`  // auth codes expiring within 7 days, not locked
+	ExpiringIn30Days int64 `json:"expiring_in_30days"` // auth codes expiring within 30 days, not locked
+	AbnormalAlerts   int64 `json:"abnormal_alerts"`    // active licenses with heartbeat timeout
+
+	// Growth rates shown as sub-text, not standalone cards
+	GrowthRate GrowthRate `json:"growth_rate"`
 }
 
-// GrowthRate 增长率结构（同比上月：当前值相比一个月前同一时刻值的增长率）
+// GrowthRate month-over-month growth rates (shown as sub-text on dashboard cards)
 type GrowthRate struct {
-	AuthCodes float64 `json:"auth_codes"` // 授权码增长率(%)（当前总授权码数相比一个月前总授权码数的增长率）
-	Licenses  float64 `json:"licenses"`   // 许可证增长率(%)（当前活跃许可证数相比一个月前活跃许可证数的增长率）
+	AuthCodesMoM float64 `json:"auth_codes_mom"` // auth codes MoM growth rate (%)
+	LicensesMoM  float64 `json:"licenses_mom"`   // active licenses MoM growth rate (%)
 }
 
 // DeviceListRequest 设备列表查询请求结构（客户用户接口）

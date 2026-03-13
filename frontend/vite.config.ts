@@ -4,6 +4,9 @@ import vue from '@vitejs/plugin-vue'
 import path from 'path'
 import { visualizer } from 'rollup-plugin-visualizer' // 打包分析插件
 import { constants } from 'zlib' // 静态引入zlib常量
+import Components from 'unplugin-vue-components/vite'
+import AutoImport from 'unplugin-auto-import/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
 // 获取当前时间戳，用于构建输出的文件名
 const Timestamp = new Date().getTime();
@@ -69,6 +72,19 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         }
       }),
 
+      // Auto-import Element Plus components from templates
+      Components({
+        resolvers: [ElementPlusResolver({ importStyle: 'css' })],
+        dts: false
+      }),
+
+      // Auto-import Element Plus APIs (ElMessage, ElNotification, etc.)
+      AutoImport({
+        resolvers: [ElementPlusResolver()],
+        imports: ['vue', 'vue-router', 'pinia'],
+        dts: false
+      }),
+
       // 打包分析插件（仅在显式启用时生效；容器/CI 默认不打开浏览器）
       enableVisualizer && visualizer({ open: false })
     ].filter(Boolean), // 过滤掉false的插件
@@ -100,9 +116,14 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         'element-plus',
         '@element-plus/icons-vue',
         'axios',
-        'vue-i18n'
-      ],
-      exclude: ['@vueuse/core'] // 排除某些包的预构建
+        'vue-i18n',
+        'echarts/core',
+        'echarts/charts',
+        'echarts/components',
+        'echarts/renderers',
+        'vue-echarts',
+        '@vueuse/core'
+      ]
     },
 
     // 模块解析配置
@@ -152,15 +173,17 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         output: {
           // 优化的手动分块策略
           manualChunks: {
-            // Vue核心
+            // Vue core
             vue: ['vue', 'vue-router', 'pinia'],
-            // Element Plus相关
+            // Element Plus (tree-shaken via auto-import, but base bundle still needed)
             elementPlus: ['element-plus'],
-            // Element Plus图标
+            // Element Plus icons
             elementIcons: ['@element-plus/icons-vue'],
-            // 工具库
+            // ECharts (large library, isolated for better caching)
+            echarts: ['echarts', 'vue-echarts'],
+            // Utilities
             utils: ['axios'],
-            // 其他第三方库单独打包
+            // i18n
             vendor: ['vue-i18n']
           },
           // 输出文件命名规则（优化缓存策略）

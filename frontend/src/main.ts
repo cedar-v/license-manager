@@ -10,11 +10,6 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 
-// Noto Sans SC 字体（@fontsource 提供预优化子集化版本）
-import '@fontsource/noto-sans-sc/400.css'
-import '@fontsource/noto-sans-sc/500.css'
-import '@fontsource/noto-sans-sc/700.css'
-
 // 全局样式系统
 import './assets/styles/fonts.css' // 其他本地字体
 import './assets/styles/global.scss'
@@ -25,10 +20,9 @@ import pinia from './store'
 import { useAppStore } from './store/modules/app'
 import { useUserStore } from './store/modules/user'
 
-import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-import i18n, { getCurrentElementLocale } from './i18n'
+import i18n from './i18n'
 
 
 const app = createApp(App)
@@ -38,10 +32,6 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
 
-// 正确配置Element Plus语言包
-app.use(ElementPlus, {
-  locale: getCurrentElementLocale()
-})
 app.use(pinia)
 app.use(i18n)
 app.use(router)

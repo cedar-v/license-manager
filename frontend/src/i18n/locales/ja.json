@@ -17,7 +17,23 @@
       "usernameMinLength": "ユーザー名は3文字以上である必要があります",
       "passwordRequired": "パスワードを入力してください",
       "passwordMinLength": "パスワードは6文字以上である必要があります"
-    }
+    },
+    "heroTitleLine1": "セキュアな",
+    "heroTitleLine2": "ライセンス管理",
+    "heroSubtitle": "エンタープライズグレードのプラットフォームで、ソフトウェアライセンス管理を効率化。",
+    "stats": {
+      "totalAuthCodes": "認可コード総数",
+      "totalAuthCodesSubLabel": "今月 2.4K 件追加",
+      "activeLicenses": "アクティブライセンス",
+      "activeLicensesSubLabel": "先月比 +12%",
+      "systemUptime": "システム稼働率",
+      "systemUptimeSubLabel": "24/7 オンライン",
+      "uptime": "稼働率",
+      "support": "サポート"
+    },
+    "welcomeTitle": "おかえりなさい",
+    "welcomeSubtitle": "アカウントにサインインして続けてください",
+    "copyright": "© 2025 Cedar-V. All rights reserved."
   },
   "sidebar": {
     "expand": "サイドバーを展開",
@@ -26,13 +42,19 @@
   "dashboard": {
     "title": "ダッシュボード",
     "stats": {
-      "totalCustomers": "顧客総数",
-      "totalLicenses": "総ライセンス数",
+      "totalAuthCodes": "認可コード総数",
       "activeLicenses": "アクティブライセンス",
-      "expired": "期限切れ",
-      "onlineClients": "オンラインクライアント数",
-      "expiringSoon": "期限近し",
-      "authSuccessRate24h": "24時間認証成功率"
+      "todayNewLicenses": "本日の新規",
+      "expiringIn7Days": "7日以内に期限切れ",
+      "expiringIn30Days": "30日以内に期限切れ",
+      "abnormalAlerts": "異常アラート",
+      "subText": {
+        "monthNew": "今月 {n} 件追加",
+        "vsLastMonth": "先月比 {rate}%",
+        "yesterday": "昨日 {n} 件",
+        "urgent": "緊急対応が必要",
+        "heartbeatTimeout": "ハートビートタイムアウト"
+      }
     },
     "recentLicenses": {
       "title": "最近のライセンス",
@@ -294,9 +316,8 @@
     "licenseTrend": {
       "title": "ライセンストレンド",
       "quickOptions": {
-        "today": "今日",
-        "week": "今週",
-        "month": "今月"
+        "week": "直7日間",
+        "month": "直30日間"
       },
       "datePicker": {
         "rangeSeparator": "から",
@@ -313,9 +334,8 @@
       "endDate": "終了日付",
       "separator": "から",
       "quickOptions": {
-        "today": "今日",
-        "week": "今週",
-        "month": "今月"
+        "week": "直7日間",
+        "month": "直30日間"
       }
     }
   },

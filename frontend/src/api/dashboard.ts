@@ -58,6 +58,27 @@ export const getAuthorizationTrend = (params: {
 }
 
 // 获取仪表盘统计数据（新接口，返回卡片区数据）
-export const getOverviewStats = () => {
+export interface GrowthRate {
+  auth_codes_mom: number
+  licenses_mom: number
+}
+
+export interface StatsOverviewData {
+  // stock metrics
+  total_auth_codes: number
+  active_licenses: number
+  // flow metrics
+  today_new_licenses: number
+  yesterday_new_licenses: number
+  month_new_auth_codes: number
+  // risk metrics
+  expiring_in_7days: number
+  expiring_in_30days: number
+  abnormal_alerts: number
+  // growth rates (sub-text only)
+  growth_rate: GrowthRate
+}
+
+export const getOverviewStats = (): Promise<ApiResponse<StatsOverviewData>> => {
   return Axios.get('/api/v1/stats/overview')
 }

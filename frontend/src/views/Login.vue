@@ -1,66 +1,94 @@
 <template>
   <div class="login-page">
-    <!-- 背景层 -->
-    <div class="background-layer" :style="backgroundStyle"></div>
-
-    <!-- Logo -->
-    <div class="logo-section">
-      <div class="logo-icon">
-        <svg
-          width="54"
-          height="52"
-          viewBox="0 0 54 52"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M26.3125 11.4814L22.25 19.5947V22.7148L27.1191 13.0576L29.7393 18.1777L18.7988 40H0L13.5938 22.8037H14L13.8125 23.1201L7.46875 33.541H17.8438V16.9111L7.1875 25.6475L18.0312 10.1406L11.625 14.4463V14.2588L20.4375 0L26.3125 11.4814Z"
-            fill="#019C7C"
-          />
-          <path
-            d="M34.5498 39.9996H28.75L24.5938 32.8864L27.125 27.6246L34.5498 39.9996ZM41 39.9996H36.2705L27.9346 25.941L30.7188 20.1559L41 39.9996Z"
-            fill="#146B59"
-          />
-        </svg>
+    <!-- 左侧视觉区域 - 黄金比例 61.8% -->
+    <div class="visual-section">
+      <!-- 动画背景层 -->
+      <div class="animated-background">
+        <div class="gradient-bg"></div>
+        <div class="gradient-mesh"></div>
+        <canvas ref="canvasRef" class="connection-canvas"></canvas>
+        <div class="particles-container">
+          <div v-for="n in 50" :key="n" class="particle" :style="getParticleStyle(n)"></div>
+        </div>
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
+        <div class="wave wave-1"></div>
+        <div class="wave wave-2"></div>
+        <div class="grid-lines"></div>
       </div>
-      <span class="logo-text">Cedar-V</span>
+
+      <!-- 品牌标识 -->
+      <div class="brand-header">
+        <div class="brand-logo">
+          <svg width="48" height="48" viewBox="0 0 54 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M26.3125 11.4814L22.25 19.5947V22.7148L27.1191 13.0576L29.7393 18.1777L18.7988 40H0L13.5938 22.8037H14L13.8125 23.1201L7.46875 33.541H17.8438V16.9111L7.1875 25.6475L18.0312 10.1406L11.625 14.4463V14.2588L20.4375 0L26.3125 11.4814Z" fill="#ffffff"/>
+            <path d="M34.5498 39.9996H28.75L24.5938 32.8864L27.125 27.6246L34.5498 39.9996ZM41 39.9996H36.2705L27.9346 25.941L30.7188 20.1559L41 39.9996Z" fill="rgba(255,255,255,0.7)"/>
+          </svg>
+        </div>
+        <span class="brand-name">Cedar-V</span>
+      </div>
+
+      <!-- 左侧主文案 -->
+      <div class="hero-content">
+        <h1 class="hero-title">{{ t('login.heroTitleLine1') }}{{ t('login.heroTitleLine2') }}</h1>
+        <p class="hero-subtitle">{{ t('login.heroSubtitle') }}</p>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <span class="stat-number">10K+</span>
+            <span class="stat-label">{{ t('login.stats.activeLicenses') }}</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-number">99.9%</span>
+            <span class="stat-label">{{ t('login.stats.uptime') }}</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-number">24/7</span>
+            <span class="stat-label">{{ t('login.stats.support') }}</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- 语言切换器 -->
-    <div class="language-switcher">
-      <el-select v-model="currentLanguage" @change="handleLanguageChange" size="default">
-        <el-option label="English" value="en" />
-        <el-option label="中文" value="zh" />
-        <el-option label="日本語" value="ja" />
-      </el-select>
-    </div>
-
-    <!-- 登录区域 -->
+    <!-- 右侧登录区域 - 黄金比例 38.2% -->
     <div class="login-section">
+      <!-- 语言切换器 -->
+      <div class="language-switcher">
+        <el-select v-model="currentLanguage" @change="handleLanguageChange" size="default">
+          <el-option label="English" value="en" />
+          <el-option label="中文" value="zh" />
+          <el-option label="日本語" value="ja" />
+        </el-select>
+      </div>
+
       <div class="login-container">
         <div class="login-card">
-          <h1 class="title">{{ t('login.title') }}</h1>
-          <p class="subtitle">{{ t('login.subtitle') }}</p>
+          <div class="login-header">
+            <h2 class="title">{{ t('login.welcomeTitle') }}</h2>
+            <p class="subtitle">{{ t('login.welcomeSubtitle') }}</p>
+          </div>
+
           <el-form
             ref="loginFormRef"
             :model="loginForm"
             :rules="loginRules"
             @submit.prevent="handleLogin"
             class="login-form"
-            size="large"
           >
-            <!-- 用户名输入框 -->
             <el-form-item prop="username">
               <el-input
                 v-model="loginForm.username"
                 :placeholder="t('login.usernamePlaceholder')"
                 :prefix-icon="User"
                 clearable
-                class="login-input"
+                :class="['login-input', { 'is-field-valid': fieldStatus.username }]"
+                size="large"
+                @blur="validateFieldOnBlur('username')"
               />
             </el-form-item>
 
-            <!-- 密码输入框 -->
             <el-form-item prop="password">
               <el-input
                 v-model="loginForm.password"
@@ -69,12 +97,13 @@
                 :prefix-icon="Lock"
                 show-password
                 clearable
-                class="login-input"
+                :class="['login-input', { 'is-field-valid': fieldStatus.password }]"
+                size="large"
+                @blur="validateFieldOnBlur('password')"
                 @keyup.enter="handleLogin"
               />
             </el-form-item>
 
-            <!-- 记住密码和忘记密码 -->
             <div class="form-options">
               <el-checkbox v-model="rememberMe" size="default">
                 {{ t('login.remember') }}
@@ -89,7 +118,6 @@
               </el-link>
             </div>
 
-            <!-- 登录按钮 -->
             <el-form-item>
               <el-button
                 type="primary"
@@ -102,6 +130,10 @@
               </el-button>
             </el-form-item>
           </el-form>
+
+          <div class="login-footer">
+            <p>{{ t('login.copyright') }}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -109,7 +141,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
@@ -118,35 +150,18 @@ import { Login, type LoginRequest } from '@/api/user'
 import { changeLanguage, type SupportedLocale } from '@/utils/language'
 import { useAppStore } from '@/store/modules/app'
 import { useUserStore } from '@/store/modules/user'
-// 导入背景图片
-import lightBgImg from '@/assets/images/login-background.png'
-import darkBgImg from '@/assets/images/login-background-dark.png'
 
 const router = useRouter()
 const appStore = useAppStore()
 const userStore = useUserStore()
 
-// 动态背景图样式
-const backgroundStyle = computed(() => {
-  const isDark = appStore.theme === 'dark'
-  const backgroundImage = isDark ? `url(${darkBgImg})` : `url(${lightBgImg})`
-
-  return {
-    backgroundImage,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat'
-  }
-})
-
 const { t, locale } = useI18n()
 const loginFormRef = ref<FormInstance>()
+const canvasRef = ref<HTMLCanvasElement>()
 
-// 当前语言
 const currentLanguage = ref(locale.value)
 const loading = ref(false)
 
-// 登录表单数据
 const loginForm = reactive({
   username: '',
   password: ''
@@ -154,7 +169,27 @@ const loginForm = reactive({
 
 const rememberMe = ref(false)
 
-// 表单验证规则
+const fieldStatus = reactive({
+  username: false,
+  password: false
+})
+
+watch(() => loginForm.username, (val) => { if (!val) fieldStatus.username = false })
+watch(() => loginForm.password, (val) => { if (!val) fieldStatus.password = false })
+
+async function validateFieldOnBlur(field: 'username' | 'password') {
+  if (!loginForm[field]) {
+    fieldStatus[field] = false
+    return
+  }
+  try {
+    await loginFormRef.value?.validateField(field)
+    fieldStatus[field] = true
+  } catch {
+    fieldStatus[field] = false
+  }
+}
+
 const loginRules: FormRules = {
   username: [
     { required: true, message: () => t('login.error.usernameRequired'), trigger: 'blur' },
@@ -166,18 +201,108 @@ const loginRules: FormRules = {
   ]
 }
 
-// 切换语言
+function getParticleStyle(_index: number) {
+  const size = Math.random() * 8 + 4
+  const left = Math.random() * 100
+  const delay = Math.random() * 15
+  const duration = Math.random() * 8 + 10
+  const opacity = Math.random() * 0.5 + 0.3
+
+  return {
+    width: `${size}px`,
+    height: `${size}px`,
+    left: `${left}%`,
+    animationDelay: `${delay}s`,
+    animationDuration: `${duration}s`,
+    opacity: opacity
+  }
+}
+
+let animationId: number
+let particles: Array<{ x: number; y: number; vx: number; vy: number; radius: number }> = []
+
+function initCanvas() {
+  const canvas = canvasRef.value
+  if (!canvas) return
+
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return
+
+  const resizeCanvas = () => {
+    const parent = canvas.parentElement
+    if (parent) {
+      canvas.width = parent.offsetWidth
+      canvas.height = parent.offsetHeight
+    }
+  }
+  resizeCanvas()
+  window.addEventListener('resize', resizeCanvas)
+
+  const particleCount = 25
+  particles = []
+  for (let i = 0; i < particleCount; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.5,
+      vy: (Math.random() - 0.5) * 0.5,
+      radius: Math.random() * 2 + 1
+    })
+  }
+
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+  const primaryColor = isDark ? '0, 200, 150' : '1, 156, 124'
+
+  function animate() {
+    if (!ctx || !canvas) return
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+    particles.forEach((particle, i) => {
+      particle.x += particle.vx
+      particle.y += particle.vy
+      if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1
+      if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1
+
+      ctx.beginPath()
+      ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2)
+      ctx.fillStyle = `rgba(${primaryColor}, 0.6)`
+      ctx.fill()
+
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[j].x - particle.x
+        const dy = particles[j].y - particle.y
+        const distance = Math.sqrt(dx * dx + dy * dy)
+        if (distance < 150) {
+          ctx.beginPath()
+          ctx.moveTo(particle.x, particle.y)
+          ctx.lineTo(particles[j].x, particles[j].y)
+          const opacity = (1 - distance / 150) * 0.3
+          ctx.strokeStyle = `rgba(${primaryColor}, ${opacity})`
+          ctx.lineWidth = 1
+          ctx.stroke()
+        }
+      }
+    })
+
+    animationId = requestAnimationFrame(animate)
+  }
+
+  animate()
+
+  return () => {
+    window.removeEventListener('resize', resizeCanvas)
+    cancelAnimationFrame(animationId)
+  }
+}
+
 function handleLanguageChange(lang: string) {
-  // 使用统一的语言管理器切换语言
   changeLanguage(lang as SupportedLocale)
   currentLanguage.value = lang
 }
 
 onMounted(() => {
-  // 确保主题正确初始化
   appStore.initTheme()
 
-  // 记住密码功能
   const saved = localStorage.getItem('loginInfo')
   if (saved) {
     const info = JSON.parse(saved)
@@ -186,8 +311,16 @@ onMounted(() => {
     rememberMe.value = true
   }
 
-  // 同步当前语言状态
   currentLanguage.value = locale.value
+
+  const cleanup = initCanvas()
+  onUnmounted(() => {
+    cleanup?.()
+  })
+})
+
+onUnmounted(() => {
+  if (animationId) cancelAnimationFrame(animationId)
 })
 
 function handleForgotPassword() {
@@ -196,26 +329,19 @@ function handleForgotPassword() {
 
 async function handleLogin() {
   if (!loginFormRef.value) return
-
   try {
     const valid = await loginFormRef.value.validate()
     if (!valid) return
 
     loading.value = true
-
     const loginData: LoginRequest = {
       username: loginForm.username,
       password: loginForm.password
     }
 
     const response = await Login(loginData)
-    console.log('登录响应:', response)
-
-    // 检查响应是否成功 (支持 code 000000)
     if (response.code === '000000') {
-      // 登录成功，存储用户信息到store
-      if (response.data && response.data.token && response.data.user_info) {
-        // 使用store的方法存储登录数据
+      if (response.data?.token && response.data?.user_info) {
         userStore.setLoginData(response.data.token, {
           username: response.data.user_info.username,
           role: response.data.user_info.role
@@ -223,13 +349,10 @@ async function handleLogin() {
       }
 
       if (rememberMe.value) {
-        localStorage.setItem(
-          'loginInfo',
-          JSON.stringify({
-            username: loginForm.username,
-            password: loginForm.password
-          })
-        )
+        localStorage.setItem('loginInfo', JSON.stringify({
+          username: loginForm.username,
+          password: loginForm.password
+        }))
       } else {
         localStorage.removeItem('loginInfo')
       }
@@ -240,11 +363,8 @@ async function handleLogin() {
       ElMessage.error(response.message)
     }
   } catch (error: any) {
-    // 使用后端返回的错误信息
-    let errorMessage = error.backendMessage || error.response?.data?.message || error.message
-    if (errorMessage) {
-      ElMessage.error(errorMessage)
-    }
+    const errorMessage = error.backendMessage || error.response?.data?.message || error.message
+    if (errorMessage) ElMessage.error(errorMessage)
   } finally {
     loading.value = false
   }
@@ -252,698 +372,751 @@ async function handleLogin() {
 </script>
 
 <style lang="scss" scoped>
-// Variables and mixins are auto-injected via Vite configuration
 @use 'sass:color';
 
-/* 基础页面样式 */
+/* 黄金比例: 61.8% / 38.2% */
+$phi: 61.8%;
+$phi-inv: 38.2%;
+
 .login-page {
   position: relative;
   width: 100vw;
   height: 100vh;
   min-height: 100vh;
-  display: flex;
   overflow: hidden;
-  background-color: var(--app-bg-color);
-  transition: background-color 0.3s ease;
+  display: flex;
 
   @include mobile {
     flex-direction: column;
   }
 }
 
-/* 背景层样式 */
-.background-layer {
+/* 左侧视觉区域 - 61.8% */
+.visual-section {
+  position: relative;
+  width: $phi;
+  height: 100%;
+  overflow: hidden;
+  background: linear-gradient(145deg, #0a3d2e 0%, #0d5c48 40%, #0f766e 100%);
+
+  :global([data-theme='dark']) & {
+    background: linear-gradient(145deg, #052e22 0%, #064335 40%, #065a52 100%);
+  }
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
+}
+
+/* 动画背景层 */
+.animated-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.gradient-bg {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: 
+    radial-gradient(ellipse at 25% 25%, rgba(255, 255, 255, 0.12) 0%, transparent 45%),
+    radial-gradient(ellipse at 75% 75%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+  animation: gradientMove 25s ease-in-out infinite;
+
+  :global([data-theme='dark']) & {
+    background: 
+      radial-gradient(ellipse at 25% 25%, rgba(0, 255, 200, 0.12) 0%, transparent 45%),
+      radial-gradient(ellipse at 75% 75%, rgba(0, 200, 255, 0.08) 0%, transparent 40%),
+      radial-gradient(ellipse at 50% 50%, rgba(0, 255, 200, 0.05) 0%, transparent 50%);
+    animation: gradientMoveDark 18s ease-in-out infinite;
+  }
+}
+
+@keyframes gradientMove {
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+  33% { transform: translate(3%, -2%) rotate(2deg) scale(1.05); }
+  66% { transform: translate(-2%, 3%) rotate(-1deg) scale(1.02); }
+}
+
+@keyframes gradientMoveDark {
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); filter: hue-rotate(0deg); }
+  33% { transform: translate(4%, -3%) rotate(3deg) scale(1.08); filter: hue-rotate(8deg); }
+  66% { transform: translate(-3%, 4%) rotate(-2deg) scale(1.04); filter: hue-rotate(-5deg); }
+}
+
+.gradient-mesh {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: meshFloat 12s linear infinite;
+
+  :global([data-theme='dark']) & {
+    background: 
+      linear-gradient(90deg, rgba(0, 255, 200, 0.03) 1px, transparent 1px),
+      linear-gradient(rgba(0, 255, 200, 0.03) 1px, transparent 1px);
+  }
+}
+
+@keyframes meshFloat {
+  0% { background-position: 0 0, 0 0; }
+  100% { background-position: 60px 60px, 60px 60px; }
+}
+
+.connection-canvas {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   z-index: 1;
-  transition: all 0.3s ease;
-
-  @include mobile {
-    filter: blur(2px);
-    position: fixed;
-  }
 }
 
-/* Logo区域样式 */
-.logo-section {
-  position: absolute;
-  top: $spacing-extra-large;
-  left: $spacing-extra-large;
-  @include flex-center-vertical;
-  gap: $spacing-base;
-  z-index: 100;
-
-  @include tablet {
-    position: fixed;
-    top: $spacing-medium;
-    left: $spacing-medium;
-    z-index: 300;
-  }
-
-  @include mobile {
-    position: fixed;
-    top: $spacing-medium;
-    left: $spacing-medium;
-    z-index: 300;
-    transform: scale(0.8);
-    transform-origin: left top;
-  }
-}
-
-.logo-icon {
-  position: relative;
-  width: 56px; // 改为56px符合8px栅格
-  height: 56px; // 改为56px符合8px栅格
-  flex-shrink: 0;
-  transition: all 0.3s ease;
-
-  // 暗模式下为Logo添加发光效果
-  :global([data-theme='dark']) & {
-    filter: drop-shadow(0 0 8px rgba(1, 156, 124, 0.4));
-
-    svg {
-      path {
-        &:first-child {
-          filter: drop-shadow(0 0 2px rgba(1, 156, 124, 0.6));
-        }
-      }
-    }
-  }
-}
-
-.logo-text {
-  font-family: 'Swis721 BlkCn BT', Arial, sans-serif;
-  font-weight: 400;
-  font-size: 24px; // 改为24px符合8px栅格
-  line-height: 1.2;
-  color: var(--app-text-primary);
-  transition: color 0.3s ease;
-  @include text-ellipsis;
-
-  @include mobile {
-    font-size: 24px; // 改为24px符合8px栅格
-  }
-}
-
-/* 登录区域样式 */
-.login-section {
+.particles-container {
   position: absolute;
   top: 0;
-  right: 0;
-  width: min(900px, 50vw);
-  height: 100vh;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(30px);
-  box-shadow: var(--app-shadow);
-  @include flex-center;
-  z-index: 50;
-  padding: $spacing-large;
-  box-sizing: border-box;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.particle {
+  position: absolute;
+  bottom: -20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.2));
+  border-radius: 50%;
+  animation: floatUp linear infinite;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+
+  :global([data-theme='dark']) & {
+    background: linear-gradient(135deg, rgba(0, 255, 200, 0.6), rgba(0, 200, 150, 0.3));
+    box-shadow: 0 0 16px rgba(0, 255, 200, 0.5);
+  }
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 0; }
+  5% { opacity: 0.8; }
+  95% { opacity: 0.4; }
+  100% { transform: translateY(-120vh) scale(0.3) rotate(360deg); opacity: 0; }
+}
+
+.glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  animation: orbFloat 25s ease-in-out infinite;
+  z-index: 0;
+}
+
+.orb-1 {
+  width: 400px;
+  height: 400px;
+  top: 15%;
+  left: 15%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+  animation-delay: 0s;
+
+  :global([data-theme='dark']) & {
+    background: radial-gradient(circle, rgba(0, 255, 200, 0.15) 0%, transparent 70%);
+  }
+}
+
+.orb-2 {
+  width: 280px;
+  height: 280px;
+  top: 55%;
+  right: 20%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  animation-delay: -8s;
+
+  :global([data-theme='dark']) & {
+    background: radial-gradient(circle, rgba(0, 200, 255, 0.12) 0%, transparent 70%);
+  }
+}
+
+.orb-3 {
+  width: 200px;
+  height: 200px;
+  bottom: 25%;
+  left: 35%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+  animation-delay: -16s;
+
+  :global([data-theme='dark']) & {
+    background: radial-gradient(circle, rgba(100, 255, 200, 0.1) 0%, transparent 70%);
+  }
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(40px, -30px) scale(1.08); }
+  66% { transform: translate(-20px, 25px) scale(0.95); }
+}
+
+.wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  height: 200px;
+  background-repeat: repeat-x;
+  background-size: 50% 100%;
+  opacity: 0.35;
+
+  :global([data-theme='dark']) & { opacity: 0.45; }
+}
+
+.wave-1 {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%23ffffff' fill-opacity='0.15' d='M0,192 C240,256 480,128 720,192 C960,256 1200,128 1440,192 L1440,320 L0,320 Z'%3E%3C/path%3E%3C/svg%3E");
+  animation: waveMove 12s linear infinite;
+  height: 240px;
+
+  :global([data-theme='dark']) & {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%2300ffc8' fill-opacity='0.12' d='M0,192 C240,256 480,128 720,192 C960,256 1200,128 1440,192 L1440,320 L0,320 Z'%3E%3C/path%3E%3C/svg%3E");
+  }
+}
+
+.wave-2 {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%23ffffff' fill-opacity='0.08' d='M0,224 C360,160 720,288 1080,224 C1260,192 1350,240 1440,224 L1440,320 L0,320 Z'%3E%3C/path%3E%3C/svg%3E");
+  animation: waveMove 16s linear infinite reverse;
+  height: 200px;
+  bottom: 30px;
+  opacity: 0.2;
+
+  :global([data-theme='dark']) & {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%2300c8ff' fill-opacity='0.08' d='M0,224 C360,160 720,288 1080,224 C1260,192 1350,240 1440,224 L1440,320 L0,320 Z'%3E%3C/path%3E%3C/svg%3E");
+    opacity: 0.3;
+  }
+}
+
+@keyframes waveMove {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.grid-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 100px 100px;
+
+  :global([data-theme='dark']) & {
+    background-image: 
+      linear-gradient(rgba(0, 200, 150, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 200, 150, 0.02) 1px, transparent 1px);
+  }
+}
+
+/* 品牌头部 */
+.brand-header {
+  position: absolute;
+  top: 40px;
+  left: 48px;
+  display: flex;
+  z-index: 10;
+}
+
+.brand-name {
+  font-family: 'Swis721 BlkCn BT', Arial, sans-serif;
+  font-size: 30px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+/* Hero 内容区 */
+.hero-content {
+  position: absolute;
+  bottom: 80px;
+  left: 48px;
+  right: 48px;
+  z-index: 10;
+}
+
+.hero-title {
+  font-size: 42px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+  margin: 0 0 16px 0;
+  letter-spacing: -0.5px;
+}
+
+.hero-subtitle {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  margin: 0 0 40px 0;
+  white-space: nowrap;
+}
+
+.hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 400;
+  margin-bottom: 2px;
+}
+
+.stat-number {
+  font-size: 28px;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.stat-sublabel {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 400;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* 右侧登录区域 - 38.2% */
+.login-section {
+  position: relative;
+  width: $phi-inv;
+  height: 100%;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  :global([data-theme='dark']) & {
+    background: #0a0f1a;
+  }
+
+  @media (max-width: 1024px) {
+    width: 100%;
+  }
+}
+
+.language-switcher {
+  position: absolute;
+  top: 32px;
+  right: 40px;
+  z-index: 100;
+}
+
+.language-switcher :deep(.el-select) {
+  width: 100px;
+}
+
+.language-switcher :deep(.el-input__wrapper) {
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: none;
   transition: all 0.3s ease;
 
-  // 暗模式样式 - 使用30%透明度的黑色背景
   :global([data-theme='dark']) & {
-    background: rgba(0, 0, 0, 0.3) !important;
-    backdrop-filter: blur(40px) saturate(1.2) !important;
-    box-shadow:
-      -8px 0px 32px 0px rgba(0, 0, 0, 0.4),
-      0 4px 12px 0px rgba(0, 0, 0, 0.2) !important;
-    border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-color: #2d3748;
   }
 
-  @include desktop {
-    width: 60vw;
+  &:hover {
+    border-color: #019c7c;
   }
+}
 
-  @include tablet {
-    width: 100vw;
-    right: 0;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    position: relative;
-    padding: $spacing-medium;
-    min-height: 100vh;
+.language-switcher :deep(.el-input__inner) {
+  font-size: 13px;
+  color: #374151;
 
-    :global([data-theme='dark']) & {
-      background: rgba(0, 0, 0, 0.3) !important;
-      backdrop-filter: blur(30px) saturate(1.2) !important;
-    }
-  }
-
-  @include mobile {
-    width: 100vw;
-    right: 0;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    position: relative;
-    padding: $spacing-medium $spacing-small;
-    min-height: 100vh;
-
-    :global([data-theme='dark']) & {
-      background: rgba(0, 0, 0, 0.3) !important;
-      backdrop-filter: blur(30px) saturate(1.2) !important;
-    }
+  :global([data-theme='dark']) & {
+    color: #e5e7eb;
   }
 }
 
 .login-container {
   width: 100%;
-  max-width: 448px; // 改为448px (56*8)
-  margin: 0 auto;
-
-  @include mobile {
-    max-width: 100%;
-  }
+  max-width: 581px;
+  padding: 0 40px;
 }
 
 .login-card {
-  padding: $spacing-large;
+  width: 100%;
+  animation: cardFadeIn 0.6s ease-out;
+}
 
-  @include mobile {
-    padding: $spacing-base;
-  }
+@keyframes cardFadeIn {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.login-header {
+  margin-bottom: 40px;
 }
 
 .title {
-  margin: 0 0 $spacing-medium 0;
-  
-  font-weight: 700;
-  font-size: 32px; // 改为32px符合8px栅格
-  line-height: 1.2;
-  color: var(--app-text-primary);
-  text-align: center;
-  transition: color 0.3s ease;
+  margin: 0 0 12px 0;
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 1.3;
+  color: #1a1a1a;
 
-  @include mobile {
-    font-size: 24px; // 改为24px符合8px栅格
-    margin-bottom: $spacing-small;
+  :global([data-theme='dark']) & {
+    color: #f9fafb;
   }
 }
 
 .subtitle {
-  margin: 0 0 $spacing-large 0;
-  
-  font-weight: $font-weight-primary;
-  font-size: $font-size-medium;
-  line-height: 1.4;
-  color: var(--app-text-secondary);
-  text-align: center;
-  transition: color 0.3s ease;
+  margin: 0;
+  font-size: 16px;
+  color: #666666;
+  font-weight: 400;
+  line-height: 1.5;
 
-  @include mobile {
-    font-size: $font-size-base;
-    margin-bottom: $spacing-base;
+  :global([data-theme='dark']) & {
+    color: #9ca3af;
   }
 }
 
-/* 表单样式 */
 .login-form {
   width: 100%;
 }
 
+.login-form :deep(.el-form-item) {
+  margin-bottom: 24px;
+}
+
+.login-input {
+  height: 48px;
+}
+
 .login-input :deep(.el-input__wrapper) {
-  height: 56px; // 改为56px符合8px栅格
-  border-radius: 8px; // 改为8px符合8px栅格
-  background-color: var(--app-content-bg);
-  border: 1px solid var(--app-border-color);
-  box-shadow: none;
-  transition: all 0.3s ease;
-  padding: 0 $spacing-base;
+  height: 48px !important;
+  min-height: 48px !important;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px #dbdbdb inset;
+  transition: all 0.25s ease;
+  padding: 0 16px;
+  padding-left: 0;
+  position: relative;
 
-  @include input-style;
-
-  // 暗模式下的特殊样式
   :global([data-theme='dark']) & {
-    background-color: rgba(45, 45, 45, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(8px);
-
-    &:hover {
-      border-color: rgba(255, 255, 255, 0.2);
-      background-color: rgba(45, 45, 45, 0.7);
-    }
-
-    &.is-focus {
-      border-color: $primary-color !important;
-      background-color: rgba(45, 45, 45, 0.8);
-      box-shadow: 0 0 0 2px rgba($primary-color, 0.3) !important;
-    }
-  }
-
-  @include mobile {
-    height: 48px;
-    min-height: 44px; // 触摸目标大小
+    background-color: #111827;
+    box-shadow: 0 0 0 1px #374151 inset;
   }
 
   &:hover {
-    border-color: var(--app-border-light);
+    box-shadow: 0 0 0 1px #019c7c inset;
+
+    :global([data-theme='dark']) & {
+      box-shadow: 0 0 0 1px #4b5563 inset;
+    }
   }
 
-  &.is-focus {
-    border-color: $primary-color !important;
-    box-shadow: 0 0 0 2px rgba($primary-color, 0.2) !important;
+}
+
+.login-input {
+  &.is-field-valid {
+    :deep(.el-input__wrapper) {
+      box-shadow: 0 0 0 1px #019c7c inset !important;
+    }
   }
 }
 
 .login-input :deep(.el-input__inner) {
   height: 100%;
-  font-size: $font-size-base;
-  color: var(--app-text-primary);
+  font-size: 14px;
+  color: #333333;
   background-color: transparent;
   border: none;
   box-shadow: none;
-  transition: color 0.3s ease;
+  padding-left: 56px;
 
   &::placeholder {
-    color: var(--app-text-secondary);
+    color: #999999;
   }
 
-  @include mobile {
-    font-size: $font-size-small;
+  :global([data-theme='dark']) & {
+    color: #f9fafb;
+
+    &::placeholder {
+      color: #6b7280;
+    }
   }
 }
 
 .login-input :deep(.el-input__prefix) {
-  color: rgba($primary-color, 0.6);
-  transition: color 0.3s ease;
+  color: #019c7c;
+  margin-right: 0;
+  padding: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.login-input :deep(.el-input__prefix)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 24px;
+  background-color: #e8e8e8;
 
   :global([data-theme='dark']) & {
-    color: rgba($primary-color, 0.8);
+    background-color: #374151;
+  }
+}
+
+.login-input :deep(.el-input__prefix-inner) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.login-input :deep(.el-input__icon),
+.login-input :deep(.el-icon) {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  line-height: 1;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-input :deep(.el-input__prefix-inner .el-icon) {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* 后缀图标（清除按钮、密码切换） */
+.login-input :deep(.el-input__suffix) {
+  position: absolute;
+  right: 16px;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.login-input :deep(.el-input__suffix-inner) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.login-input :deep(.el-input__clear),
+.login-input :deep(.el-input__password) {
+  color: #999999;
+  cursor: pointer;
+  
+  &:hover {
+    color: #019c7c;
   }
 }
 
 .login-button {
   width: 100%;
-  height: 64px; // 改为64px符合8px栅格
-  font-size: $font-size-medium;
-  font-weight: 600;
-  border-radius: 8px; // 改为8px符合8px栅格
-  background: linear-gradient(
-    135deg,
-    $primary-color 0%,
-    color.adjust($primary-color, $lightness: -5%) 100%
-  );
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 8px;
+  background: #019c7c;
   border: none;
-  margin-top: $spacing-medium;
-  position: relative;
-  overflow: hidden;
+  margin-top: 32px;
+  transition: all 0.25s ease;
+  color: #ffffff;
 
-  @include button-primary;
-
-  // 暗模式下的按钮增强效果
   :global([data-theme='dark']) & {
-    background: linear-gradient(
-      135deg,
-      $primary-color 0%,
-      color.adjust($primary-color, $lightness: -8%) 100%
-    );
-    box-shadow:
-      0 4px 20px rgba($primary-color, 0.4),
-      0 2px 8px rgba(0, 0, 0, 0.3);
+    background: #019c7c;
+    color: #ffffff;
+  }
 
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
+  &:hover {
+    background: #018a6d;
+    transform: translateY(-1px);
 
-    &:hover::before {
-      opacity: 1;
+    :global([data-theme='dark']) & {
+      background: #018a6d;
     }
   }
 
-  @include mobile {
-    height: 48px; // 改为48px符合8px栅格
-    min-height: 44px; // 触摸目标大小
-    font-size: $font-size-base;
-  }
-
-  @include non-touch-device {
-    &:hover {
-      background: linear-gradient(
-        135deg,
-        color.adjust($primary-color, $lightness: -5%) 0%,
-        $primary-color 100%
-      );
-      @include hover-effect;
-      box-shadow: 0 8px 25px rgba($primary-color, 0.3);
-
-      :global([data-theme='dark']) & {
-        background: linear-gradient(
-          135deg,
-          color.adjust($primary-color, $lightness: -3%) 0%,
-          color.adjust($primary-color, $lightness: -10%) 100%
-        );
-        box-shadow:
-          0 8px 32px rgba($primary-color, 0.5),
-          0 4px 16px rgba(0, 0, 0, 0.4);
-        transform: translateY(-1px);
-      }
-    }
+  &:active {
+    transform: translateY(0);
   }
 }
 
 .form-options {
-  @include flex-between;
-  margin: $spacing-medium 0;
-  font-size: $font-size-base;
-
-  @include mobile {
-    flex-direction: column;
-    gap: $spacing-base;
-    align-items: flex-start;
-  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 16px 0 24px 0;
+  font-size: 13px;
 }
 
 .forgot-link {
-  font-size: $font-size-base;
-  color: var(--app-text-secondary);
-  transition: color 0.3s ease;
+  font-size: 13px;
+  color: #999999;
+  transition: color 0.25s ease;
 
-  @include non-touch-device {
-    &:hover {
-      color: $primary-color;
-    }
-  }
-
-  @include mobile {
-    font-size: $font-size-small;
-  }
-}
-
-/* 语言切换器样式 */
-.language-switcher {
-  position: absolute;
-  top: $spacing-extra-large;
-  right: $spacing-extra-large;
-  z-index: 200;
-
-  @include tablet {
-    position: fixed;
-    top: $spacing-medium;
-    right: $spacing-medium;
-    z-index: 300;
-  }
-
-  @include mobile {
-    position: fixed;
-    top: $spacing-medium;
-    right: $spacing-medium;
-    z-index: 300;
-    transform: scale(0.8);
-    transform-origin: right top;
-  }
-}
-
-.language-switcher :deep(.el-select) {
-  width: 152px; // 改为152px (19*8)
-
-  @include mobile {
-    width: 96px; // 改为96px (12*8)
-  }
-}
-
-.language-switcher :deep(.el-input__inner) {
-  background: var(--app-content-bg);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--app-border-color);
-  border-radius: $border-radius-base;
-  font-size: $font-size-base;
-  color: var(--app-text-primary);
-  transition: all 0.3s ease;
-
-  // 暗模式下的特殊样式
   :global([data-theme='dark']) & {
-    background: rgba(45, 45, 45, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(15px);
+    color: #9ca3af;
+  }
 
-    &:hover {
-      border-color: rgba(255, 255, 255, 0.3);
-      background: rgba(45, 45, 45, 0.8);
+  &:hover {
+    color: #019c7c;
+
+    :global([data-theme='dark']) & {
+      color: #019c7c;
     }
   }
-
-  @include mobile {
-    font-size: $font-size-small;
-  }
-
-  @include non-touch-device {
-    &:hover {
-      border-color: $primary-color;
-      box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
-
-      :global([data-theme='dark']) & {
-        border-color: $primary-color;
-        box-shadow: 0 0 0 2px rgba($primary-color, 0.4);
-      }
-    }
-  }
-}
-
-/* 高度适配 */
-@media (max-height: 700px) {
-  .login-section {
-    padding: $spacing-medium;
-    align-items: flex-start;
-    padding-top: 80px; // 符合8px栅格
-  }
-}
-
-@media (max-height: 600px) {
-  .login-section {
-    padding-top: 48px; // 符合8px栅格
-  }
-
-  .title {
-    margin-bottom: $spacing-small;
-  }
-
-  .subtitle {
-    margin-bottom: $spacing-base;
-  }
-
-  .form-options {
-    margin: $spacing-base 0;
-  }
-}
-
-/* Element Plus checkbox 自定义样式 */
-.login-form :deep(.el-checkbox__input.is-checked + .el-checkbox__label) {
-  color: $primary-color;
 }
 
 .login-form :deep(.el-checkbox__label) {
-  display: inline-block;
-  font-size: $font-size-base;
-  line-height: 1;
-  padding-left: $spacing-small;
-  color: var(--app-text-regular);
-  transition: color 0.3s ease;
-}
-
-/* 语言切换器下拉菜单暗模式适配 */
-.language-switcher :deep(.el-select-dropdown) {
-  background-color: var(--app-content-bg) !important;
-  border: 1px solid var(--app-border-color) !important;
-  box-shadow: var(--app-shadow) !important;
-  transition: all 0.3s ease;
+  font-size: 13px;
+  color: #666666;
+  padding-left: 6px;
 
   :global([data-theme='dark']) & {
-    background: rgba(45, 45, 45, 0.95) !important;
-    backdrop-filter: blur(20px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.4),
-      0 4px 16px rgba(0, 0, 0, 0.2) !important;
+    color: #d1d5db;
   }
 }
 
-.language-switcher :deep(.el-popper) {
-  background-color: var(--app-content-bg) !important;
+.login-form :deep(.el-checkbox__inner) {
+  border-radius: 4px;
+  border-color: #d9d9d9;
+  width: 16px;
+  height: 16px;
 
   :global([data-theme='dark']) & {
-    background: rgba(45, 45, 45, 0.95) !important;
+    border-color: #4b5563;
+    background-color: transparent;
+  }
+
+  &:hover {
+    border-color: #019c7c;
+  }
+}
+
+.login-form :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
+  background-color: #019c7c;
+  border-color: #019c7c;
+
+  :global([data-theme='dark']) & {
+    background-color: #019c7c;
+    border-color: #019c7c;
+  }
+}
+
+.login-form :deep(.el-checkbox__input.is-checked + .el-checkbox__label) {
+  color: #019c7c;
+
+  :global([data-theme='dark']) & {
+    color: #019c7c;
+  }
+}
+
+.login-footer {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #e5e7eb;
+  text-align: center;
+
+  :global([data-theme='dark']) & {
+    border-color: #374151;
+  }
+
+  p {
+    font-size: 12px;
+    color: #9ca3af;
+    margin: 0;
+
+    :global([data-theme='dark']) & {
+      color: #6b7280;
+    }
+  }
+}
+
+.language-switcher :deep(.el-select-dropdown) {
+  background-color: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15) !important;
+
+  :global([data-theme='dark']) & {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.4) !important;
   }
 }
 
 .language-switcher :deep(.el-select-dropdown__item) {
-  color: var(--app-text-primary) !important;
-  transition: all 0.2s ease;
+  color: #374151 !important;
+  font-size: 13px;
+  padding: 10px 14px;
+
+  :global([data-theme='dark']) & {
+    color: #e5e7eb !important;
+  }
 
   &:hover {
-    background-color: var(--app-action-btn-bg) !important;
+    background-color: #f3f4f6 !important;
 
     :global([data-theme='dark']) & {
-      background-color: rgba(1, 156, 124, 0.15) !important;
-      color: rgba(1, 156, 124, 1) !important;
+      background-color: #374151 !important;
     }
   }
 
   &.selected {
-    background-color: rgba(1, 156, 124, 0.1) !important;
-    color: $primary-color !important;
+    color: #019c7c !important;
+    font-weight: 500;
 
     :global([data-theme='dark']) & {
-      background-color: rgba(1, 156, 124, 0.2) !important;
-      color: rgba(1, 156, 124, 1) !important;
+      color: #00c896 !important;
     }
-  }
-
-  :global([data-theme='dark']) & {
-    color: #e5eaf3 !important;
-  }
-}
-</style>
-
-<style lang="scss">
-/* 暗模式登录区域样式 - 完美还原截图设计 */
-[data-theme='dark'] .login-section {
-  background: rgba(0, 0, 0, 0.3) !important;
-  opacity: 0.8;
-  backdrop-filter: blur(40px) !important;
-  box-shadow: -6px 0px 30px 0px rgba(63, 139, 255, 0.05) !important;
-}
-
-/* 暗模式下登录卡片 - 简洁设计 */
-[data-theme='dark'] .login-card {
-  background: transparent !important;
-  backdrop-filter: none !important;
-  border-radius: 0 !important;
-  padding: 40px !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* 暗模式下文字样式 - 还原截图 */
-[data-theme='dark'] .title {
-  color: #ffffff !important;
-  text-shadow: none !important;
-  font-weight: 400 !important;
-}
-
-[data-theme='dark'] .subtitle {
-  color: #9ca3af !important;
-  text-shadow: none !important;
-}
-
-/* 暗模式下输入框样式 - 还原截图 */
-[data-theme='dark'] .login-input .el-input__wrapper {
-  background-color: transparent !important;
-  border: none !important;
-  border-bottom: 1px solid #4b5563 !important;
-  border-radius: 0 !important;
-  backdrop-filter: none !important;
-  box-shadow: none !important;
-  padding: 8px 0 !important;
-}
-
-[data-theme='dark'] .login-input .el-input__wrapper:hover {
-  border-bottom-color: #6b7280 !important;
-}
-
-[data-theme='dark'] .login-input .el-input__wrapper.is-focus {
-  border-bottom-color: #00c896 !important;
-  box-shadow: none !important;
-}
-
-[data-theme='dark'] .login-input .el-input__inner {
-  color: #ffffff !important;
-  background: transparent !important;
-}
-
-[data-theme='dark'] .login-input .el-input__inner::placeholder {
-  color: #6b7280 !important;
-}
-
-[data-theme='dark'] .login-input .el-input__prefix {
-  color: #6b7280 !important;
-}
-
-/* 暗模式下记住密码和忘记密码链接 - 还原截图 */
-[data-theme='dark'] .form-options .el-checkbox__label {
-  color: #9ca3af !important;
-}
-
-[data-theme='dark'] .forgot-link {
-  color: #9ca3af !important;
-}
-
-[data-theme='dark'] .forgot-link:hover {
-  color: #00c896 !important;
-}
-
-/* 暗模式下登录按钮 - 还原截图样式 */
-[data-theme='dark'] .login-button {
-  background: #00c896 !important;
-  box-shadow: none !important;
-  border: none !important;
-  border-radius: 6px !important;
-  color: #ffffff !important;
-  font-weight: 500 !important;
-}
-
-[data-theme='dark'] .login-button:hover {
-  background: #00b085 !important;
-  box-shadow: none !important;
-  transform: none !important;
-}
-
-[data-theme='dark'] .login-button:active {
-  background: #009973 !important;
-}
-
-/* 暗模式下语言选择器 */
-[data-theme='dark'] .language-switcher .el-input__inner {
-  background: rgba(25, 25, 25, 0.8) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  color: #e5eaf3 !important;
-  backdrop-filter: blur(15px) !important;
-}
-
-[data-theme='dark'] .language-switcher .el-input__inner:hover {
-  border-color: rgba(255, 255, 255, 0.3) !important;
-  background: rgba(25, 25, 25, 0.9) !important;
-}
-
-/* 暗模式下复选框 - 还原截图样式 */
-[data-theme='dark'] .el-checkbox__input.is-checked .el-checkbox__inner {
-  background-color: #00c896 !important;
-  border-color: #00c896 !important;
-}
-
-[data-theme='dark'] .el-checkbox__inner {
-  background-color: transparent !important;
-  border-color: #6b7280 !important;
-}
-
-[data-theme='dark'] .el-checkbox__inner:hover {
-  border-color: #00c896 !important;
-}
-
-/* 响应式暗模式样式 - 保持一致性 */
-@media (max-width: 1024px) {
-  [data-theme='dark'] .login-section {
-    background: #1a2332 !important;
-  }
-}
-
-@media (max-width: 768px) {
-  [data-theme='dark'] .login-section {
-    background: #1a2332 !important;
-  }
-
-  [data-theme='dark'] .login-card {
-    padding: 32px 24px !important;
   }
 }
 </style>

@@ -17,7 +17,23 @@
       "usernameMinLength": "用户名至少需要3个字符",
       "passwordRequired": "请输入密码",
       "passwordMinLength": "密码至少需要6个字符"
-    }
+    },
+    "heroTitleLine1": "软件授权",
+    "heroTitleLine2": "管理系统",
+    "heroSubtitle": "赋能软件商业化，构建 B2B 与 B2C 全场景的软件授权体系。",
+    "stats": {
+      "totalAuthCodes": "授权码总量",
+      "totalAuthCodesSubLabel": "本月新增 2.4K",
+      "activeLicenses": "活跃许可证",
+      "activeLicensesSubLabel": "较上月 +12%",
+      "systemUptime": "系统可用性",
+      "systemUptimeSubLabel": "24/7 在线",
+      "uptime": "可用率",
+      "support": "全天支持"
+    },
+    "welcomeTitle": "授权管理平台",
+    "welcomeSubtitle": "登录您的账户",
+    "copyright": "© 2025 Cedar-V. 保留所有权利。"
   },
   "sidebar": {
     "expand": "展开侧边栏",
@@ -26,13 +42,19 @@
   "dashboard": {
     "title": "仪表盘",
     "stats": {
-      "totalCustomers": "总授权码",
-      "totalLicenses": "活跃许可证",
-      "activeLicenses": "即将过期",
-      "expired": "异常警告",
-      "onlineClients": "增长率",
-      "expiringSoon": "授权码增长率",
-      "authSuccessRate24h": "许可证增长率"
+      "totalAuthCodes": "授权码总量",
+      "activeLicenses": "活跃许可证",
+      "todayNewLicenses": "今日新增授权",
+      "expiringIn7Days": "7天内到期",
+      "expiringIn30Days": "30天内到期",
+      "abnormalAlerts": "异常告警",
+      "subText": {
+        "monthNew": "本月新增 {n} 个",
+        "vsLastMonth": "较上月 {rate}%",
+        "yesterday": "昨日 {n} 个",
+        "urgent": "紧急跟进",
+        "heartbeatTimeout": "心跳超时"
+      }
     },
     "recentLicenses": {
       "title": "最近授权",
@@ -328,9 +350,8 @@
     "licenseTrend": {
       "title": "授权趋势",
       "quickOptions": {
-        "today": "本日",
-        "week": "本周",
-        "month": "本月"
+        "week": "最近7天",
+        "month": "最近30天"
       },
       "datePicker": {
         "rangeSeparator": "至",
@@ -347,9 +368,8 @@
       "endDate": "结束日期",
       "separator": "至",
       "quickOptions": {
-        "today": "本日",
-        "week": "本周",
-        "month": "本月"
+        "week": "最近7天",
+        "month": "最近30天"
       }
     }
   },
