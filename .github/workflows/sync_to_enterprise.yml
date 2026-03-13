@@ -15,30 +15,20 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Git
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Add enterprise remote
-        run: |
-          echo "Adding enterprise remote..."
-          TOKEN="${{ secrets.ENTERPRISE_REPO_TOKEN }}"
-          echo "Token prefix: ${TOKEN:0:10}"
-          git remote add enterprise https://x-access-token:$TOKEN@github.com/cedar-v/license-manager-enterprise.git
-          echo "Remote added successfully"
-
-      - name: Verify remote and push
+      - name: Sync to enterprise repo
         env:
-          TOKEN: "${{ secrets.ENTERPRISE_REPO_TOKEN }}"
+          TOKEN: ${{ secrets.ENTERPRISE_REPO_TOKEN }}
         run: |
-          echo "Verifying remote exists..."
-          # 先测试是否能访问
-          if git ls-remote enterprise 2>&1; then
-            echo "Remote accessible, pushing..."
-            git push enterprise main:license-manager --force
-            echo "Push completed successfully!"
-          else
-            echo "Failed to access remote"
-            exit 1
-          fi
+          # 使用 gh CLI
+          echo "Checking gh auth..."
+          echo "$TOKEN" | gh auth login --hostname github.com --with-token
+          
+          gh auth status
+          
+          echo "Setting up git remote..."
+          git remote add enterprise https://github.com/cedar-v/license-manager-enterprise.git
+          
+          echo "Pushing to enterprise..."
+          git push enterprise main:license-manager --force
+          
+          echo "Done!"
