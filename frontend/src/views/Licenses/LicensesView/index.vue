@@ -138,51 +138,15 @@
               </el-form-item>
 
               <el-form-item :label="t('pages.licenses.detail.updateDialog.fields.featureConfig')">
-                <div class="kv-entries">
-                  <div v-for="(entry, idx) in featureConfigEntries" :key="entry.id" class="kv-row">
-                    <el-input v-model="entry.key" placeholder="key" style="width:40%" />
-                    <el-select v-model="entry.type" placeholder="type" style="width:14%;margin:0 8px">
-                      <el-option label="string" value="string" />
-                      <el-option label="number" value="number" />
-                      <el-option label="bool" value="bool" />
-                    </el-select>
-                    <el-input v-model="entry.value" placeholder="value" style="width:40%" />
-                    <el-button type="text" icon="el-icon-delete" @click="removeFeatureConfigEntry(idx)" />
-                  </div>
-                  <el-button size="small" @click="addFeatureConfigEntry">{{ t('pages.licenses.form.keyValue.addItem') }}</el-button>
-                </div>
+                <JsonEditor ref="featureConfigRef" v-model="featureConfigData" />
               </el-form-item>
 
               <el-form-item :label="t('pages.licenses.detail.updateDialog.fields.usageLimits')">
-                <div class="kv-entries">
-                  <div v-for="(entry, idx) in usageLimitsEntries" :key="entry.id" class="kv-row">
-                    <el-input v-model="entry.key" placeholder="key" style="width:40%" />
-                    <el-select v-model="entry.type" placeholder="type" style="width:14%;margin:0 8px">
-                      <el-option label="string" value="string" />
-                      <el-option label="number" value="number" />
-                      <el-option label="bool" value="bool" />
-                    </el-select>
-                    <el-input v-model="entry.value" placeholder="value" style="width:40%" />
-                    <el-button type="text" icon="el-icon-delete" @click="removeUsageLimitEntry(idx)" />
-                  </div>
-                  <el-button size="small" @click="addUsageLimitEntry">{{ t('pages.licenses.form.keyValue.addItem') }}</el-button>
-                </div>
+                <JsonEditor ref="usageLimitsRef" v-model="usageLimitsData" />
               </el-form-item>
 
               <el-form-item :label="t('pages.licenses.detail.updateDialog.fields.customParameters')">
-                <div class="kv-entries">
-                  <div v-for="(entry, idx) in customParametersEntries" :key="entry.id" class="kv-row">
-                    <el-input v-model="entry.key" placeholder="key" style="width:40%" />
-                    <el-select v-model="entry.type" placeholder="type" style="width:14%;margin:0 8px">
-                      <el-option label="string" value="string" />
-                      <el-option label="number" value="number" />
-                      <el-option label="bool" value="bool" />
-                    </el-select>
-                    <el-input v-model="entry.value" placeholder="value" style="width:40%" />
-                    <el-button type="text" icon="el-icon-delete" @click="removeCustomParamEntry(idx)" />
-                  </div>
-                  <el-button size="small" @click="addCustomParamEntry">{{ t('pages.licenses.form.keyValue.addItem') }}</el-button>
-                </div>
+                <JsonEditor ref="customParamsRef" v-model="customParamsData" />
               </el-form-item>
 
               <el-form-item :label="t('pages.licenses.detail.updateDialog.fields.reason')">
@@ -223,6 +187,7 @@ import BasicInfo from './components/BasicInfo.vue'
 import AuthorizationInfo from './components/AuthorizationInfo.vue'
 import LicenseInfo from './components/LicenseInfo.vue'
 import ChangeHistory from './components/ChangeHistory.vue'
+import JsonEditor from '@/components/common/JsonEditor.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -385,12 +350,10 @@ const handleConfirmChangeValidity = async () => {
       if (updateMaxActivations.value !== null && updateMaxActivations.value !== undefined) {
         payload.max_activations = updateMaxActivations.value
       }
-      const fc = buildJsonRecord(featureConfigEntries.value)
-      if (fc) payload.feature_config = fc
-      const ul = buildJsonRecord(usageLimitsEntries.value)
-      if (ul) payload.usage_limits = ul
-      const cp = buildJsonRecord(customParametersEntries.value)
-      if (cp) payload.custom_parameters = cp
+      // 使用 JsonEditor 数据
+      payload.feature_config = featureConfigData.value || {}
+      payload.usage_limits = usageLimitsData.value || {}
+      payload.custom_parameters = customParamsData.value || {}
       payload.change_type = updateChangeType.value || payload.change_type
       // if reason in update dialog provided, override
       if (updateReason.value && updateReason.value.trim()) {
@@ -417,121 +380,37 @@ const handleConfirmChangeValidity = async () => {
 
 // --- update authorization dialog ---
 import type { RawEnumItem } from '@/api/enum'
-type KeyValueType = 'string' | 'number' | 'bool'
-interface KeyValueItem {
-  id: string
-  key: string
-  value: string
-  type: KeyValueType
-}
 
 const updateDialogVisible = ref(false)
 const changeTypeOptions = ref<RawEnumItem[]>([])
 const updateChangeType = ref<string>('other')
 const updateMaxActivations = ref<number | null>(null)
-const featureConfigEntries = ref<KeyValueItem[]>([])
-const usageLimitsEntries = ref<KeyValueItem[]>([])
-const customParametersEntries = ref<KeyValueItem[]>([])
+const featureConfigData = ref<Record<string, any>>({})
+const usageLimitsData = ref<Record<string, any>>({})
+const customParamsData = ref<Record<string, any>>({})
 const updateReason = ref<string>('')
 const updateSubmitting = ref(false)
 
-const createEntryId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-const createEmptyEntry = (): KeyValueItem => ({
-  id: createEntryId(),
-  key: '',
-  value: '',
-  type: 'string'
-})
-
-const addFeatureConfigEntry = () => featureConfigEntries.value.push(createEmptyEntry())
-const addUsageLimitEntry = () => usageLimitsEntries.value.push(createEmptyEntry())
-const addCustomParamEntry = () => customParametersEntries.value.push(createEmptyEntry())
-const removeFeatureConfigEntry = (i: number) => featureConfigEntries.value.splice(i, 1)
-const removeUsageLimitEntry = (i: number) => usageLimitsEntries.value.splice(i, 1)
-const removeCustomParamEntry = (i: number) => customParametersEntries.value.splice(i, 1)
-
-const convertValueByType = (value: string, type: KeyValueType) => {
-  if (type === 'number') {
-    const num = Number(value)
-    if (Number.isNaN(num)) throw new Error('invalid number')
-    return num
-  }
-  if (type === 'bool') return value === 'true'
-  return value
-}
-
-const buildJsonRecord = (entries: KeyValueItem[]) => {
-  if (!entries.length) return null
-  const result: Record<string, any> = {}
-  entries.forEach(item => {
-    const k = item.key.trim()
-    if (!k) return
-    try {
-      result[k] = convertValueByType(item.value, item.type)
-    } catch {
-      // ignore here; validation will surface
-    }
-  })
-  return Object.keys(result).length ? result : null
-}
-
-// Validate key-value entries: ensure key present and value matches selected type
-const validateKeyValueEntries = (entries: KeyValueItem[]): { ok: boolean; msg?: string } => {
-  for (const item of entries) {
-    const key = item.key?.trim()
-    const val = item.value
-    if (!key) {
-      return { ok: false, msg: t('pages.licenses.form.keyValue.keyRequired') }
-    }
-    if (item.type === 'number') {
-      if (val === '' || val === null || val === undefined || Number.isNaN(Number(val))) {
-        return { ok: false, msg: t('pages.licenses.form.keyValue.numberRequired') }
-      }
-    }
-    if (item.type === 'bool') {
-      const lower = String(val).toLowerCase()
-      if (lower !== 'true' && lower !== 'false') {
-        return { ok: false, msg: t('pages.licenses.form.keyValue.boolRequired') }
-      }
-    }
-  }
-  return { ok: true }
-}
+// JsonEditor 组件引用
+const featureConfigRef = ref<InstanceType<typeof JsonEditor>>()
+const usageLimitsRef = ref<InstanceType<typeof JsonEditor>>()
+const customParamsRef = ref<InstanceType<typeof JsonEditor>>()
 
 const openUpdateDialog = async () => {
   updateChangeType.value = 'other'
   updateReason.value = ''
   updateMaxActivations.value = licenseData.value?.max_activations || null
-  // populate entries from existing JSON if present
-  featureConfigEntries.value = []
-  usageLimitsEntries.value = []
-  customParametersEntries.value = []
-  try {
-    if (licenseData.value?.feature_config) {
-      const obj = typeof licenseData.value.feature_config === 'string' ? JSON.parse(licenseData.value.feature_config) : licenseData.value.feature_config
-      for (const [k, v] of Object.entries(obj || {})) {
-        featureConfigEntries.value.push({ id: createEntryId(), key: k, value: String(v), type: typeof v === 'number' ? 'number' : typeof v === 'boolean' ? 'bool' : 'string' })
-      }
-    }
-  } catch {
-    // ignore parse errors
-  }
-  try {
-    if (licenseData.value?.usage_limits) {
-      const obj = typeof licenseData.value.usage_limits === 'string' ? JSON.parse(licenseData.value.usage_limits) : licenseData.value.usage_limits
-      for (const [k, v] of Object.entries(obj || {})) {
-        usageLimitsEntries.value.push({ id: createEntryId(), key: k, value: String(v), type: typeof v === 'number' ? 'number' : typeof v === 'boolean' ? 'bool' : 'string' })
-      }
-    }
-  } catch {}
-  try {
-    if (licenseData.value?.custom_parameters) {
-      const obj = typeof licenseData.value.custom_parameters === 'string' ? JSON.parse(licenseData.value.custom_parameters) : licenseData.value.custom_parameters
-      for (const [k, v] of Object.entries(obj || {})) {
-        customParametersEntries.value.push({ id: createEntryId(), key: k, value: String(v), type: typeof v === 'number' ? 'number' : typeof v === 'boolean' ? 'bool' : 'string' })
-      }
-    }
-  } catch {}
+
+  // 使用 JsonEditor 加载数据
+  featureConfigData.value = typeof licenseData.value?.feature_config === 'string'
+    ? JSON.parse(licenseData.value?.feature_config || '{}')
+    : (licenseData.value?.feature_config || {})
+  usageLimitsData.value = typeof licenseData.value?.usage_limits === 'string'
+    ? JSON.parse(licenseData.value?.usage_limits || '{}')
+    : (licenseData.value?.usage_limits || {})
+  customParamsData.value = typeof licenseData.value?.custom_parameters === 'string'
+    ? JSON.parse(licenseData.value?.custom_parameters || '{}')
+    : (licenseData.value?.custom_parameters || {})
 
   // load change type options from backend enum
   try {
@@ -563,7 +442,17 @@ const handleConfirmUpdate = async () => {
     return
   }
 
-  // build payload
+  // 验证 JsonEditor 数据
+  const featureValid = featureConfigRef.value?.validate() ?? true
+  const limitValid = usageLimitsRef.value?.validate() ?? true
+  const customValid = customParamsRef.value?.validate() ?? true
+  if (!featureValid || !limitValid || !customValid) {
+    ElMessage.error(t('pages.licenses.form.keyValue.validationFailed'))
+    changeSubmitting.value = false
+    return
+  }
+
+  // 构建 payload
   const payload: any = {
     change_type: updateChangeType.value,
     reason: updateReason.value
@@ -572,32 +461,10 @@ const handleConfirmUpdate = async () => {
     payload.max_activations = updateMaxActivations.value
   }
 
-  // build JSON object from key-value entries
-  const fc = buildJsonRecord(featureConfigEntries.value)
-  if (fc) payload.feature_config = fc
-  const ul = buildJsonRecord(usageLimitsEntries.value)
-  if (ul) payload.usage_limits = ul
-  const cp = buildJsonRecord(customParametersEntries.value)
-  if (cp) payload.custom_parameters = cp
-  // validate KV entries before sending
-  const v1 = validateKeyValueEntries(featureConfigEntries.value)
-  if (!v1.ok) {
-    ElMessage.error(v1.msg || t('pages.licenses.detail.updateDialog.validation.featureConfigInvalid'))
-    changeSubmitting.value = false
-    return
-  }
-  const v2 = validateKeyValueEntries(usageLimitsEntries.value)
-  if (!v2.ok) {
-    ElMessage.error(v2.msg || t('pages.licenses.detail.updateDialog.validation.usageLimitsInvalid'))
-    changeSubmitting.value = false
-    return
-  }
-  const v3 = validateKeyValueEntries(customParametersEntries.value)
-  if (!v3.ok) {
-    ElMessage.error(v3.msg || t('pages.licenses.detail.updateDialog.validation.customParametersInvalid'))
-    changeSubmitting.value = false
-    return
-  }
+  // 使用 JsonEditor 数据
+  payload.feature_config = featureConfigData.value || {}
+  payload.usage_limits = usageLimitsData.value || {}
+  payload.custom_parameters = customParamsData.value || {}
 
   updateSubmitting.value = true
   try {

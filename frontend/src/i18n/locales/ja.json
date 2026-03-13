@@ -812,7 +812,7 @@
           "importTitleLimit": "利用制限 JSON をインポート",
           "importTitleCustom": "カスタムパラメータ JSON をインポート",
           "importDescription": "キーを設定名とするオブジェクト形式の JSON を貼り付けてください。値は文字列・数値・ブールをサポートします。確定すると現在のリストを上書きします。",
-          "importPlaceholder": "{ \"feature_dashboard\": \"enabled\" }",
+          "importPlaceholder": "JSONオブジェクトを入力してください",
           "importCancel": "キャンセル",
           "importConfirm": "解析して上書き",
           "importSuccess": "JSON を取り込みました",
@@ -962,6 +962,43 @@
         "yearMonth": "{years}年{months}ヶ月",
         "days": "{days}日"
       }
+    }
+  },
+  "jsonEditor": {
+    "addItem": "フィールド追加",
+    "clearAll": "クリア",
+    "copyJson": "JSONをコピー",
+    "importJson": "JSONをインポート",
+    "emptyState": "データがありません。フィールドを追加するかJSONをインポートしてください",
+    "preview": "JSONプレビュー",
+    "copyEmpty": "コピーするJSONがありません",
+    "copySuccess": "コピー成功",
+    "copyError": "コピー失敗",
+    "importTitle": "JSONをインポート",
+    "importDescription": "有効なJSON文字列を入力してください。ネストされたオブジェクトと配列をサポートします",
+    "importPlaceholder": "有効なJSON文字列を入力してください",
+    "importCancel": "キャンセル",
+    "importConfirm": "インポート",
+    "importSuccess": "インポート成功",
+    "importFailed": "JSON形式が無効です",
+    "keyLabel": "キー",
+    "keyPlaceholder": "キーを入力",
+    "valueLabel": "値",
+    "valuePlaceholder": "値を入力",
+    "typeLabel": "タイプ",
+    "keyRequired": "キーを入力してください",
+    "keyDuplicate": "キーが重複しています",
+    "numberInvalid": "有効な数値を入力してください",
+    "addChild": "子要素を追加",
+    "remove": "削除",
+    "arrayEmpty": "配列が空です。クリックして子要素を追加",
+    "objectEmpty": "オブジェクトが空です。クリックして子要素を追加",
+    "types": {
+      "string": "文字列",
+      "number": "数値",
+      "boolean": "真偽値",
+      "object": "オブジェクト",
+      "array": "配列"
     }
   }
 }

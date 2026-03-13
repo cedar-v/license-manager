@@ -176,6 +176,9 @@ const parseKeyValueData = (source: unknown): KeyValueItem[] => {
     } else if (typeof value === 'boolean') {
       type = 'bool'
       normalizedValue = value ? 'true' : 'false'
+    } else if (typeof value === 'object' && value !== null) {
+      // 对象或数组用 JSON.stringify 处理
+      normalizedValue = JSON.stringify(value)
     } else {
       normalizedValue = value === undefined || value === null ? '' : String(value)
     }

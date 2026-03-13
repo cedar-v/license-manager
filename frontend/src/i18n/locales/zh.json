@@ -846,7 +846,7 @@
           "importTitleLimit": "导入使用限制 JSON",
           "importTitleCustom": "导入自定义参数 JSON",
           "importDescription": "粘贴一个对象格式的 JSON，键为配置项，值支持字符串、数字或布尔类型。提交后将覆盖当前列表。",
-          "importPlaceholder": "{ \"feature_dashboard\": \"enabled\" }",
+          "importPlaceholder": "请输入 JSON 对象",
           "importCancel": "取消",
           "importConfirm": "解析并覆盖",
           "importSuccess": "JSON 解析成功",
@@ -996,6 +996,43 @@
         "yearMonth": "{years}年{months}个月",
         "days": "{days}天"
       }
+    }
+  },
+  "jsonEditor": {
+    "addItem": "添加字段",
+    "clearAll": "清空",
+    "copyJson": "复制JSON",
+    "importJson": "导入JSON",
+    "emptyState": "暂无数据，请添加字段或导入JSON",
+    "preview": "JSON 预览",
+    "copyEmpty": "没有可复制的JSON",
+    "copySuccess": "复制成功",
+    "copyError": "复制失败",
+    "importTitle": "导入 JSON",
+    "importDescription": "请输入有效的 JSON 字符串，支持嵌套对象和数组",
+    "importPlaceholder": "请输入有效的 JSON 字符串",
+    "importCancel": "取消",
+    "importConfirm": "导入",
+    "importSuccess": "导入成功",
+    "importFailed": "JSON 格式不正确",
+    "keyLabel": "键名",
+    "keyPlaceholder": "请输入键名",
+    "valueLabel": "值",
+    "valuePlaceholder": "请输入值",
+    "typeLabel": "类型",
+    "keyRequired": "请输入键名",
+    "keyDuplicate": "键名重复",
+    "numberInvalid": "请输入有效数字",
+    "addChild": "添加子项",
+    "remove": "删除",
+    "arrayEmpty": "数组为空，点击添加子项",
+    "objectEmpty": "对象为空，点击添加子项",
+    "types": {
+      "string": "字符串",
+      "number": "数字",
+      "boolean": "布尔",
+      "object": "对象",
+      "array": "数组"
     }
   }
 }

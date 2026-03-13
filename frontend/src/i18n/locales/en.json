@@ -813,7 +813,7 @@
           "importTitleLimit": "Import Usage Limits JSON",
           "importTitleCustom": "Import Custom Parameters JSON",
           "importDescription": "Paste a JSON object whose values can be string, number, or boolean. Confirming will overwrite current entries.",
-          "importPlaceholder": "{ \"feature_dashboard\": \"enabled\" }",
+          "importPlaceholder": "Please enter a JSON object",
           "importCancel": "Cancel",
           "importConfirm": "Parse & Overwrite",
           "importSuccess": "JSON imported successfully",
@@ -963,6 +963,43 @@
         "yearMonth": "{years} year(s) {months} month(s)",
         "days": "{days} day(s)"
       }
+    }
+  },
+  "jsonEditor": {
+    "addItem": "Add Field",
+    "clearAll": "Clear",
+    "copyJson": "Copy JSON",
+    "importJson": "Import JSON",
+    "emptyState": "No data yet, add fields or import JSON",
+    "preview": "JSON Preview",
+    "copyEmpty": "Nothing to copy",
+    "copySuccess": "Copied successfully",
+    "copyError": "Copy failed",
+    "importTitle": "Import JSON",
+    "importDescription": "Please enter valid JSON string, supports nested objects and arrays",
+    "importPlaceholder": "Please enter a valid JSON string",
+    "importCancel": "Cancel",
+    "importConfirm": "Import",
+    "importSuccess": "Imported successfully",
+    "importFailed": "Invalid JSON format",
+    "keyLabel": "Key",
+    "keyPlaceholder": "Enter key",
+    "valueLabel": "Value",
+    "valuePlaceholder": "Enter value",
+    "typeLabel": "Type",
+    "keyRequired": "Key is required",
+    "keyDuplicate": "Duplicate key",
+    "numberInvalid": "Please enter a valid number",
+    "addChild": "Add Child",
+    "remove": "Delete",
+    "arrayEmpty": "Array is empty, click to add child",
+    "objectEmpty": "Object is empty, click to add child",
+    "types": {
+      "string": "String",
+      "number": "Number",
+      "boolean": "Boolean",
+      "object": "Object",
+      "array": "Array"
     }
   }
 }

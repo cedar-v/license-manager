@@ -213,295 +213,24 @@
 
         <!-- 功能配置 -->
         <div class="license-form">
-          <div class="key-value-section-header">
-            <h3 class="section-title">{{ t('pages.licenses.form.sections.featureConfig') }}</h3>
-            <div class="key-value-section-actions">
-              <el-button size="small" @click="addFeatureConfigEntry">
-                {{ t('pages.licenses.form.keyValue.addItem') }}
-              </el-button>
-              <el-button
-                size="small"
-                text
-                :disabled="!featureConfigEntries.length"
-                @click="clearFeatureConfigEntries"
-              >
-                {{ t('pages.licenses.form.keyValue.clearAll') }}
-              </el-button>
-              <el-button
-                size="small"
-                text
-                :disabled="!featureConfigPreview"
-                @click="copyJson(featureConfigPreview)"
-              >
-                {{ t('pages.licenses.form.keyValue.copyJson') }}
-              </el-button>
-              <el-button size="small" text @click="openImportDialog('feature')">
-                {{ t('pages.licenses.form.keyValue.importJson') }}
-              </el-button>
-            </div>
-          </div>
-
-          <div class="key-value-list">
-            <div v-for="(item, index) in featureConfigEntries" :key="item.id" class="key-value-row">
-              <div class="key-value-field">
-                <label>{{ t('pages.licenses.form.keyValue.keyLabel') }}</label>
-                <el-input
-                  v-model="item.key"
-                  :placeholder="t('pages.licenses.form.keyValue.keyPlaceholder')"
-                  @input="item.keyError = ''"
-                />
-                <p v-if="item.keyError" class="key-value-error">{{ item.keyError }}</p>
-              </div>
-              <div class="key-value-field type-field">
-                <label>{{ t('pages.licenses.form.keyValue.typeLabel') }}</label>
-                <el-select v-model="item.type" @change="handleEntryTypeChange(item)">
-                  <el-option
-                    v-for="type in typeOptions"
-                    :key="type"
-                    :label="t(`pages.licenses.form.keyValue.typeOptions.${type}`)"
-                    :value="type"
-                  />
-                </el-select>
-              </div>
-              <div class="key-value-field">
-                <label>{{ t('pages.licenses.form.keyValue.valueLabel') }}</label>
-                <template v-if="item.type === 'bool'">
-                  <el-select v-model="item.value" @change="item.valueError = ''">
-                    <el-option
-                      v-for="option in boolOptions"
-                      :key="option.value"
-                      :label="option.label"
-                      :value="option.value"
-                    />
-                  </el-select>
-                </template>
-                <el-input
-                  v-else
-                  v-model="item.value"
-                  :placeholder="t('pages.licenses.form.keyValue.valuePlaceholder')"
-                  @input="item.valueError = ''"
-                  :inputmode="item.type === 'number' ? 'decimal' : 'text'"
-                />
-                <p v-if="item.valueError" class="key-value-error">{{ item.valueError }}</p>
-              </div>
-              <el-button link type="danger" @click="removeFeatureConfigEntry(index)">
-                {{ t('pages.licenses.form.keyValue.remove') }}
-              </el-button>
-            </div>
-
-            <div v-if="!featureConfigEntries.length" class="key-value-empty">
-              {{ t('pages.licenses.form.keyValue.emptyState') }}
-            </div>
-          </div>
-
-          <div class="key-value-preview">
-            <div class="key-value-preview-label">
-              {{ t('pages.licenses.form.keyValue.preview') }}
-            </div>
-            <el-input type="textarea" :rows="3" :model-value="featureConfigPreview" readonly />
-          </div>
+          <h3 class="section-title">{{ t('pages.licenses.form.sections.featureConfig') }}</h3>
+          <JsonEditor ref="featureConfigRef" v-model="featureConfigData" />
         </div>
 
         <!-- 限制设置 -->
         <div class="license-form">
-          <div class="key-value-section-header">
-            <h3 class="section-title">{{ t('pages.licenses.form.sections.usageLimits') }}</h3>
-            <div class="key-value-section-actions">
-              <el-button size="small" @click="addLimitEntry">
-                {{ t('pages.licenses.form.keyValue.addItem') }}
-              </el-button>
-              <el-button size="small" text :disabled="!limitEntries.length" @click="clearLimitEntries">
-                {{ t('pages.licenses.form.keyValue.clearAll') }}
-              </el-button>
-              <el-button
-                size="small"
-                text
-                :disabled="!usageJsonPreview"
-                @click="copyJson(usageJsonPreview)"
-              >
-                {{ t('pages.licenses.form.keyValue.copyJson') }}
-              </el-button>
-              <el-button size="small" text @click="openImportDialog('limit')">
-                {{ t('pages.licenses.form.keyValue.importJson') }}
-              </el-button>
-            </div>
-          </div>
-
-          <div class="key-value-list">
-            <div v-for="(item, index) in limitEntries" :key="item.id" class="key-value-row">
-              <div class="key-value-field">
-                <label>{{ t('pages.licenses.form.keyValue.keyLabel') }}</label>
-                <el-input
-                  v-model="item.key"
-                  :placeholder="t('pages.licenses.form.keyValue.keyPlaceholder')"
-                  @input="item.keyError = ''"
-                />
-                <p v-if="item.keyError" class="key-value-error">{{ item.keyError }}</p>
-              </div>
-              <div class="key-value-field type-field">
-                <label>{{ t('pages.licenses.form.keyValue.typeLabel') }}</label>
-                <el-select v-model="item.type" @change="handleEntryTypeChange(item)">
-                  <el-option
-                    v-for="type in typeOptions"
-                    :key="type"
-                    :label="t(`pages.licenses.form.keyValue.typeOptions.${type}`)"
-                    :value="type"
-                  />
-                </el-select>
-              </div>
-              <div class="key-value-field">
-                <label>{{ t('pages.licenses.form.keyValue.valueLabel') }}</label>
-                <template v-if="item.type === 'bool'">
-                  <el-select v-model="item.value" @change="item.valueError = ''">
-                    <el-option
-                      v-for="option in boolOptions"
-                      :key="option.value"
-                      :label="option.label"
-                      :value="option.value"
-                    />
-                  </el-select>
-                </template>
-                <el-input
-                  v-else
-                  v-model="item.value"
-                  :placeholder="t('pages.licenses.form.keyValue.valuePlaceholder')"
-                  @input="item.valueError = ''"
-                  :inputmode="item.type === 'number' ? 'decimal' : 'text'"
-                />
-                <p v-if="item.valueError" class="key-value-error">{{ item.valueError }}</p>
-              </div>
-              <el-button link type="danger" @click="removeLimitEntry(index)">
-                {{ t('pages.licenses.form.keyValue.remove') }}
-              </el-button>
-            </div>
-
-            <div v-if="!limitEntries.length" class="key-value-empty">
-              {{ t('pages.licenses.form.keyValue.emptyState') }}
-            </div>
-          </div>
-
-          <div class="key-value-preview">
-            <div class="key-value-preview-label">
-              {{ t('pages.licenses.form.keyValue.preview') }}
-            </div>
-            <el-input type="textarea" :rows="3" :model-value="usageJsonPreview" readonly />
-          </div>
+          <h3 class="section-title">{{ t('pages.licenses.form.sections.usageLimits') }}</h3>
+          <JsonEditor ref="usageLimitsRef" v-model="usageLimitsData" />
         </div>
 
         <!-- 自定义参数 -->
         <div class="license-form">
-          <div class="key-value-section-header">
-            <h3 class="section-title">{{ t('pages.licenses.form.sections.customParameters') }}</h3>
-            <div class="key-value-section-actions">
-              <el-button size="small" @click="addCustomEntry">
-                {{ t('pages.licenses.form.keyValue.addItem') }}
-              </el-button>
-              <el-button size="small" text :disabled="!customEntries.length" @click="clearCustomEntries">
-                {{ t('pages.licenses.form.keyValue.clearAll') }}
-              </el-button>
-              <el-button
-                size="small"
-                text
-                :disabled="!customJsonPreview"
-                @click="copyJson(customJsonPreview)"
-              >
-                {{ t('pages.licenses.form.keyValue.copyJson') }}
-              </el-button>
-              <el-button size="small" text @click="openImportDialog('custom')">
-                {{ t('pages.licenses.form.keyValue.importJson') }}
-              </el-button>
-            </div>
-          </div>
-
-          <div class="key-value-list">
-            <div v-for="(item, index) in customEntries" :key="item.id" class="key-value-row">
-              <div class="key-value-field">
-                <label>{{ t('pages.licenses.form.keyValue.keyLabel') }}</label>
-                <el-input
-                  v-model="item.key"
-                  :placeholder="t('pages.licenses.form.keyValue.keyPlaceholder')"
-                  @input="item.keyError = ''"
-                />
-                <p v-if="item.keyError" class="key-value-error">{{ item.keyError }}</p>
-              </div>
-              <div class="key-value-field type-field">
-                <label>{{ t('pages.licenses.form.keyValue.typeLabel') }}</label>
-                <el-select v-model="item.type" @change="handleEntryTypeChange(item)">
-                  <el-option
-                    v-for="type in typeOptions"
-                    :key="type"
-                    :label="t(`pages.licenses.form.keyValue.typeOptions.${type}`)"
-                    :value="type"
-                  />
-                </el-select>
-              </div>
-              <div class="key-value-field">
-                <label>{{ t('pages.licenses.form.keyValue.valueLabel') }}</label>
-                <template v-if="item.type === 'bool'">
-                  <el-select v-model="item.value" @change="item.valueError = ''">
-                    <el-option
-                      v-for="option in boolOptions"
-                      :key="option.value"
-                      :label="option.label"
-                      :value="option.value"
-                    />
-                  </el-select>
-                </template>
-                <el-input
-                  v-else
-                  v-model="item.value"
-                  :placeholder="t('pages.licenses.form.keyValue.valuePlaceholder')"
-                  @input="item.valueError = ''"
-                  :inputmode="item.type === 'number' ? 'decimal' : 'text'"
-                />
-                <p v-if="item.valueError" class="key-value-error">{{ item.valueError }}</p>
-              </div>
-              <el-button link type="danger" @click="removeCustomEntry(index)">
-                {{ t('pages.licenses.form.keyValue.remove') }}
-              </el-button>
-            </div>
-
-            <div v-if="!customEntries.length" class="key-value-empty">
-              {{ t('pages.licenses.form.keyValue.emptyState') }}
-            </div>
-          </div>
-
-          <div class="key-value-preview">
-            <div class="key-value-preview-label">
-              {{ t('pages.licenses.form.keyValue.preview') }}
-            </div>
-            <el-input type="textarea" :rows="3" :model-value="customJsonPreview" readonly />
-          </div>
+          <h3 class="section-title">{{ t('pages.licenses.form.sections.customParameters') }}</h3>
+          <JsonEditor ref="customParamsRef" v-model="customParamsData" />
         </div>
       </el-form>
     </div>
   </div>
-
-  <el-dialog
-    v-model="importDialogVisible"
-    :title="importDialogTitle"
-    width="520px"
-    destroy-on-close
-  >
-    <p class="import-dialog-tip">
-      {{ t('pages.licenses.form.keyValue.importDescription') }}
-    </p>
-    <el-input
-      v-model="importDialogContent"
-      type="textarea"
-      :rows="8"
-      :placeholder="t('pages.licenses.form.keyValue.importPlaceholder')"
-    />
-    <p v-if="importDialogError" class="key-value-error import-error">{{ importDialogError }}</p>
-    <template #footer>
-      <el-button @click="importDialogVisible = false">
-        {{ t('pages.licenses.form.keyValue.importCancel') }}
-      </el-button>
-      <el-button type="primary" @click="handleImportConfirm">
-        {{ t('pages.licenses.form.keyValue.importConfirm') }}
-      </el-button>
-    </template>
-  </el-dialog>
 </template>
 
 <script setup lang="ts">
@@ -519,58 +248,34 @@ import {
 } from '@/api/license'
 import { getCustomers, type Customer } from '@/api/customer'
 import { getEnumOptions, type RawEnumItem } from '@/api/enum'
-
-type KeyValueType = 'string' | 'number' | 'bool'
-
-interface KeyValueItem {
-  id: string
-  key: string
-  value: string
-  type: KeyValueType
-  keyError?: string
-  valueError?: string
-}
-
-const KEY_PATTERN = /^[a-z0-9-]{1,32}$/
+import JsonEditor from '@/components/common/JsonEditor.vue'
 
 const router = useRouter()
 const route = useRoute()
 const { t } = useI18n()
-const boolOptions = computed(() => [
-  { label: t('pages.licenses.form.keyValue.booleanTrue'), value: 'true' },
-  { label: t('pages.licenses.form.keyValue.booleanFalse'), value: 'false' }
-])
 
 // 表单引用
 const formRef = ref<FormInstance>()
+
+// JsonEditor 组件引用
+const featureConfigRef = ref<InstanceType<typeof JsonEditor>>()
+const usageLimitsRef = ref<InstanceType<typeof JsonEditor>>()
+const customParamsRef = ref<InstanceType<typeof JsonEditor>>()
 
 // 响应式数据
 const submitting = ref(false)
 const customerLoading = ref(false)
 const customerOptions = ref<Customer[]>([])
 
-const featureConfigEntries = ref<KeyValueItem[]>([])
-const limitEntries = ref<KeyValueItem[]>([])
-const customEntries = ref<KeyValueItem[]>([])
-const importDialogVisible = ref(false)
-const importDialogTarget = ref<'feature' | 'limit' | 'custom'>('feature')
-const importDialogTitle = computed(() => {
-  if (importDialogTarget.value === 'limit') {
-    return t('pages.licenses.form.keyValue.importTitleLimit')
-  }
-  if (importDialogTarget.value === 'custom') {
-    return t('pages.licenses.form.keyValue.importTitleCustom')
-  }
-  return t('pages.licenses.form.keyValue.importTitleFeature')
-})
-const importDialogContent = ref('')
-const importDialogError = ref('')
+// JsonEditor 数据
+const featureConfigData = ref<Record<string, any> | null>(null)
+const usageLimitsData = ref<Record<string, any> | null>(null)
+const customParamsData = ref<Record<string, any> | null>(null)
 
 // 枚举选项
 const deploymentTypeOptions = ref<RawEnumItem[]>([])
 const encryptionTypeOptions = ref<RawEnumItem[]>([])
 
-const typeOptions: KeyValueType[] = ['string', 'number', 'bool']
 // 表单数据
 const formData = reactive<
   AuthorizationCodeCreateRequest & {
@@ -593,10 +298,6 @@ const formData = reactive<
 
 // 独立的响应式变量
 const dateRange = ref<[string, string] | null>(null)
-
-const featureConfigPreview = computed(() => buildJsonString(featureConfigEntries.value))
-const usageJsonPreview = computed(() => buildJsonString(limitEntries.value))
-const customJsonPreview = computed(() => buildJsonString(customEntries.value))
 
 // 计算属性
 const isEdit = computed(() => {
@@ -742,277 +443,6 @@ const formRules: FormRules = {
       trigger: 'blur'
     }
   ]
-}
-
-const createEntryId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-
-const createEmptyEntry = (): KeyValueItem => ({
-  id: createEntryId(),
-  key: '',
-  value: '',
-  type: 'string',
-  keyError: '',
-  valueError: ''
-})
-
-const convertValueByType = (value: string, type: KeyValueType) => {
-  if (type === 'number') {
-    const num = Number(value)
-    if (Number.isNaN(num)) {
-      throw new Error('invalid number')
-    }
-    return num
-  }
-  if (type === 'bool') {
-    return value === 'true'
-  }
-  return value
-}
-
-const buildJsonRecord = (entries: KeyValueItem[]) => {
-  if (!entries.length) {
-    return null
-  }
-  const result: Record<string, string | number | boolean> = {}
-  entries.forEach(item => {
-    const trimmedKey = item.key.trim()
-    if (trimmedKey) {
-      try {
-        result[trimmedKey] = convertValueByType(item.value, item.type)
-      } catch {
-        // 如果转换失败，则忽略该条目，等待校验提示
-      }
-    }
-  })
-  return Object.keys(result).length ? result : null
-}
-
-const buildJsonString = (entries: KeyValueItem[]) => {
-  const record = buildJsonRecord(entries)
-  return record ? JSON.stringify(record) : ''
-}
-
-const addFeatureConfigEntry = () => {
-  featureConfigEntries.value.push(createEmptyEntry())
-}
-
-const addLimitEntry = () => {
-  limitEntries.value.push(createEmptyEntry())
-}
-
-const addCustomEntry = () => {
-  customEntries.value.push(createEmptyEntry())
-}
-
-const removeFeatureConfigEntry = (index: number) => {
-  featureConfigEntries.value.splice(index, 1)
-}
-
-const removeLimitEntry = (index: number) => {
-  limitEntries.value.splice(index, 1)
-}
-
-const removeCustomEntry = (index: number) => {
-  customEntries.value.splice(index, 1)
-}
-
-const clearFeatureConfigEntries = () => {
-  featureConfigEntries.value = []
-}
-
-const clearLimitEntries = () => {
-  limitEntries.value = []
-}
-
-const clearCustomEntries = () => {
-  customEntries.value = []
-}
-
-const handleEntryTypeChange = (entry: KeyValueItem) => {
-  if (entry.type === 'bool') {
-    entry.value = entry.value === 'false' ? 'false' : 'true'
-  } else if (entry.type === 'number') {
-    if (entry.value && Number.isNaN(Number(entry.value))) {
-      entry.value = ''
-    }
-  }
-  entry.valueError = ''
-}
-
-const fallbackCopy = (value: string) => {
-  if (typeof document === 'undefined') {
-    throw new Error('document is not available')
-  }
-  const textarea = document.createElement('textarea')
-  textarea.value = value
-  textarea.style.position = 'fixed'
-  textarea.style.opacity = '0'
-  document.body.appendChild(textarea)
-  textarea.focus()
-  textarea.select()
-  document.execCommand('copy')
-  document.body.removeChild(textarea)
-}
-
-const copyJson = async (value: string) => {
-  if (!value) {
-    ElMessage.info(t('pages.licenses.form.keyValue.copyEmpty'))
-    return
-  }
-  try {
-    if (navigator?.clipboard?.writeText) {
-      await navigator.clipboard.writeText(value)
-    } else {
-      fallbackCopy(value)
-    }
-    ElMessage.success(t('pages.licenses.form.keyValue.copySuccess'))
-  } catch (error) {
-    console.error('复制JSON失败:', error)
-    ElMessage.error(t('pages.licenses.form.keyValue.copyError'))
-  }
-}
-
-const validateKeyValueEntries = (entries: KeyValueItem[]) => {
-  let isValid = true
-  const existingKeys = new Set<string>()
-
-  entries.forEach(item => {
-    item.keyError = ''
-    item.valueError = ''
-
-    const trimmedKey = item.key.trim()
-    if (!trimmedKey) {
-      item.keyError = t('pages.licenses.form.keyValue.keyRequired')
-      isValid = false
-    } else if (!KEY_PATTERN.test(trimmedKey)) {
-      item.keyError = t('pages.licenses.form.keyValue.keyFormat')
-      isValid = false
-    } else if (existingKeys.has(trimmedKey)) {
-      item.keyError = t('pages.licenses.form.keyValue.keyDuplicate')
-      isValid = false
-    } else {
-      existingKeys.add(trimmedKey)
-    }
-
-    if (item.value.trim() === '') {
-      item.valueError = t('pages.licenses.form.keyValue.valueRequired')
-      isValid = false
-    } else if (item.type === 'number') {
-      const num = Number(item.value)
-      if (Number.isNaN(num)) {
-        item.valueError = t('pages.licenses.form.keyValue.numberRequired')
-        isValid = false
-      }
-    } else if (item.type === 'bool') {
-      if (item.value !== 'true' && item.value !== 'false') {
-        item.valueError = t('pages.licenses.form.keyValue.boolRequired')
-        isValid = false
-      }
-    }
-  })
-
-  return isValid
-}
-
-const openImportDialog = (target: 'feature' | 'limit' | 'custom') => {
-  importDialogTarget.value = target
-  importDialogContent.value =
-    target === 'feature'
-      ? featureConfigPreview.value
-      : target === 'limit'
-        ? usageJsonPreview.value
-        : customJsonPreview.value
-  importDialogError.value = ''
-  importDialogVisible.value = true
-}
-
-const handleImportConfirm = () => {
-  importDialogError.value = ''
-  try {
-    const content = importDialogContent.value.trim()
-    if (!content) {
-      if (importDialogTarget.value === 'feature') {
-        featureConfigEntries.value = []
-      } else if (importDialogTarget.value === 'limit') {
-        limitEntries.value = []
-      } else {
-        customEntries.value = []
-      }
-    } else {
-      const entries = parseJsonToEntries(content, { strict: true })
-      if (!entries.length) {
-        throw new Error(t('pages.licenses.form.keyValue.importEmpty'))
-      }
-      if (importDialogTarget.value === 'feature') {
-        featureConfigEntries.value = entries
-      } else if (importDialogTarget.value === 'limit') {
-        limitEntries.value = entries
-      } else {
-        customEntries.value = entries
-      }
-    }
-    importDialogVisible.value = false
-    ElMessage.success(t('pages.licenses.form.keyValue.importSuccess'))
-  } catch (error: any) {
-    importDialogError.value =
-      error?.message || t('pages.licenses.form.keyValue.importFailed')
-  }
-}
-
-const mapObjectToEntries = (data: Record<string, any>): KeyValueItem[] => {
-  return Object.entries(data).map(([key, value]) => {
-    let type: KeyValueType = 'string'
-    let normalizedValue = ''
-    if (typeof value === 'number') {
-      type = 'number'
-      normalizedValue = String(value)
-    } else if (typeof value === 'boolean') {
-      type = 'bool'
-      normalizedValue = value ? 'true' : 'false'
-    } else {
-      normalizedValue = value === undefined || value === null ? '' : String(value)
-    }
-
-    return {
-      id: createEntryId(),
-      key,
-      value: normalizedValue,
-      type,
-      keyError: '',
-      valueError: ''
-    }
-  })
-}
-
-const parseJsonToEntries = (raw: unknown, options?: { strict?: boolean }): KeyValueItem[] => {
-  if (!raw) return []
-
-  let parsed: unknown = raw
-  if (typeof raw === 'string') {
-    if (!raw.trim()) return []
-    try {
-      parsed = JSON.parse(raw)
-    } catch (error) {
-      if (options?.strict) {
-        throw error
-      }
-      console.warn('解析JSON失败:', error)
-      return []
-    }
-  }
-
-  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    if (options?.strict) {
-      throw new Error('JSON payload must be an object with key-value pairs')
-    }
-    return []
-  }
-
-  return mapObjectToEntries(parsed as Record<string, any>)
-}
-
-const hydrateEntriesFromField = (raw: unknown, target: Ref<KeyValueItem[]>) => {
-  target.value = parseJsonToEntries(raw)
 }
 
 // 方法
@@ -1201,9 +631,16 @@ const loadLicenseDetail = async () => {
         ]
       }
 
-      hydrateEntriesFromField(data.feature_config, featureConfigEntries)
-      hydrateEntriesFromField(data.usage_limits, limitEntries)
-      hydrateEntriesFromField(data.custom_parameters, customEntries)
+      // 使用 JsonEditor 加载数据
+      featureConfigData.value = typeof data.feature_config === 'string'
+        ? JSON.parse(data.feature_config || '{}')
+        : (data.feature_config || {})
+      usageLimitsData.value = typeof data.usage_limits === 'string'
+        ? JSON.parse(data.usage_limits || '{}')
+        : (data.usage_limits || {})
+      customParamsData.value = typeof data.custom_parameters === 'string'
+        ? JSON.parse(data.custom_parameters || '{}')
+        : (data.custom_parameters || {})
     } else {
       throw new Error(response.message || t('pages.licenses.form.messages.loadDetailError'))
     }
@@ -1226,17 +663,18 @@ const handleSubmit = async () => {
     // 执行表单验证
     await formRef.value.validate()
 
-    const featureConfigValid = validateKeyValueEntries(featureConfigEntries.value)
-    const limitValid = validateKeyValueEntries(limitEntries.value)
-    const customValid = validateKeyValueEntries(customEntries.value)
-    if (!featureConfigValid || !limitValid || !customValid) {
+    // 验证 JsonEditor 数据
+    const featureValid = featureConfigRef.value?.validate() ?? true
+    const limitValid = usageLimitsRef.value?.validate() ?? true
+    const customValid = customParamsRef.value?.validate() ?? true
+    if (!featureValid || !limitValid || !customValid) {
       ElMessage.error(t('pages.licenses.form.keyValue.validationFailed'))
       return
     }
 
-    formData.feature_config = buildJsonRecord(featureConfigEntries.value) || {}
-    formData.usage_limits = usageJsonPreview.value
-    formData.custom_parameters = customJsonPreview.value
+    formData.feature_config = featureConfigData.value || {}
+    formData.usage_limits = JSON.stringify(usageLimitsData.value || {})
+    formData.custom_parameters = JSON.stringify(customParamsData.value || {})
 
     submitting.value = true
 
@@ -1323,30 +761,6 @@ watch(
       formData.customer_code = ''
     }
   }
-)
-
-watch(
-  limitEntries,
-  () => {
-    formData.usage_limits = usageJsonPreview.value
-  },
-  { deep: true }
-)
-
-watch(
-  featureConfigEntries,
-  () => {
-    formData.feature_config = buildJsonRecord(featureConfigEntries.value) || {}
-  },
-  { deep: true }
-)
-
-watch(
-  customEntries,
-  () => {
-    formData.custom_parameters = customJsonPreview.value
-  },
-  { deep: true }
 )
 
 // 生命周期
