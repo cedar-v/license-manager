@@ -235,7 +235,6 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, watch } from 'vue'
-import type { Ref } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
