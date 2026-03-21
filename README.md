@@ -29,11 +29,11 @@
 ✨同时支持**任何开发语言**、**任何类型的软件产品**通过标准化 **HTTP API** 与**跨平台客户端 SDK** **快速集成授权能力**。
 
 ## Demo环境
-  <a href="https://lm.cedar-v.com:18080">
+  <a href="http://lm.cedar-v.com">
     <img src="https://img.shields.io/badge/Demo-Online-success?logo=googlechrome" alt="Live Demo">
   </a>
 
-访问地址：[lm.cedar-v.com:18080](http://lm.cedar-v.com:18080)  
+访问地址：[lm.cedar-v.com](http://lm.cedar-v.com)  
 **登录凭证：**  
 - 用户名：`admin`  
 - 密码：`admin@123`
