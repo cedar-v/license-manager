@@ -334,9 +334,9 @@ const handleImportConfirm = () => {
   }
 }
 
-// 节点更新
+// 节点更新（子节点输入 key/value 等时同步到 v-model）
 const handleNodeUpdate = () => {
-  // 自动触发表单更新
+  emitUpdate()
 }
 
 // 节点删除
@@ -364,6 +364,7 @@ const handleAddChild = (parentId: string) => {
     return false
   }
   findAndAdd(nodes.value)
+  emitUpdate()
 }
 
 // 切换展开
@@ -435,20 +436,27 @@ defineExpose({
   setValue: initializeNodes
 })
 
-// 监听 modelValue 变化（仅用于初始化）
+// 内部 emit 时跳过 modelValue 回灌，否则 buildJsonData 会丢掉「空 key」占位行，
+// watch 再 initializeNodes 会把刚添加的行立刻清掉（表现为「添加字段」无效）。
+const skipModelSync = ref(false)
+
 watch(
   () => props.modelValue,
   (newValue) => {
+    if (skipModelSync.value) return
     initializeNodes(newValue)
   },
   { immediate: true }
 )
 
-// 手动触发更新的方法（供内部操作调用）
 const emitUpdate = () => {
   nextTick(() => {
+    skipModelSync.value = true
     const newValue = buildJsonData(nodes.value)
     emit('update:modelValue', newValue)
+    nextTick(() => {
+      skipModelSync.value = false
+    })
   })
 }
 </script>

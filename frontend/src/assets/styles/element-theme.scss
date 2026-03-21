@@ -6,19 +6,23 @@
   border-radius: $border-radius-base;
   transition: all 0.3s ease;
 
-  &--primary {
+  // 仅「实心」主按钮用品牌色填充；plain / link / text 仍走 EP 默认（避免 plain 被铺成深底+主色字，对比度崩溃）
+  &--primary:not(.is-plain):not(.is-link):not(.is-text) {
     background-color: $primary-color;
     border-color: $primary-color;
-    
+    color: #ffffff;
+
     &:hover,
     &:focus {
       background-color: color.adjust($primary-color, $lightness: 10%);
       border-color: color.adjust($primary-color, $lightness: 10%);
+      color: #ffffff;
     }
-    
+
     &:active {
       background-color: color.adjust($primary-color, $lightness: -10%);
       border-color: color.adjust($primary-color, $lightness: -10%);
+      color: #ffffff;
     }
   }
 

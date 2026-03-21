@@ -22,7 +22,7 @@
           v-model="node.key"
           :placeholder="t('jsonEditor.keyPlaceholder')"
           size="small"
-          @input="node.keyError = ''"
+          @input="onKeyInput"
         />
         <p v-if="node.keyError" class="node-error">{{ node.keyError }}</p>
       </div>
@@ -50,6 +50,7 @@
           v-if="node.type === 'boolean'"
           v-model="node.value"
           size="small"
+          @change="emit('update')"
         >
           <el-option :label="'true'" value="true" />
           <el-option :label="'false'" value="false" />
@@ -70,7 +71,7 @@
           :placeholder="t('jsonEditor.valuePlaceholder')"
           size="small"
           type="number"
-          @input="node.valueError = ''"
+          @input="onNumberInput"
         />
 
         <!-- 字符串类型 -->
@@ -79,27 +80,27 @@
           v-model="node.value"
           :placeholder="t('jsonEditor.valuePlaceholder')"
           size="small"
-          @input="node.valueError = ''"
+          @input="onStringValueInput"
         />
         <p v-if="node.valueError" class="node-error">{{ node.valueError }}</p>
       </div>
 
-      <!-- 操作按钮 -->
+      <!-- 操作按钮：根级任意类型都显示删除（原先仅 depth>0 或 根级数组 才有，导致多余行无法删） -->
       <div class="node-actions">
         <el-button
           v-if="isContainer"
-          link
           type="primary"
           size="small"
+          class="add-child-btn"
           @click="$emit('add-child', node.id)"
         >
           {{ t('jsonEditor.addChild') }}
         </el-button>
         <el-button
-          v-if="depth > 0 || node.type === 'array'"
           link
           type="danger"
           size="small"
+          class="remove-btn"
           @click="$emit('delete')"
         >
           {{ t('jsonEditor.remove') }}
@@ -150,6 +151,21 @@ const { t } = useI18n()
 const typeOptions: JsonValueType[] = ['string', 'number', 'boolean', 'object', 'array']
 
 const isContainer = computed(() => props.node.type === 'object' || props.node.type === 'array')
+
+const onKeyInput = () => {
+  props.node.keyError = ''
+  emit('update')
+}
+
+const onNumberInput = () => {
+  props.node.valueError = ''
+  emit('update')
+}
+
+const onStringValueInput = () => {
+  props.node.valueError = ''
+  emit('update')
+}
 
 const handleTypeChange = (newType: JsonValueType) => {
   // 清空 children 如果切换到非容器类型
@@ -235,8 +251,18 @@ const removeChild = (index: number) => {
 
 .node-actions {
   display: flex;
-  gap: 4px;
+  align-items: center;
+  gap: 8px;
   flex-shrink: 0;
+}
+
+/* 实心主色 + 白字由全局 element-theme 保证；此处仅做字重 */
+.add-child-btn {
+  font-weight: 500;
+}
+
+.remove-btn {
+  font-weight: 500;
 }
 
 .node-error {
