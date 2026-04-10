@@ -19,6 +19,7 @@ database:
   auto_migrate: true # 是否自动迁移数据库
 
 auth:
+  admin_password: "admin@123"
   jwt:
     secret: "license-manager-dev-secret-key-32-bytes" # 32字节的随机字符串
     expire_hours: 1 # 1小时后过期
