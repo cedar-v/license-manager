@@ -19,6 +19,7 @@ database:
   auto_migrate: true
 
 auth:
+  admin_password: "admin@123"
   jwt:
     secret: "license-manager-dev-secret-key-32-bytes"
     expire_hours: 1

@@ -118,18 +118,22 @@ func createCuUserIndexes() error {
 // initDefaultAdminUser 初始化默认管理员用户
 func initDefaultAdminUser() error {
 	var user models.User
-	result := DB.Where("username = ?", "admin").First(&user)
-
+	cfg := config.GetConfig()
+	if cfg == nil {
+		return fmt.Errorf("config not initialized")
+	}
+	passwordHash, err := utils.HashPassword(cfg.Auth.AdminPassword)
+	if err != nil {
+		return fmt.Errorf("failed to hash password: %w", err)
+	}
+	adminUsername := "admin"
+	adminEmail := "admin@example.com"
+	result := DB.Where("username = ?", adminUsername).First(&user)
 	if result.Error != nil {
 		// 用户不存在，创建默认管理员
-		passwordHash, err := utils.HashPassword("admin@123")
-		if err != nil {
-			return fmt.Errorf("failed to hash password: %w", err)
-		}
-
 		user = models.User{
-			Username:     "admin",
-			Email:        "admin@example.com",
+			Username:     adminUsername,
+			Email:        adminEmail,
 			PasswordHash: passwordHash,
 			FullName:     "系统管理员",
 			Role:         "admin",
@@ -142,7 +146,12 @@ func initDefaultAdminUser() error {
 
 		log.Println("Created default admin user: admin / admin@123")
 	} else {
-		log.Println("Default admin user already exists")
+		log.Println("Default admin user already exists, will update password only")
+		user.PasswordHash = passwordHash
+		if err := DB.Save(&user).Error; err != nil {
+			return fmt.Errorf("failed to update default admin user password: %w", err)
+		}
+		log.Println("Updated default admin user password")
 	}
 
 	return nil

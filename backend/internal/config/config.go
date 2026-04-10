@@ -43,9 +43,10 @@ type DatabaseConfig struct {
 }
 
 type AuthConfig struct {
-	JWT      JWTConfig      `mapstructure:"jwt"`
-	CuJWT    CuJWTConfig    `mapstructure:"cu_jwt"` // 客户用户JWT配置
-	Security SecurityConfig `mapstructure:"security"`
+	JWT           JWTConfig      `mapstructure:"jwt"`
+	CuJWT         CuJWTConfig    `mapstructure:"cu_jwt"` // 客户用户JWT配置
+	Security      SecurityConfig `mapstructure:"security"`
+	AdminPassword string         `mapstructure:"admin_password"`
 }
 
 type JWTConfig struct {
@@ -211,6 +212,7 @@ func setDefaults() {
 	viper.SetDefault("database.auto_migrate", true)
 
 	// Auth defaults
+	viper.SetDefault("auth.admin_password", "admin@123")
 	viper.SetDefault("auth.jwt.secret", "license-manager-default-secret-key")
 	viper.SetDefault("auth.jwt.expire_hours", 1)
 	viper.SetDefault("auth.jwt.refresh_threshold_minutes", 30)

@@ -19,6 +19,7 @@ database:
   auto_migrate: true
 
 auth:
+  admin_password: "admin@123"
   jwt:
     secret: "please-change-in-prod"
     expire_hours: 1
